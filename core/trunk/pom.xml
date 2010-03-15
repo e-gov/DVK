@@ -5,9 +5,7 @@
   <packaging>jar</packaging>
   <name>dvk-core</name>
   <version>1.6.0</version>
-  
-  
-  
+    
   <dependencies>
 	  <dependency>
 	  	<groupId>axis</groupId>

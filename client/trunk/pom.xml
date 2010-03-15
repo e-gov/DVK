@@ -8,7 +8,7 @@
   
   <!-- Properties -->
   <properties>
-  	<dvkCoreDir>C:\development\ws\dvkclean\core</dvkCoreDir>
+  	<dvkCoreDir>C:\development\ws\dvkria\core</dvkCoreDir>
   </properties>
   
   <!-- Dependencies -->

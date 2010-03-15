@@ -772,8 +772,8 @@ begin
         into    Get_DhlMessageID.dhl_message_id
         from    dhl_message_recipient
         where   dhl_id = Get_DhlMessageID.dhl_id
-                and nvl(producer_name,'') = nvl(Get_DhlMessageID.producer_name,'')
-                and nvl(service_url,'') = nvl(Get_DhlMessageID.service_url,'');
+                and nvl(producer_name,' ') = nvl(Get_DhlMessageID.producer_name,' ')
+                and nvl(service_url,' ') = nvl(Get_DhlMessageID.service_url,' ');
     else
         select  count(*)
         into    cnt

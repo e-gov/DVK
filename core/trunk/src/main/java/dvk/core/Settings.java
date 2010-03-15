@@ -50,7 +50,7 @@ public class Settings {
     public static boolean Server_ValidateXmlFiles = false;
     public static boolean Server_ValidateSignatures = false;
     
-    // Üldkasutatavad seaded
+    // ï¿½ldkasutatavad seaded
     public static boolean LogErrors = false;
     public static String ErrorLogFile = "error_log.txt";
     public static String PerformanceLogFile = "";
@@ -161,7 +161,7 @@ public class Settings {
                 Client_SentMessageStatusFollowupDays = 30;
             }
             
-            // Kliendi poolelt saadetav säilitustähtaeg
+            // Kliendi poolelt saadetav sï¿½ilitustï¿½htaeg
             try {
                 if (currentProperties.getProperty("client_sent_message_lifetime_days") != null) {
                    Client_SentMessageDefaultLifetime = Integer.parseInt(currentProperties.getProperty("client_sent_message_lifetime_days"));
@@ -208,7 +208,7 @@ public class Settings {
                 Server_DatabaseEnvironmentVariable = currentProperties.getProperty("server_database_environment_variable");
             }
             
-            // Dokumendi vaikimisi säilitustähtaeg serveris
+            // Dokumendi vaikimisi sï¿½ilitustï¿½htaeg serveris
             try {
                 if (currentProperties.getProperty("server_document_default_lifetime") != null) {
                     Server_DocumentDefaultLifetime = Integer.parseInt(currentProperties.getProperty("server_document_default_lifetime"));
@@ -260,7 +260,7 @@ public class Settings {
             }
             
             
-            // Õiguste haldamise kesksüsteemi kasutamine
+            // ï¿½iguste haldamise kesksï¿½steemi kasutamine
             if ((currentProperties.getProperty("server_use_central_rights_database") != null) &&
                 (currentProperties.getProperty("server_use_central_rights_database").equalsIgnoreCase("yes") ||
                 currentProperties.getProperty("server_use_central_rights_database").equalsIgnoreCase("true") ||
@@ -294,7 +294,7 @@ public class Settings {
             }
             
             
-            // Üldkasutatavad seaded
+            // ï¿½ldkasutatavad seaded
             if ((currentProperties.getProperty("log_errors") != null) &&
                 (currentProperties.getProperty("log_errors").equalsIgnoreCase("yes") ||
                 currentProperties.getProperty("log_errors").equalsIgnoreCase("true") ||

@@ -1,0 +1,6 @@
+Recently I had a requirement to sort an XML document based on the tag names in the document.
+You can sort it using XSLT, but this post tells you how to sort the XML nodes through Java.
+
+Lets extend the com.sun.org.apache.xerces.internal.util.DOMUtil or org.apache.xerces.internal.util.DOMUtil class which has some basic utility methods. And I'm going to extend it by adding a method called sortChildNodes() .
+
+This method sorts the children of the given node in descending or ascending order with the given Comparator. And it recurses upto the specified depth if available.

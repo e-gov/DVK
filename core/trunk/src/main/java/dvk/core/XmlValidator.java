@@ -23,8 +23,8 @@ public class XmlValidator extends DefaultHandler {
     }
     
     public static ArrayList<String> Validate(String fileName) throws Exception {
-        // Kontrollime, et valideerimiseks antud faili nimi ei oleks määramata
-        // ja et etteantud fail üldse eksisteeriks
+        // Kontrollime, et valideerimiseks antud faili nimi ei oleks mÃ¤Ã¤ramata
+        // ja et etteantud fail Ã¼ldse eksisteeriks
         if ((fileName == null) || (fileName.length() < 1)) {
             throw new Exception("DVK tarkvaraline viga: Valideeritava XML faili nimi on maaramata!");
         }
@@ -67,7 +67,7 @@ public class XmlValidator extends DefaultHandler {
     }
 
     public void error(SAXParseException e) throws SAXParseException {
-        // Üritame vältida viitamata või vigaselt viidatud XSD failist
+        // Ã¼ritame vÃ¤ltida viitamata vÃµi vigaselt viidatud XSD failist
         // tingitud vigade sattumist vigade nimekirja.
         if (e.getMessage().indexOf("Cannot find the declaration of element") < 0) {
             m_errors.add(e.getMessage());

@@ -58,9 +58,9 @@ public class CommonMethods {
 	static Logger logger = Logger.getLogger(CommonMethods.class.getName());
 	
 	/**
-	 * Genereerib operatsioonis�steemi ajutiste failide kataloogi uue unikaalse nimega ajutise faili.
+	 * Genereerib operatsioonisüsteemi ajutiste failide kataloogi uue unikaalse nimega ajutise faili.
 	 * 
-	 * @param itemIndex		Faili j�rjekorranumber. V�imaldab vajadusel eristada n�iteks ts�klis loodud ajutisi faile.
+	 * @param itemIndex		Faili järjekorranumber. Võimaldab vajadusel eristada näiteks tsüklis loodud ajutisi faile.
 	 * @return				Faili nimi (absolute path)
 	 */
 	public static String createPipelineFile(int itemIndex) {
@@ -68,10 +68,10 @@ public class CommonMethods {
 	}
 	
 	/**
-	 * Genereerib operatsioonis�steemi ajutiste failide kataloogi uue unikaalse nimega ajutise faili.
+	 * Genereerib operatsioonisüsteemi ajutiste failide kataloogi uue unikaalse nimega ajutise faili.
 	 * 
-	 * @param itemIndex		Faili j�rjekorranumber. V�imaldab vajadusel eristada n�iteks ts�klis loodud ajutisi faile.
-	 * @param extension		Faililaiend. V�imaldab ajutisele failile vajadusel ka faililaiendi anda. 
+	 * @param itemIndex		Faili järjekorranumber. Võimaldab vajadusel eristada näiteks tsüklis loodud ajutisi faile.
+	 * @param extension		Faililaiend. Võimaldab ajutisele failile vajadusel ka faililaiendi anda. 
 	 * @return				Faili nimi (absolute path)
 	 */
     public static String createPipelineFile(int itemIndex, String extension) {
@@ -100,7 +100,7 @@ public class CommonMethods {
     }
     
     public static void deleteOldPipelineFiles(int maxFilesToDelete, boolean giveFeedbackOnConsole) {
-        // Kustutame �le 10 minuti vanused failid
+        // Kustutame üle 10 minuti vanused failid
         File tempPath = new File(System.getProperty("java.io.tmpdir", ""));
         if ((tempPath != null) && tempPath.exists() && tempPath.isDirectory()) {
             if (giveFeedbackOnConsole) {
@@ -183,13 +183,13 @@ public class CommonMethods {
                 out.write("</root>".getBytes("UTF-8"));
             }
 
-            // Paneme failid kinni, et saaks �learuse faili maha kustutada ja
-            // vajaliku �mber nimetada.
+            // Paneme failid kinni, et saaks ülearuse faili maha kustutada ja
+            // vajaliku ümber nimetada.
             safeCloseStream(in);
             safeCloseStream(sourceStream);
             safeCloseStream(out);
 
-            // Kustutame esialgse faili ja nimetame uue �mber nii,
+            // Kustutame esialgse faili ja nimetame uue ümber nii,
             // et see saaks vana asemele
             (new File(sourceFile)).delete();
             (new File(targetFile)).renameTo(new File(sourceFile));
@@ -243,7 +243,7 @@ public class CommonMethods {
         in.close();
         b64out.close();
 
-        // Kustutame vaheproduktideks olnud failid �ra
+        // Kustutame vaheproduktideks olnud failid ära
         (new File(zipOutFileName)).delete();
 
         return base64OutFileName;
@@ -372,7 +372,7 @@ public class CommonMethods {
         }
     }
 
-    // Meetod teisendab Java kuup�eva ISO 8601 kuup�evastringiks,
+    // Meetod teisendab Java kuupäeva ISO 8601 kuupäevastringiks,
     // mida saab kasutada XQuery ja XPath-iga.
     public static String getDateISO8601(Date date) {
         try {
@@ -493,8 +493,8 @@ public class CommonMethods {
 
     public static String getDataFromDataSource(DataSource source, String transferEncoding, String targetFile, boolean append) {
         try {
-            // V�ldime andmete korduvat lugemist ja arvutame andmete esmakordsel
-            // lugemisel �htlasi ka andmete MD5 kontrollsumma
+            // Väldime andmete korduvat lugemist ja arvutame andmete esmakordsel
+            // lugemisel ühtlasi ka andmete MD5 kontrollsumma
             MessageDigest md = MessageDigest.getInstance("MD5");
             InputStream dataStream = source.getInputStream();
             FileOutputStream outStream = new FileOutputStream(targetFile, append);
@@ -809,7 +809,7 @@ public class CommonMethods {
                     isTag = true;
                 }
 
-                // Kui asume keset l�put�hiseta TAGi, siis lisame s�mboli puhvrisse
+                // Kui asume keset lõputähiseta TAGi, siis lisame sümboli puhvrisse
                 if (isTag) {
                     ioBuffer += readBuffer[0];
                 } else {
@@ -844,7 +844,7 @@ public class CommonMethods {
                                 subWriter = new BufferedWriter(subOutWriter);
                                 subWriter.write(ioBuffer);
 
-                                // Kirjutame p�hifaili kommentaari, mille alusel me p�rast
+                                // Kirjutame põhifaili kommentaari, mille alusel me pärast
                                 // eraldatud TAGi tagasi saame panna.
                                 if (!noMainFile) {
                                     mainWriter.write("<!--DVK_SYS_INCLUDE_" + (new File(subFileName)).getName() + "-->");
@@ -864,7 +864,7 @@ public class CommonMethods {
                         // Puhvris on eraldatava TAGi algus
                         ++currentLevel;
 
-                        // Veendume, et tegemist on k�ige �lemise taseme algusega
+                        // Veendume, et tegemist on kõige ülemise taseme algusega
                         if (currentLevel == 1) {
                             isMainDocument = false;
                             if (!noSubFiles) {
@@ -879,7 +879,7 @@ public class CommonMethods {
                         if (!noSubFiles) {
                             subWriter.write(ioBuffer);
 
-                            // Kirjutame p�hifaili kommentaari, mille alusel me p�rast
+                            // Kirjutame põhifaili kommentaari, mille alusel me pärast
                             // eraldatud TAGi tagasi saame panna.
                             if (!noMainFile && (currentLevel == 1)) {
                                 mainWriter.write("<!--DVK_SYS_INCLUDE_" + (new File(subFileName)).getName() + "-->");
@@ -890,10 +890,10 @@ public class CommonMethods {
                     	dvkContainerVersion = 1;
                     	
                         if (!noSubFiles) {
-                            // Puhvris on eraldatava TAGi l�pp
+                            // Puhvris on eraldatava TAGi lõpp
                             subWriter.write(ioBuffer);
                         }
-                        // Veendume, et tegemist on k�ige �lemise taseme l�puga
+                        // Veendume, et tegemist on kõige ülemise taseme lõpuga
                         if (currentLevel == 1) {
                             if (!noSubFiles) {
                                 safeCloseWriter(subWriter);
@@ -933,7 +933,7 @@ public class CommonMethods {
             safeCloseWriter(subOutWriter);
             safeCloseStream(subOutStream);
 
-            // Nimetame failid �mber nii, et t��deldud fail asendaks algselt
+            // Nimetame failid ümber nii, et töödeldud fail asendaks algselt
             // ette antud faili.
             if (!noMainFile) {
                 if (replaceMain) {
@@ -1008,7 +1008,7 @@ public class CommonMethods {
                     isTag = true;
                 }
 
-                // Kui asume keset l�put�hiseta TAGi, siis lisame s�mboli puhvrisse
+                // Kui asume keset lõputähiseta TAGi, siis lisame sümboli puhvrisse
                 if (isTag) {
                     ioBuffer += readBuffer[0];
                 } else {
@@ -1044,7 +1044,7 @@ public class CommonMethods {
                 }
             }
 
-            // Paneme sisendfaili kinni, et saaks �learuse faili �ra kustutada
+            // Paneme sisendfaili kinni, et saaks ülearuse faili ära kustutada
             safeCloseReader(mainReader);
             safeCloseReader(mainInReader);
             safeCloseStream(mainInStream);
@@ -1315,7 +1315,7 @@ public class CommonMethods {
                 }
             }
             
-            // M�rgime antud DVK serveri s�numi vahendajaks
+            // Märgime antud DVK serveri sõnumi vahendajaks
             if (addProxy){
             	Element elProxy = currentXmlContent.createElementNS(dvkNamespace, defaultPrefix + ":vahendaja");
                 elProxy = CommonMethods.appendTextNode(currentXmlContent, elProxy, "regnr", Settings.Client_DefaultOrganizationCode, defaultPrefix, dvkNamespace);
@@ -1503,7 +1503,7 @@ public class CommonMethods {
     private static AttachmentExtractionResult getExtractedFileFromAttachmentPart(org.apache.axis.attachments.AttachmentPart attachmentPart) throws AxisFault {
     	AttachmentExtractionResult result = new AttachmentExtractionResult();
     	
-    	// Leiame s�numi kehas olnud viite alusels MIME lisast vajalikud andmed
+    	// Leiame sõnumi kehas olnud viite alusels MIME lisast vajalikud andmed
         if (attachmentPart == null) {
             throw new AxisFault( CommonStructures.VIGA_PUUDUV_MIME_LISA );
         }
@@ -1539,12 +1539,12 @@ public class CommonMethods {
     }
     
     /**
-     * Eraldab X-Tee p�ringu kehast elemendi <heha>, mis  tuleb vastuss�numi
-     * koosseisus hiljem p�ringu teostajale tagasi saata.
+     * Eraldab X-Tee päringu kehast elemendi <heha>, mis  tuleb vastussõnumi
+     * koosseisus hiljem päringu teostajale tagasi saata.
      * 
-     * @param context			Axis s�numi kontekst
-     * @param requestName		X-Tee p�ringu nimi (n�it. sendDocuments)
-     * @return					SOAP s�numi kehas asuv <keha> element.
+     * @param context			Axis sõnumi kontekst
+     * @param requestName		X-Tee päringu nimi (näit. sendDocuments)
+     * @return					SOAP sõnumi kehas asuv <keha> element.
      */
     public static Element getXRoadRequestBodyElement(org.apache.axis.MessageContext context, String requestName) {
         Element result = null;

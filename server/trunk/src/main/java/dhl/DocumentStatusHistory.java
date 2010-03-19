@@ -14,6 +14,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import org.apache.log4j.Logger;
+import org.apache.xalan.xsltc.compiler.util.Type;
+
+import dhl.iostructures.XHeader;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import dvk.core.Fault;
@@ -162,37 +165,48 @@ public class DocumentStatusHistory {
     	this.m_occupationShortName = "";
     }
     
-    public int addToDB(Connection conn) throws SQLException, IllegalArgumentException {
+    public int addToDB(Connection conn, XHeader xTeePais) throws SQLException, IllegalArgumentException {
         if (conn != null) {
             Calendar cal = Calendar.getInstance();
-
             StringReader r = new StringReader(m_metaXML);
-            String sql = "BEGIN INSERT INTO staatuse_ajalugu(staatuse_ajalugu_id, vastuvotja_id, staatus_id, staatuse_muutmise_aeg, fault_code, fault_actor, fault_string, fault_detail, vastuvotja_staatus_id, metaxml) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING staatuse_ajalugu_id INTO ?; END;";
-            CallableStatement cs = conn.prepareCall(sql);
+            CallableStatement cs = conn.prepareCall("{call ADD_STAATUSE_AJALUGU(?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+            cs.registerOutParameter("staatuse_ajalugu_id_out", Types.INTEGER);
             
-            cs.setInt(1, m_id);
-            cs.setInt(2, m_recipientId);
-            cs.setInt(3, m_sendingStatusId);
-            cs.setTimestamp(4, CommonMethods.sqlDateFromDate(m_statusDate), cal);
+            cs.setInt("staatuse_ajalugu_id", m_id);
+            cs.setInt("vastuvotja_id", m_recipientId);
+            cs.setInt("staatus_id", m_sendingStatusId);
+            cs.setTimestamp("staatuse_muutmise_aeg", CommonMethods.sqlDateFromDate(m_statusDate), cal);
+            
             if (m_fault != null) {
-                cs.setString(5, CommonMethods.TruncateString(m_fault.getFaultCode(), 50));
-                cs.setString(6, CommonMethods.TruncateString(m_fault.getFaultActor(), 250));
-                cs.setString(7, CommonMethods.TruncateString(m_fault.getFaultString(), 500));
-                cs.setString(8, CommonMethods.TruncateString(m_fault.getFaultDetail(), 2000));
+                cs.setString("fault_code", CommonMethods.TruncateString(m_fault.getFaultCode(), 50));
+                cs.setString("fault_actor", CommonMethods.TruncateString(m_fault.getFaultActor(), 250));
+                cs.setString("fault_string", CommonMethods.TruncateString(m_fault.getFaultString(), 500));
+                cs.setString("fault_detail", CommonMethods.TruncateString(m_fault.getFaultDetail(), 2000));
             } else {
-                cs.setNull(5, Types.VARCHAR);
-                cs.setNull(6, Types.VARCHAR);
-                cs.setNull(7, Types.VARCHAR);
-                cs.setNull(8, Types.VARCHAR);
+                cs.setNull("fault_code", Types.VARCHAR);
+                cs.setNull("fault_actor", Types.VARCHAR);
+                cs.setNull("fault_string", Types.VARCHAR);
+                cs.setNull("fault_detail", Types.VARCHAR);
             }
-            cs = CommonMethods.setNullableIntParam(cs, 9, m_recipientStatusId);
-            cs.setCharacterStream(10, r, m_metaXML.length());
-            cs.registerOutParameter(11, Types.INTEGER);
+            
+            cs = CommonMethods.setNullableIntParam(cs, "vastuvotja_staatus_id", m_recipientStatusId);
+            
+            if(xTeePais != null) {
+            	cs.setString("xtee_isikukood", xTeePais.isikukood);
+                cs.setString("xtee_asutus", xTeePais.asutus);
+    		} else {
+    			cs.setString("xtee_isikukood", null);
+                cs.setString("xtee_asutus", null);
+    		}     
+            
+            cs.setCharacterStream("metaxml", r, m_metaXML.length());                  
+            
             cs.executeUpdate();
-            m_id = cs.getInt(11);
+            m_id = cs.getInt("staatuse_ajalugu_id_out");
             logger.debug("Added new history entry with ID: " + String.valueOf(m_id));
             cs.close();
-
+            
+            
             return m_id;
         } else {
         	throw new IllegalArgumentException("Database connection is NULL!");
@@ -272,7 +286,7 @@ public class DocumentStatusHistory {
         // Ajaloo kirje unikaalne ID
         xmlWriter.write("<staatuse_ajalugu_id>" + String.valueOf(m_id) + "</staatuse_ajalugu_id>");
         
-        // Staatuse kuup‰ev
+        // Staatuse kuup√µev
         xmlWriter.write("<staatuse_muutmise_aeg>" + CommonMethods.getDateISO8601(m_statusDate) + "</staatuse_muutmise_aeg>");
 
         // Staatuse kood
@@ -297,7 +311,7 @@ public class DocumentStatusHistory {
         	m_fault.appendObjectXML(xmlWriter);
         }
         
-        // Vastuvıtja saadetud staatus
+        // Vastuv√µtja saadetud staatus
         xmlWriter.write("<vastuvotja_staatus_id>" + String.valueOf(m_recipientStatusId) + "</vastuvotja_staatus_id>");
 
         // Vabas vormis metaandmed

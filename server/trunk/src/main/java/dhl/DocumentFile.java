@@ -128,7 +128,7 @@ public class DocumentFile {
 
             if (xmlReader.hasName()) {
                 if (xmlReader.getLocalName().equalsIgnoreCase("signeddoc") && xmlReader.isEndElement()) {
-                    // Kui oleme jõudnud faili ploki lõppu, siis katkestame tsükli
+                    // Kui oleme jÃµudnud faili ploki lÃµppu, siis katkestame tsÃµkli
                     break;
                 } else if (xmlReader.getLocalName().equalsIgnoreCase("datafile") && xmlReader.isStartElement()) {
                 	DocumentFile item = new DocumentFile();
@@ -202,10 +202,10 @@ public class DocumentFile {
 
             if (xmlReader.hasName()) {
                 if (xmlReader.getLocalName().equalsIgnoreCase("failid") && xmlReader.isEndElement()) {
-                    // Kui oleme jõudnud failide ploki lõppu, siis katkestame tsükli
+                    // Kui oleme jÃµudnud failide ploki lÃµppu, siis katkestame tsÃµkli
                     break;
                 } else if (xmlReader.getLocalName().equalsIgnoreCase("fail") && xmlReader.isEndElement()) {
-                	// Kui jõuame faili lõpuelemendi juurde, siis lisame andmetega täidetud faili
+                	// Kui jÃµuame faili lÃµpuelemendi juurde, siis lisame andmetega tÃµidetud faili
                 	// objekti failide nimekirja.
                 	if (item != null) {
 	                	boolean skipFile = true;
@@ -328,7 +328,7 @@ public class DocumentFile {
 						in = df.getBodyAsStream();
 						
 						if ((in != null) && (out != null)) {
-							// Siin ei tasu puhverdamist üritada, kuna JDigiDoc teek ei toeta seda.
+							// Siin ei tasu puhverdamist Ãµritada, kuna JDigiDoc teek ei toeta seda.
 				            while ((val = in.read()) >= 0) {
 				                out.write((byte) val);
 				            }
@@ -362,14 +362,14 @@ public class DocumentFile {
 					ddocFactory = ConfigManager.instance().getDigiDocFactory();
 				}
 			} catch (DigiDocException ex) {
-				throw new ComponentException("DigiDoc teegi initsialiseerimine ebaõnnestus!", ex);
+				throw new ComponentException("DigiDoc teegi initsialiseerimine ebaÃµnnestus!", ex);
 			}
 			
 			SignedDoc container = null;
 			try {
 				container = ddocFactory.readSignedDoc(this.m_localFileFullName);
 			} catch (DigiDocException ex) {
-				throw new ComponentException("DigiDoc faili avamine ebaõnnestus!", ex);
+				throw new ComponentException("DigiDoc faili avamine ebaÃµnnestus!", ex);
 			}
 			
 			if (container.countSignatures() > 0) {

@@ -44,12 +44,12 @@ public class markDocumentsReceivedV3RequestType {
 
                     	NodeList foundNodes = docRefNode.getElementsByTagName("item");
                         
-                    	// Kontrollime, et sisendis sisalduks v‰hemalt 1 dokumendi andmed
+                    	// Kontrollime, et sisendis sisalduks v√µhemalt 1 dokumendi andmed
                         if (foundNodes == null) {
-                            throw new AxisFault("Dokumentide nimekiri on t¸hi vıi vigase XML struktuuriga!");
+                            throw new AxisFault("Dokumentide nimekiri on t√µhi v√µi vigase XML struktuuriga!");
                         }
                         if (foundNodes.getLength() < 1) {
-                            throw new AxisFault("Dokumentide nimekiri on t¸hi vıi vigase XML struktuuriga!");
+                            throw new AxisFault("Dokumentide nimekiri on t√µhi v√µi vigase XML struktuuriga!");
                         }
                         for (int i = 0; i < foundNodes.getLength(); ++i) {
                         	markDocumentsReceivedV2Item item = markDocumentsReceivedV2Item.getFromXML((Element)foundNodes.item(i));

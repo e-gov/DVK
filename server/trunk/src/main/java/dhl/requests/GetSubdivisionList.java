@@ -25,7 +25,7 @@ public class GetSubdivisionList {
     	
     	getSubdivisionListResponseType result = new getSubdivisionListResponseType();
 
-        // Laeme p�ringu keha endale sobivasse andmestruktuuri
+        // Laeme põringu keha endale sobivasse andmestruktuuri
         getSubdivisionListRequestType bodyData = getSubdivisionListRequestType.getFromSOAPBody(context);
         result.paring = bodyData;
 
@@ -53,11 +53,11 @@ public class GetSubdivisionList {
     	
     	getSubdivisionListV2ResponseType result = new getSubdivisionListV2ResponseType();
 
-        // Laeme p�ringu keha endale sobivasse andmestruktuuri
+        // Laeme põringu keha endale sobivasse andmestruktuuri
         getSubdivisionListV2RequestType bodyData = getSubdivisionListV2RequestType.getFromSOAPBody(context);
         result.paring = bodyData;
 
-        // Laeme sisendparameetrid SOAP s�numi manuses asuvast XML failist
+        // Laeme sisendparameetrid SOAP sõnumi manuses asuvast XML failist
         AttachmentExtractionResult exResult = CommonMethods.getExtractedFileFromAttachment(context, bodyData.asutusedHref);
         result.dataMd5Hash = exResult.getAttachmentHash();
         bodyData.loadParametersFromXML(exResult.getExtractedFileName());

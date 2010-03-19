@@ -56,13 +56,13 @@ public class getSendingOptionsV3RequestType {
                     }
                     return result;
                 } else {
-                	throw new Exception("Vigane päringu getSendingOptions.V3 keha - puudub element \"parameetrid\".");
+                	throw new Exception("Vigane pÃµringu getSendingOptions.V3 keha - puudub element \"parameetrid\".");
                 }                
             } else {
-            	throw new Exception("Vigane päringu getSendingOptions.V3 keha - puudub element \"keha\".");
+            	throw new Exception("Vigane pÃµringu getSendingOptions.V3 keha - puudub element \"keha\".");
             }
         } else {
-        	throw new Exception("Vigane päringu getSendingOptions.V3 keha - puudub element \"getSendingOptions\".");
+        	throw new Exception("Vigane pÃµringu getSendingOptions.V3 keha - puudub element \"getSendingOptions\".");
         }
     }
     
@@ -86,7 +86,7 @@ public class getSendingOptionsV3RequestType {
                     }
                 }
                 
-                // Allüksuste nimekiri
+                // AllÃµksuste nimekiri
                 nodes = el.getElementsByTagName("allyksused");
                 if (nodes.getLength() > 0) {
                     Element el1 = (Element)nodes.item(0);
@@ -134,7 +134,7 @@ public class getSendingOptionsV3RequestType {
                     }
                 }
                 
-                // Ainult vastuvõtmist ootavate dokumentidega asutused
+                // Ainult vastuvÃµtmist ootavate dokumentidega asutused
                 nodes = el.getElementsByTagName("vastuvotmata_dokumente_ootel");
                 if (nodes.getLength() > 0) {
                 	Element el1 = (Element)nodes.item(0);
@@ -144,7 +144,7 @@ public class getSendingOptionsV3RequestType {
                     }
                 }
 
-                // Ainult asutused, kes on vahetanud vähemalt N dokumenti
+                // Ainult asutused, kes on vahetanud vÃµhemalt N dokumenti
                 nodes = el.getElementsByTagName("vahetatud_dokumente_vahemalt");
                 if (nodes.getLength() > 0) {
                 	Element el1 = (Element)nodes.item(0);

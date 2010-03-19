@@ -313,7 +313,7 @@ public class AmetikohaTaitmine {
             }
             
             // Kannamae keskregistrist saadud andmed kohaliku
-            // andmeobjekti külge
+            // andmeobjekti kÃµlge
             taitmine.setAmetikohtID(jobID);
             taitmine.setIsikID(isikID);
             taitmine.setAlates(aarTaitmine.getAlates());

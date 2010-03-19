@@ -443,7 +443,7 @@ public class Ametikoht {
                 return 0;
             }
             
-            // Allüksuse tuvastamine
+            // AllÃµksuse tuvastamine
             int allyksusID = 0;
             if (aarJob.getAllyksusID() > 0) {
                 Allyksus tmpAY = Allyksus.getByAarID(aarJob.getAllyksusID(), conn);
@@ -468,7 +468,7 @@ public class Ametikoht {
             }
             
             // Kannamae keskregistrist saadud andmed kohaliku
-            // andmeobjekti külge
+            // andmeobjekti kÃµlge
             job.setAsutusID(orgID);
             job.setNimetus(aarJob.getNimetus());
             job.setAlates(aarJob.getAlates());
@@ -483,7 +483,7 @@ public class Ametikoht {
             job.setAarID(aarJob.getAmetikohtID());
             int jobID = job.saveToDB(conn);
             
-            // Ametikoha täitmised
+            // Ametikoha tÃµitmised
             if ((aarJob.getTaitmised() != null) && (aarJob.getTaitmised().size() > 0)) {
                 AmetikohaTaitmine.syncListWithAar(aarJob.getTaitmised(), jobID, conn);
             }

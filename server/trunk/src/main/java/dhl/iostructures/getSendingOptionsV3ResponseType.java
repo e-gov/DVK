@@ -46,7 +46,7 @@ public class getSendingOptionsV3ResponseType implements SOAPOutputBodyRepresenta
             SOAPElement elHash = elParing.addChildElement("parameetrid");
             elHash.addTextNode(this.dataMd5Hash);
             
-            // Sõnumi keha osa
+            // SÃµnumi keha osa
             SOAPElement elKeha = element.addChildElement(se.createName("keha"));
             SOAPElement elDokument = elKeha.addChildElement(se.createName("asutused"));
             elDokument.addAttribute(se.createName("href"), "cid:" + asutusedHref);

@@ -163,7 +163,7 @@ public class AarAmetikoht {
 
                 if (xmlReader.hasName()) {
                     if (xmlReader.getLocalName().equalsIgnoreCase("ametikoht") && xmlReader.isEndElement()) {
-                        // Kui oleme jıudnud asutuse elemendi lıppu, siis katkestame ts¸kli
+                        // Kui oleme j√µudnud asutuse elemendi l√µppu, siis katkestame ts√µkli
                         break;
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("asutus_id") && xmlReader.isStartElement()) {
                         xmlReader.next();
@@ -257,7 +257,7 @@ public class AarAmetikoht {
                 }
             }
 
-            // Kui ¸hegi kontrolli taha pidama ei j‰‰nud, siis tagastame v‰‰rtuse
+            // Kui √µhegi kontrolli taha pidama ei j√µ√µnud, siis tagastame v√µ√µrtuse
             return result;
         } catch (XMLStreamException ex) {
             throw new AxisFault("Exception parsing AAR message organization data section: " + ex.getMessage());

@@ -1,5 +1,6 @@
 package dhl;
 
+import dhl.iostructures.XHeader;
 import dhl.users.Allyksus;
 import dhl.users.Ametikoht;
 import dhl.users.Asutus;
@@ -219,9 +220,9 @@ public class Sender
         }
     }
 
-    public int addToDB(Connection conn) throws IllegalArgumentException, SQLException {
+    public int addToDB(Connection conn, XHeader xTeePais) throws IllegalArgumentException, SQLException {
         if (conn != null) {
-            CallableStatement cs = conn.prepareCall("{call ADD_SENDER(?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+            CallableStatement cs = conn.prepareCall("{call ADD_SENDER(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
             cs.registerOutParameter("sender_id", Types.INTEGER);
             cs.setInt("sending_id", m_sendingID);
             cs.setInt("organization_id", m_organizationID);
@@ -235,6 +236,15 @@ public class Sender
             cs.setString("department_name", m_departmentName);
             cs.setString("position_short_name", m_positionShortName);
             cs.setString("division_short_name", m_divisionShortName);
+            
+            if(xTeePais != null) {
+    			cs.setString("xtee_isikukood", xTeePais.isikukood);
+    			cs.setString("xtee_asutus", xTeePais.asutus);
+    		} else {
+    			cs.setString("xtee_isikukood", null);
+    			cs.setString("xtee_asutus", null);
+    		}
+            
             cs.executeUpdate();
             m_id = cs.getInt("sender_id");
             cs.close();
@@ -244,14 +254,14 @@ public class Sender
         }
     }
 
-    public static Sender fromXML(XMLStreamReader xmlReader, Connection conn) throws AxisFault
+    public static Sender fromXML(XMLStreamReader xmlReader, Connection conn, XHeader xTeePais) throws AxisFault
     {
         try {
             Sender result = new Sender();
             
-            // Jätame järgnevas väärtustamata järgmised andmeväljad:
-            //   ID - sest see saab vääruse andmebaasi salvestamisel
-            //   SendingID - sest see saab väärtuse alles siis, kuin saatmisinfo on
+            // JÃµtame jÃµrgnevas vÃµÃµrtustamata jÃµrgmised andmevÃµljad:
+            //   ID - sest see saab vÃµÃµruse andmebaasi salvestamisel
+            //   SendingID - sest see saab vÃµÃµrtuse alles siis, kuin saatmisinfo on
             //       andmebaasi salvatstaud
             int orgID = 0;
             int positionID = 0;
@@ -265,7 +275,7 @@ public class Sender
                 
                 if (xmlReader.hasName()) {
                     if (xmlReader.getLocalName().equalsIgnoreCase("saatja") && xmlReader.isEndElement()) {
-                        // Kui oleme jõudnud saatja elemendi lõppu, siis katkestame tsükli
+                        // Kui oleme jÃµudnud saatja elemendi lÃµppu, siis katkestame tsÃµkli
                         break;
                     }
                     else if (xmlReader.getLocalName().equalsIgnoreCase("regnr") && xmlReader.isStartElement()) {
@@ -280,7 +290,7 @@ public class Sender
                             // serveri enda asutuste registris pole algse saatja kohta mingeid andmeid.
                             if (orgID == 0) {
                                 try {
-                                    Asutus.getOrgsFromAllKnownServers(orgCode, conn);
+                                    Asutus.getOrgsFromAllKnownServers(orgCode, conn, xTeePais);
                                     orgID = Asutus.getIDByRegNr(orgCode, false, conn);
                                 }
                                 catch (Exception ex) {
@@ -316,7 +326,7 @@ public class Sender
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("allyksuse_kood") && xmlReader.isStartElement()) {
                         xmlReader.next();
                         if (xmlReader.isCharacters()) {
-                            // Tuvastame adressaadi allüksuse
+                            // Tuvastame adressaadi allÃµksuse
                              String divisionIDText = xmlReader.getText().trim();
                              if((divisionIDText != null) && (divisionIDText.length() > 0)) {
                                  try {
@@ -368,15 +378,15 @@ public class Sender
                 }
             }
             
-            // Kui saatjaks märgitud asutus ei kuulu DVK kasutajate hulka,
+            // Kui saatjaks mÃµrgitud asutus ei kuulu DVK kasutajate hulka,
             // siis teavitame sellest kasutajat.
             if (orgID < 1) {
                 throw new AxisFault( CommonStructures.VIGA_TUNDMATU_SAATJA_ASUTUS.replaceFirst("#1",orgCode) );
             }
             
-            // Tuvastame ametikoha lühinime järgi ametikoha ID
-            // Seda ei saa enne teha, kui kogu XML on läbi käidud, kuna ametikoha
-            // leidmiseks peab lisaks lühinimele tedma ka asutuse ID-d.
+            // Tuvastame ametikoha lÃµhinime jÃµrgi ametikoha ID
+            // Seda ei saa enne teha, kui kogu XML on lÃµbi kÃµidud, kuna ametikoha
+            // leidmiseks peab lisaks lÃµhinimele tedma ka asutuse ID-d.
             if ((occupationShortName != null) && (occupationShortName.length() > 0)) {
             	int occupationId = Ametikoht.getIdByShortName(orgID, occupationShortName, conn);
             	if (occupationId > 0) {
@@ -384,9 +394,9 @@ public class Sender
             	}
             }
             
-            // Tuvastame allüksuse lühinime järgi allüksuse ID
-            // Seda ei saa enne teha, kui kogu XML on läbi käidud, kuna allüksuse
-            // leidmiseks peab lisaks lühinimele tedma ka asutuse ID-d.
+            // Tuvastame allÃµksuse lÃµhinime jÃµrgi allÃµksuse ID
+            // Seda ei saa enne teha, kui kogu XML on lÃµbi kÃµidud, kuna allÃµksuse
+            // leidmiseks peab lisaks lÃµhinimele tedma ka asutuse ID-d.
             if ((subdivisionShortName != null) && (subdivisionShortName.length() > 0)) {
             	int subdivisionId = Allyksus.getIdByShortName(orgID, subdivisionShortName, conn);
             	if (subdivisionId > 0) {

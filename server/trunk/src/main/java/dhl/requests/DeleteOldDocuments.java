@@ -25,7 +25,7 @@ public class DeleteOldDocuments {
     public static RequestInternalResult V1(Connection conn) throws AxisFault {
         RequestInternalResult result = new RequestInternalResult();
         
-        // Laeme andmebaasist s‰ilitust‰htaja ¸letanud dokumendid
+        // Laeme andmebaasist s√µilitust√µhtaja √µletanud dokumendid
         ArrayList<ExpiredDocumentData> expiredDocuments = Document.getExpiredDocuments(conn);
         
         ExpiredDocumentData doc;
@@ -33,9 +33,9 @@ public class DeleteOldDocuments {
             doc = expiredDocuments.get(i);
             if (doc.getSendStatusID() == CommonStructures.SendStatus_Sending) {
                 // Kui dokument on endiselt alles saatmisel, siis kuulutame
-                // saatmise ebınnestunuks, saadame saatjale e-maili ja anname
-                // dokumenile veel N p‰eva ajapikendust, enne kui see lıplikult
-                // maha kustutatakse (et staatuse muutus jıuaks ka saatjale tagasi)
+                // saatmise eb√µnnestunuks, saadame saatjale e-maili ja anname
+                // dokumenile veel N p√µeva ajapikendust, enne kui see l√µplikult
+                // maha kustutatakse (et staatuse muutus j√µuaks ka saatjale tagasi)
                 Sending s = new Sending();
                 s.loadByDocumentID(doc.getDocumentID(), conn);
                 
@@ -45,7 +45,7 @@ public class DeleteOldDocuments {
                 f.setFaultString("Dokumendi saatmine ebaonnestus, kuna adressaat ei laadinud antud dokumenti sailitustahtaja jooksul DVK-st alla.");
                 f.setFaultActor(CommonStructures.FAULT_ACTOR);
                 
-                // M‰rgime saatmisel olevad adressaadid katkestatuks
+                // M√µrgime saatmisel olevad adressaadid katkestatuks
                 ArrayList<Recipient> recipients = s.getRecipients();
                 for (int j = 0; j < recipients.size(); ++j) {
                     if (recipients.get(j).getSendStatusID() == CommonStructures.SendStatus_Sending) {
@@ -55,20 +55,20 @@ public class DeleteOldDocuments {
                     }
                 }
                 
-                // M‰rgime saatmise katkestatuks
+                // M√µrgime saatmise katkestatuks
                 s.setSendStatusID(CommonStructures.SendStatus_Canceled);
                 s.setEndDate(new Date());
                 
                 // Salvestame saatmise andmetes tehtud muudatused
-                s.update(true, conn);
+                s.update(true, conn, null);
                 
-                // Arvutame uue s‰ilitust‰htaja
+                // Arvutame uue s√µilitust√µhtaja
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(doc.getConservationDeadline());
                 calendar.add(Calendar.DATE, Settings.Server_ExpiredDocumentGracePeriod);
                 doc.setConservationDeadline(calendar.getTime());
                 
-                // Salvestame uue s‰ilitust‰htaja andmebaasi
+                // Salvestame uue s√µilitust√µhtaja andmebaasi
                 Document.updateExpirationDate(doc.getDocumentID(), doc.getConservationDeadline(), conn);
                 
                 // Saadame dokumendi saatjale teavituskirja, et tema poolt
@@ -108,7 +108,7 @@ public class DeleteOldDocuments {
                 DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
                 String docSendingDateString = dateFormat.format(docSendingDate);
                 
-                message.setText( "Dokumendivahetuskeskus katkestas Teie poolt "+ docSendingDateString +" saadetud dokumendi edastamise, kuna v‰hemalt ¸ks adressaat ei ole dokumendi edastust‰htaja jooksul saadetud dokumenti vastu vıtnud." );
+                message.setText( "Dokumendivahetuskeskus katkestas Teie poolt "+ docSendingDateString +" saadetud dokumendi edastamise, kuna v√µhemalt √µks adressaat ei ole dokumendi edastust√µhtaja jooksul saadetud dokumenti vastu v√µtnud." );
                 
                 Transport.send( message );
             }

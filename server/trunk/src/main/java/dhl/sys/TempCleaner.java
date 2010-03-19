@@ -13,7 +13,7 @@ public class TempCleaner implements Runnable {
     }
 
     public void run() {
-        // Kustutame üle 10 minuti vanused failid
+        // Kustutame Ã¼le 10 minuti vanused failid
         File tempPath = new File(System.getProperty("java.io.tmpdir", ""));
         if ((tempPath != null) && tempPath.exists() && tempPath.isDirectory()) {
             FilenameFilter filter = new FilenameFilter() {

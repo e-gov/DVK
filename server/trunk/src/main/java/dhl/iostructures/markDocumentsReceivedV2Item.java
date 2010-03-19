@@ -41,9 +41,9 @@ public class markDocumentsReceivedV2Item {
                 result.guid = CommonMethods.getNodeText(e);
             }
 
-            // Vastuv�tja staatuse ID
-            // (vanas versioonis ja kliendis toimis valesti ja j�tame ka praegu sisse, et vanad asjad kohe katki ei l�heks)
-            // TODO: Eemaldada see koodil�ik
+            // Vastuvõtja staatuse ID
+            // (vanas versioonis ja kliendis toimis valesti ja jõtame ka praegu sisse, et vanad asjad kohe katki ei lõheks)
+            // TODO: Eemaldada see koodilõik
             nodes = root.getElementsByTagName("staatus_id");
             if((nodes != null) && (nodes.getLength() > 0))
             {
@@ -51,14 +51,14 @@ public class markDocumentsReceivedV2Item {
                 result.recipientStatusID = Integer.parseInt( CommonMethods.getNodeText(e) );
             }
 
-            // Vastuv�tja staatuse ID
+            // Vastuvõtja staatuse ID
             nodes = root.getElementsByTagName("vastuvotja_staatus_id");
             if ((nodes != null) && (nodes.getLength() > 0)) {
                 e = (Element)nodes.item(0);
                 result.recipientStatusID = Integer.parseInt(CommonMethods.getNodeText(e));
             }
 
-            // Vastuv�tja edastatud viga
+            // Vastuvõtja edastatud viga
             nodes = root.getElementsByTagName("fault");
             if ((nodes != null) && (nodes.getLength() > 0)) {
                 e = (Element)nodes.item(0);

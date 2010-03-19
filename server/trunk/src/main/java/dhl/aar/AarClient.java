@@ -38,7 +38,7 @@ import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.httpclient.Header;
 
 /**
- * ‹htse ıiguste alls¸steemi klient.
+ * √µhtse √µiguste alls√µsteemi klient.
  */
 public class AarClient {
     private String orgCode;
@@ -72,19 +72,19 @@ public class AarClient {
         // Manuse ID
         String attachmentName = String.valueOf((new Date()).getTime());
         
-        // P‰ringu nimi
+        // P√µringu nimi
         String requestName = "aar.asutused.v1";
         
-        // P‰ringu ID koostamine
+        // P√µringu ID koostamine
         String queryId = "aar" + orgCode + String.valueOf((new Date()).getTime());
         
-        // Saadetava sınumi p‰isesse kantavad parameetrid
+        // Saadetava s√µnumi p√µisesse kantavad parameetrid
         XHeader header = new XHeader(orgCode, "aar", personCode, queryId, requestName, "", (CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE"+this.personCode));
 
-        // Koodtame p‰ringu faili
+        // Koodtame p√µringu faili
         String requestFile = asutusedRequestType.createRequestFile(orgCodes, orgIDs, false);
         
-        // SOAP sınumi saatmine
+        // SOAP s√µnumi saatmine
         serviceClient.getOptions().setProperty(Constants.Configuration.ENABLE_SWA, Constants.VALUE_TRUE);
         OperationClient mepClient = serviceClient.createClient(ServiceClient.ANON_OUT_IN_OP);
         MessageContext requestMsg = new MessageContext();
@@ -94,7 +94,7 @@ public class AarClient {
         dataHandler.setContentType("{http://www.w3.org/2001/XMLSchema}base64Binary");
         requestMsg.addAttachment(attachmentName, dataHandler);
 
-        // Koostame SOAP sınumi keha
+        // Koostame SOAP s√µnumi keha
         SOAPFactory fac = OMAbstractFactory.getSOAP11Factory();
         SOAPEnvelope env = fac.getDefaultEnvelope();
         OMNamespace omNs = fac.createOMNamespace("http://producers.aar.xtee.riik.ee/producer/aar", "aar");
@@ -110,12 +110,12 @@ public class AarClient {
         env = header.appendToSOAPHeader(env, fac);
         requestMsg.setEnvelope(env);
 
-        // K‰ivitame p‰ringu
+        // K√µivitame p√µringu
         mepClient.addMessageContext(requestMsg);
         mepClient.execute(true);
         MessageContext response = mepClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
         
-        // Vastuse tˆˆtlemine
+        // Vastuse t√µ√µtlemine
         ArrayList<AarAsutus> orgs = null;
         DataHandler dh = response.getAttachment("vastus_xml");
         if (dh != null) {
@@ -129,7 +129,7 @@ public class AarClient {
             // Laeme andmed XML failist andmestruktuuridesse
             orgs = AarAsutus.getListFromXML(attachmentFile);
             
-            // Kustutame p‰ringu ja vastuse failid
+            // Kustutame p√µringu ja vastuse failid
             (new File(attachmentFile)).delete();
         } else {
             throw new AxisFault("Oiguste kesksysteemi vastus ei sisaldanud vastuse faili!");
@@ -142,19 +142,19 @@ public class AarClient {
         // Manuse ID
         String attachmentName = String.valueOf((new Date()).getTime());
         
-        // P‰ringu nimi
+        // P√µringu nimi
         String requestName = "aar.ametikohad.v1";
         
-        // P‰ringu ID koostamine
+        // P√µringu ID koostamine
         String queryId = "aar" + orgCode + String.valueOf((new Date()).getTime());
         
-        // Saadetava sınumi p‰isesse kantavad parameetrid
+        // Saadetava s√µnumi p√µisesse kantavad parameetrid
         XHeader header = new XHeader(orgCode, "aar", personCode, queryId, requestName, "", (CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE"+this.personCode));
 
-        // Koodtame p‰ringu faili
+        // Koodtame p√µringu faili
         String requestFile = ametikohadRequestType.createRequestFile();
         
-        // SOAP sınumi saatmine
+        // SOAP s√µnumi saatmine
         serviceClient.getOptions().setProperty(Constants.Configuration.ENABLE_SWA, Constants.VALUE_TRUE);
         OperationClient mepClient = serviceClient.createClient(ServiceClient.ANON_OUT_IN_OP);
         MessageContext requestMsg = new MessageContext();
@@ -164,7 +164,7 @@ public class AarClient {
         dataHandler.setContentType("{http://www.w3.org/2001/XMLSchema}base64Binary");
         requestMsg.addAttachment(attachmentName, dataHandler);
 
-        // Koostame SOAP sınumi keha
+        // Koostame SOAP s√µnumi keha
         SOAPFactory fac = OMAbstractFactory.getSOAP11Factory();
         SOAPEnvelope env = fac.getDefaultEnvelope();
         OMNamespace omNs = fac.createOMNamespace("http://producers.aar.xtee.riik.ee/producer/aar", "aar");
@@ -180,12 +180,12 @@ public class AarClient {
         env = header.appendToSOAPHeader(env, fac);
         requestMsg.setEnvelope(env);
 
-        // K‰ivitame p‰ringu
+        // K√µivitame p√µringu
         mepClient.addMessageContext(requestMsg);
         mepClient.execute(true);
         MessageContext response = mepClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
         
-        // Vastuse tˆˆtlemine
+        // Vastuse t√µ√µtlemine
         ArrayList<AarAmetikoht> jobs = null;
         DataHandler dh = response.getAttachment("vastus_xml");
         if (dh != null) {
@@ -199,7 +199,7 @@ public class AarClient {
 
             jobs = AarAmetikoht.getListFromXML(attachmentFile);
             
-            // Kustutame p‰ringu ja vastuse failid
+            // Kustutame p√µringu ja vastuse failid
             (new File(attachmentFile)).delete();
         } else {
             throw new AxisFault("Oiguste kesksysteemi vastus ei sisaldanud vastuse faili!");
@@ -211,19 +211,19 @@ public class AarClient {
         // Manuse ID
         String attachmentName = String.valueOf((new Date()).getTime());
         
-        // P‰ringu nimi
+        // P√µringu nimi
         String requestName = "aar.isikud.v1";
         
-        // P‰ringu ID koostamine
+        // P√µringu ID koostamine
         String queryId = "aar" + orgCode + String.valueOf((new Date()).getTime());
         
-        // Saadetava sınumi p‰isesse kantavad parameetrid
+        // Saadetava s√µnumi p√µisesse kantavad parameetrid
         XHeader header = new XHeader(orgCode, "aar", personCode, queryId, requestName, "", (CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE"+this.personCode));
 
-        // Koodtame p‰ringu faili
+        // Koodtame p√µringu faili
         String requestFile = isikudRequestType.createRequestFile();
         
-        // SOAP sınumi saatmine
+        // SOAP s√µnumi saatmine
         serviceClient.getOptions().setProperty(Constants.Configuration.ENABLE_SWA, Constants.VALUE_TRUE);
         OperationClient mepClient = serviceClient.createClient(ServiceClient.ANON_OUT_IN_OP);
         MessageContext requestMsg = new MessageContext();
@@ -233,7 +233,7 @@ public class AarClient {
         dataHandler.setContentType("{http://www.w3.org/2001/XMLSchema}base64Binary");
         requestMsg.addAttachment(attachmentName, dataHandler);
 
-        // Koostame SOAP sınumi keha
+        // Koostame SOAP s√µnumi keha
         SOAPFactory fac = OMAbstractFactory.getSOAP11Factory();
         SOAPEnvelope env = fac.getDefaultEnvelope();
         OMNamespace omNs = fac.createOMNamespace("http://producers.aar.xtee.riik.ee/producer/aar", "aar");
@@ -249,12 +249,12 @@ public class AarClient {
         env = header.appendToSOAPHeader(env, fac);
         requestMsg.setEnvelope(env);
 
-        // K‰ivitame p‰ringu
+        // K√µivitame p√µringu
         mepClient.addMessageContext(requestMsg);
         mepClient.execute(true);
         MessageContext response = mepClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
         
-        // Vastuse tˆˆtlemine
+        // Vastuse t√µ√µtlemine
         ArrayList<AarIsik> people = null;
         DataHandler dh = response.getAttachment("vastus_xml");
         if (dh != null) {
@@ -268,7 +268,7 @@ public class AarClient {
 
             people = AarIsik.getListFromXML(attachmentFile);
             
-            // Kustutame p‰ringu ja vastuse failid
+            // Kustutame p√µringu ja vastuse failid
             (new File(attachmentFile)).delete();
         } else {
             throw new AxisFault("Oiguste kesksysteemi vastus ei sisaldanud vastuse faili!");
@@ -280,19 +280,19 @@ public class AarClient {
         // Manuse ID
         String attachmentName = String.valueOf((new Date()).getTime());
         
-        // P‰ringu nimi
+        // P√µringu nimi
         String requestName = "aar.taitmised.v1";
         
-        // P‰ringu ID koostamine
+        // P√µringu ID koostamine
         String queryId = "aar" + orgCode + String.valueOf((new Date()).getTime());
         
-        // Saadetava sınumi p‰isesse kantavad parameetrid
+        // Saadetava s√µnumi p√µisesse kantavad parameetrid
         XHeader header = new XHeader(orgCode, "aar", personCode, queryId, requestName, "", (CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE"+this.personCode));
 
-        // Koodtame p‰ringu faili
+        // Koodtame p√µringu faili
         String requestFile = taitmisedRequestType.createRequestFile();
         
-        // SOAP sınumi saatmine
+        // SOAP s√µnumi saatmine
         serviceClient.getOptions().setProperty(Constants.Configuration.ENABLE_SWA, Constants.VALUE_TRUE);
         OperationClient mepClient = serviceClient.createClient(ServiceClient.ANON_OUT_IN_OP);
         MessageContext requestMsg = new MessageContext();
@@ -302,7 +302,7 @@ public class AarClient {
         dataHandler.setContentType("{http://www.w3.org/2001/XMLSchema}base64Binary");
         requestMsg.addAttachment(attachmentName, dataHandler);
 
-        // Koostame SOAP sınumi keha
+        // Koostame SOAP s√µnumi keha
         SOAPFactory fac = OMAbstractFactory.getSOAP11Factory();
         SOAPEnvelope env = fac.getDefaultEnvelope();
         OMNamespace omNs = fac.createOMNamespace("http://producers.aar.xtee.riik.ee/producer/aar", "aar");
@@ -318,12 +318,12 @@ public class AarClient {
         env = header.appendToSOAPHeader(env, fac);
         requestMsg.setEnvelope(env);
 
-        // K‰ivitame p‰ringu
+        // K√µivitame p√µringu
         mepClient.addMessageContext(requestMsg);
         mepClient.execute(true);
         MessageContext response = mepClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
         
-        // Vastuse tˆˆtlemine
+        // Vastuse t√µ√µtlemine
         ArrayList<AarAmetikohaTaitmine> result = null;
         DataHandler dh = response.getAttachment("vastus_xml");
         if (dh != null) {
@@ -337,7 +337,7 @@ public class AarClient {
 
             result = AarAmetikohaTaitmine.getListFromXML(attachmentFile);
             
-            // Kustutame p‰ringu ja vastuse failid
+            // Kustutame p√µringu ja vastuse failid
             (new File(attachmentFile)).delete();
         } else {
             throw new AxisFault("Oiguste kesksysteemi vastus ei sisaldanud vastuse faili!");
@@ -346,21 +346,21 @@ public class AarClient {
     }
     
     public ArrayList<AarOigus> oigusedRequest(String queryOrgCode, int jobID, String queryPersonCode) throws Exception {
-        // P‰ringu nimi
+        // P√µringu nimi
         String requestName = "aar.oigused.v1";
         
-        // P‰ringu ID koostamine
+        // P√µringu ID koostamine
         String queryId = "aar" + this.orgCode + String.valueOf((new Date()).getTime());
         
-        // Saadetava sınumi p‰isesse kantavad parameetrid
+        // Saadetava s√µnumi p√µisesse kantavad parameetrid
         XHeader header = new XHeader(this.orgCode, "aar", this.personCode, queryId, requestName, "", (CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE"+this.personCode));
 
-        // SOAP sınumi saatmine
+        // SOAP s√µnumi saatmine
         serviceClient.getOptions().setProperty(Constants.Configuration.ENABLE_SWA, Constants.VALUE_FALSE);
         OperationClient mepClient = serviceClient.createClient(ServiceClient.ANON_OUT_IN_OP);
         MessageContext requestMsg = new MessageContext();
 
-        // Koostame SOAP sınumi keha
+        // Koostame SOAP s√µnumi keha
         SOAPFactory fac = OMAbstractFactory.getSOAP11Factory();
         SOAPEnvelope env = fac.getDefaultEnvelope();
         OMNamespace omNs = fac.createOMNamespace("http://producers.aar.xtee.riik.ee/producer/aar", "aar");
@@ -389,12 +389,12 @@ public class AarClient {
         env = header.appendToSOAPHeader(env, fac);
         requestMsg.setEnvelope(env);
 
-        // K‰ivitame p‰ringu
+        // K√µivitame p√µringu
         mepClient.addMessageContext(requestMsg);
         mepClient.execute(true);
         MessageContext response = mepClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
         
-        // Vastuse tˆˆtlemine
+        // Vastuse t√µ√µtlemine
         ArrayList<AarOigus> result = AarOigus.getListFromSOAP(response.getEnvelope().getBody());
         
         return result;

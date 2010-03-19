@@ -223,7 +223,7 @@ public class AarAsutus {
 
                 if (xmlReader.hasName()) {
                     if (xmlReader.getLocalName().equalsIgnoreCase("asutus") && xmlReader.isEndElement()) {
-                        // Kui oleme jıudnud asutuse elemendi lıppu, siis katkestame ts¸kli
+                        // Kui oleme j√µudnud asutuse elemendi l√µppu, siis katkestame ts√µkli
                         break;
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("asutus_id") && xmlReader.isStartElement()) {
                         xmlReader.next();
@@ -335,7 +335,7 @@ public class AarAsutus {
                 }
             }
 
-            // Kui ¸hegi kontrolli taha pidama ei j‰‰nud, siis tagastame v‰‰rtuse
+            // Kui √µhegi kontrolli taha pidama ei j√µ√µnud, siis tagastame v√µ√µrtuse
             return result;
         } catch (XMLStreamException ex) {
             CommonMethods.logError(ex, "dhl.aar.iostructures.AarAsutus", "fromXML");

@@ -18,7 +18,7 @@ public class AarSyncronizer implements Runnable {
             this.dbConn = conn;
             this.syncDelay = syncDelay;
             
-            // Vigaste seadetega threadi käima ei tõmba
+            // Vigaste seadetega threadi kÃµima ei tÃµmba
             if ((this.dbConn != null) && (this.syncDelay > 0)) {
                 this.t.start();
             } else {
@@ -45,19 +45,19 @@ public class AarSyncronizer implements Runnable {
             Calendar currentSync = Calendar.getInstance();
             currentSync.setTime(markerDate);
             
-            // Kui praegune hetk on hilisem planeeritud sünkroniseerimise ajast,
-            // siis käivitame sünkroniseerimise
+            // Kui praegune hetk on hilisem planeeritud sÃµnkroniseerimise ajast,
+            // siis kÃµivitame sÃµnkroniseerimise
             if (now.after(currentSync)) {
-                // Märgime seadetesse viimase sünkroniseerimise kuupäevaks
+                // MÃµrgime seadetesse viimase sÃµnkroniseerimise kuupÃµevaks
                 // praeguse hetke.
-                // Teeme seda igaks juhuks enne realset sünkroniseerimist, kuna
-                // sedasi on väiksem tõenäosus, et sünkroniseerimine mitmekordselt
-                // käivitatakse
+                // Teeme seda igaks juhuks enne realset sÃµnkroniseerimist, kuna
+                // sedasi on vÃµiksem tÃµenÃµosus, et sÃµnkroniseerimine mitmekordselt
+                // kÃµivitatakse
                 params.setLastAarSync(new Date());
                 params.saveToDB(this.dbConn);
 
-                // Sünkroniseerime kohaliku asutuste ja õiguste andmebaasi andmeid
-                // keskse õiguste andmekoguga
+                // SÃµnkroniseerime kohaliku asutuste ja Ãµiguste andmebaasi andmeid
+                // keskse Ãµiguste andmekoguga
                 Asutus.runAarSyncronization(dbConn);
             }            
         } catch (Exception ex) {

@@ -4,15 +4,14 @@
 	<groupId>dvk</groupId>
 	<artifactId>server</artifactId>
 	<packaging>war</packaging>
-	<version>1.5.4</version>
+	<version>1.6.0</version>
 
 	<properties>
 		<packageName>dhl</packageName>
-		<dvkCoreDir>C:\development\ws\dvk\core</dvkCoreDir>
-		<dvkClientDir>C:\development\ws\dvk\client</dvkClientDir>
+		<dvkCoreDir>C:\development\ws\dvkclean\core</dvkCoreDir>
+		<dvkClientDir>C:\development\ws\dvkclean\client</dvkClientDir>
 	</properties>
 
-  <!-- Dependencies -->
   <dependencies>
   	<dependency>
       <groupId>ria</groupId>
@@ -34,13 +33,6 @@
       <version>1.1</version>
       <scope>system</scope>
       <systemPath>${basedir}\lib\activation-1.1.jar</systemPath>
-    </dependency>
-    <dependency>
-      <groupId>java</groupId>
-      <artifactId>activation</artifactId>
-      <version>1.0</version>
-      <scope>system</scope>
-      <systemPath>${basedir}\lib\activation.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>java</groupId>
@@ -422,13 +414,6 @@
     </dependency>
     <dependency>
       <groupId>java</groupId>
-      <artifactId>mail</artifactId>
-      <version>1.0</version>
-      <scope>system</scope>
-      <systemPath>${basedir}\lib\mail.jar</systemPath>
-    </dependency>
-    <dependency>
-      <groupId>java</groupId>
       <artifactId>mex</artifactId>
       <version>1.4</version>
       <scope>system</scope>
@@ -561,13 +546,6 @@
       <systemPath>${basedir}\lib\xercesImpl-2.8.1.jar</systemPath>
     </dependency>
     <dependency>
-      <groupId>apache</groupId>
-      <artifactId>xerces-impl</artifactId>
-      <version>2.9.1</version>
-      <scope>system</scope>
-      <systemPath>${basedir}\lib\xercesImpl-2.9.1.jar</systemPath>
-    </dependency>
-    <dependency>
       <groupId>java</groupId>
       <artifactId>xml-apis</artifactId>
       <version>1.3.04</version>
@@ -630,6 +608,10 @@
 					<include>dvk-client.jar</include>
 				</includes>
 			</resource>
+			<resource>
+				<directory>sql</directory>
+				<targetPath>../${packageName}/sql</targetPath>
+			</resource>
 		</resources>
 		<plugins>
 			<plugin>
@@ -638,7 +620,7 @@
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
-					<excludes></excludes>
+					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>			
 		</plugins>

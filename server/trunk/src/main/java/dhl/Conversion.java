@@ -22,7 +22,7 @@ import dvk.core.CommonMethods;
 import dvk.core.Settings;
 
 /**
- * Klass, mis sisaldab meetodeid DVK konteineri konverteerimiseks �htest
+ * Klass, mis sisaldab meetodeid DVK konteineri konverteerimiseks õhtest
  * versioonist teise.
  * 
  * @author Marko Kurm, marko.kurm@mircolink.ee

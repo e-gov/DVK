@@ -44,13 +44,13 @@ public class receiveDocumentsV4RequestType {
                     
                     // Arv
                     result.arv = CommonMethods.getNumberFromChildNode(bodyNode, "arv", 10);
-                    // Kontrollime, et ei saaks esitada päringut, mille väljundisse
-                    // ei ole lubatud ühtegi dokumenti.
+                    // Kontrollime, et ei saaks esitada pÃµringut, mille vÃµljundisse
+                    // ei ole lubatud Ãµhtegi dokumenti.
                     if (result.arv < 1) {
                         result.arv = 1;
                     }
                     
-                    // Allüksus
+                    // AllÃµksus
                     nodes = bodyNode.getElementsByTagName("allyksuse_lyhinimetus");
                     if (nodes.getLength() > 0) {
                         result.allyksuseLyhinimetus = CommonMethods.getNodeText((Element)nodes.item(0)).trim();

@@ -1,5 +1,6 @@
 package dhl;
 
+import dhl.iostructures.XHeader;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import java.util.ArrayList;
@@ -218,31 +219,40 @@ public class Sending
         }
     }
 
-    public int addToDB(Connection conn) throws IllegalArgumentException, SQLException {
+    public int addToDB(Connection conn, XHeader xTeePais) throws IllegalArgumentException, SQLException {
         if (conn != null) {
             Calendar cal = Calendar.getInstance();
-            CallableStatement cs = conn.prepareCall("{call ADD_SENDING(?,?,?,?,?)}");
+            CallableStatement cs = conn.prepareCall("{call ADD_SENDING(?,?,?,?,?,?,?)}");
             cs.registerOutParameter("sending_id", Types.INTEGER);
             cs.setInt("document_id", m_documentID);
             cs.setTimestamp("sending_start_date", CommonMethods.sqlDateFromDate(m_startDate), cal);
             cs.setTimestamp("sending_end_date", CommonMethods.sqlDateFromDate(m_endDate), cal);
             cs.setInt("send_status_id", m_sendStatusID);
+            
+            if(xTeePais != null) {
+            	cs.setString("xtee_isikukood", xTeePais.isikukood);
+                cs.setString("xtee_asutus", xTeePais.asutus);
+    		} else {
+    			cs.setString("xtee_isikukood", null);
+                cs.setString("xtee_asutus", null);
+    		}            
+            
             cs.executeUpdate();
             m_id = cs.getInt("sending_id");
             cs.close();
 
             if (m_id > 0) {
                 m_sender.setSendingID(m_id);
-                m_sender.addToDB(conn);
+                m_sender.addToDB(conn, xTeePais);
                 
                 if ((m_proxy != null) && (m_proxy.getOrganizationID() > 0)) {
                     m_proxy.setSendingID(m_id);
-                    m_proxy.addToDB(conn);
+                    m_proxy.addToDB(conn, xTeePais);
                 }
 
                 for (Recipient tmpRecipient: m_recipients) {
                     tmpRecipient.setSendingID(m_id);
-                    tmpRecipient.addToDB(conn);
+                    tmpRecipient.addToDB(conn, xTeePais);
                 }
             }
 
@@ -252,7 +262,7 @@ public class Sending
         }
     }
 
-    public boolean update(boolean updateChildObjects, Connection conn) {
+    public boolean update(boolean updateChildObjects, Connection conn, XHeader xTeePais) {
     	logger.debug("Updating sending. Parameters: ");
     	logger.debug("sending_id: " + m_id);
     	logger.debug("document_id: " + m_documentID);
@@ -274,7 +284,7 @@ public class Sending
 
                 if (updateChildObjects == true) {
                     for (Recipient tmpRecipient: m_recipients) {
-                        tmpRecipient.update(conn);
+                        tmpRecipient.update(conn, xTeePais);
                     }
                 }
 
@@ -289,23 +299,24 @@ public class Sending
     }
 
 
-    public static Sending fromXML(XMLStreamReader xmlReader, Connection conn) throws AxisFault {
+    public static Sending fromXML(XMLStreamReader xmlReader, Connection conn, XHeader xTeePais) throws AxisFault {
+    	logger.debug("Parsing sending information from XML...");
         try {
             Calendar cal = Calendar.getInstance();
             Sending result = new Sending();
             result.setSender(null);
 
-            // Enne alamstruktuuride juurde asumist v��rtustame �ra k�ik lihtandmet��pi
-            // muutujad. V��rtustamata j�tame:
-            //   ID - sest see saab v��rtuse andmebaasi salvestamisel
-            //   DocumentID - sest see saab v��rtuse, kui dokument andmebaasi salvestatakse
-            //   EndDate - sest see saab v��rtuse alles siis, kui k�ik adressaadid
-            //       on oma koopia antud dokumendist k�tte saanud
+            // Enne alamstruktuuride juurde asumist võõrtustame õra kõik lihtandmetõõpi
+            // muutujad. Võõrtustamata jõtame:
+            //   ID - sest see saab võõrtuse andmebaasi salvestamisel
+            //   DocumentID - sest see saab võõrtuse, kui dokument andmebaasi salvestatakse
+            //   EndDate - sest see saab võõrtuse alles siis, kui kõik adressaadid
+            //       on oma koopia antud dokumendist kõtte saanud
 
-            // M�rgime, et lisatud dokument on saatmisel
+            // Mõrgime, et lisatud dokument on saatmisel
             result.setSendStatusID(CommonStructures.SendStatus_Sending);
 
-            // Saatmise alguskuup�evaks-kellaajaks m�rgime praeguse hetke
+            // Saatmise alguskuupõevaks-kellaajaks mõrgime praeguse hetke
             result.setStartDate(cal.getTime());
 
             int senderCount = 0;
@@ -313,21 +324,25 @@ public class Sending
 
             while (xmlReader.hasNext()) {
                 xmlReader.next();
-
                 if (xmlReader.hasName()) {
+                	logger.debug("Element localName: " + xmlReader.getLocalName());
                     if (xmlReader.getLocalName().equalsIgnoreCase("transport") && xmlReader.isEndElement()) {
-                        // Kui oleme j�udnud transport ploki l�ppu, siis katkestame ts�kli
+                    	logger.debug("Found transport.");
+                        // Kui oleme jõudnud transport ploki lõppu, siis katkestame tsõkli
                         break;
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("saatja") && xmlReader.isStartElement()) {
+                    	logger.debug("Found sender.");
                         // Laeme saatja andmed XML-st oma andmestruktuuri
-                        result.setSender(Sender.fromXML(xmlReader, conn));
+                        result.setSender(Sender.fromXML(xmlReader, conn, xTeePais));
                         ++senderCount;
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("vahendaja") && xmlReader.isStartElement()) {
+                    	logger.debug("Found proxy.");
                         // Laeme vahendaja andmed XML-st oma andmestruktuuri
                         result.setProxy(Proxy.fromXML(xmlReader, conn));
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("saaja") && xmlReader.isStartElement()) {
+                    	logger.debug("Found recipient.");
                         // Laeme saaja andmed XML-st oma andmestruktuuri
-                        Recipient r = Recipient.fromXML(xmlReader, conn);
+                        Recipient r = Recipient.fromXML(xmlReader, conn, xTeePais);
                         ++recipientCount;
                         if (r != null) {
                             result.getRecipients().add(r);
@@ -337,23 +352,23 @@ public class Sending
             }
 
             // Kui "transport" plokk saatja ega saajate kohta infot ei sisalda,
-            // siis j�relikult ei saadetud dokumenti edastamiseks.
+            // siis jõrelikult ei saadetud dokumenti edastamiseks.
             if (((result.getSender() == null) || (result.getSender().getOrganizationID() < 1)) && (result.getRecipients().size() < 1)) {
                 return null;
             }
 
-            // Kuna saatjaid saab olla t�pselt �ks, siis anname veateate niipea,
-            // kui saatjaid pole v�i on �le �he.
+            // Kuna saatjaid saab olla tõpselt õks, siis anname veateate niipea,
+            // kui saatjaid pole või on õle õhe.
             if (senderCount != 1) {
                 throw new AxisFault(CommonStructures.VIGA_VALE_ARV_SAATJAID);
             }
 
-            // Kui �htegi saajat pole esitatud, siis tagastame veateate
+            // Kui õhtegi saajat pole esitatud, siis tagastame veateate
             if (recipientCount < 1) {
                 throw new AxisFault(CommonStructures.VIGA_VALE_ARV_VASTUVOTJAID);
             }
 
-            // Kui �hegi kontrolli taha pidama ei j��nud, siis tagastame v��rtuse
+            // Kui õhegi kontrolli taha pidama ei jõõnud, siis tagastame võõrtuse
             return result;
         } catch (XMLStreamException ex) {
             throw new AxisFault("Exception parsing DVK message transport section: " + ex.getMessage());

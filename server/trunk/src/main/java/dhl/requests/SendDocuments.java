@@ -36,6 +36,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.OutputStreamWriter;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -58,7 +59,7 @@ public class SendDocuments {
         String pipelineDataFile = CommonMethods.createPipelineFile(0);
         
         try {
-            // Laeme p�ringu keha endale sobivasse andmestruktuuri
+            // Laeme põringu keha endale sobivasse andmestruktuuri
             sendDocumentsRequestType bodyData = sendDocumentsRequestType.getFromSOAPBody( context );
             if (bodyData == null) {
                 throw new AxisFault( CommonStructures.VIGA_VIGANE_KEHA );
@@ -66,15 +67,15 @@ public class SendDocuments {
             result.folder = bodyData.kaust;
             
             // Tuvastame, millisesse kausta soovitakse dokumenti salvestada
-            // - Kui DVK server on seadistatud t��tama kliendi tabelite peal,
+            // - Kui DVK server on seadistatud tõõtama kliendi tabelite peal,
             //   siis pole meil kaustade tabelit olemas ja seega ei saa kausta
             //   ID-d tuvastada.
             int senderTargetFolder = Folder.GLOBAL_ROOT_FOLDER;
             if (!Settings.Server_RunOnClientDatabase) {
-                senderTargetFolder = Folder.getFolderIdByPath( bodyData.kaust, user.getOrganizationID(), conn, false, true );
+                senderTargetFolder = Folder.getFolderIdByPath( bodyData.kaust, user.getOrganizationID(), conn, false, true, xTeePais );
             }
             
-            // Leiame s�numi kehas olnud viite alusels MIME lisast vajalikud andmed
+            // Leiame sõnumi kehas olnud viite alusels MIME lisast vajalikud andmed
             org.apache.axis.attachments.AttachmentPart px = (org.apache.axis.attachments.AttachmentPart) context.getCurrentMessage().getAttachmentsImpl().getAttachmentByReference(bodyData.dokumendid);
             if (px == null) {
                 throw new AxisFault( CommonStructures.VIGA_PUUDUV_MIME_LISA );
@@ -128,12 +129,12 @@ public class SendDocuments {
                     // Valideerime XML dokumendi
                     Fault validationFault = CommonMethods.validateDVKContainer(docFiles.subFiles.get(i));
                     
-                    // S�ltuvalt sellest, kas server t��tab serveri v�i kliendi
+                    // Sõltuvalt sellest, kas server tõõtab serveri või kliendi
                     // andmebaasi peal, koostame DVK konteineri XML failidest
                     // vastavad andmeobjektid ja salvestame need andmebaasi
                     if (Settings.Server_RunOnClientDatabase) {
-                        // V�tame v�lja antud andmebaasis seadistatud asutuste nimekirja, et
-                        // saaksime XML parsimisel v�tta v�lja eraldi kirjed, kui smaa s�numit
+                        // Võtame võlja antud andmebaasis seadistatud asutuste nimekirja, et
+                        // saaksime XML parsimisel võtta võlja eraldi kirjed, kui smaa sõnumit
                         // on saadetud mitmele asutusele
                         UnitCredential[] credentials = UnitCredential.getCredentials(hostOrgSettings);
                         
@@ -145,7 +146,7 @@ public class SendDocuments {
                             DhlMessage msg = msgList.get(j);
                             msg.setDhlID(dhlID);
                             
-                            // Kontrollime, et dokumendi saatjaks v�i vahendajaks m�rgitud asutus
+                            // Kontrollime, et dokumendi saatjaks või vahendajaks mõrgitud asutus
                             // ja dokumendi reaalselt saatnud asutus oleksid samad.
                             if ((msg.getSenderOrgCode() != user.getOrganizationCode()) &&
                                (msg.getProxyOrgCode() !=  user.getOrganizationCode())) {
@@ -163,25 +164,25 @@ public class SendDocuments {
                         }
                     } else {
                     	// Loome dokumendi andmestruktuuri
-                        Document doc = Document.fromXML(docFiles.subFiles.get(i), user.getOrganizationID(), Settings.Server_ValidateXmlFiles, conn);
+                        Document doc = Document.fromXML(docFiles.subFiles.get(i), user.getOrganizationID(), Settings.Server_ValidateXmlFiles, conn, xTeePais);
                         
                         // Vajadusel valideerime saadetavad XML dokumendid
                         validateXmlFiles(doc.getFiles());
                         
-                        // Vajadusel kontrollime saadetavate .ddoc ja .bdoc failide allkirjad �le
+                        // Vajadusel kontrollime saadetavate .ddoc ja .bdoc failide allkirjad õle
                         validateSignedFileSignatures(doc.getFiles());
                         
-                        // Lisame v��rtused s�numi p�isest ja kehast
+                        // Lisame võõrtused sõnumi põisest ja kehast
                         doc.setFolderID( senderTargetFolder );
                         doc.setOrganizationID( user.getOrganizationID() );
                         
-                        // M��rame dokumendi s�ilitust�htajaks vaikimisi v��rtuse
+                        // Mõõrame dokumendi sõilitustõhtajaks vaikimisi võõrtuse
                         Calendar calendar = Calendar.getInstance();
                         calendar.setTime(new Date());
                         calendar.add(Calendar.DATE, Settings.Server_DocumentDefaultLifetime);
                         doc.setConservationDeadline(calendar.getTime());
                         
-                        // Kontrollime, et dokumendi saatjaks v�i vahendajaks m�rgitud asutus
+                        // Kontrollime, et dokumendi saatjaks või vahendajaks mõrgitud asutus
                         // ja dokumendi reaalselt saatnud asutus oleksid samad.
                         if (doc.getSendingList() != null) {
                             Sending tmpSending;
@@ -232,7 +233,7 @@ public class SendDocuments {
             t.markElapsed("Parsing document XML");
             
             // Salvestame saadud dokumendid andmebaasi ja koostame
-            // uute dokumentide ID-de p�hjal vastuss�numi.
+            // uute dokumentide ID-de põhjal vastussõnumi.
             try {
                 t.reset();
                 out = new FileOutputStream(pipelineDataFile, false);
@@ -254,9 +255,9 @@ public class SendDocuments {
                         // Salvestame dokumendi andmebaasi
                         tmpMsg.addToDB(hostOrgSettings);
                         
-                        // Tagastame siin kirje ID asemel DHL_ID v��rtuse, kuna
+                        // Tagastame siin kirje ID asemel DHL_ID võõrtuse, kuna
                         // kliendi poolel peaks DVK unikaalne identifikaator
-                        // asuma just sellel andmev�ljal.
+                        // asuma just sellel andmevõljal.
                         if (tmpMsg.getId() > 0) {
                             ow.write("<dhl_id>"+ String.valueOf(tmpMsg.getDhlID()) +"</dhl_id>");
                         } else {
@@ -269,10 +270,10 @@ public class SendDocuments {
                         tmpDoc = serverDocuments.get(i);
                         
                         // Salvestame dokumendi andmebaasi
-                        tmpDoc.addToDB( conn );
+                        tmpDoc.addToDB(conn, xTeePais);
                         
-                        // Edastame dokumendi vajadusel m�nda teise DVK serverisse
-                        ForwardDocument(tmpDoc, bodyData.kaust, conn, 1);
+                        // Edastame dokumendi vajadusel mõnda teise DVK serverisse
+                        ForwardDocument(tmpDoc, bodyData.kaust, conn, 1, xTeePais);
                         
                         if (tmpDoc.getId() > 0) {
                             ow.write("<dhl_id>"+ String.valueOf(tmpDoc.getId()) +"</dhl_id>");
@@ -290,7 +291,7 @@ public class SendDocuments {
                 ow = null;
                 out = null;
                 
-                // Kustutame ajutisest kataloogist �ra andmebaasi salvestatud failid
+                // Kustutame ajutisest kataloogist õra andmebaasi salvestatud failid
                 t.reset();
                 if (Settings.Server_RunOnClientDatabase) {
                     for (int i = 0; i < clientDocuments.size(); ++i) {
@@ -326,7 +327,7 @@ public class SendDocuments {
         String responseDataFile = null;
         
         try {
-            // Laeme p�ringu keha endale sobivasse andmestruktuuri
+            // Laeme põringu keha endale sobivasse andmestruktuuri
             sendDocumentsV2RequestType bodyData = sendDocumentsV2RequestType.getFromSOAPBody( context );
             if (bodyData == null) {
                 throw new RequestProcessingException(CommonStructures.VIGA_VIGANE_KEHA);
@@ -334,15 +335,15 @@ public class SendDocuments {
             result.folder = bodyData.kaust;
             
             // Tuvastame, millisesse kausta soovitakse dokumenti salvestada
-            // - Kui DVK server on seadistatud t��tama kliendi tabelite peal,
+            // - Kui DVK server on seadistatud tõõtama kliendi tabelite peal,
             //   siis pole meil kaustade tabelit olemas ja seega ei saa kausta
             //   ID-d tuvastada.
             int senderTargetFolder = Folder.GLOBAL_ROOT_FOLDER;
             if (!Settings.Server_RunOnClientDatabase) {
-                senderTargetFolder = Folder.getFolderIdByPath( bodyData.kaust, user.getOrganizationID(), conn, false, true );
+                senderTargetFolder = Folder.getFolderIdByPath( bodyData.kaust, user.getOrganizationID(), conn, false, true, xTeePais );
             }            
             
-            // Leiame s�numi kehas olnud viite alusels MIME lisast vajalikud andmed
+            // Leiame sõnumi kehas olnud viite alusels MIME lisast vajalikud andmed
             org.apache.axis.attachments.AttachmentPart px = (org.apache.axis.attachments.AttachmentPart) context.getCurrentMessage().getAttachmentsImpl().getAttachmentByReference(bodyData.dokumendid);
             if (px == null) {
                 throw new RequestProcessingException(CommonStructures.VIGA_PUUDUV_MIME_LISA);
@@ -383,8 +384,8 @@ public class SendDocuments {
             // fragmentide tabelisse
             if (bodyData.fragmenteKokku > 0) {
                 if (Settings.Server_RunOnClientDatabase) {
-                    // Kui DVK server on seadistatud t��tama kliendi andmetabelite peal,
-                    // siis teostame fragmentide t��tlemise andmebaasi asemel k�vakettal
+                    // Kui DVK server on seadistatud tõõtama kliendi andmetabelite peal,
+                    // siis teostame fragmentide tõõtlemise andmebaasi asemel kõvakettal
                     String uniqueFolder = CommonMethods.getUniqueDirectory(user.getOrganizationCode(), bodyData.edastusID);
                     if (uniqueFolder == null) {
                         throw new FragmentedDataProcessingException("Viga dokumendi fragmendi tootlemisel! Ei onnestunud luua ajutist kausta fragmentide salvestamiseks!");
@@ -404,7 +405,7 @@ public class SendDocuments {
                     fragment.setFragmentNr(bodyData.fragmentNr);
                     fragment.setOrganizationID(user.getOrganizationID());
                     fragment.setIsIncoming(true);
-                    fragment.addToDB(conn);
+                    fragment.addToDBProc(conn, xTeePais);
                     (new File(pipelineDataFile)).delete();
                 }
             
@@ -480,12 +481,12 @@ public class SendDocuments {
                         // Valideerime XML dokumendi
                         Fault validationFault = CommonMethods.validateDVKContainer(docFiles.subFiles.get(i));
                         
-                        // S�ltuvalt sellest, kas server t��tab serveri v�i kliendi
+                        // Sõltuvalt sellest, kas server tõõtab serveri või kliendi
                         // andmebaasi peal, koostame DVK konteineri XML failidest
                         // vastavad andmeobjektid ja salvestame need andmebaasi
                         if (Settings.Server_RunOnClientDatabase) {
-                            // V�tame v�lja antud andmebaasis seadistatud asutuste nimekirja, et
-                            // saaksime XML parsimisel v�tta v�lja eraldi kirjed, kui smaa s�numit
+                            // Võtame võlja antud andmebaasis seadistatud asutuste nimekirja, et
+                            // saaksime XML parsimisel võtta võlja eraldi kirjed, kui smaa sõnumit
                             // on saadetud mitmele asutusele
                             UnitCredential[] credentials = UnitCredential.getCredentials(hostOrgSettings);
 
@@ -497,7 +498,7 @@ public class SendDocuments {
                                 DhlMessage msg = msgList.get(j);
                                 msg.setDhlID(dhlID);
                                 
-                                // Kontrollime, et dokumendi saatjaks v�i vahendajaks m�rgitud asutus
+                                // Kontrollime, et dokumendi saatjaks või vahendajaks mõrgitud asutus
                                 // ja dokumendi reaalselt saatnud asutus oleksid samad.
                                 if (!msg.getSenderOrgCode().equalsIgnoreCase(user.getOrganizationCode()) &&
                                    !msg.getProxyOrgCode().equalsIgnoreCase(user.getOrganizationCode())) {
@@ -514,22 +515,22 @@ public class SendDocuments {
                                 clientDocuments.add(msg);
                             }
                         } else {
-                            Document doc = Document.fromXML(docFiles.subFiles.get(i), user.getOrganizationID(), Settings.Server_ValidateXmlFiles, conn);
+                            Document doc = Document.fromXML(docFiles.subFiles.get(i), user.getOrganizationID(), Settings.Server_ValidateXmlFiles, conn, xTeePais);
                             
                             // Vajadusel valideerime saadetavad XML dokumendid
                             validateXmlFiles(doc.getFiles());
                             
-                            // Vajadusel kontrollime saadetavate .ddoc ja .bdoc failide allkirjad �le
+                            // Vajadusel kontrollime saadetavate .ddoc ja .bdoc failide allkirjad õle
                             validateSignedFileSignatures(doc.getFiles());
                             
-                            // Lisame v��rtused s�numi p�isest ja kehast
+                            // Lisame võõrtused sõnumi põisest ja kehast
                             doc.setFolderID( senderTargetFolder );
                             doc.setOrganizationID( user.getOrganizationID() );
                             
                             Date conservationDeadline = bodyData.sailitustahtaeg;
                             if (conservationDeadline == null) {
-                                // Kui saatja on dokumendi s�ilitust�htaja m��ramata j�tnud v�i m��ranud
-                                // t�htaja vigaselt, siis m��rame dokumendi s�ilitust�htajaks vaikimisi v��rtuse
+                                // Kui saatja on dokumendi sõilitustõhtaja mõõramata jõtnud või mõõranud
+                                // tõhtaja vigaselt, siis mõõrame dokumendi sõilitustõhtajaks vaikimisi võõrtuse
                                 Calendar calendar = Calendar.getInstance();
                                 calendar.setTime(new Date());
                                 calendar.add(Calendar.DATE, Settings.Server_DocumentDefaultLifetime);
@@ -539,7 +540,7 @@ public class SendDocuments {
                                 doc.setConservationDeadline(conservationDeadline);
                             }
                             
-                            // Kontrollime, et dokumendi saatjaks v�i vahendajaks m�rgitud asutus
+                            // Kontrollime, et dokumendi saatjaks või vahendajaks mõrgitud asutus
                             // ja dokumendi reaalselt saatnud asutus oleksid samad.
                             if (doc.getSendingList() != null) {
                                 Sending tmpSending;
@@ -586,7 +587,7 @@ public class SendDocuments {
             }
             
             // Salvestame saadud dokumendid andmebaasi ja koostame
-            // uute dokumentide ID-de p�hjal vastuss�numi.
+            // uute dokumentide ID-de põhjal vastussõnumi.
             try {
                 t.reset();
                 responseDataFile = CommonMethods.createPipelineFile(0);
@@ -610,9 +611,9 @@ public class SendDocuments {
                             // Salvestame dokumendi andmebaasi
                             tmpMsg.addToDB(hostOrgSettings);
                             
-                            // Tagastame siin kirje ID asemel DHL_ID v��rtuse, kuna
+                            // Tagastame siin kirje ID asemel DHL_ID võõrtuse, kuna
                             // kliendi poolel peaks DVK unikaalne identifikaator
-                            // asuma just sellel andmev�ljal.
+                            // asuma just sellel andmevõljal.
                             if (tmpMsg.getId() > 0) {
                                 ow.write("<dhl_id>"+ String.valueOf(tmpMsg.getDhlID()) +"</dhl_id>");
                             } else {
@@ -625,10 +626,10 @@ public class SendDocuments {
                             tmpDoc = serverDocuments.get(i);
                             
                             // Salvestame dokumendi andmebaasi
-                            tmpDoc.addToDB( conn );
+                            tmpDoc.addToDB(conn, xTeePais);
                             
-                            // Edastame dokumendi vajadusel m�nda teise DVK serverisse
-                            ForwardDocument(tmpDoc, bodyData.kaust, conn, 2);
+                            // Edastame dokumendi vajadusel mõnda teise DVK serverisse
+                            ForwardDocument(tmpDoc, bodyData.kaust, conn, 2, xTeePais);
                             
                             if (tmpDoc.getId() > 0) {
                                 ow.write("<dhl_id>"+ String.valueOf(tmpDoc.getId()) +"</dhl_id>");
@@ -648,7 +649,7 @@ public class SendDocuments {
                 ow = null;
                 out = null;
                 
-                // Kustutame ajutisest kataloogist �ra andmebaasi salvestatud failid
+                // Kustutame ajutisest kataloogist õra andmebaasi salvestatud failid
                 t.reset();
                 if (Settings.Server_RunOnClientDatabase) {
                     for (int i = 0; i < clientDocuments.size(); ++i) {
@@ -679,7 +680,7 @@ public class SendDocuments {
     }
     
     /**
-     * Uus versioon p�ringust. Muudatused:
+     * Uus versioon põringust. Muudatused:
      * 
      * 1. Kaotatud element <allyksuse_kood />
      * 
@@ -702,7 +703,7 @@ public class SendDocuments {
         String responseDataFile = null;
         
         try {
-            // Laeme p�ringu keha endale sobivasse andmestruktuuri
+            // Laeme põringu keha endale sobivasse andmestruktuuri
             sendDocumentsV2RequestType bodyData = sendDocumentsV2RequestType.getFromSOAPBody( context );
             if (bodyData == null) {
                 throw new RequestProcessingException(CommonStructures.VIGA_VIGANE_KEHA);
@@ -710,15 +711,15 @@ public class SendDocuments {
             result.folder = bodyData.kaust;
             
             // Tuvastame, millisesse kausta soovitakse dokumenti salvestada
-            // - Kui DVK server on seadistatud t��tama kliendi tabelite peal,
+            // - Kui DVK server on seadistatud tõõtama kliendi tabelite peal,
             //   siis pole meil kaustade tabelit olemas ja seega ei saa kausta
             //   ID-d tuvastada.
             int senderTargetFolder = Folder.GLOBAL_ROOT_FOLDER;
             if (!Settings.Server_RunOnClientDatabase) {
-                senderTargetFolder = Folder.getFolderIdByPath( bodyData.kaust, user.getOrganizationID(), conn, false, true );
+                senderTargetFolder = Folder.getFolderIdByPath( bodyData.kaust, user.getOrganizationID(), conn, false, true, xTeePais );
             }            
             
-            // Leiame s�numi kehas olnud viite alusels MIME lisast vajalikud andmed
+            // Leiame sõnumi kehas olnud viite alusels MIME lisast vajalikud andmed
             org.apache.axis.attachments.AttachmentPart px = (org.apache.axis.attachments.AttachmentPart) context.getCurrentMessage().getAttachmentsImpl().getAttachmentByReference(bodyData.dokumendid);
             if (px == null) {
                 throw new RequestProcessingException(CommonStructures.VIGA_PUUDUV_MIME_LISA);
@@ -759,8 +760,8 @@ public class SendDocuments {
             // fragmentide tabelisse
             if (bodyData.fragmenteKokku > 0) {
                 if (Settings.Server_RunOnClientDatabase) {
-                    // Kui DVK server on seadistatud t��tama kliendi andmetabelite peal,
-                    // siis teostame fragmentide t��tlemise andmebaasi asemel k�vakettal
+                    // Kui DVK server on seadistatud tõõtama kliendi andmetabelite peal,
+                    // siis teostame fragmentide tõõtlemise andmebaasi asemel kõvakettal
                     String uniqueFolder = CommonMethods.getUniqueDirectory(user.getOrganizationCode(), bodyData.edastusID);
                     if (uniqueFolder == null) {
                         throw new FragmentedDataProcessingException("Viga dokumendi fragmendi tootlemisel! Ei onnestunud luua ajutist kausta fragmentide salvestamiseks!");
@@ -780,7 +781,7 @@ public class SendDocuments {
                     fragment.setFragmentNr(bodyData.fragmentNr);
                     fragment.setOrganizationID(user.getOrganizationID());
                     fragment.setIsIncoming(true);
-                    fragment.addToDB(conn);
+                    fragment.addToDBProc(conn, xTeePais);
                     (new File(pipelineDataFile)).delete();
                 }
             
@@ -833,7 +834,7 @@ public class SendDocuments {
             OutputStreamWriter ow = null;
             BufferedWriter bw = null;
             ArrayList<Document> serverDocuments = new ArrayList<Document>();
-            ArrayList<DhlMessage> clientDocuments = new ArrayList<DhlMessage>();
+            ArrayList<DhlMessage> clientDocuments = new ArrayList<DhlMessage>();            
             if ((bodyData.fragmenteKokku <= 0) || (bodyData.fragmentNr == (bodyData.fragmenteKokku-1))) {
                 // Pakime andmed GZIPiga lahti
                 t.reset();
@@ -844,6 +845,7 @@ public class SendDocuments {
                 
                 // Pakime saadetud dokumentide faili lahti ja laeme selle XML struktuuri
                 t.reset();
+                
                 FileSplitResult docFiles = CommonMethods.splitOutTags(pipelineDataFile, "dokument", true, false, true);
                 t.markElapsed("Splitting attachment data");
                     if ((docFiles == null) || (docFiles.subFiles == null) || (docFiles.subFiles.size() < 1)) {
@@ -856,12 +858,12 @@ public class SendDocuments {
                         // Valideerime XML dokumendi
                         Fault validationFault = CommonMethods.validateDVKContainer(docFiles.subFiles.get(i));
                         
-                        // S�ltuvalt sellest, kas server t��tab serveri v�i kliendi
+                        // Sõltuvalt sellest, kas server tõõtab serveri või kliendi
                         // andmebaasi peal, koostame DVK konteineri XML failidest
                         // vastavad andmeobjektid ja salvestame need andmebaasi
                         if (Settings.Server_RunOnClientDatabase) {
-                            // V�tame v�lja antud andmebaasis seadistatud asutuste nimekirja, et
-                            // saaksime XML parsimisel v�tta v�lja eraldi kirjed, kui smaa s�numit
+                            // Võtame võlja antud andmebaasis seadistatud asutuste nimekirja, et
+                            // saaksime XML parsimisel võtta võlja eraldi kirjed, kui smaa sõnumit
                             // on saadetud mitmele asutusele
                             UnitCredential[] credentials = UnitCredential.getCredentials(hostOrgSettings);
 
@@ -873,7 +875,7 @@ public class SendDocuments {
                                 DhlMessage msg = msgList.get(j);
                                 msg.setDhlID(dhlID);
                                 
-                                // Kontrollime, et dokumendi saatjaks v�i vahendajaks m�rgitud asutus
+                                // Kontrollime, et dokumendi saatjaks või vahendajaks mõrgitud asutus
                                 // ja dokumendi reaalselt saatnud asutus oleksid samad.
                                 if (!msg.getSenderOrgCode().equalsIgnoreCase(user.getOrganizationCode()) &&
                                    !msg.getProxyOrgCode().equalsIgnoreCase(user.getOrganizationCode())) {
@@ -890,22 +892,22 @@ public class SendDocuments {
                                 clientDocuments.add(msg);
                             }
                         } else {
-                            Document doc = Document.fromXML(docFiles.subFiles.get(i), user.getOrganizationID(), Settings.Server_ValidateXmlFiles, conn);
+                            Document doc = Document.fromXML(docFiles.subFiles.get(i), user.getOrganizationID(), Settings.Server_ValidateXmlFiles, conn, xTeePais);
                             
                             // Vajadusel valideerime saadetavad XML dokumendid
                             validateXmlFiles(doc.getFiles());
                             
-                            // Vajadusel kontrollime saadetavate .ddoc ja .bdoc failide allkirjad �le
+                            // Vajadusel kontrollime saadetavate .ddoc ja .bdoc failide allkirjad õle
                             validateSignedFileSignatures(doc.getFiles());
                             
-                            // Lisame v��rtused s�numi p�isest ja kehast
+                            // Lisame võõrtused sõnumi põisest ja kehast
                             doc.setFolderID( senderTargetFolder );
                             doc.setOrganizationID( user.getOrganizationID() );
                             
                             Date conservationDeadline = bodyData.sailitustahtaeg;
                             if (conservationDeadline == null) {
-                                // Kui saatja on dokumendi s�ilitust�htaja m��ramata j�tnud v�i m��ranud
-                                // t�htaja vigaselt, siis m��rame dokumendi s�ilitust�htajaks vaikimisi v��rtuse
+                                // Kui saatja on dokumendi sõilitustõhtaja mõõramata jõtnud või mõõranud
+                                // tõhtaja vigaselt, siis mõõrame dokumendi sõilitustõhtajaks vaikimisi võõrtuse
                                 Calendar calendar = Calendar.getInstance();
                                 calendar.setTime(new Date());
                                 calendar.add(Calendar.DATE, Settings.Server_DocumentDefaultLifetime);
@@ -915,7 +917,7 @@ public class SendDocuments {
                                 doc.setConservationDeadline(conservationDeadline);
                             }
                             
-                            // Kontrollime, et dokumendi saatjaks v�i vahendajaks m�rgitud asutus
+                            // Kontrollime, et dokumendi saatjaks või vahendajaks mõrgitud asutus
                             // ja dokumendi reaalselt saatnud asutus oleksid samad.
                             if (doc.getSendingList() != null) {
                                 Sending tmpSending;
@@ -962,7 +964,7 @@ public class SendDocuments {
             }
             
             // Salvestame saadud dokumendid andmebaasi ja koostame
-            // uute dokumentide ID-de p�hjal vastuss�numi.
+            // uute dokumentide ID-de põhjal vastussõnumi.
             try {
                 t.reset();
                 responseDataFile = CommonMethods.createPipelineFile(0);
@@ -986,9 +988,9 @@ public class SendDocuments {
                             // Salvestame dokumendi andmebaasi
                             tmpMsg.addToDB(hostOrgSettings);
                             
-                            // Tagastame siin kirje ID asemel DHL_ID v��rtuse, kuna
+                            // Tagastame siin kirje ID asemel DHL_ID võõrtuse, kuna
                             // kliendi poolel peaks DVK unikaalne identifikaator
-                            // asuma just sellel andmev�ljal.
+                            // asuma just sellel andmevõljal.
                             if (tmpMsg.getId() > 0) {
                                 ow.write("<dhl_id>"+ String.valueOf(tmpMsg.getDhlID()) +"</dhl_id>");
                             } else {
@@ -1001,10 +1003,11 @@ public class SendDocuments {
                             tmpDoc = serverDocuments.get(i);
                             
                             // Salvestame dokumendi andmebaasi
-                            tmpDoc.addToDB( conn );
+                            //tmpDoc.addToDB( conn );
+                            tmpDoc.addToDB(conn, xTeePais);
                             
-                            // Edastame dokumendi vajadusel m�nda teise DVK serverisse
-                            ForwardDocument(tmpDoc, bodyData.kaust, conn, 3);
+                            // Edastame dokumendi vajadusel mõnda teise DVK serverisse
+                            ForwardDocument(tmpDoc, bodyData.kaust, conn, 3, xTeePais);
                             
                             if (tmpDoc.getId() > 0) {
                                 ow.write("<dhl_id>"+ String.valueOf(tmpDoc.getId()) +"</dhl_id>");
@@ -1025,7 +1028,7 @@ public class SendDocuments {
                 ow = null;
                 out = null;
                 
-                // Kustutame ajutisest kataloogist �ra andmebaasi salvestatud failid
+                // Kustutame ajutisest kataloogist õra andmebaasi salvestatud failid
                 t.reset();
                 if (Settings.Server_RunOnClientDatabase) {
                     for (int i = 0; i < clientDocuments.size(); ++i) {
@@ -1055,7 +1058,7 @@ public class SendDocuments {
     }
     
     // Edastab dokumendi teise DVK serverisse
-    private static ArrayList<Sending> ForwardDocument(dhl.Document doc, String kaust, Connection conn, int requestVersion) throws Exception {
+    private static ArrayList<Sending> ForwardDocument(dhl.Document doc, String kaust, Connection conn, int requestVersion, XHeader xTeePais) throws Exception {
         ArrayList<Sending> sendingList = doc.getSendingList();
         int lastSendingIndex = -1;
         if ((sendingList != null) && !sendingList.isEmpty()) {
@@ -1098,14 +1101,14 @@ public class SendDocuments {
                         ArrayList<OrgForwardHelper> orgArray = addressTable.get(key);
                         
                         // Koostame nimekirja asutustest, mille aadressid peavad konteineri
-                        // <transport> plokki alles j��ma
+                        // <transport> plokki alles jõõma
                         ArrayList<String> allowedOrgs = new ArrayList<String>();
                         for (int i = 0; i < orgArray.size(); ++i) {
                             allowedOrgs.add(orgArray.get(i).OrgCode);
                             logger.info("Organization " + orgArray.get(i).OrgCode + " will be left to forwarded message addressee list.");
                         }
                         
-                        // Kopeerime dokumendi faili uueks t��failiks
+                        // Kopeerime dokumendi faili uueks tõõfailiks
                         String simplifiedFile = CommonMethods.createPipelineFile(0);
                         if (CommonMethods.copyFile(doc.getFilePath(), simplifiedFile)) {
                             String newFile = CommonMethods.createPipelineFile(1);
@@ -1147,17 +1150,17 @@ public class SendDocuments {
                                 
                                 int docNewID = dvkClient.sendDocuments(header, dvkMessage, requestVersion);
                                 for (int i = 0; i < orgArray.size(); ++i) {
-                                    // M�rgime dokumendi ID vastuv�tja andmete juurde
+                                    // Mõrgime dokumendi ID vastuvõtja andmete juurde
                                     Recipient tmpRecipient = lastSending.getRecipients().get(orgArray.get(i).Index);
                                     tmpRecipient.setIdInRemoteServer(docNewID);
-                                    tmpRecipient.update(conn);
+                                    tmpRecipient.update(conn, xTeePais);
                                     lastSending.getRecipients().set(i, tmpRecipient);
                                 }
                             } else {
-                                throw new Exception("Dokumendi edastamine eba�nnestus!");
+                                throw new Exception("Dokumendi edastamine ebaõnnestus!");
                             }
                         } else {
-                            throw new Exception("Dokumendi faili kopeerimine edastamiseks eba�nnestus!");
+                            throw new Exception("Dokumendi faili kopeerimine edastamiseks ebaõnnestus!");
                         }
                     }
                 } else {

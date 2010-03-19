@@ -218,7 +218,7 @@ public class RecipientTemplate {
                         
                         if(doc.getDvkContainerVersion() == 1) {
                         	
-                        	// XML konteineri transport ploki täiendamine
+                        	// XML konteineri transport ploki tÃµiendamine
                             nodes = xmlDocNS.getDocumentElement().getElementsByTagNameNS(CommonStructures.DhlNamespace, "transport");
                             if (nodes.getLength() > 0) {
                                 el = (Element)nodes.item(0);
@@ -277,7 +277,7 @@ public class RecipientTemplate {
                         	
                         } else if(doc.getDvkContainerVersion() == 2) {
                         	
-                        	// XML konteineri transport ploki täiendamine
+                        	// XML konteineri transport ploki tÃµiendamine
                             nodes = xmlDocNS.getDocumentElement().getElementsByTagNameNS(CommonStructures.DhlNamespaceV2, "transport");
                             if (nodes.getLength() > 0) {
                                 el = (Element)nodes.item(0);

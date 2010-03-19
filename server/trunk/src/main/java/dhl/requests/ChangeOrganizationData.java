@@ -1,6 +1,7 @@
 package dhl.requests;
 
 import dvk.core.CommonStructures;
+import dhl.iostructures.XHeader;
 import dhl.iostructures.changeOrganizationDataRequestType;
 import dhl.users.Asutus;
 import dhl.users.UserProfile;
@@ -21,13 +22,13 @@ public class ChangeOrganizationData {
             throw new AxisFault(CommonStructures.VIGA_VIGANE_KEHA);
         }
         
-        // Kui p‰ringuga ¸ritatakse muuta teise asutuse andmeid, siis anname veatete
+        // Kui p√µringuga √µritatakse muuta teise asutuse andmeid, siis anname veatete
         if (!bodyData.asutus.getRegistrikood().equalsIgnoreCase(user.getOrganizationCode())) {
-            throw new AxisFault("Antud p‰ringuga saab muuta ainult p‰ringu sooritanud asutuse andmeid!");
+            throw new AxisFault("Antud p√µringuga saab muuta ainult p√µringu sooritanud asutuse andmeid!");
         }
 
         // Laeme andmebaasist asutuse andmete olemasoleva seisu.
-        // Ennekıike on see vajalik selleks, et teada saada asutuse olemasolevat ID koodi.
+        // Ennek√µike on see vajalik selleks, et teada saada asutuse olemasolevat ID koodi.
         Asutus asutus = new Asutus();
         asutus.loadByRegNr(bodyData.asutus.getRegistrikood(), conn);
 
@@ -36,8 +37,8 @@ public class ChangeOrganizationData {
         }
 
         if (bodyData.ksAsutuseKoodEsitatud) {
-            // Kui andmetes sisaldub viide kırgemalseisvale asutusele, siis ¸ritame
-            // tuvastada kırgemalseisva asutuse ID
+            // Kui andmetes sisaldub viide k√µrgemalseisvale asutusele, siis √µritame
+            // tuvastada k√µrgemalseisva asutuse ID
             if ((bodyData.asutus.getKsAsutuseKood() != null) && !bodyData.asutus.getKsAsutuseKood().equalsIgnoreCase("")) {
                 bodyData.asutus.setKsAsutuseID(Asutus.getIDByRegNr(bodyData.asutus.getKsAsutuseKood(), false, conn));
             }
@@ -160,8 +161,10 @@ public class ChangeOrganizationData {
             asutus.setToetatavDVKVersioon(bodyData.asutus.getToetatavDVKVersioon());
         }
 
-        // Salvestame muudatused.
-        asutus.saveToDB(conn);
+        // Salvestame muudatused. Kasutame X-tee p√§ist lihtsalt mugavaks andmete edastamiseks.
+        XHeader xTeePais = new XHeader(user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
+        
+        asutus.saveToDB(conn, xTeePais);
 
         return result;
     }

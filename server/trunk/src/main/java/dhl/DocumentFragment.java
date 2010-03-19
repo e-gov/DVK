@@ -1,13 +1,17 @@
 package dhl;
 
 import dhl.iostructures.FragmentationResult;
+import dhl.iostructures.XHeader;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import dvk.core.Settings;
+
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.sql.Blob;
 import java.sql.CallableStatement;
@@ -175,6 +179,71 @@ public class DocumentFragment {
         }
     }
     
+    public int addToDBProc(Connection conn, XHeader xTeePais) throws AxisFault {
+    	try {
+    		FileInputStream inStream = null;
+            if (conn != null) {
+                Calendar cal = Calendar.getInstance();
+                boolean defaultAutoCommit = conn.getAutoCommit();
+                conn.setAutoCommit(false);
+                FileInputStream fis = null;
+                try {
+                    m_id = getNextID(conn);
+                    
+                    CallableStatement cs = conn.prepareCall("{call ADD_DOKUMENT_FRAGMENT(?,?,?,?,?,?,?,?,?,?)}");
+		    		cs.setInt(1, m_id);
+		    		if(m_isIncoming) {
+		    			cs.setInt(2, 1);
+		    		} else {
+		    			cs.setInt(2, 0);
+		    		}		    		
+		    		cs.setInt(3, m_organizationID);
+		    		cs.setString(4, m_deliverySessionID);
+		    		cs.setInt(5, m_fragmentNr);
+		    		cs.setInt(6, m_fragmentCount);
+		    		cs.setTimestamp(7, CommonMethods.sqlDateFromDate(m_dateCreated), cal);
+		    		if(xTeePais != null) {
+		    			cs.setString(9, xTeePais.isikukood);
+		    			cs.setString(10, xTeePais.asutus);
+		    		} else {
+		    			cs.setString(9, null);
+		    			cs.setString(10, null);
+		    		}
+		    		
+		    		// BINARY TO BLOB
+		    		if ((new File(m_fileName)).exists()) {
+			    		int fileCharsCount = CommonMethods.getCharacterCountInFile(m_fileName);
+			    		inStream = new FileInputStream(m_fileName);
+			    		cs.setBlob(8, inStream, fileCharsCount);
+		    		}
+                    
+		    		// Execute
+		    		cs.execute();
+		    		cs.close();
+		    		conn.commit();
+                } catch (Exception ex) {
+                    conn.rollback();
+                    CommonMethods.logError(ex, this.getClass().getName(), "addToDB");
+                    throw ex;
+                } finally {
+                    CommonMethods.safeCloseStream(fis);
+                    fis = null;
+                }
+
+                // Anname auto-commit seadistusele uuesti vaikimisi vÃµÃµrtuse
+                conn.setAutoCommit(defaultAutoCommit);
+
+                // VÃ¤ljastame lisatud dokumendi ID
+                return m_id;
+            } else {
+                throw new AxisFault(CommonStructures.VIGA_ANDMEBAASIGA_YHENDAMISEL);
+            }
+        } catch (Exception e) {
+            CommonMethods.logError(e, this.getClass().getName(), "addToDB");
+            throw new AxisFault(CommonStructures.VIGA_ANDMEBAASI_SALVESTAMISEL + " : " + e.getMessage());
+        }
+    }
+    
     public int addToDB(Connection conn) throws AxisFault {
         try {
             if (conn != null) {
@@ -224,10 +293,10 @@ public class DocumentFragment {
                     fis = null;
                 }
 
-                // Anname auto-commit seadistusele uuesti vaikimisi väärtuse
+                // Anname auto-commit seadistusele uuesti vaikimisi vÃµÃµrtuse
                 conn.setAutoCommit(defaultAutoCommit);
 
-                // Väljastame lisatud dokumendi ID
+                // VÃµljastame lisatud dokumendi ID
                 return m_id;
             } else {
                 throw new AxisFault(CommonStructures.VIGA_ANDMEBAASIGA_YHENDAMISEL);
@@ -306,7 +375,7 @@ public class DocumentFragment {
         }
     }
     
-    public static FragmentationResult getFragments(String fileName, long fragmentMaxSize, int orgID, String deliverySessionID, boolean isIncoming, Connection conn) throws AxisFault {
+    public static FragmentationResult getFragments(String fileName, long fragmentMaxSize, int orgID, String deliverySessionID, boolean isIncoming, Connection conn, XHeader xTeePais) throws AxisFault {
         String firstFragment = null;
         FragmentationResult result = new FragmentationResult();
         try {
@@ -322,9 +391,9 @@ public class DocumentFragment {
                     fragment.setFragmentNr(i);
                     fragment.setOrganizationID(orgID);
                     fragment.setIsIncoming(isIncoming);
-                    fragment.addToDB(conn);
+                    fragment.addToDBProc(conn,xTeePais);
                     
-                    // Kustutame kettalt kõik fragmendid peale esimese
+                    // Kustutame kettalt kÃµik fragmendid peale esimese
                     if (i > 0) {
                         (new File(fragmentFiles.get(i))).delete();
                     }

@@ -88,8 +88,8 @@ public class UserProfile {
     public static UserProfile getFromHeaders(XHeader header, Connection conn) throws AxisFault {
         UserProfile result = new UserProfile();
 
-        // Kontrollime, et vajalik X-Tee p‰is anti kaasa ja et see sisaldaks
-        // infot v‰hemalt sınumi saatnud asutuse kohta.
+        // Kontrollime, et vajalik X-Tee p√µis anti kaasa ja et see sisaldaks
+        // infot v√µhemalt s√µnumi saatnud asutuse kohta.
         if (header == null) {
             throw new AxisFault(CommonStructures.VIGA_XTEE_PAISED_PUUDU);
         } else if ((header.asutus == null) || (header.asutus.length() == 0)) {
@@ -103,9 +103,9 @@ public class UserProfile {
             throw new AxisFault(CommonStructures.VIGA_TUNDMATU_ASUTUS.replaceFirst("#1", header.asutus));
         }
 
-        // Leiame sınumi saatnud isiku ID oma isikute registrist
-        // Kui isikut registrist leida ei ınnestu, siis pole hullu - enamuse
-        // p‰ringute puhul vıib p‰ringu teostajaks olla iaikute registris registreerimata isik
+        // Leiame s√µnumi saatnud isiku ID oma isikute registrist
+        // Kui isikut registrist leida ei √µnnestu, siis pole hullu - enamuse
+        // p√µringute puhul v√µib p√µringu teostajaks olla iaikute registris registreerimata isik
         if ((header.isikukood != null) && (header.isikukood.length() > 2)) {
             result.setPersonCode(header.isikukood.substring(2));
             result.setPersonID(Isik.getIDByCode(header.isikukood.substring(2), conn));
@@ -118,15 +118,15 @@ public class UserProfile {
         }*/
 
         // Leiame antud isiku teadaolevad ametid
-        // Kui ametikohta registrist leida ei ınnestu, siis pole hullu - enamuse
-        // p‰ringute puhul vıib p‰ringu teostajaks olla iaikute registris registreerimata
-        // vıi ametikohale registreerimata isik
+        // Kui ametikohta registrist leida ei √µnnestu, siis pole hullu - enamuse
+        // p√µringute puhul v√µib p√µringu teostajaks olla iaikute registris registreerimata
+        // v√µi ametikohale registreerimata isik
         result.setPositions(Ametikoht.getPersonCurrentPositions(result.getPersonID(), result.getOrganizationID(), conn));
         /*if (result.getPositions().size() < 1) {
             throw new AxisFault( CommonStructures.VIGA_AMETIKOHATA_ISIK );
         }*/
 
-        // Leiame antud isiku all¸ksused
+        // Leiame antud isiku all√µksused
         result.setDivisions(Ametikoht.getPersonCurrentDivisions(result.getPersonID(), result.getOrganizationID(), conn));
 
         // Leiame antud isikule omistatud rollid

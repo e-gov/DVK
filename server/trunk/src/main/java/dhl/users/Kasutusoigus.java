@@ -288,7 +288,7 @@ public class Kasutusoigus {
             }
             
             // Kannamae keskregistrist saadud andmed kohaliku
-            // andmeobjekti külge
+            // andmeobjekti kÃµlge
             right.setRoll(aarRight.getOigusNimi());
             right.setAlates(aarRight.getOigusAlates());
             right.setKuni(aarRight.getOigusKuni());

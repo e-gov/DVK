@@ -50,7 +50,7 @@ public class AarTaitmineOigus {
 
                 if (xmlReader.hasName()) {
                     if (xmlReader.getLocalName().equalsIgnoreCase(rootTagName) && xmlReader.isEndElement()) {
-                        // Kui oleme jıudnud asutuse elemendi lıppu, siis katkestame ts¸kli
+                        // Kui oleme j√µudnud asutuse elemendi l√µppu, siis katkestame ts√µkli
                         break;
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("nimetus") && xmlReader.isStartElement()) {
                          xmlReader.next();
@@ -71,7 +71,7 @@ public class AarTaitmineOigus {
                 }
             }
 
-            // Kui ¸hegi kontrolli taha pidama ei j‰‰nud, siis tagastame v‰‰rtuse
+            // Kui √µhegi kontrolli taha pidama ei j√µ√µnud, siis tagastame v√µ√µrtuse
             return result;
         } catch (XMLStreamException ex) {
             throw new AxisFault("Exception parsing AAR message organization data section: " + ex.getMessage());

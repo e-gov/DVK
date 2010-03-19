@@ -24,7 +24,7 @@ public class GetOccupationList {
 		
 		getOccupationListResponseType result = new getOccupationListResponseType();
 
-        // Laeme p�ringu keha endale sobivasse andmestruktuuri
+        // Laeme põringu keha endale sobivasse andmestruktuuri
         getOccupationListRequestType bodyData = getOccupationListRequestType.getFromSOAPBody(context);
         result.paring = bodyData;
 
@@ -52,11 +52,11 @@ public class GetOccupationList {
     	
     	getOccupationListV2ResponseType result = new getOccupationListV2ResponseType();
 
-        // Laeme p�ringu keha endale sobivasse andmestruktuuri
+        // Laeme põringu keha endale sobivasse andmestruktuuri
         getOccupationListV2RequestType bodyData = getOccupationListV2RequestType.getFromSOAPBody(context);
         result.paring = bodyData;
 
-        // Laeme sisendparameetrid SOAP s�numi manuses asuvast XML failist
+        // Laeme sisendparameetrid SOAP sõnumi manuses asuvast XML failist
         AttachmentExtractionResult exResult = CommonMethods.getExtractedFileFromAttachment(context, bodyData.asutusedHref);
         result.dataMd5Hash = exResult.getAttachmentHash();
         bodyData.loadParametersFromXML(exResult.getExtractedFileName());

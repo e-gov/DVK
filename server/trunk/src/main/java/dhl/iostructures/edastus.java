@@ -92,7 +92,7 @@ public class edastus {
             }
             xmlWriter.write("<staatus>" + statOut + "</staatus>");
 
-            // Vastuvıtja saadetud staatus
+            // Vastuv√µtja saadetud staatus
             xmlWriter.write("<vastuvotja_staatus_id>" + String.valueOf(m_saaja.getRecipientStatusId()) + "</vastuvotja_staatus_id>");
 
             // Vabas vormis metaandmed

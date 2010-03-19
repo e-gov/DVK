@@ -8,6 +8,7 @@ import dhl.Folder;
 import dhl.Recipient;
 import dhl.Sending;
 import dhl.iostructures.FragmentationResult;
+import dhl.iostructures.XHeader;
 import dhl.iostructures.receiveDocumentsRequestType;
 import dhl.iostructures.receiveDocumentsV2RequestType;
 import dhl.iostructures.receiveDocumentsV3RequestType;
@@ -59,18 +60,19 @@ public class ReceiveDocuments {
                 int resultLimit = bodyData.arv;
                 for (int folderNr = 0; folderNr < bodyData.kaust.size(); ++folderNr) {
                     // Tuvastame, millisesse kausta soovitakse dokumenti salvestada
-                    int requestTargetFolder = Folder.getFolderIdByPath( bodyData.kaust.get(folderNr).trim(), user.getOrganizationID(), conn, true, false );
+                	XHeader xTeePais = new XHeader(user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
+                    int requestTargetFolder = Folder.getFolderIdByPath( bodyData.kaust.get(folderNr).trim(), user.getOrganizationID(), conn, true, false, xTeePais );
                 
                     // Leiame antud kasutajale saadetud dokumendid
                     ArrayList<dhl.Document> tmpDocs = dhl.Document.getDocumentsSentTo( user.getOrganizationID(), requestTargetFolder, user.getPersonID(), 0, "", 0, "", resultLimit, conn );
                     resultLimit -= tmpDocs.size();
                     
-                    // Lisame leitud dokumendid dokumentide t�isnimekirja
+                    // Lisame leitud dokumendid dokumentide tõisnimekirja
                     documents.addAll( tmpDocs );
                     tmpDocs = null;
                     
-                    // Kui maksimaalne lubatud vastuste hulk on k�es, siis
-                    // rohkem dokumente andmebaasist v�lja ei v�ta
+                    // Kui maksimaalne lubatud vastuste hulk on kões, siis
+                    // rohkem dokumente andmebaasist võlja ei võta
                     if (resultLimit <= 0) {
                         break;
                     }
@@ -78,7 +80,7 @@ public class ReceiveDocuments {
             }
             t.markElapsed("Reading documents from DB");
             
-            // Pistame leitud dokumendid v�ljundisse
+            // Pistame leitud dokumendid võljundisse
             t.reset();
             try
             {
@@ -136,10 +138,10 @@ public class ReceiveDocuments {
                                 			
                                         }
                                         
-                                        // Viskame XML failist v�lja suure mahuga SignedDoc elemendid
+                                        // Viskame XML failist võlja suure mahuga SignedDoc elemendid
                                         CommonMethods.splitOutTags(tmpDoc.getFilePath(), "SignedDoc", false, false, true);
                                         
-                                        // T�idame DHL poolt automaatselt t�idetavad v�ljad
+                                        // Tõidame DHL poolt automaatselt tõidetavad võljad
                                         appendAutomaticMetaData(
                                             tmpDoc.getFilePath(),
                                             tmpSending,
@@ -225,18 +227,19 @@ public class ReceiveDocuments {
                     int resultLimit = bodyData.arv;
                     for (int folderNr = 0; folderNr < bodyData.kaust.size(); ++folderNr) {
                         // Tuvastame, millisesse kausta soovitakse dokumenti salvestada
-                        int requestTargetFolder = Folder.getFolderIdByPath( bodyData.kaust.get(folderNr).trim(), user.getOrganizationID(), conn, true, false );
+                    	XHeader xTeePais = new XHeader(user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
+                        int requestTargetFolder = Folder.getFolderIdByPath( bodyData.kaust.get(folderNr).trim(), user.getOrganizationID(), conn, true, false, xTeePais );
                     
                         // Leiame antud kasutajale saadetud dokumendid
                         ArrayList<dhl.Document> tmpDocs = dhl.Document.getDocumentsSentTo( user.getOrganizationID(), requestTargetFolder, user.getPersonID(), 0, "", 0, "", resultLimit, conn );
                         resultLimit -= tmpDocs.size();
                         
-                        // Lisame leitud dokumendid dokumentide t�isnimekirja
+                        // Lisame leitud dokumendid dokumentide tõisnimekirja
                         documents.addAll( tmpDocs );
                         tmpDocs = null;
                         
-                        // Kui maksimaalne lubatud vastuste hulk on k�es, siis
-                        // rohkem dokumente andmebaasist v�lja ei v�ta
+                        // Kui maksimaalne lubatud vastuste hulk on kões, siis
+                        // rohkem dokumente andmebaasist võlja ei võta
                         if (resultLimit <= 0) {
                             break;
                         }
@@ -244,7 +247,7 @@ public class ReceiveDocuments {
                 }
                 t.markElapsed("Reading documents from DB");
                 
-                // Pistame leitud dokumendid v�ljundisse
+                // Pistame leitud dokumendid võljundisse
                 t.reset();
                 try
                 {
@@ -303,10 +306,10 @@ public class ReceiveDocuments {
                                     			
                                             }
                                             
-                                            // Viskame XML failist v�lja suure mahuga SignedDoc elemendid
+                                            // Viskame XML failist võlja suure mahuga SignedDoc elemendid
                                             CommonMethods.splitOutTags(tmpDoc.getFilePath(), "SignedDoc", false, false, true);
                                             
-                                            // T�idame DHL poolt automaatselt t�idetavad v�ljad
+                                            // Tõidame DHL poolt automaatselt tõidetavad võljad
                                             appendAutomaticMetaData(
                                                 tmpDoc.getFilePath(),
                                                 tmpSending,
@@ -352,9 +355,10 @@ public class ReceiveDocuments {
                 t.markElapsed("Compressing response data");
                 
                 // Kui soovitakse vastust fragmenteeritud kujul, siis lammutame faili
-                // t�kkideks ja salvestame t�kid saatmist ootama.
+                // tõkkideks ja salvestame tõkid saatmist ootama.
                 if ((bodyData.edastusID != null) && !bodyData.edastusID.equalsIgnoreCase("") && (bodyData.fragmentNr >= 0)) {
-                    FragmentationResult fragResult = DocumentFragment.getFragments(result.responseFile, bodyData.fragmentSizeBytes, user.getOrganizationID(), bodyData.edastusID, false, conn);
+                	XHeader xTeePais = new XHeader(user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
+                    FragmentationResult fragResult = DocumentFragment.getFragments(result.responseFile, bodyData.fragmentSizeBytes, user.getOrganizationID(), bodyData.edastusID, false, conn, xTeePais);
                     if ((fragResult != null) && (fragResult.firstFragmentFile != null) && (new File(fragResult.firstFragmentFile)).exists()) {
                         result.responseFile = fragResult.firstFragmentFile;
                         result.fragmentNr = 0;
@@ -415,7 +419,8 @@ public class ReceiveDocuments {
                     int resultLimit = bodyData.arv;
                     for (int folderNr = 0; folderNr < bodyData.kaust.size(); ++folderNr) {
                         // Tuvastame, millisesse kausta soovitakse dokumenti salvestada
-                        int requestTargetFolder = Folder.getFolderIdByPath( bodyData.kaust.get(folderNr).trim(), user.getOrganizationID(), conn, true, false );
+                    	XHeader xTeePais = new XHeader(user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
+                        int requestTargetFolder = Folder.getFolderIdByPath( bodyData.kaust.get(folderNr).trim(), user.getOrganizationID(), conn, true, false, xTeePais );
                     
                         // Leiame antud kasutajale saadetud dokumendid
                         logger.debug("Searching documents using following parameters: Org ID:  " + String.valueOf(user.getOrganizationID()) + ", Folder:  " + String.valueOf(requestTargetFolder) + ", Person ID: " + String.valueOf(user.getPersonID()) + ", Subdivision ID: " + String.valueOf(bodyData.allyksus) + ", Occupation ID: " + String.valueOf(bodyData.ametikoht) + ", Max documents: " + String.valueOf(resultLimit));
@@ -431,12 +436,12 @@ public class ReceiveDocuments {
                             conn);
                         resultLimit -= tmpDocs.size();                        
                         
-                        // Lisame leitud dokumendid dokumentide t�isnimekirja
+                        // Lisame leitud dokumendid dokumentide tõisnimekirja
                         documents.addAll( tmpDocs );
                         tmpDocs = null;
                         
-                        // Kui maksimaalne lubatud vastuste hulk on k�es, siis
-                        // rohkem dokumente andmebaasist v�lja ei v�ta
+                        // Kui maksimaalne lubatud vastuste hulk on kões, siis
+                        // rohkem dokumente andmebaasist võlja ei võta
                         if (resultLimit <= 0) {
                             break;
                         }
@@ -445,7 +450,7 @@ public class ReceiveDocuments {
                 t.markElapsed("Reading documents from DB");
                 logger.info(String.valueOf(documents.size()) + " found.");
                 
-                // Pistame leitud dokumendid v�ljundisse
+                // Pistame leitud dokumendid võljundisse
                 t.reset();
                 try
                 {
@@ -516,7 +521,7 @@ public class ReceiveDocuments {
                                             logger.debug("Splitting out file tag: 'SignedDoc' from file: " + tmpDoc.getFilePath());
                                             CommonMethods.splitOutTags(tmpDoc.getFilePath(), "SignedDoc", false, false, true);
                                             
-                                            // T�idame DHL poolt automaatselt t�idetavad v�ljad
+                                            // Tõidame DHL poolt automaatselt tõidetavad võljad
                                             appendAutomaticMetaData(
                                                 tmpDoc.getFilePath(),
                                                 tmpSending,
@@ -567,9 +572,10 @@ public class ReceiveDocuments {
                 t.markElapsed("Compressing response data");
                 
                 // Kui soovitakse vastust fragmenteeritud kujul, siis lammutame faili
-                // t�kkideks ja salvestame t�kid saatmist ootama.
+                // tõkkideks ja salvestame tõkid saatmist ootama.
                 if ((bodyData.edastusID != null) && !bodyData.edastusID.equalsIgnoreCase("") && (bodyData.fragmentNr >= 0)) {
-                    FragmentationResult fragResult = DocumentFragment.getFragments(result.responseFile, bodyData.fragmentSizeBytes, user.getOrganizationID(), bodyData.edastusID, false, conn);
+                	XHeader xTeePais = new XHeader(user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
+                    FragmentationResult fragResult = DocumentFragment.getFragments(result.responseFile, bodyData.fragmentSizeBytes, user.getOrganizationID(), bodyData.edastusID, false, conn, xTeePais);
                     if ((fragResult != null) && (fragResult.firstFragmentFile != null) && (new File(fragResult.firstFragmentFile)).exists()) {
                         result.responseFile = fragResult.firstFragmentFile;
                         result.fragmentNr = 0;
@@ -631,7 +637,8 @@ public class ReceiveDocuments {
                     int resultLimit = bodyData.arv;
                     for (int folderNr = 0; folderNr < bodyData.kaust.size(); ++folderNr) {
                         // Tuvastame, millisesse kausta soovitakse dokumenti salvestada
-                        int requestTargetFolder = Folder.getFolderIdByPath( bodyData.kaust.get(folderNr).trim(), user.getOrganizationID(), conn, true, false );
+                    	XHeader xTeePais = new XHeader(user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
+                        int requestTargetFolder = Folder.getFolderIdByPath( bodyData.kaust.get(folderNr).trim(), user.getOrganizationID(), conn, true, false, xTeePais );
                     
                         // Leiame antud kasutajale saadetud dokumendid
                         logger.debug("Searching documents using following parameters: Org ID:  " + String.valueOf(user.getOrganizationID()) + ", Folder:  " + String.valueOf(requestTargetFolder) + ", Person ID: " + String.valueOf(user.getPersonID()) + ", Subdivision SN: " + bodyData.allyksuseLyhinimetus + ", Occupation SN: " + bodyData.ametikohaLyhinimetus + ", Max documents: " + String.valueOf(resultLimit));
@@ -647,12 +654,12 @@ public class ReceiveDocuments {
                             conn);
                         resultLimit -= tmpDocs.size();                        
                         
-                        // Lisame leitud dokumendid dokumentide t�isnimekirja
+                        // Lisame leitud dokumendid dokumentide tõisnimekirja
                         documents.addAll( tmpDocs );
                         tmpDocs = null;
                         
-                        // Kui maksimaalne lubatud vastuste hulk on k�es, siis
-                        // rohkem dokumente andmebaasist v�lja ei v�ta
+                        // Kui maksimaalne lubatud vastuste hulk on kões, siis
+                        // rohkem dokumente andmebaasist võlja ei võta
                         if (resultLimit <= 0) {
                             break;
                         }
@@ -661,7 +668,7 @@ public class ReceiveDocuments {
                 t.markElapsed("Reading documents from DB");
                 logger.info(String.valueOf(documents.size()) + " found.");
                 
-                // Pistame leitud dokumendid v�ljundisse
+                // Pistame leitud dokumendid võljundisse
                 t.reset();
                 try
                 {
@@ -702,11 +709,11 @@ public class ReceiveDocuments {
                                             Asutus senderOrg = new Asutus( tmpSending.getSender().getOrganizationID(), conn );
                                             Asutus recipientOrg = new Asutus( tmpRecipient.getOrganizationID(), conn );
                                             
-                                            // Viskame XML failist v�lja suure mahuga SignedDoc elemendid
+                                            // Viskame XML failist võlja suure mahuga SignedDoc elemendid
                                             //CommonMethods.splitOutTags(tmpDoc.getFilePath(), "SignedDoc", false, false, true);
                                             CommonMethods.splitOutTags(tmpDoc.getFilePath(), "failid", false, false, true);
                                             
-                                            // T�idame DHL poolt automaatselt t�idetavad v�ljad
+                                            // Tõidame DHL poolt automaatselt tõidetavad võljad
                                             appendAutomaticMetaData(
                                                 tmpDoc.getFilePath(),
                                                 tmpSending,
@@ -755,10 +762,11 @@ public class ReceiveDocuments {
                 t.markElapsed("Compressing response data");
                 
                 // Kui soovitakse vastust fragmenteeritud kujul, siis lammutame faili
-                // t�kkideks ja salvestame t�kid saatmist ootama.
+                // tõkkideks ja salvestame tõkid saatmist ootama.
                 if ((bodyData.edastusID != null) && !bodyData.edastusID.equalsIgnoreCase("") && (bodyData.fragmentNr >= 0)) {
                 	logger.debug("Vastust soovitakse fragmenteeritud kujul. Tükeldame faili.");
-                    FragmentationResult fragResult = DocumentFragment.getFragments(result.responseFile, bodyData.fragmentSizeBytes, user.getOrganizationID(), bodyData.edastusID, false, conn);
+                	XHeader xTeePais = new XHeader(user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
+                    FragmentationResult fragResult = DocumentFragment.getFragments(result.responseFile, bodyData.fragmentSizeBytes, user.getOrganizationID(), bodyData.edastusID, false, conn, xTeePais);
                     if ((fragResult != null) && (fragResult.firstFragmentFile != null) && (new File(fragResult.firstFragmentFile)).exists()) {
                     	
                     	logger.debug("fragResult.totalFragments: " + fragResult.totalFragments);
@@ -793,12 +801,12 @@ public class ReceiveDocuments {
      * Meetod lisab DVK poolt automaatselt lisatavad metaandmed
      * dokumendi XML struktuurile.
      * 
-     * @param filePath              T��deldava XML faili asukoht
+     * @param filePath              Tõõdeldava XML faili asukoht
      * @param sendingData           Dokumendi saatmise andmed
-     * @param recipientData         Dokumenti hetkel vastuv�tva adressaadi andmed
+     * @param recipientData         Dokumenti hetkel vastuvõtva adressaadi andmed
      * @param documentData          Dokumendi saatja andmed
      * @param senderOrg             Dokumendi saatnud asutuse andmed
-     * @param recipientOrg          Dokumenti hetkel vastuv�tva asutuse andmed
+     * @param recipientOrg          Dokumenti hetkel vastuvõtva asutuse andmed
      * @throws Exception
      */
     private static void appendAutomaticMetaData(

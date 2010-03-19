@@ -1,5 +1,6 @@
 package dhl;
 
+import dhl.iostructures.XHeader;
 import dvk.core.CommonMethods;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -79,7 +80,7 @@ public class Folder {
         clear();
     }
 
-    public static int getFolderIdByPath(String path, int organizationID, Connection conn, boolean allowUnspecified, boolean allowNew) {
+    public static int getFolderIdByPath(String path, int organizationID, Connection conn, boolean allowUnspecified, boolean allowNew, XHeader xTeePais) {
         if ((path == null) || (path.length() < 1)) {
             return allowUnspecified ? UNSPECIFIED_FOLDER : GLOBAL_ROOT_FOLDER;
         }
@@ -105,7 +106,7 @@ public class Folder {
             }
 
             if (folderMarker == NONEXISTING_FOLDER) {
-                return allowNew ? createFolder(path, GLOBAL_ROOT_FOLDER, 0, "", conn) : NONEXISTING_FOLDER;
+                return allowNew ? createFolder(path, GLOBAL_ROOT_FOLDER, 0, "", conn, xTeePais) : NONEXISTING_FOLDER;
             }
         }
         return folderMarker;
@@ -116,8 +117,8 @@ public class Folder {
      * 
      * @param folderName        kausta nimi
      * @param organizationID    asutuse ID
-     * @param parentID          otsitava kausta ülemkausta ID
-     * @param conn              andmebaasiühenduse objekt
+     * @param parentID          otsitava kausta Ãµlemkausta ID
+     * @param conn              andmebaasiÃµhenduse objekt
      * @return                  kausta ID
      */
     public static int getFolderIdByName(String folderName, int organizationID, int parentID, Connection conn) {
@@ -149,11 +150,11 @@ public class Folder {
     }
 
     /**
-     * Leiab kataloogi ID järgi kausta täisnime (täisteekonna alustades juurkaustast)
+     * Leiab kataloogi ID jÃµrgi kausta tÃµisnime (tÃµisteekonna alustades juurkaustast)
      * 
      * @param folderID  Kausta ID
-     * @param conn      Andmebaasiühenduse objekt
-     * @return          Kausta täisnimi
+     * @param conn      AndmebaasiÃµhenduse objekt
+     * @return          Kausta tÃµisnimi
      */
     public static String getFolderFullPath(int folderID, Connection conn) {
         try {
@@ -174,7 +175,7 @@ public class Folder {
         }
     }
 
-    public static int createFolder(String fullPath, int parentID, int orgID, String folderNumber, Connection conn) {
+    public static int createFolder(String fullPath, int parentID, int orgID, String folderNumber, Connection conn, XHeader xTeePais) {
         try {
             if (conn != null) {
                 while (fullPath.startsWith(DELIMITER)) {
@@ -189,7 +190,7 @@ public class Folder {
                 if ((splitPath.length > 0) && (splitPath[0] != null) && (splitPath[0].trim().length() > 0)) {
                     id = getFolderIdByName(splitPath[0].trim(), orgID, parentID, conn);
                     if (id == NONEXISTING_FOLDER) {
-                        CallableStatement cs = conn.prepareCall("{call ADD_FOLDER(?,?,?,?,?)}");
+                        CallableStatement cs = conn.prepareCall("{call ADD_FOLDER(?,?,?,?,?,?,?)}");
                         cs.setString("folder_name", splitPath[0].trim());
                         cs.setInt("parent_id", parentID);
 
@@ -204,7 +205,16 @@ public class Folder {
                         } else {
                             cs.setNull("folder_number", Types.VARCHAR);
                         }
-
+                        
+                        if(xTeePais != null) {
+    		    			cs.setString("xtee_isikukood", xTeePais.isikukood);
+    		    			cs.setString("xtee_asutus", xTeePais.asutus);
+    		    		} else {
+    		    			cs.setString("xtee_isikukood", null);
+    		    			cs.setString("xtee_asutus", null);
+    		    		}
+                        
+                        
                         cs.registerOutParameter("folder_id", Types.INTEGER);
                         cs.executeUpdate();
                         id = cs.getInt("folder_id");
@@ -220,7 +230,7 @@ public class Folder {
                         }
                         subPath += splitPath[i];
                     }
-                    return createFolder(subPath, id, orgID, folderNumber, conn);
+                    return createFolder(subPath, id, orgID, folderNumber, conn, xTeePais);
                 } else {
                     return id;
                 }
@@ -234,7 +244,7 @@ public class Folder {
     }
     
     /**
-     * Muudab etteantud kausta nimetust nii, et see sisaldaks ainult ASCII sümboleid
+     * Muudab etteantud kausta nimetust nii, et see sisaldaks ainult ASCII sÃµmboleid
      * A-Z, 0-9, /, _.
      * 
      * @param initialName   Kliendi poolt etteantud kausta nimetus

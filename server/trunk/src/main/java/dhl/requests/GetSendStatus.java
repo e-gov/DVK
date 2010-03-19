@@ -55,7 +55,7 @@ public class GetSendStatus {
             AttachmentExtractionResult attachment = CommonMethods.getExtractedFileFromAttachment(context, bodyData.kehaHref);
             result.dataMd5Hash = attachment.getAttachmentHash();
                       
-            // Leiame k�ik XML elemendid, mille nimi on "dhl_id"
+            // Leiame kõik XML elemendid, mille nimi on "dhl_id"
             ArrayList<Document> docIDs = dhl.Document.sendingStatusFromXML(attachment.getExtractedFileName(), 1);
             
             try {
@@ -66,7 +66,7 @@ public class GetSendStatus {
                     ow = new OutputStreamWriter(out, "UTF-8"); 
                     ow.write("<keha>");
                     
-                    // Leiame andmebaasist k�situd dokumentide staatuse
+                    // Leiame andmebaasist kõsitud dokumentide staatuse
                     Sending sendingData = null;
                     dhl.iostructures.edastus tmpEdastus = null;
                     boolean isCanceled = false;
@@ -130,8 +130,8 @@ public class GetSendStatus {
                                     resp.olek = CommonStructures.SendStatus_Sent_Name;
                                 }
                                 
-                                // Kui s�numi saatnud asutus on sama, mis praegu s�numi
-                                // staatust p�riv asutus, siis lisame antud dokumendi
+                                // Kui sõnumi saatnud asutus on sama, mis praegu sõnumi
+                                // staatust põriv asutus, siis lisame antud dokumendi
                                 // andmed vastuse XML-i.
                                 if (senderOK) {
                                     resp.appendObjectXML(ow, conn);
@@ -141,7 +141,7 @@ public class GetSendStatus {
                             sendingData = new Sending();
                             sendingData.loadByDocumentID( docID, conn );
                          
-                            // Kontrollime, et sisseloginud kasutajal on �igus antud dokumentide
+                            // Kontrollime, et sisseloginud kasutajal on õigus antud dokumentide
                             // kohta infot saada
                             if( (sendingData.getSender().getPersonalIdCode() == user.getPersonCode()) ||
                                 user.getPositions().contains(sendingData.getSender().getPositionID()) ||
@@ -153,7 +153,7 @@ public class GetSendStatus {
                             {
                                 for (Recipient r : sendingData.getRecipients()) {
                                     if (r.getIdInRemoteServer() > 0) {
-                                        // Teeme staatuse p�ringu v�lisesse serverisse
+                                        // Teeme staatuse põringu võlisesse serverisse
                                          tmpEdastus = getSendStatusFromRemoteServer(r, conn);
                                          if (tmpEdastus != null) {
                                              resp.edastus.add( tmpEdastus );
@@ -241,7 +241,7 @@ public class GetSendStatus {
                 ow = new OutputStreamWriter(out, "UTF-8"); 
                 ow.write("<keha>");
                 
-                // Leiame andmebaasist k�situd dokumentide staatuse
+                // Leiame andmebaasist kõsitud dokumentide staatuse
                 Sending sendingData = null;
                 dhl.iostructures.edastus tmpEdastus = null;
                 boolean isCanceled = false;
@@ -318,12 +318,12 @@ public class GetSendStatus {
                             	totalStatus = CommonStructures.SendStatus_Sent_Name;
                             }
                             
-                            // Kui rakendus t��tab kliendi andmetabelite peal, siis
-                            // pole vahet, kas k�siti ajalugu v�i mitte, kuna mingeid m�istlikke
-                            // staatuse ajaloo andmeid pole niikuinii (ega isegi teki t�� k�igus).
+                            // Kui rakendus tõõtab kliendi andmetabelite peal, siis
+                            // pole vahet, kas kõsiti ajalugu või mitte, kuna mingeid mõistlikke
+                            // staatuse ajaloo andmeid pole niikuinii (ega isegi teki tõõ kõigus).
                             
-                            // Kui s�numi saatnud asutus on sama, mis praegu s�numi
-                            // staatust p�riv asutus, siis lisame antud dokumendi
+                            // Kui sõnumi saatnud asutus on sama, mis praegu sõnumi
+                            // staatust põriv asutus, siis lisame antud dokumendi
                             // andmed vastuse XML-i.
                             if (senderOK) {
                             	getSendStatusV2ResponseType.appendObjectXML(docID, doc.getGuid(), edastusList, historyList, totalStatus, ow, conn);
@@ -342,7 +342,7 @@ public class GetSendStatus {
                         	docID = sendingData.getDocumentID();
                         }
                         
-                        // Kontrollime, et sisseloginud kasutajal on �igus antud dokumentide
+                        // Kontrollime, et sisseloginud kasutajal on õigus antud dokumentide
                         // kohta infot saada
                         if( CommonMethods.stringsEqualIgnoreNull(sendingData.getSender().getPersonalIdCode(), user.getPersonCode()) ||
                             user.getPositions().contains(sendingData.getSender().getPositionID()) ||
@@ -354,7 +354,7 @@ public class GetSendStatus {
                         {
                             for (Recipient r : sendingData.getRecipients()) {
                                 if (r.getIdInRemoteServer() > 0) {
-                                    // Teeme staatuse p�ringu v�lisesse serverisse
+                                    // Teeme staatuse põringu võlisesse serverisse
                                      tmpEdastus = getSendStatusFromRemoteServer(r, conn);
                                      if (tmpEdastus != null) {
                                          edastusList.add( tmpEdastus );
@@ -380,7 +380,7 @@ public class GetSendStatus {
                             	totalStatus = CommonStructures.SendStatus_Sent_Name;
                             }
                             
-                            // Kui k�siti ka ajalugu, siis v�tame andmebaasist v�lja
+                            // Kui kõsiti ka ajalugu, siis võtame andmebaasist võlja
                             // antud dokumendi staatuse ajaloo.
                             if (bodyData.staatuseAjalugu) {
                             	historyList = DocumentStatusHistory.getList(docID, conn);
@@ -435,7 +435,7 @@ public class GetSendStatus {
         
         
         
-        // TODO: Kas siin peaks vajadusel ka ajaloo v�lja k�sima?
+        // TODO: Kas siin peaks vajadusel ka ajaloo võlja kõsima?
         
         ArrayList<GetSendStatusResponseItem> statusResponse = dvkClient.getSendStatus(header, msgArray, 1, false);
         if (statusResponse.size() > 0) {

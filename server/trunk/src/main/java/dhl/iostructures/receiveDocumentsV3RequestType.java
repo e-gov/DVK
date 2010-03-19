@@ -45,13 +45,13 @@ public class receiveDocumentsV3RequestType {
                     
                     // Arv
                     result.arv = CommonMethods.getNumberFromChildNode(bodyNode, "arv", 10);
-                    // Kontrollime, et ei saaks esitada päringut, mille väljundisse
-                    // ei ole lubatud ühtegi dokumenti.
+                    // Kontrollime, et ei saaks esitada pÃµringut, mille vÃµljundisse
+                    // ei ole lubatud Ãµhtegi dokumenti.
                     if (result.arv < 1) {
                         result.arv = 1;
                     }
                     
-                    // Allüksus
+                    // AllÃµksus
                     result.allyksus = CommonMethods.getNumberFromChildNode(bodyNode, "allyksus", 0);
                     
                     // Ametikoht

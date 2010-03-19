@@ -5,6 +5,7 @@ import dhl.aar.AarClient;
 import dhl.aar.iostructures.AarAmetikoht;
 import dhl.aar.iostructures.AarAsutus;
 import dhl.aar.iostructures.AarOigus;
+import dhl.iostructures.XHeader;
 import dvk.client.ClientAPI;
 import dvk.client.businesslayer.DhlCapability;
 import dvk.client.iostructures.GetSendingOptionsV3ResponseType;
@@ -699,11 +700,11 @@ public class Asutus {
         }
     }
     
-    public void addToDB(Connection conn) {
+    public void addToDB(Connection conn, XHeader xTeePais) {
         try {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
-                CallableStatement cs = conn.prepareCall("{call ADD_ASUTUS(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                CallableStatement cs = conn.prepareCall("{call ADD_ASUTUS(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 cs.registerOutParameter("id", Types.INTEGER);
                 cs.setString("registrikood", m_registrikood);
                 cs.setString("registrikood_vana", m_registrikoodVana);
@@ -740,6 +741,15 @@ public class Asutus {
                 cs.setInt("dhl_otse_saatmine", (m_dvkOtseSaatmine ? 1 : 0));
                 cs.setString("dhs_nimetus", m_dhsNimetus);
                 cs.setString("toetatav_dvk_versioon", m_toetatavDVKVersioon);
+                
+                if(xTeePais != null) {
+                	cs.setString("xtee_isikukood", xTeePais.isikukood);
+                	cs.setString("xtee_asutus", xTeePais.asutus);
+                } else {
+                	cs.setString("xtee_isikukood", null);
+                	cs.setString("xtee_asutus", null);
+                }
+                
                 CommonMethods.setNullableIntParam(cs, "server_id", m_serverID);
                 CommonMethods.setNullableIntParam(cs, "aar_id", m_aarID);
                 cs.executeUpdate();
@@ -752,11 +762,11 @@ public class Asutus {
         }
     }
     
-    public void updateInDB(Connection conn) {
+    public void updateInDB(Connection conn, XHeader xTeePais) {
         try {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
-                CallableStatement cs = conn.prepareCall("{call UPDATE_ASUTUS(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                CallableStatement cs = conn.prepareCall("{call UPDATE_ASUTUS(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 cs.setInt("id", m_id);
                 cs.setString("registrikood", m_registrikood);
                 cs.setString("registrikood_vana", m_registrikoodVana);
@@ -793,6 +803,15 @@ public class Asutus {
                 cs.setInt("dhl_otse_saatmine", (m_dvkOtseSaatmine ? 1 : 0));
                 cs.setString("dhs_nimetus", m_dhsNimetus);
                 cs.setString("toetatav_dvk_versioon", m_toetatavDVKVersioon);
+                
+                if(xTeePais != null) {
+                	cs.setString("xtee_isikukood", xTeePais.isikukood);
+                	cs.setString("xtee_asutus", xTeePais.asutus);
+                } else {
+                	cs.setString("xtee_isikukood", null);
+                	cs.setString("xtee_asutus", null);
+                }
+                
                 CommonMethods.setNullableIntParam(cs, "server_id", m_serverID);
                 CommonMethods.setNullableIntParam(cs, "aar_id", m_aarID);
                 cs.executeUpdate();
@@ -804,19 +823,19 @@ public class Asutus {
         }
     }
     
-    public void saveToDB(Connection conn) {
+    public void saveToDB(Connection conn, XHeader xTeePais) {
         if (m_id > 0) {
-            updateInDB(conn);
+            updateInDB(conn, xTeePais);
         } else {
-            addToDB(conn);
+            addToDB(conn, xTeePais);
         }
     }
 
     /**
-     * Laeb kõigist teistest teadaolevatest serveritest asutuste nimekirjad
-     * ja sünkroniseerib kohaliku asutuste registri saadud andmetega
+     * Laeb kÃµigist teistest teadaolevatest serveritest asutuste nimekirjad
+     * ja sÃµnkroniseerib kohaliku asutuste registri saadud andmetega
      */
-    public static void getOrgsFromAllKnownServers(String orgCodeToFind, Connection conn) throws Exception {
+    public static void getOrgsFromAllKnownServers(String orgCodeToFind, Connection conn, XHeader xTeePais) throws Exception {
         boolean foundMissingOrg = false;
         ArrayList<RemoteServer> servers = RemoteServer.getList(conn);
         if (!servers.isEmpty()) {
@@ -842,7 +861,7 @@ public class Asutus {
                             newOrg.setDvkSaatmine(item.getIsDhlCapable());
                             newOrg.setDvkOtseSaatmine(item.getIsDhlDirectCapable());
                             newOrg.setServerID(server.getID());
-                            newOrg.addToDB(conn);
+                            newOrg.addToDB(conn, xTeePais);
                             if ((orgCodeToFind != null) && !orgCodeToFind.equalsIgnoreCase("") && (orgCodeToFind == item.getOrgCode())) {
                                 foundMissingOrg = true;
                             }
@@ -858,7 +877,7 @@ public class Asutus {
     
     public static void runAarSyncronization(Connection conn) {
         try {
-            // Asutuste sünkroniseerimine
+            // Asutuste sÃµnkroniseerimine
             ArrayList<Asutus> orgs = getList(conn);
             ArrayList<String> orgCodes = new ArrayList<String>();
             for (int i = 0; i < orgs.size(); ++i) {
@@ -885,7 +904,7 @@ public class Asutus {
                 }
             }
             
-            // Ametikohtade sünkroniseerimine
+            // Ametikohtade sÃµnkroniseerimine
             for (int i = 0; i < aarOrgs.size(); ++i) {
                 aarOrg = aarOrgs.get(i);
                 if (aarOrg.getAmetikohad() != null) {
@@ -903,7 +922,7 @@ public class Asutus {
                 }
             }
             
-            // Õiguste sünkroniseerimine
+            // Ãµiguste sÃµnkroniseerimine
             for (int i = 0; i < aarOrgs.size(); ++i) {
                 aarOrg = aarOrgs.get(i);
                 ArrayList<AarOigus> aarRights = aarClient.oigusedRequest(aarOrg.getRegistrikood(), 0, "");
@@ -929,7 +948,7 @@ public class Asutus {
                 return 0;
             }
             
-            // Kõrgemalseisva asutuse andmed
+            // KÃµrgemalseisva asutuse andmed
             int topOrgID = 0;
             if (aarOrg.getKsAsutusID() > 0) {
                 boolean getTopOrgData = true;
@@ -940,7 +959,7 @@ public class Asutus {
                     }
                 }
                 
-                // Kui antud asutuse kõrgemalseisva asutuse andmeid kohalikus
+                // Kui antud asutuse kÃµrgemalseisva asutuse andmeid kohalikus
                 // asutuste registris ei ole, siis laeme need keskregistrist
                 // ja salvestame kohalikku registrisse.
                 if (getTopOrgData) {
@@ -958,7 +977,7 @@ public class Asutus {
             }
             
             // Kannamae keskregistrist saadud andmed kohaliku
-            // andmeobjekti külge
+            // andmeobjekti kÃµlge
             org.setRegistrikood(aarOrg.getRegistrikood());
             org.setAarID(aarOrg.getAsutusID());
             org.setKsAsutuseID(topOrgID);
@@ -974,7 +993,7 @@ public class Asutus {
             org.setEpost(aarOrg.getEPost());
             org.setWww(aarOrg.getWww());
             org.setAsutamiseKuupaev(aarOrg.getAsutamiseKp());
-            org.saveToDB(conn);
+            org.saveToDB(conn, null);
             
             
             return org.getId();

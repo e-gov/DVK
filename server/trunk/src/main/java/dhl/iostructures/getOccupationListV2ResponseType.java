@@ -44,7 +44,7 @@ public class getOccupationListV2ResponseType implements SOAPOutputBodyRepresenta
             SOAPElement elHash = elParing.addChildElement("asutused");
             elHash.addTextNode(this.dataMd5Hash);
             
-            // Sõnumi keha osa
+            // SÃµnumi keha osa
             SOAPElement elKeha = element.addChildElement(se.createName("keha"));
             SOAPElement elDokument = elKeha.addChildElement(se.createName("ametikohad"));
             elDokument.addAttribute(se.createName("href"), "cid:" + this.ametikohadHref);

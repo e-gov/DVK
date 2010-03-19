@@ -307,7 +307,7 @@ public class Isik {
             }
             
             // Kannamae keskregistrist saadud andmed kohaliku
-            // andmeobjekti külge
+            // andmeobjekti kÃµlge
             person.setIsikukood(aarPerson.getIsikukood());
             person.setPerenimi(aarPerson.getPerenimi());
             person.setEesnimi(aarPerson.getEesnimi());

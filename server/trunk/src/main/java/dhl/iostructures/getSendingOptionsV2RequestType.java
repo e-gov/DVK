@@ -52,7 +52,7 @@ public class getSendingOptionsV2RequestType {
                         }
                     }
                     
-                    // Ainult vastuvõtmist ootavate dokumentidega asutused
+                    // Ainult vastuvÃµtmist ootavate dokumentidega asutused
                     nodes = el.getElementsByTagName("vastuvotmata_dokumente_ootel");
                     if (nodes.getLength() > 0) {
                         el1 = (Element)nodes.item(0);
@@ -62,7 +62,7 @@ public class getSendingOptionsV2RequestType {
                         }
                     }
 
-                    // Ainult asutused, kes on vahetanud vähemalt N dokumenti
+                    // Ainult asutused, kes on vahetanud vÃµhemalt N dokumenti
                     nodes = el.getElementsByTagName("vahetatud_dokumente_vahemalt");
                     if (nodes.getLength() > 0) {
                         el1 = (Element)nodes.item(0);

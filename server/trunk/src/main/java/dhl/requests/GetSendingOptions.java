@@ -31,7 +31,7 @@ public class GetSendingOptions {
     	
     	getSendingOptionsResponseType result = new getSendingOptionsResponseType();
 
-        // Laeme päringu keha endale sobivasse andmestruktuuri
+        // Laeme pÃµringu keha endale sobivasse andmestruktuuri
         getSendingOptionsRequestType bodyData = getSendingOptionsRequestType.getFromSOAPBody(context);
         result.paring = bodyData;
 
@@ -71,12 +71,12 @@ public class GetSendingOptions {
                     org.add(tmpOrg);
                 }
             } else {
-                // Tagastame nimekirja kõigist seotud asutustest
+                // Tagastame nimekirja kÃµigist seotud asutustest
                 org = Asutus.getList(conn);
             }
             
-            // Kui kõrgemalseisva asutuse ID on määratud, siis
-            // kirjutame selle alusel kõrgmalseisva asutuse koodi üle.
+            // Kui kÃµrgemalseisva asutuse ID on mÃµÃµratud, siis
+            // kirjutame selle alusel kÃµrgmalseisva asutuse koodi Ãµle.
             for (Asutus o : org) {
             	if (o.getKsAsutuseID() > 0) {
             		Asutus ks = new Asutus(o.getKsAsutuseID(), conn);
@@ -94,16 +94,16 @@ public class GetSendingOptions {
     	
     	getSendingOptionsV2ResponseType result = new getSendingOptionsV2ResponseType();
 
-    	// Laeme päringu keha endale sobivasse andmestruktuuri
+    	// Laeme pÃµringu keha endale sobivasse andmestruktuuri
         getSendingOptionsV2RequestType bodyData = getSendingOptionsV2RequestType.getFromSOAPBody(context);
         result.paring = bodyData;
 
         // Leiame andmebaasist soovitud asutused
         ArrayList<Asutus> org = new ArrayList<Asutus>();
         if (Settings.Server_RunOnClientDatabase) {
-            // Kui DVK server on seadistatud töötama kliendi andmebaasi peal,
-            // siis ei ole kunagi ühtegi dokumenti vastuvõtmise ootel, kuna
-            // dokumentide allalaadimise päring pole kasutatav.
+            // Kui DVK server on seadistatud tÃµÃµtama kliendi andmebaasi peal,
+            // siis ei ole kunagi Ãµhtegi dokumenti vastuvÃµtmise ootel, kuna
+            // dokumentide allalaadimise pÃµring pole kasutatav.
             if (!bodyData.vastuvotmataDokumenteOotel) {
                 UnitCredential[] credentials = UnitCredential.getCredentials(hostOrgSettings);
                 for (int i = 0; i < credentials.length; ++i) {
@@ -139,12 +139,12 @@ public class GetSendingOptions {
                     org.add(tmpOrg);
                 }
             } else {
-                // Tagastame nimekirja kõigist seotud asutustest
+                // Tagastame nimekirja kÃµigist seotud asutustest
                 org = Asutus.getList(conn);
             }
             
-            // Kui kõrgemalseisva asutuse ID on määratud, siis
-            // kirjutame selle alusel kõrgmalseisva asutuse koodi üle.
+            // Kui kÃµrgemalseisva asutuse ID on mÃµÃµratud, siis
+            // kirjutame selle alusel kÃµrgmalseisva asutuse koodi Ãµle.
             for (Asutus o : org) {
             	if (o.getKsAsutuseID() > 0) {
             		Asutus ks = new Asutus(o.getKsAsutuseID(), conn);
@@ -153,7 +153,7 @@ public class GetSendingOptions {
             }
         }
         
-        // Filtreerime välja etteantud kriteeriumitele vastavad asutused
+        // Filtreerime vÃµlja etteantud kriteeriumitele vastavad asutused
         if (bodyData.vastuvotmataDokumenteOotel || (bodyData.vahetatudDokumenteKuni >= 0) || (bodyData.vahetatudDokumenteVahemalt >= 0)) {
             int i = 0;
             AsutuseStatistika stat = null;
@@ -199,7 +199,7 @@ public class GetSendingOptions {
     	getSendingOptionsV3ResponseType result = new getSendingOptionsV3ResponseType();
     	try
     	{
-	        // Laeme päringu keha endale sobivasse andmestruktuuri
+	        // Laeme pÃµringu keha endale sobivasse andmestruktuuri
 	        getSendingOptionsV3RequestType bodyData = getSendingOptionsV3RequestType.getFromSOAPBody(context);
 	        result.paring = bodyData;
 	        
@@ -207,7 +207,7 @@ public class GetSendingOptions {
 	        logger.debug("vahetatudDokumenteVahemalt: " + bodyData.vahetatudDokumenteVahemalt);
 	        logger.debug("vastuvotmataDokumenteOotel: " + bodyData.vastuvotmataDokumenteOotel);
 	        
-	        // Laeme sisendparameetrid SOAP sõnumi manuses asuvast XML failist
+	        // Laeme sisendparameetrid SOAP sÃµnumi manuses asuvast XML failist
 	        AttachmentExtractionResult exResult = CommonMethods.getExtractedFileFromAttachment(context, bodyData.parameetridHref);
 	        result.dataMd5Hash = exResult.getAttachmentHash();
 	        bodyData.loadParametersFromXML(exResult.getExtractedFileName());
@@ -218,9 +218,9 @@ public class GetSendingOptions {
 	        ArrayList<Ametikoht> occupationList = new ArrayList<Ametikoht>();
 	        
 	        if (Settings.Server_RunOnClientDatabase) {
-	            // Kui DVK server on seadistatud töötama kliendi andmebaasi peal,
-	            // siis ei ole kunagi ühtegi dokumenti vastuvõtmise ootel, kuna
-	            // dokumentide allalaadimise päring pole kasutatav.
+	            // Kui DVK server on seadistatud tÃµÃµtama kliendi andmebaasi peal,
+	            // siis ei ole kunagi Ãµhtegi dokumenti vastuvÃµtmise ootel, kuna
+	            // dokumentide allalaadimise pÃµring pole kasutatav.
 	            if (!bodyData.vastuvotmataDokumenteOotel) {
 	                UnitCredential[] credentials = UnitCredential.getCredentials(hostOrgSettings);
 	                for (int i = 0; i < credentials.length; ++i) {
@@ -385,14 +385,14 @@ public class GetSendingOptions {
 	                }
 	            } else {
 	            	logger.debug("Request bodyData does not contain a list of 'asutused'.");
-	                // Tagastame nimekirja kõigist seotud asutustest
+	                // Tagastame nimekirja kÃµigist seotud asutustest
 	            	organizationList = Asutus.getList(conn);
 	            	subdivisionList = Allyksus.getList(0, "", conn);
 	            	occupationList = Ametikoht.getList(0, "", conn);
 	            }
 	            
-	            // Kui kõrgemalseisva asutuse ID on määratud, siis
-	            // kirjutame selle alusel kõrgmalseisva asutuse koodi üle.
+	            // Kui kÃµrgemalseisva asutuse ID on mÃµÃµratud, siis
+	            // kirjutame selle alusel kÃµrgmalseisva asutuse koodi Ãµle.
 	            for (Asutus o : organizationList) {
 	            	if (o.getKsAsutuseID() > 0) {
 	            		Asutus ks = new Asutus(o.getKsAsutuseID(), conn);
@@ -401,8 +401,8 @@ public class GetSendingOptions {
 	            }
 	        }
 	        
-	        // Filtreerime välja etteantud kriteeriumitele vastavad asutused
-	        logger.debug("Filtreerime välja etteantud kriteeriumitele vastavad asutused.");
+	        // Filtreerime vÃµlja etteantud kriteeriumitele vastavad asutused
+	        logger.debug("Filtreerime vÃµlja etteantud kriteeriumitele vastavad asutused.");
 	        if (bodyData.vastuvotmataDokumenteOotel || (bodyData.vahetatudDokumenteKuni >= 0) || (bodyData.vahetatudDokumenteVahemalt >= 0)) {
 	            int i = 0;
 	            AsutuseStatistika stat = null;
@@ -444,8 +444,8 @@ public class GetSendingOptions {
 	                }
 	            }
 	            
-	            // Allüksuste listi filtreerimine
-	            logger.debug("Allüksuste listi filtreerimine.");
+	            // AllÃµksuste listi filtreerimine
+	            logger.debug("AllÃµksuste listi filtreerimine.");
 	            i = 0;
 	            while (i < subdivisionList.size()) {
 	                if (Settings.Server_RunOnClientDatabase) {
@@ -457,8 +457,8 @@ public class GetSendingOptions {
 	                    stat = AsutuseStatistika.getBySubdivisionId(subdivisionList.get(i).getAsutusID(), subdivisionList.get(i).getID(), conn);
 	                }
 	                if (stat == null) {
-	                	logger.warn("DVK tarkvaraline viga: Viga allüksuse statistika lugemisel!");
-	                    throw new AxisFault("DVK tarkvaraline viga: Viga allüksuse statistika lugemisel!");
+	                	logger.warn("DVK tarkvaraline viga: Viga allÃµksuse statistika lugemisel!");
+	                    throw new AxisFault("DVK tarkvaraline viga: Viga allÃµksuse statistika lugemisel!");
 	                } else {
 	                    remove = false;
 	                    if (bodyData.vastuvotmataDokumenteOotel) {
@@ -490,7 +490,7 @@ public class GetSendingOptions {
 	                    stat = AsutuseStatistika.getByOccupationId(occupationList.get(i).getAsutusID(), occupationList.get(i).getID(), conn);
 	                }
 	                if (stat == null) {
-	                    throw new AxisFault("DVK tarkvaraline viga: Viga allüksuse statistika lugemisel!");
+	                    throw new AxisFault("DVK tarkvaraline viga: Viga allÃµksuse statistika lugemisel!");
 	                } else {
 	                    remove = false;
 	                    if (bodyData.vastuvotmataDokumenteOotel) {
@@ -523,14 +523,14 @@ public class GetSendingOptions {
 	        
 	        if(subdivisionList != null && subdivisionList.size() > 0) {
 	        	for(Allyksus a: subdivisionList) {
-	        		logger.debug("Allüksuse lühinimetus: " + a.getLyhinimetus());
-	        		logger.debug("Allüksuse nimetus: " + a.getNimetus());
+	        		logger.debug("AllÃµksuse lÃµhinimetus: " + a.getLyhinimetus());
+	        		logger.debug("AllÃµksuse nimetus: " + a.getNimetus());
 	        	}
 	        }
 	        
 	        if(occupationList != null && occupationList.size() > 0) {
 	        	for(Ametikoht a: occupationList) {
-	        		logger.debug("Ametikoha lühinimetus: " + a.getLyhinimetus());
+	        		logger.debug("Ametikoha lÃµhinimetus: " + a.getLyhinimetus());
 	        		logger.debug("Ametikoht nimetus: " + a.getNimetus());
 	        	}
 	        }

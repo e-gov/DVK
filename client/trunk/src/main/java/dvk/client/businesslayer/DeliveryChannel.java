@@ -3,9 +3,9 @@ package dvk.client.businesslayer;
 import dvk.client.conf.OrgSettings;
 
 /**
- * DVK sınumi edastusinfo.
- * Klass on mıeldud selleks, et vahetult enne dokumendi
- * v‰ljasaatmist lisada sınumi juurde, millisel viisil see
+ * DVK s√µnumi edastusinfo.
+ * Klass on m√µeldud selleks, et vahetult enne dokumendi
+ * v√§ljasaatmist lisada s√µnumi juurde, millisel viisil see
  * tuleks adressaadile edastada.
  * 
  * @author		Jaak Lember

@@ -52,7 +52,7 @@ public class OrgAddressFilter {
     }
     
     /**
-     * Näitab, kas antud filter on reaalselt kasutatav (korrektselt seadistatud)
+     * NÃ¤itab, kas antud filter on reaalselt kasutatav (korrektselt seadistatud)
      */
     public boolean isValidFilter() {
     	return (this.getCodesSet() || this.getIdsSet());
@@ -73,12 +73,12 @@ public class OrgAddressFilter {
     	ArrayList<MessageRecipient> result = new ArrayList<MessageRecipient>();
     	if ((this.isValidFilter() == true)) {
     		for (MessageRecipient recipient : fullList) {
-    			// Aadressandmetes on sõltuvalt konteineri versioonist antud
-    			// kas allüksuse/ametikoha ID (ver 1) või lühinimetus (ver 2).
-    			// Filtri andmetes on potentsiaalselt olemas mõlemad variandid.
+    			// Aadressandmetes on sÃµltuvalt konteineri versioonist antud
+    			// kas allÃ¼ksuse/ametikoha ID (ver 1) vÃµi lÃ¼hinimetus (ver 2).
+    			// Filtri andmetes on potentsiaalselt olemas mÃµlemad variandid.
     			//
-    			// Seega tuvastame aadressandmete järgi, kas filtreerida ID-de
-    			// või lühinimetuste järgi.
+    			// Seega tuvastame aadressandmete jÃ¤rgi, kas filtreerida ID-de
+    			// vÃµi lÃ¼hinimetuste jÃ¤rgi.
     			
     			if (((recipient.getRecipientDivisionCode() != null) && (recipient.getRecipientDivisionCode().length() > 0))
     				|| ((recipient.getRecipientPositionCode() != null) && (recipient.getRecipientPositionCode().length() > 0))) {

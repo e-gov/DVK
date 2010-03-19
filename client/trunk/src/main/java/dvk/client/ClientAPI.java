@@ -77,8 +77,8 @@ public class ClientAPI {
     private Call call;
     private OrgDvkSettings orgSettings;
     private ArrayList<String> tempFiles;
-    private String queryId; // viimase X-tee p�ringu ID
-    private String producerName; // andmekogu nimetus (kui suhtlus k�ib �le X-tee)
+    private String queryId; // viimase X-tee päringu ID
+    private String producerName; // andmekogu nimetus (kui suhtlus käib üle X-tee)
     private ArrayList<OrgSettings> allKnownDatabases;
      
     public void setOrgSettings(OrgDvkSettings value) {
@@ -122,7 +122,7 @@ public class ClientAPI {
         this.call = (Call)service.createCall();
         this.call.setTargetEndpointAddress(new URL(serverURL));
         
-        // Otsustame, kas saadame SOAPAction p�ise
+        // Otsustame, kas saadame SOAPAction päise
         if ((producerName != null) && !producerName.equalsIgnoreCase("")) {
             this.call.setUseSOAPAction(true);
             this.call.setSOAPActionURI("http://producers."+ this.producerName +".xtee.riik.ee/producer/"+ this.producerName);
@@ -135,10 +135,10 @@ public class ClientAPI {
     
     
     /**
-     * DVK getSendStatus p�ringu k�ivitamine.
+     * DVK getSendStatus päringu käivitamine.
      * Kontrollib DVK keskserverist saadetud dokumentide staatusi.
      * 
-     * @param headerVar			P�ringu X-Tee p�istesse kantavad andmed
+     * @param headerVar			Päringu X-Tee päistesse kantavad andmed
      * @param messages			Dokumentide DVK ID-d
      * @return
      * @throws Exception
@@ -159,13 +159,13 @@ public class ClientAPI {
             String attachmentName = String.valueOf(System.currentTimeMillis());
             
             if (!messages.isEmpty()) {
-                // P�ringu nimi
+                // Päringu nimi
                 String requestName = this.producerName + ".getSendStatus.v" + String.valueOf(requestVersion);
                 
-                // P�ringu ID koostamine
+                // Päringu ID koostamine
                 queryId =  "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
                 
-                // M��rame X-Tee p�ise v��rtused
+                // Määrame X-Tee päise väärtused
                 XHeader header = new XHeader(
                     headerVar.getOrganizationCode(),
                     this.producerName,
@@ -175,13 +175,13 @@ public class ClientAPI {
                     headerVar.getCaseName(),
                     headerVar.getPIDWithCountryCode());
 
-                // V�ljundfail
+                // Väljundfail
                 String attachmentFile = CommonMethods.createPipelineFile(0);
                 outStream = new FileOutputStream(attachmentFile, false);
                 outWriter = new OutputStreamWriter(outStream, "UTF-8");
                 writer = new BufferedWriter(outWriter);
                 
-                // Koostame s�numi sisu
+                // Koostame sõnumi sisu
                 ArrayList<Integer> processedIDs = new ArrayList<Integer>();
                 for (int i = 0; i < messages.size(); ++i) {
                 	DhlMessage dhlMessage = messages.get(i);
@@ -202,12 +202,12 @@ public class ClientAPI {
                 }
                 processedIDs = null;
                 
-                // V�ljundstreamid kinni
+                // Väljundstreamid kinni
                 CommonMethods.safeCloseWriter(writer);
                 CommonMethods.safeCloseWriter(outWriter);
                 CommonMethods.safeCloseStream(outStream);
 
-                // Koostame SOAP s�numi keha
+                // Koostame SOAP sõnumi keha
                 String messageData = "";
                 switch (requestVersion) {
                 	case 1:
@@ -228,7 +228,7 @@ public class ClientAPI {
                 Message msg = new Message(messageData);
                 call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "getSendStatus"));
 
-                // Lisame s�numile manuse
+                // Lisame sõnumile manuse
                 String tmpFile = CommonMethods.gzipPackXML(attachmentFile, headerVar.getOrganizationCode(), "getSendStatus");
                 (new File(attachmentFile)).delete();
                 tempFiles.add(tmpFile);
@@ -246,10 +246,10 @@ public class ClientAPI {
                 call.invoke(msg);
                 
                 logger.debug("Got response message. Processing...");
-                // Teeme vastuss�numi andmetest omad j�reldused
+                // Teeme vastussõnumi andmetest omad järeldused
                 Message respMessage = call.getResponseMessage();
                 
-                // harutame p�ringu vastuse lahti
+                // harutame päringu vastuse lahti
                 result = extractGetSendStatusResponse(respMessage);
             }
         } finally {
@@ -261,7 +261,7 @@ public class ClientAPI {
     }
 
     /**
-     * Harutab lahti getSendStatus p�ringu vastuseks saadud XML-i.
+     * Harutab lahti getSendStatus päringu vastuseks saadud XML-i.
      * 
      */
     public ArrayList<GetSendStatusResponseItem> extractGetSendStatusResponse(Message response) throws SOAPException, AxisFault {
@@ -298,13 +298,13 @@ public class ClientAPI {
         // Manuse ID
         String attachmentName = String.valueOf((new Date()).getTime());
         
-        // P�ringu nimi
+        // Päringu nimi
         String requestName = this.producerName + ".sendDocuments.v" + String.valueOf(requestVersion);
         
-        // P�ringu ID koostamine
+        // Päringu ID koostamine
         queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
         
-        // Saadetava s�numi p�isesse kantavad parameetrid
+        // Saadetava sõnumi päisesse kantavad parameetrid
         XHeader header = new XHeader(
             headerVar.getOrganizationCode(),
             this.producerName,
@@ -350,7 +350,7 @@ public class ClientAPI {
                 return runSendDocumentsRequest(messageData, tmpFile, attachmentName);
             }
         } else {
-            // Koostame SOAP s�numi keha
+            // Koostame SOAP sõnumi keha
             SendDocumentsBody b = new SendDocumentsBody();
             b.dokumendid = attachmentName;
             b.kaust = message.getDhlFolderName();
@@ -369,20 +369,20 @@ public class ClientAPI {
 	    	if ((targetDb != null) && (rec != null)) {
 		    	DhlMessage recipientSideMessage = (DhlMessage)message.clone();
 		
-		    	// Nullime s�numi ID (kirje primaarv�ti andmebaasis), et
-		    	// me sihtbaasis m�nda olemasolevat kirjet �le ei kirjutaks
+		    	// Nullime sõnumi ID (kirje primaarvõti andmebaasis), et
+		    	// me sihtbaasis mõnda olemasolevat kirjet üle ei kirjutaks
 		    	recipientSideMessage.setId(0);
 		    	
 		    	// Dokumendi DVK ID on praeguseks hetkske loodetavasti juba
-		    	// keskserverist saadud ja s�numi k�ljes ilusti olemas.
+		    	// keskserverist saadud ja sõnumi küljes ilusti olemas.
 		    	// S.t. teise andmebaasi kirjutatavad andmed tulevad kloonimisel
 		    	
-		    	// M�rgime dokumendi sissetulevaks dokumendiks ja
-		    	// m��rame �ra dokumendi unit_id vastuv�tja andmebaasis.
+		    	// Märgime dokumendi sissetulevaks dokumendiks ja
+		    	// määrame ära dokumendi unit_id vastuvõtja andmebaasis.
 		    	recipientSideMessage.setIsIncoming(true);
 		    	recipientSideMessage.setUnitID(message.getDeliveryChannel().getUnitId());
 		    	
-		    	// T�idame adressaadi andmed
+		    	// Täidame adressaadi andmed
 		    	recipientSideMessage.setRecipientOrgCode(rec.getRecipientOrgCode());
 		    	recipientSideMessage.setRecipientOrgName(rec.getRecipientOrgName());
 		    	recipientSideMessage.setRecipientPersonCode(rec.getRecipientPersonCode());
@@ -394,14 +394,14 @@ public class ClientAPI {
 		    	recipientSideMessage.setRecipientPositionCode(rec.getRecipientPositionCode());
 		    	recipientSideMessage.setRecipientPositionName(rec.getRecipientPositionName());
 		    	
-		    	// Saatmise ja vastuv�tmise kuup�evad
+		    	// Saatmise ja vastuvõtmise kuupäevad
 		    	Date now = new Date();
 		    	recipientSideMessage.setSendingDate(now);
 		    	recipientSideMessage.setReceivedDate(now);
 		    	
 		    	
 		    	
-		    	// M�rgime adressaadi poolel staatuseks, et tegemist on saabunud s�numiga
+		    	// Märgime adressaadi poolel staatuseks, et tegemist on saabunud sõnumiga
 		    	Classifier statusSent = new Classifier("STATUS_RECEIVED", targetDb);
 		    	recipientSideMessage.setSendingStatusID(statusSent.getId());
 		    	
@@ -409,7 +409,7 @@ public class ClientAPI {
 		    	result = recipientSideMessage.addToDB(targetDb);
 		    	
 		    	if (result > 0) {
-		    		// Uuendame adressaadi andmeid l�hteandmebaasis
+		    		// Uuendame adressaadi andmeid lähteandmebaasis
 		    		rec.setSendingDate(now);
 		    		rec.setReceivedDate(now);
 		    		rec.setSendingStatusID(Settings.Client_StatusSent);
@@ -434,7 +434,7 @@ public class ClientAPI {
 	    	Message msg = new Message(messageData);
 	        call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "sendDocuments"));
 	        
-	        // Lisame s�numile manuse
+	        // Lisame sõnumile manuse
 	        FileDataSource ds = new FileDataSource(attachmentFile);
 	        DataHandler d1 = new DataHandler(ds);
 	        AttachmentPart a1 = new AttachmentPart(d1);
@@ -445,20 +445,20 @@ public class ClientAPI {
 	        msg.addAttachmentPart(a1);
 	        msg.saveChanges();
 	        
-	        // K�ivitame p�ringu
+	        // Käivitame päringu
 	        call.invoke(msg);
 	        
-	        // Vastuse t��tlemine
+	        // Vastuse töötlemine
 	        Message response = call.getResponseMessage();
 	        return extractSendDocumentsResponse(response);
         } catch (Exception ex) {
-        	// Vea puhul logime vea p�hjustanud SOAP s�numi keha
+        	// Vea puhul logime vea põhjustanud SOAP sõnumi keha
         	logger.error("SOAP message body: " + messageData);
         	throw ex;
         }
     }
 
-    // Harutab lahti sendDocuments p�ringu vastuseks saadud XML-i
+    // Harutab lahti sendDocuments päringu vastuseks saadud XML-i
     private static int extractSendDocumentsResponse(Message response) throws Exception {
         int result = 0;
         Document xmldoc = null;
@@ -520,12 +520,12 @@ public class ClientAPI {
         int requestVersion) throws Exception {
         ReceiveDocumentsResult result = new ReceiveDocumentsResult();
 
-        // P�ringu nimi
+        // Päringu nimi
         String requestName = this.producerName + ".receiveDocuments.v" + String.valueOf(requestVersion);
-        // P�ringu ID koostamine
+        // Päringu ID koostamine
         queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
         
-        // Saadetava s�numi p�isesse kantavad parameetrid
+        // Saadetava sõnumi päisesse kantavad parameetrid
         XHeader header = new XHeader(
             headerVar.getOrganizationCode(),
             this.producerName,
@@ -535,7 +535,7 @@ public class ClientAPI {
             headerVar.getCaseName(),
             headerVar.getPIDWithCountryCode());
 
-        // Koostame SOAP s�numi keha
+        // Koostame SOAP sõnumi keha
         String messageData = "";
         if (requestVersion == 4) {
         	logger.debug("Invoking receiveDocuments.V4...");
@@ -557,13 +557,13 @@ public class ClientAPI {
                     Message msg = new Message(messageData);
                     call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "receiveDocuments"));
                     
-                    // Teostame p�ringu
+                    // Teostame päringu
                     call.invoke(msg);
                     
-                    // P�ringu tulemuste t��tlemine
+                    // Päringu tulemuste töötlemine
                     Message response = call.getResponseMessage();
                     
-                    // Loeme p�ringu vastusest andmed fragmendi kohta
+                    // Loeme päringu vastusest andmed fragmendi kohta
                     int fragmentNr = -1;
                     int fragmentCount = 0;
                     SOAPBody body = response.getSOAPBody();
@@ -620,14 +620,14 @@ public class ClientAPI {
                             throw new Exception( CommonStructures.VIGA_VIGANE_MIME_LISA );
                         }
                         
-                        // Kui k�ik fragmendid on k�es, siis t��tleme faili �ra
+                        // Kui kõik fragmendid on käes, siis töötleme faili ära
                         // ja salvestame saadud dokumendid andmebaasi.
                         if (!hasMoreFragments) {
                             CommonMethods.gzipUnpackXML(attachmentFile, true);
                             FileSplitResult splitResult = CommonMethods.splitOutTags(attachmentFile, "dokument", true, false, false);
                             result.documents.addAll(splitResult.subFiles);
                             
-                            // Kustutame manuse faili, kuna kogu edasine t�� toimub juba
+                            // Kustutame manuse faili, kuna kogu edasine töö toimub juba
                             // eraldatud dokumentide failidega.
                             (new File(attachmentFile)).delete();
                             
@@ -657,13 +657,13 @@ public class ClientAPI {
                     Message msg = new Message(messageData);
                     call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "receiveDocuments"));
                     
-                    // Teostame p�ringu
+                    // Teostame päringu
                     call.invoke(msg);
                     
-                    // P�ringu tulemuste t��tlemine
+                    // Päringu tulemuste töötlemine
                     Message response = call.getResponseMessage();
                     
-                    // Loeme p�ringu vastusest andmed fragmendi kohta
+                    // Loeme päringu vastusest andmed fragmendi kohta
                     int fragmentNr = -1;
                     int fragmentCount = 0;
                     SOAPBody body = response.getSOAPBody();
@@ -713,14 +713,14 @@ public class ClientAPI {
                             throw new Exception( CommonStructures.VIGA_VIGANE_MIME_LISA );
                         }
                         
-                        // Kui k�ik fragmendid on k�es, siis t��tleme faili �ra
+                        // Kui kõik fragmendid on käes, siis töötleme faili ära
                         // ja salvestame saadud dokumendid andmebaasi.
                         if (!hasMoreFragments) {
                             CommonMethods.gzipUnpackXML(attachmentFile, true);
                             FileSplitResult splitResult = CommonMethods.splitOutTags(attachmentFile, "dokument", true, false, false);
                             result.documents.addAll(splitResult.subFiles);
                             
-                            // Kustutame manuse faili, kuna kogu edasine t�� toimub juba
+                            // Kustutame manuse faili, kuna kogu edasine töö toimub juba
                             // eraldatud dokumentide failidega.
                             (new File(attachmentFile)).delete();
                             
@@ -748,13 +748,13 @@ public class ClientAPI {
                     Message msg = new Message(messageData);
                     call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "receiveDocuments"));
                     
-                    // Teostame p�ringu
+                    // Teostame päringu
                     call.invoke(msg);
                     
-                    // P�ringu tulemuste t��tlemine
+                    // Päringu tulemuste töötlemine
                     Message response = call.getResponseMessage();
                     
-                    // Loeme p�ringu vastusest andmed fragmendi kohta
+                    // Loeme päringu vastusest andmed fragmendi kohta
                     int fragmentNr = -1;
                     int fragmentCount = 0;
                     SOAPBody body = response.getSOAPBody();
@@ -804,14 +804,14 @@ public class ClientAPI {
                             throw new Exception( CommonStructures.VIGA_VIGANE_MIME_LISA );
                         }
                         
-                        // Kui k�ik fragmendid on k�es, siis t��tleme faili �ra
+                        // Kui kõik fragmendid on käes, siis töötleme faili ära
                         // ja salvestame saadud dokumendid andmebaasi.
                         if (!hasMoreFragments) {
                             CommonMethods.gzipUnpackXML(attachmentFile, true);
                             FileSplitResult splitResult = CommonMethods.splitOutTags(attachmentFile, "dokument", true, false, false);
                             result.documents.addAll(splitResult.subFiles);
                             
-                            // Kustutame manuse faili, kuna kogu edasine t�� toimub juba
+                            // Kustutame manuse faili, kuna kogu edasine töö toimub juba
                             // eraldatud dokumentide failidega.
                             (new File(attachmentFile)).delete();
                             
@@ -831,10 +831,10 @@ public class ClientAPI {
         Message msg = new Message(messageData);
         call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "receiveDocuments"));
 
-        // Teostame p�ringu
+        // Teostame päringu
         call.invoke(msg);
 
-        // P�ringu tulemuste t��tlemine
+        // Päringu tulemuste töötlemine
         Message response = call.getResponseMessage();
         Iterator attachments = response.getAttachments();
         if (attachments.hasNext()) {
@@ -862,7 +862,7 @@ public class ClientAPI {
                 FileSplitResult splitResult = CommonMethods.splitOutTags(attachmentFile, "dokument", true, false, false);
                 result.documents.addAll(splitResult.subFiles);
                 
-                // Kustutame manuse faili, kuna kogu edasine t�� toimub juba
+                // Kustutame manuse faili, kuna kogu edasine töö toimub juba
                 // eraldatud dokumentide failidega.
                 (new File(attachmentFile)).delete();
             }
@@ -895,14 +895,14 @@ public class ClientAPI {
             return;
         }
     	
-        // P�ringu ID koostamine
+        // Päringu ID koostamine
         queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
         
-        // P�ringu nimi ja versioon
+        // Päringu nimi ja versioon
         int requestVersion = orgSettings.getMarkDocumentsReceivedRequestVersion();
         String requestName = this.producerName + ".markDocumentsReceived.v" + String.valueOf(requestVersion);
         
-        // Saadetava s�numi p�isesse kantavad parameetrid
+        // Saadetava sõnumi päisesse kantavad parameetrid
         XHeader header = new XHeader(
             headerVar.getOrganizationCode(),
             this.producerName,
@@ -931,9 +931,9 @@ public class ClientAPI {
 	        b.kaust = "";
 	        b.edastusID = deliverySessionID;
 	        
-	        // All�ksuse ja ametikoha parameetrid lisame markDocumentsReceived
-	        // p�ringule �ksnes juhul, kui allalaadimisel kasutatud receiveDocuments
-	        // p�ring toetas all�ksuse ja ametikoha parameetrite kasutamist.
+	        // Allüksuse ja ametikoha parameetrid lisame markDocumentsReceived
+	        // päringule üksnes juhul, kui allalaadimisel kasutatud receiveDocuments
+	        // päring toetas allüksuse ja ametikoha parameetrite kasutamist.
 	        if ((unitSettings != null) && (orgSettings.getReceiveDocumentsRequestVersion() >= 3)) {
 		        b.allyksuseId = unitSettings.getDivisionID();
 		        b.ametikohaId = unitSettings.getOccupationID();
@@ -949,9 +949,9 @@ public class ClientAPI {
 	    	b3.vastuvotjaVeateade = clientFault;
 	    	b3.metaXml = metaXML;
 	        
-	        // All�ksuse ja ametikoha parameetrid lisame markDocumentsReceived
-	        // p�ringule �ksnes juhul, kui allalaadimisel kasutatud receiveDocuments
-	        // p�ring toetas all�ksuse ja ametikoha parameetrite kasutamist.
+	        // Allüksuse ja ametikoha parameetrid lisame markDocumentsReceived
+	        // päringule üksnes juhul, kui allalaadimisel kasutatud receiveDocuments
+	        // päring toetas allüksuse ja ametikoha parameetrite kasutamist.
 	        if ((unitSettings != null) && (orgSettings.getReceiveDocumentsRequestVersion() >= 3)) {
 		        b3.allyksuseLyhinimetus = unitSettings.getDivisionShortName();
 		        b3.ametikohaLyhinimetus = unitSettings.getOccupationShortName();
@@ -962,7 +962,7 @@ public class ClientAPI {
         Message msg = new Message(messageBody);
         call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "markDocumentsReceived"));
 
-        // Lisame s�numile manuse
+        // Lisame sõnumile manuse
         if (requestVersion < 3) {
 	        String tempFile = CommonMethods.gzipPackXML(attachmentFile, header.getAsutus(), "markDocumentsReceived");
 	        tempFiles.add(tempFile);
@@ -977,7 +977,7 @@ public class ClientAPI {
 	        msg.saveChanges();
         }
 
-        // K�ivitame p�ringu
+        // Käivitame päringu
         call.invoke(msg);
     }
 
@@ -996,14 +996,14 @@ public class ClientAPI {
             return;
         }
     	
-        // P�ringu ID koostamine
+        // Päringu ID koostamine
         queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
         
-        // P�ringu nimi ja versioon
+        // Päringu nimi ja versioon
         int requestVersion = orgSettings.getMarkDocumentsReceivedRequestVersion();
         String requestName = this.producerName + ".markDocumentsReceived.v" + String.valueOf(requestVersion);
         
-        // Saadetava s�numi p�isesse kantavad parameetrid
+        // Saadetava sõnumi päisesse kantavad parameetrid
         XHeader header = new XHeader(
             headerVar.getOrganizationCode(),
             this.producerName,
@@ -1035,7 +1035,7 @@ public class ClientAPI {
 	        b3.kaust = "";
 	        b3.edastusID = deliverySessionID;
 	        
-	        // Vastuv�tja staatus, veateade ja metaxml tulevad iga
+	        // Vastuvõtja staatus, veateade ja metaxml tulevad iga
 	        // konkreetse dokumendi andmetest.
 	        
 	        if (unitSettings != null) {
@@ -1048,7 +1048,7 @@ public class ClientAPI {
         Message msg = new Message(messageBody);
         call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "markDocumentsReceived"));
 
-        // Lisame s�numile manuse
+        // Lisame sõnumile manuse
         if (requestVersion < 3) {
 	        String tempFile = CommonMethods.gzipPackXML(attachmentFile, header.getAsutus(), "markDocumentsReceived");
 	        tempFiles.add(tempFile);
@@ -1063,17 +1063,17 @@ public class ClientAPI {
 	        msg.saveChanges();
         }
 
-        // K�ivitame p�ringu
+        // Käivitame päringu
         call.invoke(msg);
     }
 
     /**
-     * Meetod �ritab etteantud s�numite staatusi otse saatja andmebaasi kirjutada.
-     * Meetod tagastab nimekirja s�numitest, mille staatust tuleks uuendada DVK
+     * Meetod üritab etteantud sõnumite staatusi otse saatja andmebaasi kirjutada.
+     * Meetod tagastab nimekirja sõnumitest, mille staatust tuleks uuendada DVK
      * keskserveri kaudu.
      * 
-     * @param messages		Nimekiri s�numitest, mille stattusi oleks vaja uuendada.
-     * @return				Nimekiri s�numitest, mille staatust ei �nnestunud otse teise andmebaasi salvestada
+     * @param messages		Nimekiri sõnumitest, mille stattusi oleks vaja uuendada.
+     * @return				Nimekiri sõnumitest, mille staatust ei õnnestunud otse teise andmebaasi salvestada
      */
     public ArrayList<DhlMessage> markDocumentsReceivedDirect(ArrayList<DhlMessage> messages, OrgSettings db) {
     	ArrayList<DhlMessage> result = new ArrayList<DhlMessage>();
@@ -1148,7 +1148,7 @@ public class ClientAPI {
     }
     
     /**
-     *  V�ljastab nimekirja asutustest, kus on allalaadimist ootavaid dokumente
+     *  Väljastab nimekirja asutustest, kus on allalaadimist ootavaid dokumente
      */
     public ArrayList<String> receiveDownloadWaitingOrgs(HeaderVariables headerVar, ArrayList<OrgSettings> dbs) throws Exception {
         ArrayList<String> result = new ArrayList<String>();       
@@ -1164,7 +1164,7 @@ public class ClientAPI {
     }
     
     /**
-     *  V�ljastab nimekirja asutustest, kus on allalaadimist ootavaid dokumente
+     *  Väljastab nimekirja asutustest, kus on allalaadimist ootavaid dokumente
      */
     public GetSendingOptionsV3ResponseType receiveDownloadWaitingOrgsV2(HeaderVariables headerVar, ArrayList<OrgSettings> dbs) throws Exception {
         // Loeme organisatsioonide koodid arraylisti        
@@ -1172,7 +1172,7 @@ public class ClientAPI {
         ArrayList<ShortName> subdivisions = new ArrayList<ShortName>();
         ArrayList<ShortName> occupations = new ArrayList<ShortName>();
 
-        // K�ime l�bi k�ik baasid ning korjame kokku asutuste registrikoodid,
+        // Käime läbi kõik baasid ning korjame kokku asutuste registrikoodid,
         // mis on DHL_SETTINGS tabelis kirjas
         for (OrgSettings db : dbs) {
             UnitCredential[] credentials = UnitCredential.getCredentials(db);
@@ -1199,7 +1199,7 @@ public class ClientAPI {
         return getSendingOptions(headerVar, orgCodes, subdivisions, occupations, true, -1, -1, 3);
     }
     
-    // V�ljastab nimekirja asutustest, kus on allalaadimist ootavaid dokumente
+    // Väljastab nimekirja asutustest, kus on allalaadimist ootavaid dokumente
     public GetSendingOptionsV3ResponseType getSendingOptions(
     		HeaderVariables headerVar,
     		ArrayList<String> orgCodes,
@@ -1214,13 +1214,13 @@ public class ClientAPI {
 		
 		GetSendingOptionsV3ResponseType result = new GetSendingOptionsV3ResponseType();
             
-        // P�ringu nimi
+        // Päringu nimi
         String requestName = this.producerName + ".getSendingOptions.v" + String.valueOf(requestVersion);
         
-        // P�ringu ID koostamine
+        // Päringu ID koostamine
         this.queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
         
-        // Saadetava s�numi p�isesse kantavad parameetrid        
+        // Saadetava sõnumi päisesse kantavad parameetrid        
         XHeader header = new XHeader(
             headerVar.getOrganizationCode(),
             this.producerName,
@@ -1230,7 +1230,7 @@ public class ClientAPI {
             headerVar.getCaseName(),
             headerVar.getPIDWithCountryCode());
 
-        // Koostame SOAP s�numi keha
+        // Koostame SOAP sõnumi keha
         String messageData = "";
         String attachmentName = String.valueOf(System.currentTimeMillis());
         String attachmentFileName = "";
@@ -1267,7 +1267,7 @@ public class ClientAPI {
         Message msg = new Message(messageData);
         call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "getSendingOptions"));
 
-        // Lisame s�numile manuse
+        // Lisame sõnumile manuse
         if (requestVersion == 3) {
 	        FileDataSource ds = new FileDataSource(attachmentFileName);
 	        DataHandler d1 = new DataHandler(ds);
@@ -1280,10 +1280,10 @@ public class ClientAPI {
 	        msg.saveChanges();
         }
         
-        // Teostame p�ringu
+        // Teostame päringu
         call.invoke(msg);
 
-        // P�ringu tulemuste t��tlemine
+        // Päringu tulemuste töötlemine
         Message response = call.getResponseMessage();
         
         if (requestVersion < 3) {
@@ -1328,13 +1328,13 @@ public class ClientAPI {
     public ArrayList<Subdivision> getSubdivisionList(HeaderVariables headerVar, ArrayList<String> orgCodes, int requestVersion) throws Exception {
         ArrayList<Subdivision> result = new ArrayList<Subdivision>();
         
-        // P�ringu nimi
+        // Päringu nimi
         String requestName = this.producerName + ".getSubdivisionList.v" + String.valueOf(requestVersion);
         
-        // P�ringu ID koostamine
+        // Päringu ID koostamine
         queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
         
-        // Saadetava s�numi p�isesse kantavad parameetrid        
+        // Saadetava sõnumi päisesse kantavad parameetrid        
         XHeader header = new XHeader(
             headerVar.getOrganizationCode(),
             this.producerName,
@@ -1344,7 +1344,7 @@ public class ClientAPI {
             headerVar.getCaseName(),
             headerVar.getPIDWithCountryCode());
 
-        // Koostame SOAP s�numi keha
+        // Koostame SOAP sõnumi keha
         String messageData = "";
         String attachmentName = String.valueOf(System.currentTimeMillis());
         String attachmentFileName = "";
@@ -1368,7 +1368,7 @@ public class ClientAPI {
         Message msg = new Message(messageData);
         call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "getSubdivisionList"));
 
-        // Lisame s�numile manuse
+        // Lisame sõnumile manuse
         if (requestVersion == 2) {
 	        FileDataSource ds = new FileDataSource(attachmentFileName);
 	        DataHandler d1 = new DataHandler(ds);
@@ -1381,11 +1381,11 @@ public class ClientAPI {
 	        msg.saveChanges();
         }
         
-        // Teostame p�ringu
+        // Teostame päringu
         call.invoke(msg);
         Message response = call.getResponseMessage();
         
-        // P�ringu tulemuste t��tlemine
+        // Päringu tulemuste töötlemine
         Node msgBodyNode = null;
         if (requestVersion < 2) {
 	        SOAPBody body = response.getSOAPBody();
@@ -1430,13 +1430,13 @@ public class ClientAPI {
     public ArrayList<Occupation> getOccupationList(HeaderVariables headerVar, ArrayList<String> orgCodes, int requestVersion) throws Exception {
         ArrayList<Occupation> result = new ArrayList<Occupation>();
             
-        // P�ringu nimi
+        // Päringu nimi
         String requestName = this.producerName + ".getOccupationList.v" + String.valueOf(requestVersion);
         
-        // P�ringu ID koostamine
+        // Päringu ID koostamine
         queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
         
-        // Saadetava s�numi p�isesse kantavad parameetrid        
+        // Saadetava sõnumi päisesse kantavad parameetrid        
         XHeader header = new XHeader(
             headerVar.getOrganizationCode(),
             this.producerName,
@@ -1446,7 +1446,7 @@ public class ClientAPI {
             headerVar.getCaseName(),
             headerVar.getPIDWithCountryCode());
 
-        // Koostame SOAP s�numi keha
+        // Koostame SOAP sõnumi keha
         String messageData = "";
         String attachmentName = String.valueOf(System.currentTimeMillis());
         String attachmentFileName = "";
@@ -1469,7 +1469,7 @@ public class ClientAPI {
         Message msg = new Message(messageData);
         call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "getOccupationList"));
 
-        // Lisame s�numile manuse
+        // Lisame sõnumile manuse
         if (requestVersion == 2) {
 	        FileDataSource ds = new FileDataSource(attachmentFileName);
 	        DataHandler d1 = new DataHandler(ds);
@@ -1482,10 +1482,10 @@ public class ClientAPI {
 	        msg.saveChanges();
         }
         
-        // Teostame p�ringu
+        // Teostame päringu
         call.invoke(msg);
 
-        // P�ringu tulemuste t��tlemine
+        // Päringu tulemuste töötlemine
         Message response = call.getResponseMessage();
         Node msgBodyNode = null;
         if (requestVersion < 2) {        

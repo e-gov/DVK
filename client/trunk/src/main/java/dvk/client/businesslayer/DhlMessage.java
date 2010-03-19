@@ -74,8 +74,8 @@ public class DhlMessage implements Cloneable {
     private String m_faultDetail;
     private boolean m_statusUpdateNeeded;
     private String m_metaXML;    
-    private String m_queryID; // X-tee p�ringu p�ise ID
-    private ArrayList<MessageRecipient> m_recipients; // s�numi saajad
+    private String m_queryID; // X-tee põringu põise ID
+    private ArrayList<MessageRecipient> m_recipients; // sõnumi saajad
     private String m_recipientDepartmentNr;
     private String m_recipientDepartmentName;
     private String m_recipientEmail;
@@ -97,7 +97,7 @@ public class DhlMessage implements Cloneable {
     
     private int m_containerVersion;
     
-    // DeliveryChannel t�idetakse saatmisel ja seda infot
+    // DeliveryChannel tõidetakse saatmisel ja seda infot
     // andmebaasi ei salvestata.
     private DeliveryChannel m_deliveryChannel;
     
@@ -742,8 +742,8 @@ public class DhlMessage implements Cloneable {
         InputStreamReader inReader = null;
         BufferedReader reader = null;
         try {
-            // Loendame failis olevad t�hed kokku, kuna Oracle JDBC draiver tahab
-            // kindlasti teada, kui pikk on CLOB v�ljale kirjutatav stream.
+            // Loendame failis olevad tõhed kokku, kuna Oracle JDBC draiver tahab
+            // kindlasti teada, kui pikk on CLOB võljale kirjutatav stream.
             int fileCharsCount = CommonMethods.getCharacterCountInFile(m_filePath);
             
             inStream = new FileInputStream(m_filePath);
@@ -824,8 +824,8 @@ public class DhlMessage implements Cloneable {
         InputStreamReader inReader = null;
         BufferedReader reader = null;
         try {
-            // Loendame failis olevad t�hed kokku, kuna Oracle JDBC draiver tahab
-            // kindlasti teada, kui pikk on CLOB v�ljale kirjutatav stream.
+            // Loendame failis olevad tõhed kokku, kuna Oracle JDBC draiver tahab
+            // kindlasti teada, kui pikk on CLOB võljale kirjutatav stream.
             int fileCharsCount = CommonMethods.getCharacterCountInFile(m_filePath);
             
             inStream = new FileInputStream(m_filePath);
@@ -1027,7 +1027,7 @@ public class DhlMessage implements Cloneable {
                 if (originalRecipient != null) {
                 	logger.debug("Original recipient is defined. Saving messageRecipient to database.");
                     // Kuna antud juhul on ilmselt tegemist DVK serveri poolel automaatselt
-                    // lisatud adressaadiga, siis j��b siin m��ramata saatmise p�ringu ID
+                    // lisatud adressaadiga, siis jõõb siin mõõramata saatmise põringu ID
                     originalRecipient.setSendingDate(r.getSendingDate());
                     originalRecipient.setSendingStatusID(r.getSendingStatusID());
                     originalRecipient.setReceivedDate(r.getReceivedDate());
@@ -1051,7 +1051,7 @@ public class DhlMessage implements Cloneable {
             	for (int i = 0; i < item.getHistory().size(); i++) {
             		DocumentStatusHistory historyItem = item.getHistory().get(i); 
 
-            		// �ritame n��d adressaadi andmete j�rgi adressaadi ID ka tuvastada
+            		// õritame nõõd adressaadi andmete jõrgi adressaadi ID ka tuvastada
 	                int recipientId = MessageRecipient.getId(messageID, historyItem.getOrgCode(), historyItem.getPersonCode(), historyItem.getSubdivisionShortName(), historyItem.getOccupationShortName(), db);
 	                if (recipientId > 0) {
 	                	historyItem.setRecipientId(recipientId);
@@ -1401,11 +1401,11 @@ public class DhlMessage implements Cloneable {
         units = null;
     }
     
-    // Lisab s�numi XMLi transpordi saajate osasse etteantud saajad (eemaldab �leliigsed)
-    // V�ljastab uue faili PATHi, eisalgne faile j��b ka alles
+    // Lisab sõnumi XMLi transpordi saajate osasse etteantud saajad (eemaldab õleliigsed)
+    // Võljastab uue faili PATHi, eisalgne faile jõõb ka alles
     public String CreateNewFile(ArrayList<String> allowedOrgs, int containerVersion)throws Exception{
         String newFile = "";
-        // Kopeerime dokumendi faili uueks t��failiks
+        // Kopeerime dokumendi faili uueks tõõfailiks
         String simplifiedFile = CommonMethods.createPipelineFile(0);
         if (CommonMethods.copyFile(getFilePath(), simplifiedFile)) {
             newFile = CommonMethods.createPipelineFile(1);
@@ -1431,7 +1431,7 @@ public class DhlMessage implements Cloneable {
                 CommonMethods.safeCloseStream(out);
             }            
         } else {
-            throw new Exception("Dokumendi faili kopeerimine edastamiseks eba�nnestus!");
+            throw new Exception("Dokumendi faili kopeerimine edastamiseks ebaõnnestus!");
         }
         return newFile;
     }
@@ -1439,7 +1439,7 @@ public class DhlMessage implements Cloneable {
     public String createNewFile(ArrayList<MessageRecipient> allowedRecipients, int containerVersion) throws Exception{
         String newFile = "";
         
-        // Kopeerime dokumendi faili uueks t��failiks
+        // Kopeerime dokumendi faili uueks tõõfailiks
         String simplifiedFile = CommonMethods.createPipelineFile(0);
         if (CommonMethods.copyFile(this.m_filePath, simplifiedFile)) {
             newFile = CommonMethods.createPipelineFile(1);
@@ -1466,7 +1466,7 @@ public class DhlMessage implements Cloneable {
                 CommonMethods.safeCloseStream(out);
             }            
         } else {
-            throw new Exception("Dokumendi faili kopeerimine edastamiseks eba�nnestus!");
+            throw new Exception("Dokumendi faili kopeerimine edastamiseks ebaõnnestus!");
         }
         return newFile;
     }
@@ -1616,7 +1616,7 @@ public class DhlMessage implements Cloneable {
                                     addr.add(a);
                                     
                                     // Kui tegemist on esimese leitud kohaliku adressaadiga, siis kirjutame
-                                    // selle andmed kohe ka s�numi k�lge.
+                                    // selle andmed kohe ka sõnumi kõlge.
                                     if (addr.size() == 1) {
                                         templateMessage.m_recipientOrgCode = recipientOrgCode;
                                         templateMessage.m_recipientOrgName = recipientOrgName;
@@ -1815,10 +1815,10 @@ public class DhlMessage implements Cloneable {
             reader.close();
         }
 
-        // Kui dokumendi pealkiri ei ole esitatud v�ljal mm:koostaja_dokumendinimi, siis
-        // v��rtustame selle Riigikantselei XML-is oleva pealkirja v�i dokumendiliigi
-        // j�rgi (dokumendiliigi j�rgi v��rtustamine on kasulik ennek�ike Kodanikuportaali)
-        // andmete puhul, kuna seal on reeglina pealkiri v��rtustamata.
+        // Kui dokumendi pealkiri ei ole esitatud võljal mm:koostaja_dokumendinimi, siis
+        // võõrtustame selle Riigikantselei XML-is oleva pealkirja või dokumendiliigi
+        // jõrgi (dokumendiliigi jõrgi võõrtustamine on kasulik ennekõike Kodanikuportaali)
+        // andmete puhul, kuna seal on reeglina pealkiri võõrtustamata.
         if (templateMessage != null) {
             if ((templateMessage.m_title == null) || (templateMessage.m_title.length() < 1)) {
                 if ((rkTitle != null) && (rkTitle.length() > 0)) {
@@ -1894,7 +1894,7 @@ public class DhlMessage implements Cloneable {
         for (int i = 0; i < messages.size(); ++i) {
             DhlMessage msg = messages.get(i);
             
-            // Kui saadetava s�numi GUID on m��ramata, siis anname s�numile GUID-i
+            // Kui saadetava sõnumi GUID on mõõramata, siis anname sõnumile GUID-i
             // ja salvestame selle kohe ka andmebaasi.
             if ((msg.getDhlGuid() == null) || (msg.getDhlGuid().length() < 1)) {
             	msg.setDhlGuid(generateGUID());
@@ -2075,7 +2075,7 @@ public class DhlMessage implements Cloneable {
     	org.w3c.dom.Document currentXmlContent = CommonMethods.xmlDocumentFromFile(filePath, true);
         Element transportNode = null;
 
-        // Tuvastame katse-eksituse meetodil �ige nimeruumi.
+        // Tuvastame katse-eksituse meetodil õige nimeruumi.
         String namespaceUri = CommonStructures.DhlNamespace;
         NodeList foundNodes = currentXmlContent.getDocumentElement().getElementsByTagNameNS(namespaceUri, "transport");
         if (foundNodes.getLength() < 1) {
@@ -2115,7 +2115,7 @@ public class DhlMessage implements Cloneable {
                 	personalIdCode = CommonMethods.getNodeText(personalIdNodes.item(0));
                 }
                 
-                // Adressaadi all�ksuse kood XML konteineris
+                // Adressaadi allõksuse kood XML konteineris
             	NodeList subdivisionNodes = recipientRoot.getElementsByTagNameNS(namespaceUri, "allyksuse_kood");
                 if (subdivisionNodes.getLength() > 0) {
                 	try {
@@ -2137,13 +2137,13 @@ public class DhlMessage implements Cloneable {
                 	}
                 }
                 
-                // Adressaadi all�ksuse l�hinimetus XML konteineris
+                // Adressaadi allõksuse lõhinimetus XML konteineris
             	NodeList subdivisionSnNodes = recipientRoot.getElementsByTagNameNS(namespaceUri, "allyksuse_lyhinimetus");
                 if (subdivisionSnNodes.getLength() > 0) {
                 	subdivisionShortName = CommonMethods.getNodeText(subdivisionSnNodes.item(0));
                 }
                 
-                // Adressaadi ametikoha l�hinimetus XML konteineris
+                // Adressaadi ametikoha lõhinimetus XML konteineris
             	NodeList occupationSnNodes = recipientRoot.getElementsByTagNameNS(namespaceUri, "ametikoha_lyhinimetus");
                 if (occupationSnNodes.getLength() > 0) {
                 	occupationShortName = CommonMethods.getNodeText(occupationSnNodes.item(0));
@@ -2164,23 +2164,23 @@ public class DhlMessage implements Cloneable {
                 if (!recipientFound) {
                     transportNode.removeChild(recipientRoot);
                     logger.info("");
-                	logger.info("Failist v�lja visatud asutus");
+                	logger.info("Failist võlja visatud asutus");
                 	logger.info("Reg nr: " + regNr);
                 	logger.info("Isikukood: " + personalIdCode);
-                	logger.info("All�ksuse ID: " + String.valueOf(subdivisionId));
+                	logger.info("Allõksuse ID: " + String.valueOf(subdivisionId));
                 	logger.info("Ametikoha ID: " + String.valueOf(occupationId));
-                	logger.info("All�ksuse l�hinimetus: " + subdivisionShortName);
-                	logger.info("Ametikoha l�hinimetus: " + occupationShortName);
+                	logger.info("Allõksuse lõhinimetus: " + subdivisionShortName);
+                	logger.info("Ametikoha lõhinimetus: " + occupationShortName);
                 } else {
                 	recipientIndex++;
                 	logger.info("");
                 	logger.info("Uude faili lubatud asutus.");
                 	logger.info("Reg nr: " + regNr);
                 	logger.info("Isikukood: " + personalIdCode);
-                	logger.info("All�ksuse ID: " + String.valueOf(subdivisionId));
+                	logger.info("Allõksuse ID: " + String.valueOf(subdivisionId));
                 	logger.info("Ametikoha ID: " + String.valueOf(occupationId));
-                	logger.info("All�ksuse l�hinimetus: " + subdivisionShortName);
-                	logger.info("Ametikoha l�hinimetus: " + occupationShortName);
+                	logger.info("Allõksuse lõhinimetus: " + subdivisionShortName);
+                	logger.info("Ametikoha lõhinimetus: " + occupationShortName);
                 }
             }
             
@@ -2195,7 +2195,7 @@ public class DhlMessage implements Cloneable {
                 }
             }
             
-            // M�rgime antud DVK serveri s�numi vahendajaks
+            // Mõrgime antud DVK serveri sõnumi vahendajaks
             if (addProxy){
                 Element elProxy = currentXmlContent.createElementNS(namespaceUri, defaultPrefix + ":vahendaja");
                 elProxy = CommonMethods.appendTextNode(currentXmlContent, elProxy, "regnr", Settings.Client_DefaultOrganizationCode, defaultPrefix, namespaceUri);
@@ -2209,11 +2209,11 @@ public class DhlMessage implements Cloneable {
     }
     
     /**
-     * Jaotab s�numi iga erineva edastuskanali jaoks omaette alams�numiteks.
-     * Alams�numid erinevad �ksteisest DVK konteineri <transport> elemendis
+     * Jaotab sõnumi iga erineva edastuskanali jaoks omaette alamsõnumiteks.
+     * Alamsõnumid erinevad õksteisest DVK konteineri <transport> elemendis
      * asuvate adressaatide poolest.
      * 
-     * @return		Alams�numite nimekiri
+     * @return		Alamsõnumite nimekiri
      */
     public ArrayList<DhlMessage> splitMessageByDeliveryChannel(OrgSettings myDatabase, ArrayList<OrgSettings> allKnownDatabases, int containerVersion) throws Exception {
     	
@@ -2225,7 +2225,7 @@ public class DhlMessage implements Cloneable {
     		this.m_recipients = MessageRecipient.getList(this.m_id, myDatabase);
     	}
     	
-		// Kontrollime, kas m�nedele adressaatidele saaks otse andmebaasist
+		// Kontrollime, kas mõnedele adressaatidele saaks otse andmebaasist
     	// andmebaasi saata.
     	// 
     	// Esmalt eraldame adressaatide hulgast need adressaadid, kes
@@ -2245,16 +2245,16 @@ public class DhlMessage implements Cloneable {
     	}
     	logger.info("Minuga samas asutuses on " + String.valueOf(myOrgRecipients.size()) + " adressaati.");
     	
-    	// Kui m�ni adressaat on saatjaga samas asutuses, siis tuvastame,
-    	// kas meil on teada andmebaasi�hendus dokumendi otse saatmiseks.
+    	// Kui mõni adressaat on saatjaga samas asutuses, siis tuvastame,
+    	// kas meil on teada andmebaasiõhendus dokumendi otse saatmiseks.
     	//
-		// Isegi juhul, kui sama dokument l�heb samas andmebaasis mitmele
+		// Isegi juhul, kui sama dokument lõheb samas andmebaasis mitmele
 		// adressaadile, saadame ta sinna mitmes eksemplaris. Vastasel juhul
-		// ei saa adressaadip�hiselt j�lgida, milline adressaat on dokumendi
-		// k�tte saanud ja milline mitte.
+		// ei saa adressaadipõhiselt jõlgida, milline adressaat on dokumendi
+		// kõtte saanud ja milline mitte.
 		for (OrgSettings db : allKnownDatabases) {
 			// Teise andmebaasi dhl_settings andmebaasis on kirjas, millise
-			// asutuse, all�ksuse ja ametikohaga on tegemist.
+			// asutuse, allõksuse ja ametikohaga on tegemist.
 			UnitCredential[] orgsInDB = UnitCredential.getCredentials(db);
 			for (int j = 0; j < orgsInDB.length; j++) {
 				UnitCredential cred = orgsInDB[j];
@@ -2284,7 +2284,7 @@ public class DhlMessage implements Cloneable {
 			}
 		}
     	
-    	// Tuvastame, kas m�nele adressaadile tuleks ka DVK keskserveri kaudu saata.
+    	// Tuvastame, kas mõnele adressaadile tuleks ka DVK keskserveri kaudu saata.
     	if ((centralServerRecipients != null) && (centralServerRecipients.size() > 0)) {
     		DhlMessage centralServerMessage = (DhlMessage)this.clone();
     		String centralServerFilePath = centralServerMessage.createNewFile(centralServerRecipients, containerVersion);
@@ -2295,14 +2295,14 @@ public class DhlMessage implements Cloneable {
     		centralServerMessage.loadRecipientsFromXML();
     		
         	// Leiame nimekirja erinevatest serveritest, kuhu antud dokument tuleks saata.
-        	// S.t. kui dokument peab j�udma erinevatele adressaatidele erinevate serverite kaudu
+        	// S.t. kui dokument peab jõudma erinevatele adressaatidele erinevate serverite kaudu
         	ArrayList<DhlCapability> destinationServers = DhlCapability.getListByMessageID(centralServerMessage.getId(), myDatabase);
             
-        	// V�tame filtreerimiseks v�lja k�igi teadaolevate asutuste nimekirja
+        	// Võtame filtreerimiseks võlja kõigi teadaolevate asutuste nimekirja
         	ArrayList<DhlCapability> allKnownOrgs = DhlCapability.getList(myDatabase);
         	
-        	// Kui serverite massiiv on t�hi, siis lisame sinna
-            // �he t�hja v��rtuse DVK keskserveri jaoks
+        	// Kui serverite massiiv on tõhi, siis lisame sinna
+            // õhe tõhja võõrtuse DVK keskserveri jaoks
             if (destinationServers == null) {
             	destinationServers = new ArrayList<DhlCapability>();
             }
@@ -2315,9 +2315,9 @@ public class DhlMessage implements Cloneable {
                 destinationServers.add(defaultServer);
             }
             
-            // Komplekteerime erinevate serverite jaoks omaette alams�numid
+            // Komplekteerime erinevate serverite jaoks omaette alamsõnumid
             for (int i = 0; i < destinationServers.size(); i++){
-                // Paneme kokku konkreetsesse serverisse saadetavate saajate s�numi,
+                // Paneme kokku konkreetsesse serverisse saadetavate saajate sõnumi,
             	// ehk siis  eemaldame saajate hulgast need, kes selles sihtserveris ei paikne
                 String currentProducer = destinationServers.get(i).getDhlDirectProducerName();
                 String currentServiceUrl = destinationServers.get(i).getDhlDirectServiceUrl();
@@ -2328,7 +2328,7 @@ public class DhlMessage implements Cloneable {
                     currentProducer = Settings.Client_ProducerName;
                 }
                 
-                // Filtreerime v�lja asutused, kes saavad s�numit aktiivse (indexiga i) DVK serveri kaudu
+                // Filtreerime võlja asutused, kes saavad sõnumit aktiivse (indexiga i) DVK serveri kaudu
                 ArrayList<String> orgs = DhlCapability.getOrgsByCapability(destinationServers.get(i), myDatabase); // nimekiri asutuse koodidest
                 if ((orgs != null) && (orgs.size() > 0)) {
                 	DhlMessage newMessage = (DhlMessage)centralServerMessage.clone();
@@ -2338,8 +2338,8 @@ public class DhlMessage implements Cloneable {
                     	if (orgs.contains(mr.getRecipientOrgCode())){
                             allowedOrgs.add(mr.getRecipientOrgCode());
                         } else {
-                        	// Kontrollime, kas me sellist asutust �ldse tunneme.
-                        	// Kui ei tunne, siis �rme teda igaks juhuks v�lja viska.
+                        	// Kontrollime, kas me sellist asutust õldse tunneme.
+                        	// Kui ei tunne, siis õrme teda igaks juhuks võlja viska.
                         	boolean orgFound = false;
                         	for (int j = 0; j < allKnownOrgs.size(); j++) {
                         		if (CommonMethods.stringsEqualIgnoreNull(allKnownOrgs.get(i).getOrgCode(), mr.getRecipientOrgCode())) {
@@ -2353,14 +2353,14 @@ public class DhlMessage implements Cloneable {
                         }
                     }
                     
-                    String newFilePath = newMessage.CreateNewFile(allowedOrgs, containerVersion); // eemldada s�numi XMList need saajad, kes aktiivse serveri kaudu kirja ei saa
+                    String newFilePath = newMessage.CreateNewFile(allowedOrgs, containerVersion); // eemldada sõnumi XMList need saajad, kes aktiivse serveri kaudu kirja ei saa
                     newMessage.setFilePath(newFilePath);
                     
                     newMessage.getDeliveryChannel().setServiceUrl(currentServiceUrl);
                     newMessage.getDeliveryChannel().setProducerName(currentProducer);
                     
-                    // Paneme keskserveri kaudu saadetavad s�numid ettepoole,
-                    // et saatmisel saaks keskserveri ID v�imalikult kiiresti k�tte.
+                    // Paneme keskserveri kaudu saadetavad sõnumid ettepoole,
+                    // et saatmisel saaks keskserveri ID võimalikult kiiresti kõtte.
                     result.add(0, newMessage);
                     logger.info("Added message clone for central server delivery");
                 }
@@ -2372,11 +2372,11 @@ public class DhlMessage implements Cloneable {
 
     
     /**
-     * Arvutab adressaadip�histe staatuse koodide alusel v�lja kogu s�numi
+     * Arvutab adressaadipõhiste staatuse koodide alusel võlja kogu sõnumi
      * staatuse ja uuendab seda andmebaasis.
      * 
-     * @param messageId		S�numi kohalik ID
-     * @param db			Andmebaasi�henduse seaded
+     * @param messageId		Sõnumi kohalik ID
+     * @param db			Andmebaasiõhenduse seaded
      */
     public static void calculateAndUpdateMessageStatus(int messageId, OrgSettings db) {
     	ArrayList<MessageRecipient> recipients = MessageRecipient.getList(messageId, db);

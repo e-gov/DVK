@@ -1,4 +1,7 @@
-﻿IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='dhl_message_recipient' AND COLUMN_NAME='recipient_division_code')
+/*
+ * DVK Client 1.6.0 - 2010/01
+ */
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='dhl_message_recipient' AND COLUMN_NAME='recipient_division_code')
 BEGIN
 	ALTER TABLE [dhl_message_recipient] ADD [recipient_division_code] nvarchar(25) not null default('')
 END

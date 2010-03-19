@@ -17,7 +17,7 @@ public class SoapMessageBuilder {
         StringBuilder sb = new StringBuilder();
         sb.append("<env:Envelope xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:"+ producerPrefix +"=\""+ producerURI +"\" xmlns:xtee=\"http://x-tee.riik.ee/xsd/xtee.xsd\">");
 
-        // X-Tee p‰is
+        // X-Tee p√§is
         sb.append("<env:Header>");
         sb.append("<xtee:asutus>" + m_header.getAsutus() + "</xtee:asutus>");
         sb.append("<xtee:andmekogu>" + m_header.getAndmekogu() + "</xtee:andmekogu>");
@@ -33,7 +33,7 @@ public class SoapMessageBuilder {
         sb.append(m_body);
         sb.append("</env:Body>");
 
-        // ‹mbriku lıpp
+        // √ºmbriku l√µpp
         sb.append("</env:Envelope>");
 
         return sb.toString();

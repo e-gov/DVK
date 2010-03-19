@@ -133,10 +133,10 @@ public class OrgDvkSettings {
     }
 
     /**
-     * Loeb DVK ühenduse seaded XML struktuurist.
+     * Loeb DVK Ã¼henduse seaded XML struktuurist.
      * 
-     * @param rootNode      DVK ühenduse seadete juurelement
-     * @return              DVK ühenduse seadete objekt
+     * @param rootNode      DVK Ã¼henduse seadete juurelement
+     * @return              DVK Ã¼henduse seadete objekt
      */
     public static OrgDvkSettings getFromXML(Node rootNode) {
         Node n;

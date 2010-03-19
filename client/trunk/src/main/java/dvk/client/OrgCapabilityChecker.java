@@ -27,7 +27,7 @@ public class OrgCapabilityChecker {
         Date startDate = new Date();
         ClientAPI dvkClient = new ClientAPI();
 
-        // Vaatame, kas kasutaja on käivitamisel ka mingeid argumente ette andnud
+        // Vaatame, kas kasutaja on kÃ¤ivitamisel ka mingeid argumente ette andnud
         String propertiesFile = "dvk_client.properties";
         for (int i = 0; i < args.length; ++i) {
             if (args[i].startsWith("-prop=") && (args[i].length() > 6)) {
@@ -35,7 +35,7 @@ public class OrgCapabilityChecker {
             }
         }
         
-        // Kontrollime seaded üle
+        // Kontrollime seaded Ã¼le
         if (!(new File(propertiesFile)).exists()) {
             System.out.println("Application properties file " + propertiesFile + " does not exist!");
             return;
@@ -45,9 +45,9 @@ public class OrgCapabilityChecker {
         Settings.loadProperties(propertiesFile);
         ArrayList<OrgSettings> allKnownDatabases = OrgSettings.getSettings(Settings.Client_ConfigFile);
 
-        // Filtreerime välja need andmebaasid, mille andmeid antud klient
-        // peab keskserveriga sünkroniseerima.
-        // S.t. filtreerimisel jäetakse välja need andmebaasid, mille andmed
+        // Filtreerime vÃ¤lja need andmebaasid, mille andmeid antud klient
+        // peab keskserveriga sÃ¼nkroniseerima.
+        // S.t. filtreerimisel jÃ¤etakse vÃ¤lja need andmebaasid, mille andmed
         // on konfifailis ainult selleks, et teaks sinna vajadusel otse andmeid kopeerida.
         ArrayList<OrgSettings> databases = new ArrayList<OrgSettings>();
         for (OrgSettings db : allKnownDatabases) {
@@ -56,17 +56,17 @@ public class OrgCapabilityChecker {
         	}
         }
         
-        // Kontrollime, et seadetes on märgitud vähemalt üks andmebaas, kus
+        // Kontrollime, et seadetes on mÃ¤rgitud vÃ¤hemalt Ã¼ks andmebaas, kus
         // andmeid saaks uuendada.
         if ((databases == null) || (databases.size() < 1)) {
             System.out.println("No database configured in configuration file "+ Settings.Client_ConfigFile +"!");
             return;
         }
 
-        // TODO: See ei ole päris õige. Tegelikult tuleks siin asutused grupeerida
-        // turvaserverite kaupa ja siis iga grupi kohta eraldi päring teha. Antud juhul
-        // toimib loogika valesti, kui sama klient vahendab andmeid üle test-x-tee ja
-        // "päris" x-tee.
+        // TODO: See ei ole pÃ¤ris Ãµige. Tegelikult tuleks siin asutused grupeerida
+        // turvaserverite kaupa ja siis iga grupi kohta eraldi pÃ¤ring teha. Antud juhul
+        // toimib loogika valesti, kui sama klient vahendab andmeid Ã¼le test-x-tee ja
+        // "pÃ¤ris" x-tee.
         // Initsialiseerime kliendi
         try {
             dvkClient.initClient(Settings.Client_ServiceUrl, Settings.Client_ProducerName);
@@ -85,7 +85,7 @@ public class OrgCapabilityChecker {
 
         GetSendingOptionsV3ResponseType result = new GetSendingOptionsV3ResponseType();
         
-        // Küsime esimese asutuse nimel nimekirja kõigist DHL-võimelistest
+        // KÃ¼sime esimese asutuse nimel nimekirja kÃµigist DHL-vÃµimelistest
         // asutustest.
         UnitCredential[] credList = UnitCredential.getCredentials(databases.get(0));
         if (credList.length > 0) {
@@ -107,8 +107,8 @@ public class OrgCapabilityChecker {
             }
             System.out.println("    Got response from DVK server...");
 
-            // Kui andmete vahetamisel kasutatava DVK serveri versioon on vähemalt 1.5, siis
-            // küsime andmed ka allüksuste ja ametikohtade kohta.
+            // Kui andmete vahetamisel kasutatava DVK serveri versioon on vÃ¤hemalt 1.5, siis
+            // kÃ¼sime andmed ka allÃ¼ksuste ja ametikohtade kohta.
             if (CommonMethods.compareVersions(Settings.Client_SpecificationVersion,"1.5") >= 0) {
                 if ((result.allyksused == null) || (result.allyksused.size() < 1)
                 	|| (result.ametikohad == null) || (result.ametikohad.size() < 1)) {
@@ -155,7 +155,7 @@ public class OrgCapabilityChecker {
             UnitCredential[] credentials = UnitCredential.getCredentials(db);
 
             // Lisame asutuste andmed teadaolevate asutuste andmebaasidesse
-            // või kui need seal juba olemas on, siis uuendame vajadusel.
+            // vÃµi kui need seal juba olemas on, siis uuendame vajadusel.
             for (int a = 0; a < credentials.length; ++a) {
                 Connection conn = DBConnection.getConnection(db);
 
@@ -182,7 +182,7 @@ public class OrgCapabilityChecker {
                     }
                 }
                 
-                // Eemaldame DVK-ühilduvuse märke nendelt asutustelt, mis andmebaasis on küll
+                // Eemaldame DVK-Ã¼hilduvuse mÃ¤rke nendelt asutustelt, mis andmebaasis on kÃ¼ll
                 // olemas, aga mille kohta keskserverist mingit infot ei laekunud.
                 ArrayList<DhlCapability> orgsInDB = DhlCapability.getList(db);
                 for (int b = 0; b < orgsInDB.size(); ++b) {
@@ -200,13 +200,13 @@ public class OrgCapabilityChecker {
                     }
                 }
                 
-                // Allüksuste andmete kirjutamine andmebaasi
+                // AllÃ¼ksuste andmete kirjutamine andmebaasi
                 for (int b = 0; b < result.allyksused.size(); ++b) {
                     Subdivision sub = result.allyksused.get(b);
                     sub.saveToDB(conn, db);
                     
                     // Kui Amphora integratsioon on lubatud, siis lisame uue
-                    // allüksuse otse Amphora asutuste registrisse.
+                    // allÃ¼ksuse otse Amphora asutuste registrisse.
                     if (Settings.Client_IntegratedAmphoraFunctions) {
                          if((sub != null) && (sub.getID() > 0) && (sub.getName() != null) && !sub.getName().equalsIgnoreCase("") && (sub.getOrgCode() != null) && !sub.getOrgCode().equalsIgnoreCase("")) {
                              Department.addDepartment(conn, db, credentials[a], sub.getID(), sub.getName(), sub.getOrgCode());
@@ -221,7 +221,7 @@ public class OrgCapabilityChecker {
                 } 
                 
                 // Kui Amphora integratsioon on lubatud, siis kontrollime, et
-                // Amphora asutuste tabelis olev info oleks sünkroonis DVK-st
+                // Amphora asutuste tabelis olev info oleks sÃ¼nkroonis DVK-st
                 // saadud infoga.
                 if (Settings.Client_IntegratedAmphoraFunctions) {
                     Organization.syncOrgDhlCapability(conn);

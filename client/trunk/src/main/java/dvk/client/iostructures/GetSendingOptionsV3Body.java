@@ -45,7 +45,7 @@ public class GetSendingOptionsV3Body implements SOAPBodyOverride {
             ow = new OutputStreamWriter(out, "UTF-8");
             bw = new BufferedWriter(ow);
 
-            // Server tahab praegu igal juhul oma XML p‰ise lisada
+            // Server tahab praegu igal juhul oma XML p√§ise lisada
             //bw.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
             
             bw.write("<parameetrid>");

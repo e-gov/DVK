@@ -8,7 +8,7 @@
   
   <!-- Properties -->
   <properties>
-  	<dvkCoreDir>C:\development\ws\dvkria\core</dvkCoreDir>
+  	<dvkCoreDir>C:\development\ws\dvkclean\core</dvkCoreDir>
   </properties>
   
   <!-- Dependencies -->
@@ -212,7 +212,7 @@
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
-					<excludes></excludes>
+					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
 			<plugin>

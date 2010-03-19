@@ -58,7 +58,7 @@ public class TestClient {
             {
                 CommonMethods.logError( ex, "clnt.DhlTestClient", "main" );
                 System.out.println("Viga teenuse proksi loomisel: " + ex.getMessage());
-                System.out.println("Katkestan töö...");
+                System.out.println("Katkestan tÃµÃµ...");
                 return;
             }
             

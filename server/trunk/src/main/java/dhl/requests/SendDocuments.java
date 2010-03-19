@@ -164,7 +164,7 @@ public class SendDocuments {
                         }
                     } else {
                     	// Loome dokumendi andmestruktuuri
-                        Document doc = Document.fromXML(docFiles.subFiles.get(i), user.getOrganizationID(), Settings.Server_ValidateXmlFiles, conn, xTeePais);
+                        Document doc = Document.fromXML(docFiles.subFiles.get(i), user.getOrganizationID(), (Settings.Server_ValidateXmlFiles || Settings.Server_ValidateSignatures), conn, xTeePais);
                         
                         // Vajadusel valideerime saadetavad XML dokumendid
                         validateXmlFiles(doc.getFiles());
@@ -515,7 +515,7 @@ public class SendDocuments {
                                 clientDocuments.add(msg);
                             }
                         } else {
-                            Document doc = Document.fromXML(docFiles.subFiles.get(i), user.getOrganizationID(), Settings.Server_ValidateXmlFiles, conn, xTeePais);
+                            Document doc = Document.fromXML(docFiles.subFiles.get(i), user.getOrganizationID(), (Settings.Server_ValidateXmlFiles || Settings.Server_ValidateSignatures), conn, xTeePais);
                             
                             // Vajadusel valideerime saadetavad XML dokumendid
                             validateXmlFiles(doc.getFiles());
@@ -892,7 +892,7 @@ public class SendDocuments {
                                 clientDocuments.add(msg);
                             }
                         } else {
-                            Document doc = Document.fromXML(docFiles.subFiles.get(i), user.getOrganizationID(), Settings.Server_ValidateXmlFiles, conn, xTeePais);
+                            Document doc = Document.fromXML(docFiles.subFiles.get(i), user.getOrganizationID(), (Settings.Server_ValidateXmlFiles || Settings.Server_ValidateSignatures), conn, xTeePais);
                             
                             // Vajadusel valideerime saadetavad XML dokumendid
                             validateXmlFiles(doc.getFiles());

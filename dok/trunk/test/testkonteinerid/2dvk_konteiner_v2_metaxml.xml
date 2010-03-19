@@ -70,10 +70,8 @@
             <dhl:regnr>87654321</dhl:regnr>
             <dhl:nimi>Jaak Lember</dhl:nimi>
             <dhl:asutuse_nimi>Asutus</dhl:asutuse_nimi>
-            <!-- <dhl:ametikoha_kood>SEPP</dhl:ametikoha_kood> -->
             <dhl:ametikoha_nimetus>Insenser</dhl:ametikoha_nimetus>
             <dhl:ametikoha_lyhinimetus>INSENER</dhl:ametikoha_lyhinimetus>
-            <!-- <dhl:allyksuse_kood>SEPIKODA</dhl:allyksuse_kood> -->
             <dhl:allyksuse_nimetus>Sepikoda</dhl:allyksuse_nimetus>
             <dhl:allyksuse_lyhinimetus>SEPIKODA</dhl:allyksuse_lyhinimetus>
         </dhl:saatja>

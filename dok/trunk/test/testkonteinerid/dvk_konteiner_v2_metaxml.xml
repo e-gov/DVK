@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <dhl:dokument xmlns:dhl="http://www.riik.ee/schemas/dhl/2010/2">
     <dhl:metainfo xmlns:ma="http://www.riik.ee/schemas/dhl-meta-automatic" xmlns:mm="http://www.riik.ee/schemas/dhl-meta-manual/2010/2">
-        <mm:koostaja_asutuse_nr>100845334999</mm:koostaja_asutuse_nr>
-        <mm:saaja_asutuse_nr>100845334892</mm:saaja_asutuse_nr>
+        <mm:koostaja_asutuse_nr>87654321</mm:koostaja_asutuse_nr>
+        <mm:saaja_asutuse_nr>99954321</mm:saaja_asutuse_nr>
         <mm:koostaja_dokumendinimi>Avaldus üritus</mm:koostaja_dokumendinimi>
         <mm:koostaja_dokumendityyp>Avaldus</mm:koostaja_dokumendityyp>
         <mm:koostaja_dokumendinr>A-101</mm:koostaja_dokumendinr>

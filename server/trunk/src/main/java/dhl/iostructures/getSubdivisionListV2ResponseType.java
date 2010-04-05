@@ -38,7 +38,7 @@ public class getSubdivisionListV2ResponseType implements SOAPOutputBodyRepresent
                 body.removeContents();
             }
 
-            SOAPBodyElement element = body.addBodyElement(se.createName("getSubdivisionList", CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_URI));
+            SOAPBodyElement element = body.addBodyElement(se.createName("getSubdivisionListResponse", CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_URI));
             SOAPElement elParing = element.addChildElement(se.createName("paring"));
             SOAPElement elHash = elParing.addChildElement("asutused");
             elHash.addTextNode(this.dataMd5Hash);

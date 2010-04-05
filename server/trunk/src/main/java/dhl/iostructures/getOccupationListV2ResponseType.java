@@ -39,7 +39,7 @@ public class getOccupationListV2ResponseType implements SOAPOutputBodyRepresenta
                 body.removeContents();
             }
 
-            SOAPBodyElement element = body.addBodyElement(se.createName("getOccupationList", CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_URI));
+            SOAPBodyElement element = body.addBodyElement(se.createName("getOccupationListResponse", CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_URI));
             SOAPElement elParing = element.addChildElement(se.createName("paring"));
             SOAPElement elHash = elParing.addChildElement("asutused");
             elHash.addTextNode(this.dataMd5Hash);

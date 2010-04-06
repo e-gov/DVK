@@ -221,6 +221,13 @@ public class Sending
 
     public int addToDB(Connection conn, XHeader xTeePais) throws IllegalArgumentException, SQLException {
         if (conn != null) {
+        	
+        	logger.debug("Adding transport info to database: ");
+        	logger.debug("m_documentID: " + m_documentID);
+        	logger.debug("m_startDate: " + m_startDate);
+        	logger.debug("m_endDate: " + m_endDate);
+        	logger.debug("m_sendStatusID: " + m_sendStatusID);
+        	
             Calendar cal = Calendar.getInstance();
             CallableStatement cs = conn.prepareCall("{call ADD_SENDING(?,?,?,?,?,?,?)}");
             cs.registerOutParameter("sending_id", Types.INTEGER);

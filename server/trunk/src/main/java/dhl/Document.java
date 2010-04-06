@@ -251,6 +251,7 @@ public class Document {
 	    		// Salvestame dokumendi transpordiinfo
 	            for (Sending tmpSending: m_sendingList) {
 	                tmpSending.setDocumentID(m_id);
+	                logger.debug("Saving transport info for document: " + m_id);
 	                int sendingResult = tmpSending.addToDB(conn, xTeePais);
 	                if (sendingResult <= 0) {
 	                    conn.rollback();

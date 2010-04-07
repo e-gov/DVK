@@ -275,27 +275,27 @@ end;
 COMMENT ON COLUMN asutus.asutus_id IS 'asutuste tabeli primary key';
 COMMENT ON COLUMN asutus.registrikood IS 'asutuse registrikood';
 COMMENT ON COLUMN asutus.e_registrikood IS 'asutuse varasem registrikood';
-COMMENT ON COLUMN asutus.ks_asutus_id IS 'k�rgemalseisva asutuse asutus_id';
-COMMENT ON COLUMN asutus.ks_asutus_kood IS 'selle alusel on tekitatud ks_asutus_id. Viitab k�rgemalseisva asutuse v�ljale registrikood';
-COMMENT ON COLUMN asutus.nimetus IS 'asutuse nimetus (suurt�htedega)';
-COMMENT ON COLUMN asutus.lnimi IS 'asutuse nime l�hend (see v�li on meie enda tekitatud ja kasutame sisemisteks vajadusteks n�it e-vormide jaoks. t�idetud 13 -l asutusel)';
+COMMENT ON COLUMN asutus.ks_asutus_id IS 'kõrgemalseisva asutuse asutus_id';
+COMMENT ON COLUMN asutus.ks_asutus_kood IS 'selle alusel on tekitatud ks_asutus_id. Viitab kõrgemalseisva asutuse väljale registrikood';
+COMMENT ON COLUMN asutus.nimetus IS 'asutuse nimetus (suurtähtedega)';
+COMMENT ON COLUMN asutus.lnimi IS 'asutuse nime lühend (see väli on meie enda tekitatud ja kasutame sisemisteks vajadusteks näit e-vormide jaoks. täidetud 13 -l asutusel)';
 COMMENT ON COLUMN asutus.maakond IS 'asutuse asukoha maakond';
 COMMENT ON COLUMN asutus.asukoht IS 'asutuse juriidiline asukoht EHAK klassifikaatori alusel';
-COMMENT ON COLUMN asutus.aadress IS 'EHAK klassifikaatori t�psustus (linnas t�nava nimi ja maja nr)';
+COMMENT ON COLUMN asutus.aadress IS 'EHAK klassifikaatori täpsustus (linnas tänava nimi ja maja nr)';
 COMMENT ON COLUMN asutus.postikood IS 'postiindeks';
-COMMENT ON COLUMN asutus.telefon IS 'asutuse �ldtelefoni nr';
+COMMENT ON COLUMN asutus.telefon IS 'asutuse üldtelefoni nr';
 COMMENT ON COLUMN asutus.faks IS 'asutuse faksi number';
-COMMENT ON COLUMN asutus.e_post IS 'asutuse �ldine e-posti aadress';
+COMMENT ON COLUMN asutus.e_post IS 'asutuse üldine e-posti aadress';
 COMMENT ON COLUMN asutus.www IS 'asutuse veebilehe URL';
-COMMENT ON COLUMN asutus.logo IS 'asutuse logo faili nimi RIA failis�steemis (sisemises kasutuses)';
-COMMENT ON COLUMN asutus.asutamise_kp IS 'asutuse asutamise kuup�ev';
-COMMENT ON COLUMN asutus.mood_akt_nimi IS 'asutuse moodustamise �igusakti nimi';
+COMMENT ON COLUMN asutus.logo IS 'asutuse logo faili nimi RIA failisüsteemis (sisemises kasutuses)';
+COMMENT ON COLUMN asutus.asutamise_kp IS 'asutuse asutamise kuupäev';
+COMMENT ON COLUMN asutus.mood_akt_nimi IS 'asutuse moodustamise õigusakti nimi';
 COMMENT ON COLUMN asutus.mood_akt_nr IS 'asutuse moodustamise akti nr';
-COMMENT ON COLUMN asutus.mood_akt_kp IS 'asutuse moodustamise akti kuup�ev';
-COMMENT ON COLUMN asutus.pm_akt_nimi IS 'p�him��ruse �igusakti nimi';
-COMMENT ON COLUMN asutus.pm_akt_nr IS 'p�him��ruse akti number';
-COMMENT ON COLUMN asutus.pm_kinnitamise_kp IS 'p�him��ruse akti kuup�ev';
-COMMENT ON COLUMN asutus.pm_kande_kp IS 'Rahandusministeeriumi registrisse kandmise kuup�ev';
+COMMENT ON COLUMN asutus.mood_akt_kp IS 'asutuse moodustamise akti kuupäev';
+COMMENT ON COLUMN asutus.pm_akt_nimi IS 'põhimääruse õigusakti nimi';
+COMMENT ON COLUMN asutus.pm_akt_nr IS 'põhimääruse akti number';
+COMMENT ON COLUMN asutus.pm_kinnitamise_kp IS 'põhimääruse akti kuupäev';
+COMMENT ON COLUMN asutus.pm_kande_kp IS 'Rahandusministeeriumi registrisse kandmise kuupäev';
 COMMENT ON COLUMN asutus.created IS 'selles baasis kirje loomise aeg';
 COMMENT ON COLUMN asutus.last_modified IS 'selles baasis kirje viimase muutmise aeg';
 COMMENT ON COLUMN asutus.username IS 'selles baasis kirje viimase muutja, selle puudumisel kirje looja isikukood. Isikukoodi puudumisel andmebaasi kasutajanimi';
@@ -776,31 +776,31 @@ ON DELETE SET NULL
 /
 
 
-/* Vastuv�tja staatuse v�imalike v��rtuste sisestamine */
+/* Vastuvõtja staatuse võimalike väärtuste sisestamine */
 INSERT
 INTO    VASTUVOTJA_STAATUS(VASTUVOTJA_STAATUS_ID, NIMETUS)
 VALUES  (1, 'Dokumente on puudu (Pooleli)');
 INSERT
 INTO    VASTUVOTJA_STAATUS(VASTUVOTJA_STAATUS_ID, NIMETUS)
-VALUES  (2, 'J�rjekorras');
+VALUES  (2, 'Järjekorras');
 INSERT
 INTO    VASTUVOTJA_STAATUS(VASTUVOTJA_STAATUS_ID, NIMETUS)
 VALUES  (3, 'Ootel');
 INSERT
 INTO    VASTUVOTJA_STAATUS(VASTUVOTJA_STAATUS_ID, NIMETUS)
-VALUES  (4, 'L�petatud');
+VALUES  (4, 'Lõpetatud');
 INSERT
 INTO    VASTUVOTJA_STAATUS(VASTUVOTJA_STAATUS_ID, NIMETUS)
-VALUES  (5, 'Tagasi l�katud');
+VALUES  (5, 'Tagasi lükatud');
 INSERT
 INTO    VASTUVOTJA_STAATUS(VASTUVOTJA_STAATUS_ID, NIMETUS)
 VALUES  (6, 'Teha');
 INSERT
 INTO    VASTUVOTJA_STAATUS(VASTUVOTJA_STAATUS_ID, NIMETUS)
-VALUES  (7, 'T��tlemisel');
+VALUES  (7, 'Töötlemisel');
 INSERT
 INTO    VASTUVOTJA_STAATUS(VASTUVOTJA_STAATUS_ID, NIMETUS)
-VALUES  (8, 'Aktsepteeritud (V�etud t��sse)');
+VALUES  (8, 'Aktsepteeritud (Võetud töösse)');
 INSERT
 INTO    VASTUVOTJA_STAATUS(VASTUVOTJA_STAATUS_ID, NIMETUS)
 VALUES  (9, 'Salvestatud');
@@ -1663,7 +1663,7 @@ begin
     select  *
     from    dokument d,
     (
-        -- Dokumendid, mis adresseeriti p�ringu teostanud isikule (isikukoodi alusel)
+        -- Dokumendid, mis adresseeriti päringu teostanud isikule (isikukoodi alusel)
         select  t1.dokument_id
         from    transport t1, vastuvotja v1, isik i1
         where   t1.transport_id = v1.transport_id
@@ -1676,7 +1676,7 @@ begin
                 and nvl(Get_DocumentsSentTo.occupation_id_, nvl(v1.ametikoht_id,0)) = nvl(v1.ametikoht_id,0)
                 and nvl(Get_DocumentsSentTo.occupation_short_name, nvl(v1.ametikoha_lyhinimetus,' ')) = nvl(v1.ametikoha_lyhinimetus,' ')
                 
-        -- Dokumendid, mis adresseeriti p�ringu teostaja ametikohale (ametikoha ID v�i l�hinimetus)
+        -- Dokumendid, mis adresseeriti päringu teostaja ametikohale (ametikoha ID või lühinimetus)
         union
         select  t2.dokument_id
         from    transport t2, vastuvotja v2
@@ -1705,7 +1705,7 @@ begin
                 and nvl(Get_DocumentsSentTo.occupation_id_, nvl(v2.ametikoht_id,0)) = nvl(v2.ametikoht_id,0)
                 and nvl(Get_DocumentsSentTo.occupation_short_name, nvl(v2.ametikoha_lyhinimetus,' ')) = nvl(v2.ametikoha_lyhinimetus,' ')
         
-        -- Dokumendid, mis adresseeriti p�ringu teostaja all�ksusele
+        -- Dokumendid, mis adresseeriti päringu teostaja allüksusele
         union
         select  t3.dokument_id
         from    transport t3, vastuvotja v3
@@ -1734,9 +1734,9 @@ begin
                 and nvl(Get_DocumentsSentTo.occupation_id_, nvl(v3.ametikoht_id,0)) = nvl(v3.ametikoht_id,0)
                 and nvl(Get_DocumentsSentTo.occupation_short_name, nvl(v3.ametikoha_lyhinimetus,' ')) = nvl(v3.ametikoha_lyhinimetus,' ')
         
-        -- Dokumendid, mis adresseeriti p�ringu teostaja ametikohale
-        -- p�ringu teostaja all�ksuses (vastupidine juhtum oleks, et
-        -- dokument saadeti m�nele teisele ametikohale samas all�ksuses).
+        -- Dokumendid, mis adresseeriti päringu teostaja ametikohale
+        -- päringu teostaja allüksuses (vastupidine juhtum oleks, et
+        -- dokument saadeti mõnele teisele ametikohale samas allüksuses).
         union
         select  t4.dokument_id
         from    transport t4, vastuvotja v4
@@ -3158,7 +3158,7 @@ procedure Get_AllyksusList(
 as
 begin
     -- Allolev keeruline union all konstruktsioon on kasulik
-    -- OR operaatori v�ltimiseks (Oracle puhul v�ga aeglane)
+    -- OR operaatori vältimiseks (Oracle puhul väga aeglane)
     open RC1 for
     select  a.*,
             null as ks_allyksuse_lyhinimetus
@@ -3570,7 +3570,7 @@ procedure Get_AmetikohtList(
 as
 begin
     -- Allolev keeruline union all konstruktsioon on kasulik
-    -- OR operaatori v�ltimiseks (Oracle puhul v�ga aeglane)
+    -- OR operaatori vältimiseks (Oracle puhul väga aeglane)
     open RC1 for
     select  a.*,
             null as allyksuse_lyhinimetus
@@ -3578,6 +3578,8 @@ begin
     where   a.asutus_id = nvl(Get_AmetikohtList.asutus_id, a.asutus_id)
             and a.ametikoht_nimetus = Get_AmetikohtList.nimetus
             and a.allyksus_id is null
+            and nvl(a.alates, add_months(sysdate, -1)) < sysdate
+            and nvl(a.kuni, add_months(sysdate, 1)) > sysdate
     union all
     select  a1.*,
             null as allyksuse_lyhinimetus
@@ -3585,6 +3587,8 @@ begin
     where   a1.asutus_id = nvl(Get_AmetikohtList.asutus_id, a1.asutus_id)
             and Get_AmetikohtList.nimetus is null
             and a1.allyksus_id is null
+            and nvl(a1.alates, add_months(sysdate, -1)) < sysdate
+            and nvl(a1.kuni, add_months(sysdate, 1)) > sysdate
     union all
     select  a2.*,
             y2.lyhinimetus as allyksuse_lyhinimetus
@@ -3592,13 +3596,17 @@ begin
     where   a2.asutus_id = nvl(Get_AmetikohtList.asutus_id, a2.asutus_id)
             and a2.ametikoht_nimetus = Get_AmetikohtList.nimetus
             and y2.id = a2.allyksus_id
+            and nvl(a2.alates, add_months(sysdate, -1)) < sysdate
+            and nvl(a2.kuni, add_months(sysdate, 1)) > sysdate
     union all
     select  a3.*,
             y3.lyhinimetus as allyksuse_lyhinimetus
     from    ametikoht a3, allyksus y3
     where   a3.asutus_id = nvl(Get_AmetikohtList.asutus_id, a3.asutus_id)
             and Get_AmetikohtList.nimetus is null
-            and y3.id = a3.allyksus_id;
+            and y3.id = a3.allyksus_id
+            and nvl(a3.alates, add_months(sysdate, -1)) < sysdate
+            and nvl(a3.kuni, add_months(sysdate, 1)) > sysdate;
 end;
 /
 

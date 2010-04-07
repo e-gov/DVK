@@ -574,7 +574,7 @@ procedure Get_AmetikohtList(
 as
 begin
     -- Allolev keeruline union all konstruktsioon on kasulik
-    -- OR operaatori v�ltimiseks (Oracle puhul v�ga aeglane)
+    -- OR operaatori vältimiseks (Oracle puhul väga aeglane)
     open RC1 for
     select  a.*,
             null as allyksuse_lyhinimetus
@@ -582,6 +582,8 @@ begin
     where   a.asutus_id = nvl(Get_AmetikohtList.asutus_id, a.asutus_id)
             and a.ametikoht_nimetus = Get_AmetikohtList.nimetus
             and a.allyksus_id is null
+            and nvl(a.alates, add_months(sysdate, -1)) < sysdate
+            and nvl(a.kuni, add_months(sysdate, 1)) > sysdate
     union all
     select  a1.*,
             null as allyksuse_lyhinimetus
@@ -589,6 +591,8 @@ begin
     where   a1.asutus_id = nvl(Get_AmetikohtList.asutus_id, a1.asutus_id)
             and Get_AmetikohtList.nimetus is null
             and a1.allyksus_id is null
+            and nvl(a1.alates, add_months(sysdate, -1)) < sysdate
+            and nvl(a1.kuni, add_months(sysdate, 1)) > sysdate
     union all
     select  a2.*,
             y2.lyhinimetus as allyksuse_lyhinimetus
@@ -596,15 +600,20 @@ begin
     where   a2.asutus_id = nvl(Get_AmetikohtList.asutus_id, a2.asutus_id)
             and a2.ametikoht_nimetus = Get_AmetikohtList.nimetus
             and y2.id = a2.allyksus_id
+            and nvl(a2.alates, add_months(sysdate, -1)) < sysdate
+            and nvl(a2.kuni, add_months(sysdate, 1)) > sysdate
     union all
     select  a3.*,
             y3.lyhinimetus as allyksuse_lyhinimetus
     from    ametikoht a3, allyksus y3
     where   a3.asutus_id = nvl(Get_AmetikohtList.asutus_id, a3.asutus_id)
             and Get_AmetikohtList.nimetus is null
-            and y3.id = a3.allyksus_id;
+            and y3.id = a3.allyksus_id
+            and nvl(a3.alates, add_months(sysdate, -1)) < sysdate
+            and nvl(a3.kuni, add_months(sysdate, 1)) > sysdate;
 end;
 /
+
 
 create or replace
 procedure Get_AllyksusList(
@@ -614,7 +623,7 @@ procedure Get_AllyksusList(
 as
 begin
     -- Allolev keeruline union all konstruktsioon on kasulik
-    -- OR operaatori v�ltimiseks (Oracle puhul v�ga aeglane)
+    -- OR operaatori vältimiseks (Oracle puhul väga aeglane)
     open RC1 for
     select  a.*,
             null as ks_allyksuse_lyhinimetus
@@ -665,7 +674,7 @@ begin
     select  *
     from    dokument d,
     (
-        -- Dokumendid, mis adresseeriti p�ringu teostanud isikule (isikukoodi alusel)
+        -- Dokumendid, mis adresseeriti päringu teostanud isikule (isikukoodi alusel)
         select  t1.dokument_id
         from    transport t1, vastuvotja v1, isik i1
         where   t1.transport_id = v1.transport_id
@@ -678,7 +687,7 @@ begin
                 and nvl(Get_DocumentsSentTo.occupation_id_, nvl(v1.ametikoht_id,0)) = nvl(v1.ametikoht_id,0)
                 and nvl(Get_DocumentsSentTo.occupation_short_name, nvl(v1.ametikoha_lyhinimetus,' ')) = nvl(v1.ametikoha_lyhinimetus,' ')
                 
-        -- Dokumendid, mis adresseeriti p�ringu teostaja ametikohale (ametikoha ID v�i l�hinimetus)
+        -- Dokumendid, mis adresseeriti päringu teostaja ametikohale (ametikoha ID või lühinimetus)
         union
         select  t2.dokument_id
         from    transport t2, vastuvotja v2
@@ -707,7 +716,7 @@ begin
                 and nvl(Get_DocumentsSentTo.occupation_id_, nvl(v2.ametikoht_id,0)) = nvl(v2.ametikoht_id,0)
                 and nvl(Get_DocumentsSentTo.occupation_short_name, nvl(v2.ametikoha_lyhinimetus,' ')) = nvl(v2.ametikoha_lyhinimetus,' ')
         
-        -- Dokumendid, mis adresseeriti p�ringu teostaja all�ksusele
+        -- Dokumendid, mis adresseeriti päringu teostaja allüksusele
         union
         select  t3.dokument_id
         from    transport t3, vastuvotja v3
@@ -736,9 +745,9 @@ begin
                 and nvl(Get_DocumentsSentTo.occupation_id_, nvl(v3.ametikoht_id,0)) = nvl(v3.ametikoht_id,0)
                 and nvl(Get_DocumentsSentTo.occupation_short_name, nvl(v3.ametikoha_lyhinimetus,' ')) = nvl(v3.ametikoha_lyhinimetus,' ')
         
-        -- Dokumendid, mis adresseeriti p�ringu teostaja ametikohale
-        -- p�ringu teostaja all�ksuses (vastupidine juhtum oleks, et
-        -- dokument saadeti m�nele teisele ametikohale samas all�ksuses).
+        -- Dokumendid, mis adresseeriti päringu teostaja ametikohale
+        -- päringu teostaja allüksuses (vastupidine juhtum oleks, et
+        -- dokument saadeti mõnele teisele ametikohale samas allüksuses).
         union
         select  t4.dokument_id
         from    transport t4, vastuvotja v4

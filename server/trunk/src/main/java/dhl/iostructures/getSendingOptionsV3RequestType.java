@@ -25,6 +25,14 @@ public class getSendingOptionsV3RequestType {
     public int vahetatudDokumenteKuni;
     public boolean vastuvotmataDokumenteOotel;
     
+    public boolean getParametesSpecified() {
+    	return ((this.asutused != null) && (this.asutused.length > 0))
+		|| ((this.allyksused != null) && (this.allyksused.size() > 0))
+		|| ((this.ametikohad != null) && (this.ametikohad.size() > 0))
+		|| (this.vahetatudDokumenteVahemalt >= 0)
+		|| (this.vahetatudDokumenteKuni >= 0)
+		|| this.vastuvotmataDokumenteOotel;
+    }
 
     public getSendingOptionsV3RequestType() {
     	parameetridHref = "";

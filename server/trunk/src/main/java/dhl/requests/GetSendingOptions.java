@@ -208,7 +208,7 @@ public class GetSendingOptions {
 	        logger.debug("vastuvotmataDokumenteOotel: " + bodyData.vastuvotmataDokumenteOotel);
 	        
 	        // Laeme sisendparameetrid SOAP sõnumi manuses asuvast XML failist
-	        AttachmentExtractionResult exResult = CommonMethods.getExtractedFileFromAttachment(context, bodyData.parameetridHref);
+	        AttachmentExtractionResult exResult = CommonMethods.getExtractedFileFromAttachment(context, bodyData.kehaHref);
 	        result.dataMd5Hash = exResult.getAttachmentHash();
 	        bodyData.loadParametersFromXML(exResult.getExtractedFileName());
 	        

@@ -19,13 +19,13 @@ import org.apache.axis.AxisFault;
 
 public class getSendingOptionsV3ResponseType implements SOAPOutputBodyRepresentation {
     public getSendingOptionsV3RequestType paring;
-    public String asutusedHref;
+    public String kehaHref;
     public String responseFile;
     public String dataMd5Hash;
     
     public getSendingOptionsV3ResponseType() {
         paring = null;
-        asutusedHref = "";
+        kehaHref = "";
         responseFile = null;
         dataMd5Hash = "";
     }
@@ -43,13 +43,11 @@ public class getSendingOptionsV3ResponseType implements SOAPOutputBodyRepresenta
 
             SOAPBodyElement element = body.addBodyElement(se.createName("getSendingOptionsResponse", CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_URI));
             SOAPElement elParing = element.addChildElement(se.createName("paring"));
-            SOAPElement elHash = elParing.addChildElement("parameetrid");
-            elHash.addTextNode(this.dataMd5Hash);
+            elParing.addTextNode(this.dataMd5Hash);
             
-            // SÃµnumi keha osa
+            // Sõnumi keha osa
             SOAPElement elKeha = element.addChildElement(se.createName("keha"));
-            SOAPElement elDokument = elKeha.addChildElement(se.createName("asutused"));
-            elDokument.addAttribute(se.createName("href"), "cid:" + asutusedHref);
+            elKeha.addAttribute(se.createName("href"), "cid:" + kehaHref);
         } catch (Exception ex) {
             CommonMethods.logError(ex, this.getClass().getName(), "addToSOAPBody");
         }
@@ -72,7 +70,7 @@ public class getSendingOptionsV3ResponseType implements SOAPOutputBodyRepresenta
             bw = new BufferedWriter(ow);
 
             //bw.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
-            bw.write("<asutused>");
+            bw.write("<keha>");
 
             if (organizationList != null) {
             	bw.write("<asutused>");
@@ -132,7 +130,7 @@ public class getSendingOptionsV3ResponseType implements SOAPOutputBodyRepresenta
             	bw.write("</ametikohad>");
             }
             
-            bw.write("</asutused>");
+            bw.write("</keha>");
         }
         catch (Exception ex) {
             CommonMethods.logError( ex, this.getClass().getName(), "createResponseFile" );

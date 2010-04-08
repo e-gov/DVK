@@ -14,7 +14,7 @@ import org.w3c.dom.NodeList;
 
 public class getSendingOptionsV3RequestType {
 	static Logger logger = Logger.getLogger(getSendingOptionsV3RequestType.class.getName());
-	public String parameetridHref;
+	public String kehaHref;
     public String[] asutused;
     public ArrayList<ShortName> allyksused;
     public ArrayList<ShortName> ametikohad;
@@ -35,7 +35,7 @@ public class getSendingOptionsV3RequestType {
     }
 
     public getSendingOptionsV3RequestType() {
-    	parameetridHref = "";
+    	kehaHref = "";
         
         asutused = new String[] { };
         allyksused = new ArrayList<ShortName>();
@@ -54,30 +54,24 @@ public class getSendingOptionsV3RequestType {
             NodeList bodyNodes = msgNode.getElementsByTagName("keha");
             if (bodyNodes.getLength() > 0) {
                 Element bodyNode = (Element)bodyNodes.item(0);
-                NodeList docRefNodes = bodyNode.getElementsByTagName("parameetrid");
-                if (docRefNodes.getLength() > 0) {
-                    Element docRefNode = (Element)docRefNodes.item(0);
-                    getSendingOptionsV3RequestType result = new getSendingOptionsV3RequestType();
-                    result.parameetridHref = docRefNode.getAttribute("href");
-                    if (result.parameetridHref.startsWith("cid:")) {
-                        result.parameetridHref = result.parameetridHref.replaceFirst("cid:","");
-                    }
-                    return result;
-                } else {
-                	throw new Exception("Vigane pÃµringu getSendingOptions.V3 keha - puudub element \"parameetrid\".");
-                }                
+                getSendingOptionsV3RequestType result = new getSendingOptionsV3RequestType();
+                result.kehaHref = bodyNode.getAttribute("href");
+                if (result.kehaHref.startsWith("cid:")) {
+                    result.kehaHref = result.kehaHref.replaceFirst("cid:","");
+                }
+                return result;
             } else {
-            	throw new Exception("Vigane pÃµringu getSendingOptions.V3 keha - puudub element \"keha\".");
+            	throw new Exception("Vigane päringu getSendingOptions.V3 keha - puudub element \"keha\".");
             }
         } else {
-        	throw new Exception("Vigane pÃµringu getSendingOptions.V3 keha - puudub element \"getSendingOptions\".");
+        	throw new Exception("Vigane päringu getSendingOptions.V3 keha - puudub element \"getSendingOptions\".");
         }
     }
     
     public void loadParametersFromXML(String xmlFile) {
     	if ((xmlFile != null) && (xmlFile.length() > 0) && (new File(xmlFile)).exists()) {
     		Document xmlDoc = CommonMethods.xmlDocumentFromFile(xmlFile, true);
-            NodeList nodes = xmlDoc.getElementsByTagName("parameetrid");
+            NodeList nodes = xmlDoc.getElementsByTagName("keha");
             if (nodes.getLength() > 0) {
                 Element el = (Element)nodes.item(0);
                 
@@ -94,7 +88,7 @@ public class getSendingOptionsV3RequestType {
                     }
                 }
                 
-                // AllÃµksuste nimekiri
+                // Allüksuste nimekiri
                 nodes = el.getElementsByTagName("allyksused");
                 if (nodes.getLength() > 0) {
                     Element el1 = (Element)nodes.item(0);
@@ -142,7 +136,7 @@ public class getSendingOptionsV3RequestType {
                     }
                 }
                 
-                // Ainult vastuvÃµtmist ootavate dokumentidega asutused
+                // Ainult vastuvõtmist ootavate dokumentidega asutused
                 nodes = el.getElementsByTagName("vastuvotmata_dokumente_ootel");
                 if (nodes.getLength() > 0) {
                 	Element el1 = (Element)nodes.item(0);
@@ -152,7 +146,7 @@ public class getSendingOptionsV3RequestType {
                     }
                 }
 
-                // Ainult asutused, kes on vahetanud vÃµhemalt N dokumenti
+                // Ainult asutused, kes on vahetanud vähemalt N dokumenti
                 nodes = el.getElementsByTagName("vahetatud_dokumente_vahemalt");
                 if (nodes.getLength() > 0) {
                 	Element el1 = (Element)nodes.item(0);

@@ -22,7 +22,7 @@ public class GetSendingOptionsV3ResponseType {
 	public static GetSendingOptionsV3ResponseType fromXML(Element rootElement) {
 		GetSendingOptionsV3ResponseType result = new GetSendingOptionsV3ResponseType();
 		
-		NodeList nList = rootElement.getElementsByTagName("asutused");
+		NodeList nList = rootElement.getElementsByTagName("keha");
         if (nList.getLength() > 0) {
         	Node n = nList.item(0);
         	

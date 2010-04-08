@@ -9,7 +9,7 @@ import dvk.core.CommonMethods;
 import dvk.core.ShortName;
 
 public class GetSendingOptionsV3Body implements SOAPBodyOverride {
-    public String parameetridHref;
+    public String kehaHref;
     public String attachmentFileName;
     
     public boolean vastuvotmataDokumenteOotel;
@@ -20,7 +20,7 @@ public class GetSendingOptionsV3Body implements SOAPBodyOverride {
     public ArrayList<ShortName> ametikohad;
     
     public GetSendingOptionsV3Body() {
-    	this.parameetridHref = "";
+    	this.kehaHref = "";
     	this.attachmentFileName = "";
     	this.asutused = new ArrayList<String>();
     	this.allyksused = new ArrayList<ShortName>();
@@ -31,7 +31,7 @@ public class GetSendingOptionsV3Body implements SOAPBodyOverride {
     }
 	
 	public String getBodyContentsAsText() {
-		return "<dhl:getSendingOptions><keha><parameetrid href=\"cid:" + parameetridHref + "\"/></keha></dhl:getSendingOptions>";
+		return "<dhl:getSendingOptions><keha href=\"cid:" + kehaHref + "\"/></dhl:getSendingOptions>";
     }
 	
 	public String createAttachmentFile() throws Exception {
@@ -45,10 +45,10 @@ public class GetSendingOptionsV3Body implements SOAPBodyOverride {
             ow = new OutputStreamWriter(out, "UTF-8");
             bw = new BufferedWriter(ow);
 
-            // Server tahab praegu igal juhul oma XML p√§ise lisada
+            // Server tahab praegu igal juhul oma XML p‰ise lisada
             //bw.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
             
-            bw.write("<parameetrid>");
+            bw.write("<keha>");
 
             if (vastuvotmataDokumenteOotel) {
                 bw.write("<vastuvotmata_dokumente_ootel>true</vastuvotmata_dokumente_ootel>");
@@ -87,7 +87,7 @@ public class GetSendingOptionsV3Body implements SOAPBodyOverride {
                 bw.write("</ametikohad>");
             }
             
-            bw.write("</parameetrid>");
+            bw.write("</keha>");
         }
         catch (Exception ex) {
             CommonMethods.logError( ex, this.getClass().getName(), "createAttachmentFile" );

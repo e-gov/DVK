@@ -4442,6 +4442,69 @@ BEGIN
 END UPDATE_VASTUVOTJA;
 /
 
+-- Insert conversion data
+CREATE OR REPLACE DIRECTORY DIR_TEMP_KONV AS '&KONVERSIOON_DIRECTORY';
+
+DECLARE
+
+    v_inputFile VARCHAR2(100) := 'v2_v1.xsl';
+    v_dir VARCHAR2(100) := 'DIR_TEMP_KONV';
+    v_conversion_id konversioon.id%TYPE;  
+  
+    dest_clob   CLOB;
+    src_clob    BFILE  := BFILENAME(v_dir, v_inputFile);
+    dst_offset  number := 1 ;
+    src_offset  number := 1 ;
+    lang_ctx    number := DBMS_LOB.DEFAULT_LANG_CTX;
+    warning     number;
+  
+BEGIN
+
+  -- insert a NULL record to lock
+  INSERT INTO konversioon (
+    version, 
+    result_version, 
+    xslt
+  ) VALUES (
+    2,
+    1,
+    EMPTY_CLOB()
+  ) RETURNING id INTO v_conversion_id;
+  
+  -- lock record
+  SELECT xslt
+  INTO dest_clob
+  FROM konversioon
+  WHERE id = v_conversion_id FOR UPDATE;
+
+  DBMS_LOB.OPEN(src_clob, DBMS_LOB.LOB_READONLY);
+
+  DBMS_LOB.LoadCLOBFromFile(
+          DEST_LOB     => dest_clob
+        , SRC_BFILE    => src_clob
+        , AMOUNT       => DBMS_LOB.GETLENGTH(src_clob)
+        , DEST_OFFSET  => dst_offset
+        , SRC_OFFSET   => src_offset
+        , BFILE_CSID   => DBMS_LOB.DEFAULT_CSID
+        , LANG_CONTEXT => lang_ctx
+        , WARNING      => warning
+    );
+
+  -- update the blob field
+  UPDATE konversioon
+  SET xslt = dest_clob
+  WHERE id = v_conversion_id;
+
+  -- close file
+  dbms_lob.fileclose(src_clob);
+  
+  EXCEPTION
+    WHEN OTHERS THEN
+      dbms_lob.fileclose(src_clob);
+  
+END;
+/
+
 CREATE OR REPLACE PACKAGE DVKLOG AS 
 
   -- Enable debugging

@@ -872,7 +872,7 @@ INNER JOIN
 	dhl_message_recipient r ON r.recipient_org_code = o.org_code
 WHERE	r.dhl_message_id = @dhl_message_id
 ORDER BY
-	o.direct_service_url desc
+	o.dhl_direct_service_url desc
 GO
 
 CREATE PROCEDURE Get_DhlOrgsByCapability
@@ -1221,5 +1221,5 @@ as
             recipient_position_code,
             dhl_guid
     from    dhl_message
-    where   guid = @guid
+    where   dhl_guid = @guid
 GO

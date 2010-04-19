@@ -22,29 +22,30 @@ public class CommonStructures {
     public static final String DhlNamespaceV2 = "http://www.riik.ee/schemas/dhl/2010/2"; 
     
     // Veateadete tekstid
-    public static final String VIGA_XTEE_PAISED_PUUDU = "Esitatud sï¿½numil puuduvad vajalikud X-Tee pï¿½ised!";
-    public static final String VIGA_XTEE_ASUTUSE_PAIS_PUUDU = "Esitatud sï¿½numi X-Tee pï¿½ised ei sisalda informatsiooni sï¿½numi saatnud asutuse kohta!";
-    public static final String VIGA_XTEE_ISIKU_PAIS_PUUDU = "Esitatud sï¿½numi X-Tee pï¿½ised ei sisalda informatsiooni sï¿½numi saatnud isiku kohta!";
-    public static final String VIGA_TUNDMATU_ASUTUS = "Esitatud sï¿½numi saatjaks mï¿½rgitud asutus (#1) ei kuulu DVK-d kasutavate asutuste hulka!";
-    public static final String VIGA_TUNDMATU_ISIK = "Esitatud sï¿½numi saatjaks mï¿½rgitud isik ei kuulu DVK-s registreeritud isikute hulka!";
-    public static final String VIGA_PUUDUV_MIME_LISA = "Viga MIME lisade tï¿½ï¿½tlemisel! Sï¿½numi kehas mï¿½rgitud ID-le vastavat MIME lisa ei ï¿½nnestunud leida!";
+    public static final String VIGA_XTEE_PAISED_PUUDU = "Esitatud sõnumil puuduvad vajalikud X-Tee päised!";
+    public static final String VIGA_XTEE_ASUTUSE_PAIS_PUUDU = "Esitatud sõnumi X-Tee päised ei sisalda informatsiooni sõnumi saatnud asutuse kohta!";
+    public static final String VIGA_XTEE_ISIKU_PAIS_PUUDU = "Esitatud sõnumi X-Tee päised ei sisalda informatsiooni sõnumi saatnud isiku kohta!";
+    public static final String VIGA_TUNDMATU_ASUTUS = "Esitatud sõnumi saatjaks märgitud asutus (#1) ei kuulu DVK-d kasutavate asutuste hulka!";
+    public static final String VIGA_TUNDMATU_ISIK = "Esitatud sõnumi saatjaks märgitud isik ei kuulu DVK-s registreeritud isikute hulka!";
+    public static final String VIGA_PUUDUV_MIME_LISA = "Viga MIME lisade töötlemisel! Sõnumi kehas märgitud ID-le vastavat MIME lisa ei õnnestunud leida!";
     public static final String VIGA_VIGANE_MIME_LISA = "Sonumi lisas edastatud andmed on vigase XML struktuuriga!";
-    public static final String VIGA_VIGANE_KEHA = "Viga sï¿½numi keha tï¿½ï¿½tlemisel!";
-    public static final String VIGA_SAADETUD_DOKUMENDI_SALVESTAMISEL = "DVK serveri tarkvaraline viga! Saadetud dokumenti ei ï¿½nnestunud salvestada!";
-    public static final String VIGA_SAADETUD_DOKUMENDI_TOOTLEMISEL = "Viga saadetud dokumendi andmete tï¿½ï¿½tlemisel! Palume kontrollida, et saadetud dokument vastaks kokkulepitud struktuurile!";
+    public static final String VIGA_VIGANE_KEHA = "Viga sõnumi keha töötlemisel!";
+    public static final String VIGA_SAADETUD_DOKUMENDI_SALVESTAMISEL = "DVK serveri tarkvaraline viga! Saadetud dokumenti ei õnnestunud salvestada!";
+    public static final String VIGA_SAADETUD_DOKUMENDI_TOOTLEMISEL = "Viga saadetud dokumendi andmete töötlemisel! Palume kontrollida, et saadetud dokument vastaks kokkulepitud struktuurile!";
     public static final String VIGA_PUUDUV_TAG = "Puuduv kohustuslik XML-tag: #1";
-    public static final String VIGA_VASTUSSONUMI_KOOSTAMISEL = "DVK serveri tarkvaraline viga! Viga vastussï¿½numi koostamisel!";
-    public static final String VIGA_PUUDULIKUD_VASTUVOTJA_KONTAKTID = "Antud dokumenti ei ole vï¿½imalik saajale edastada, kuna antud asutus ei ole DVK-ga liitunud vï¿½i ei suuda DVK kaudu andmeid vahetada!";
-    public static final String VIGA_VALE_ARV_SAATJAID = "Viga saadetud sï¿½numi andmetes! Kui transpordi plokk on tï¿½idetud, siis peab dokumendi olema tï¿½pselt ï¿½ks saatja!";
-    public static final String VIGA_VALE_ARV_VASTUVOTJAID = "Viga saadetud sï¿½numi andmetes! Kui transpordi plokk on tï¿½idetud, siis peab dokumendi olema vï¿½hemalt ï¿½ks saaja!";
-    public static final String VIGA_AMETIKOHATA_ISIK = "Esitatud sï¿½numi saatjaks mï¿½rgitud isik ei tï¿½ida oma asutuses ï¿½htegi ametikohta!";
-    public static final String VIGA_TUNDMATU_SAATJA_ASUTUS = "Dokumendi saatjaks mï¿½rgitud asutus (#1) ei kuuluDVK-d kasutavate asutuste hulka!";
-    public static final String VIGA_TUNDMATU_VAHENDAJA_ASUTUS = "Dokumendi vahendajaks mï¿½rgitud asutus (#1) ei kuulu DVK-d kasutavate asutuste hulka!";
-    public static final String VIGA_SAATJA_ASUTUSED_ERINEVAD = "X-Tee kaudu dokumendi saatnud asutus erineb dokumendi sisus saatjaks mï¿½rgitud asutusest!";
-    public static final String VIGA_ANDMEBAASIGA_YHENDAMISEL = "DVK serveri tarkvaraline viga! Viga andmebaasiga ï¿½hendamisel!";
+    public static final String VIGA_VASTUSSONUMI_KOOSTAMISEL = "DVK serveri tarkvaraline viga! Viga vastussõnumi koostamisel!";
+    public static final String VIGA_PUUDULIKUD_VASTUVOTJA_KONTAKTID = "Antud dokumenti ei ole võimalik saajale edastada, kuna antud asutus ei ole DVK-ga liitunud või ei suuda DVK kaudu andmeid vahetada!";
+    public static final String VIGA_AADRESSANDMED_PUUDU = "Viga saadetud sõnumi andmetes! Dokumendi saatja ja saajate andmed on puudu!";
+    public static final String VIGA_VALE_ARV_SAATJAID = "Viga saadetud sõnumi andmetes! Kui transpordi plokk on täidetud, siis peab dokumendi olema täpselt üks saatja!";
+    public static final String VIGA_VALE_ARV_VASTUVOTJAID = "Viga saadetud sõnumi andmetes! Kui transpordi plokk on täidetud, siis peab dokumendi olema vähemalt üks saaja!";
+    public static final String VIGA_AMETIKOHATA_ISIK = "Esitatud sõnumi saatjaks märgitud isik ei täida oma asutuses ühtegi ametikohta!";
+    public static final String VIGA_TUNDMATU_SAATJA_ASUTUS = "Dokumendi saatjaks märgitud asutus (#1) ei kuulu DVK-d kasutavate asutuste hulka!";
+    public static final String VIGA_TUNDMATU_VAHENDAJA_ASUTUS = "Dokumendi vahendajaks märgitud asutus (#1) ei kuulu DVK-d kasutavate asutuste hulka!";
+    public static final String VIGA_SAATJA_ASUTUSED_ERINEVAD = "X-Tee kaudu dokumendi saatnud asutus erineb dokumendi sisus saatjaks märgitud asutusest!";
+    public static final String VIGA_ANDMEBAASIGA_YHENDAMISEL = "DVK serveri tarkvaraline viga! Viga andmebaasiga ühendamisel!";
     public static final String VIGA_ANDMEBAASI_SALVESTAMISEL = "DVK serveri tarkvaraline viga! Viga andmete andmebaasi salvestamisel!";
-    public static final String VIGA_ANDMEBAASIYHENDUSE_LOOMISEL = "DVK serveri tarkvaraline viga! Viga andmebaasiï¿½henduse loomisel!";
-    public static final String VIGA_PARINGU_VERSIOONIS = "X-Tee pï¿½ises nimetatud pï¿½ringu versiooni ei eksisteeri!";
+    public static final String VIGA_ANDMEBAASIYHENDUSE_LOOMISEL = "DVK serveri tarkvaraline viga! Viga andmebaasiühenduse loomisel!";
+    public static final String VIGA_PARINGU_VERSIOONIS = "X-Tee päises nimetatud päringu versiooni ei eksisteeri!";
     
     // Rollid
     public static final String ROLL_ASUTUSE_ADMIN = "DHL: asutuse administraator";

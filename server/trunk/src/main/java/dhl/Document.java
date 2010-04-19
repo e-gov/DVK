@@ -5,7 +5,6 @@ import dhl.iostructures.XHeader;
 import dvk.core.Settings;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,22 +12,16 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
-import java.io.Writer;
 import java.sql.CallableStatement;
 import java.sql.Clob;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
-
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis.AxisFault;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Node;
@@ -47,7 +40,7 @@ public class Document {
     private int m_dvkContainerVersion;
     private String m_guid;
     
-    // Abimuutujad, mida kasutatakse andmetÃµÃµtlusel,
+    // Abimuutujad, mida kasutatakse andmetöötlusel,
     // aga mida andmebaasi ei salvestata.
     private org.w3c.dom.Document m_simplifiedXmlDoc;
     private ArrayList<DocumentFile> m_files;
@@ -116,6 +109,22 @@ public class Document {
         this.m_files = value;
     }
     
+	public int getDvkContainerVersion() {
+		return m_dvkContainerVersion;
+	}
+
+	public void setDvkContainerVersion(int containerVersion) {
+		m_dvkContainerVersion = containerVersion;
+	}
+
+	public String getGuid() {
+		return m_guid;
+	}
+
+	public void setGuid(String mGuid) {
+		m_guid = mGuid;
+	}
+    
     public Document() {
         clear();
     }
@@ -181,7 +190,6 @@ public class Document {
     }
 
     public int addToDB(Connection conn, XHeader xTeePais) throws AxisFault {
-    	int result = 0;
     	FileInputStream inStream = null;
         InputStreamReader inReader = null;
         BufferedReader reader = null;
@@ -313,17 +321,17 @@ public class Document {
 
     /**
      * Tagastab nimekirja etteantud dokumentidest, mille allalaadimiseks
-     * on etteantud isikul Ãµigus.
+     * on etteantud isikul õigus.
      * 
      * @param organizationID			asutuse ID
      * @param folderID					kausta ID
      * @param userID					isiku ID
-     * @param divisionID				allÃµksuse ID
-     * @param divisionShortName			allÃµksuse lÃµhinimetus
+     * @param divisionID				allüksuse ID
+     * @param divisionShortName			allüksuse lühinimetus
      * @param occupationID				ametikoha ID
-     * @param occupationShortName		ametikoha lÃµhinimetus
+     * @param occupationShortName		ametikoha lühinimetus
      * @param resultLimit				maksimaalne lubatud tulemuste arv
-     * @param conn						andmebaasiÃµhenduse objekt
+     * @param conn						andmebaasiühenduse objekt
      * @return							nimekiri allalaadimist ootavatest dokumentidest
      */
     public static ArrayList<Document> getDocumentsSentTo(
@@ -434,11 +442,11 @@ public class Document {
     }
 
     /**
-     * Loob XML-i pÃµhjal <code>Document</code> objekti.
+     * Loob XML-i põhjal <code>Document</code> objekti.
      * 
      * @param dataFile XML fail
      * @param organizationID organisatsiooni ID
-     * @param conn andmebaasiÃµhendus
+     * @param conn andmebaasiühendus
      * @return dokument
      * @throws AxisFault
      */
@@ -510,16 +518,37 @@ public class Document {
                         }
                     }
                 }
-                	
+                
+                // Kontrollime veelkord andmed üle
+                // Kui "transport" plokk saatja ega saajate kohta infot ei sisalda,
+                // siis järelikult ei saadetud dokumenti edastamiseks.
+                if ((result.getSendingList() == null) || (result.getSendingList().size() < 1)) {
+                    throw new AxisFault(CommonStructures.VIGA_AADRESSANDMED_PUUDU);
+                }
+
+                Sending tmpSending = result.getSendingList().get(0);
+                if (tmpSending == null) {
+                	throw new AxisFault(CommonStructures.VIGA_AADRESSANDMED_PUUDU);
+                }
+
+                // Kuna saatjaid saab olla täpselt üks, siis anname veateate niipea,
+                // kui saatjaid pole või on üle ühe.
+                if ((tmpSending.getSender() == null) || (tmpSending.getSender().getOrganizationID() < 1)) {
+                    throw new AxisFault(CommonStructures.VIGA_VALE_ARV_SAATJAID);
+                }
+
+                // Kui ühtegi saajat pole esitatud, siis tagastame veateate
+                if ((tmpSending.getRecipients() == null) || (tmpSending.getRecipients().size() < 1)) {
+                    throw new AxisFault(CommonStructures.VIGA_VALE_ARV_VASTUVOTJAID);
+                }
+                
             } finally {
                 reader.close();
             }
             return result;
         } catch (AxisFault fault) {
-        	CommonMethods.logError(fault, "dhl.Document", "fromXML");
         	throw fault;
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dhl.Document", "fromXML");
             throw new AxisFault(ex.getMessage());
         }
     }
@@ -622,20 +651,4 @@ public class Document {
             return null;
         }
     }
-
-	public int getDvkContainerVersion() {
-		return m_dvkContainerVersion;
-	}
-
-	public void setDvkContainerVersion(int containerVersion) {
-		m_dvkContainerVersion = containerVersion;
-	}
-
-	public String getGuid() {
-		return m_guid;
-	}
-
-	public void setGuid(String mGuid) {
-		m_guid = mGuid;
-	}
 }

@@ -11,17 +11,10 @@ import dhl.iostructures.markDocumentsReceivedV2Item;
 import dhl.iostructures.markDocumentsReceivedV3RequestType;
 import dhl.users.UserProfile;
 import java.io.File;
-import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Date;
 import javax.activation.DataSource;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
 import org.apache.axis.AxisFault;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
@@ -72,10 +65,10 @@ public class MarkDocumentsReceived{
             // Laeme andmed XML DOM dokumendi kujule
             Document inputMessage = CommonMethods.xmlDocumentFromFile(pipelineDataFile, false);
             
-            // Leiame k√µik XML elemendid, mille nimi on "dhl_id"
+            // Leiame kıik XML elemendid, mille nimi on "dhl_id"
             NodeList foundNodes = inputMessage.getElementsByTagName("dhl_id");
             
-            // Konverteerime sisendikontrolli m√µttes k√µik ID-d arvudeks
+            // Konverteerime sisendikontrolli mıttes kıik ID-d arvudeks
             int[] idList = new int[foundNodes.getLength()];
             String idText = null;
             for (int i = 0; i < idList.length; ++i) {
@@ -87,7 +80,7 @@ public class MarkDocumentsReceived{
             }
             
             // Kopeerime edasiste tegevuste jaoks vajalikud andmed oma
-            // andmestruktuuri √µmber.
+            // andmestruktuuri ¸mber.
             Recipient tmpRecipient = null;
             for (int i = 0; i < idList.length; ++i) {
                 int docID = idList[i];
@@ -99,12 +92,12 @@ public class MarkDocumentsReceived{
                         tmpRecipient = tmpSending.getRecipients().get(j);
                         if (tmpRecipient.getOrganizationID() == user.getOrganizationID()) {
 
-                        	// Kui p√µringus on t√µpsustatud, millise all√µkuse ja/v√µi ametikoha
-                        	// dokumendid tuleb vastuv√µetuks m√µrkida, siis kontrollime, et
-                        	// ametikoha ja/v√µi all√µksuse ID adressaadi andmetes
-                        	// vastaks p√µringu parameetritele.
-                        	// Vastasel juhul m√µrgiks rakendus dokumendi vastuv√µetuks k√µigi
-                        	// adressaatide poolt, kes kuuluvad p√µringu teinud asutuse alla.
+                        	// Kui p‰ringus on t‰psustatud, millise all¸ksuse ja/vıi ametikoha
+                        	// dokumendid tuleb vastuvıetuks m‰rkida, siis kontrollime, et
+                        	// ametikoha ja/vıi all¸ksuse ID adressaadi andmetes
+                        	// vastaks p‰ringu parameetritele.
+                        	// Vastasel juhul m‰rgiks rakendus dokumendi vastuvıetuks kıigi
+                        	// adressaatide poolt, kes kuuluvad p‰ringu teinud asutuse alla.
                         	if (((bodyData.allyksusId <= 0) || (tmpRecipient.getDivisionID() == bodyData.allyksusId))
                             	&& ((bodyData.ametikohtId <= 0) || (tmpRecipient.getPositionID() == bodyData.ametikohtId))) {
                         	
@@ -189,30 +182,30 @@ public class MarkDocumentsReceived{
             // Laeme andmed XML DOM dokumendi kujule
             Document inputMessage = CommonMethods.xmlDocumentFromFile(pipelineDataFile, false);
             
-            // Leiame k√µik XML elemendid, mille nimi on "item"
+            // Leiame kıik XML elemendid, mille nimi on "item"
             NodeList foundNodes = inputMessage.getElementsByTagName("item");
             
-            // Kontrollime, et sisendis sisalduks v√µhemalt 1 dokumendi andmed
+            // Kontrollime, et sisendis sisalduks v‰hemalt 1 dokumendi andmed
             if (foundNodes == null) {
-                throw new AxisFault("Dokumentide nimekiri on t√µhi v√µi vigase XML struktuuriga!");
+                throw new AxisFault("Dokumentide nimekiri on t¸hi vıi vigase XML struktuuriga!");
             }
             if (foundNodes.getLength() < 1) {
-                throw new AxisFault("Dokumentide nimekiri on t√µhi v√µi vigase XML struktuuriga!");
+                throw new AxisFault("Dokumentide nimekiri on t¸hi vıi vigase XML struktuuriga!");
             }
             
             // Kopeerime edasiste tegevuste jaoks vajalikud andmed oma
-            // andmestruktuuri √µmber.
+            // andmestruktuuri ¸mber.
             int nodeCount = foundNodes.getLength();
             Recipient tmpRecipient = null;
             for (int i = 0; i < nodeCount; ++i) {
                 markDocumentsReceivedV2Item item = markDocumentsReceivedV2Item.getFromXML( (org.w3c.dom.Element)foundNodes.item(i) );
                 
-                // Kontrollime olulisemad sisendandmed √µle
+                // Kontrollime olulisemad sisendandmed ¸le
                 if (item == null) {
                     throw new AxisFault("Sisendandmed on vigase XML struktuuriga!");
                 }
                 if (item.documentID < 1) {
-                    throw new AxisFault("Vigane dokumendi ID v√µi vigane andmete XML struktuur!");
+                    throw new AxisFault("Vigane dokumendi ID vıi vigane andmete XML struktuur!");
                 }
                 
                 Sending tmpSending = new Sending();
@@ -223,31 +216,31 @@ public class MarkDocumentsReceived{
                         tmpRecipient = tmpSending.getRecipients().get(j);
                         if (tmpRecipient.getOrganizationID() == user.getOrganizationID()) {
                             
-                        	// Kui p√µringus on t√µpsustatud, millise all√µkuse ja/v√µi ametikoha
-                        	// dokumendid tuleb vastuv√µetuks m√µrkida, siis kontrollime, et
-                        	// ametikoha ja/v√µi all√µksuse ID adressaadi andmetes
-                        	// vastaks p√µringu parameetritele.
-                        	// Vastasel juhul m√µrgiks rakendus dokumendi vastuv√µetuks k√µigi
-                        	// adressaatide poolt, kes kuuluvad p√µringu teinud asutuse alla.
+                        	// Kui p‰ringus on t‰psustatud, millise all¸ksuse ja/vıi ametikoha
+                        	// dokumendid tuleb vastuvıetuks m‰rkida, siis kontrollime, et
+                        	// ametikoha ja/vıi all¸ksuse ID adressaadi andmetes
+                        	// vastaks p‰ringu parameetritele.
+                        	// Vastasel juhul m‰rgiks rakendus dokumendi vastuvıetuks kıigi
+                        	// adressaatide poolt, kes kuuluvad p‰ringu teinud asutuse alla.
                         	if (((bodyData.allyksusId <= 0) || (tmpRecipient.getDivisionID() == bodyData.allyksusId))
                             	&& ((bodyData.ametikohtId <= 0) || (tmpRecipient.getPositionID() == bodyData.ametikohtId))) {
 	                        	
                         		recipientFound = true;
 	                            if (item.recipientFault == null) {
-	                                // Kui veateadet ei saadetud, siis j√µreldame, et dokument
-	                                // v√µeti edukalt vastu.
-	                                tmpRecipient.setSendStatusID( CommonStructures.SendStatus_Sent );
+	                                // Kui veateadet ei saadetud, siis j‰reldame, et dokument
+	                                // vıeti edukalt vastu.
+	                                tmpRecipient.setSendStatusID(CommonStructures.SendStatus_Sent);
 	                            }
 	                            else {
-	                                // Kui saadeti veateade, siis m√µrgime saatmise eba√µnnestunuks.
-	                                tmpRecipient.setSendStatusID( CommonStructures.SendStatus_Canceled );
-	                                tmpRecipient.setFault(item.recipientFault);
+	                                // Kui saadeti veateade, siis m‰rgime saatmise ebaınnestunuks.
+	                                tmpRecipient.setSendStatusID(CommonStructures.SendStatus_Canceled);
 	                            }
+	                            tmpRecipient.setFault(item.recipientFault);
 	                            tmpRecipient.setSendingEndDate(new Date());
 	                            tmpRecipient.setRecipientStatusId(item.recipientStatusID);
 	                            tmpRecipient.setMetaXML(item.metaXML);
 	                            
-	                            // Praegusest kuup√µevast ja kellaajast hilisemaid staatuse
+	                            // Praegusest juup‰evast ja kellaajast hilisemaid staatuse
 	                            // muutumise aegu ei saa ette anda.
 	                            if (item.staatuseMuutmiseAeg.after(new Date())) {
 	                            	tmpRecipient.setStatusDate(new Date());
@@ -303,18 +296,18 @@ public class MarkDocumentsReceived{
         }
         
         // Kopeerime edasiste tegevuste jaoks vajalikud andmed oma
-        // andmestruktuuri √µmber.
+        // andmestruktuuri ¸mber.
         int nodeCount = bodyData.dokumendid.size();
         Recipient tmpRecipient = null;
         for (int i = 0; i < nodeCount; ++i) {
             markDocumentsReceivedV2Item item = bodyData.dokumendid.get(i);
             
-            // Kontrollime olulisemad sisendandmed √µle
+            // Kontrollime olulisemad sisendandmed ¸le
             if (item == null) {
                 throw new AxisFault("Sisendandmed on vigase XML struktuuriga!");
             }
             if (item.documentID < 1 && (item.guid == null || item.guid.trim().equalsIgnoreCase(""))) {
-                throw new AxisFault("Vigane dokumendi ID v√µi vigane andmete XML struktuur!");
+                throw new AxisFault("Vigane dokumendi ID vıi vigane andmete XML struktuur!");
             }
             
             Sending tmpSending = new Sending();
@@ -336,31 +329,31 @@ public class MarkDocumentsReceived{
                     tmpRecipient = tmpSending.getRecipients().get(j);
                     if (tmpRecipient.getOrganizationID() == user.getOrganizationID()) {
                         
-                    	// Kui p√µringus on t√µpsustatud, millise all√µkuse ja/v√µi ametikoha
-                    	// dokumendid tuleb vastuv√µetuks m√µrkida, siis kontrollime, et
-                    	// ametikoha ja/v√µi all√µksuse l√µhinimetus adressaadi andmetes
-                    	// vastaks p√µringu parameetritele.
-                    	// Vastasel juhul m√µrgiks rakendus dokumendi vastuv√µetuks k√µigi
-                    	// adressaatide poolt, kes kuuluvad p√µringu teinud asutuse alla.
+                    	// Kui p‰ringus on t‰psustatud, millise all¸ksuse ja/vıi ametikoha
+                    	// dokumendid tuleb vastuvıetuks m‰rkida, siis kontrollime, et
+                    	// ametikoha ja/vıi all¸ksuse l¸hinimetus adressaadi andmetes
+                    	// vastaks p‰ringu parameetritele.
+                    	// Vastasel juhul m‰rgiks rakendus dokumendi vastuvıetuks kıigi
+                    	// adressaatide poolt, kes kuuluvad p‰ringu teinud asutuse alla.
                     	if (((bodyData.allyksuseLyhinimetus == null) || (bodyData.allyksuseLyhinimetus.length() < 1) || CommonMethods.stringsEqualIgnoreNull(tmpRecipient.getDivisionShortName(), bodyData.allyksuseLyhinimetus))
                         	&& ((bodyData.ametikohaLyhinimetus == null) || (bodyData.ametikohaLyhinimetus.length() < 1) || CommonMethods.stringsEqualIgnoreNull(tmpRecipient.getPositionShortName(), bodyData.ametikohaLyhinimetus))) {
 	                    	
                         	recipientFound = true;
 	                        if (item.recipientFault == null) {
-	                            // Kui veateadet ei saadetud, siis j√µreldame, et dokument
-	                            // v√µeti edukalt vastu.
-	                            tmpRecipient.setSendStatusID( CommonStructures.SendStatus_Sent );
+	                            // Kui veateadet ei saadetud, siis j‰reldame, et dokument
+	                            // vıeti edukalt vastu.
+	                            tmpRecipient.setSendStatusID(CommonStructures.SendStatus_Sent);
 	                        }
 	                        else {
-	                            // Kui saadeti veateade, siis m√µrgime saatmise eba√µnnestunuks.
-	                            tmpRecipient.setSendStatusID( CommonStructures.SendStatus_Canceled );
-	                            tmpRecipient.setFault( item.recipientFault );
+	                            // Kui saadeti veateade, siis m‰rgime saatmise ebaınnestunuks.
+	                            tmpRecipient.setSendStatusID(CommonStructures.SendStatus_Canceled);
 	                        }
+	                        tmpRecipient.setFault(item.recipientFault);
 	                        tmpRecipient.setSendingEndDate(new Date());
 	                        tmpRecipient.setRecipientStatusId(item.recipientStatusID);
 	                        tmpRecipient.setMetaXML(item.metaXML);
 	                        
-                            // Praegusest kuup√µevast ja kellaajast hilisemaid staatuse
+                            // Praegusest juup‰evast ja kellaajast hilisemaid staatuse
                             // muutumise aegu ei saa ette anda.
                             if (item.staatuseMuutmiseAeg.after(new Date())) {
                             	tmpRecipient.setStatusDate(new Date());
@@ -401,13 +394,13 @@ public class MarkDocumentsReceived{
     
     private static String createRecipientNotFoundMessage(int docId, String orgCode, int subdivisionId, int occupationId, String subdivisionShortName, String occupationShortName) {
     	StringBuilder sb = new StringBuilder(1000);
-    	sb.append("Dokumendi vastuv√µetuks m√µrkimine eba√µnnestus! Etteantud ID-le (").append(docId).append(") vastavat dokumenti ei ole antud asutusele");
+    	sb.append("Dokumendi vastuvıetuks m‰rkimine ebaınnestus! Etteantud ID-le (").append(docId).append(") vastavat dokumenti ei ole antud asutusele");
         sb.append(orgCode);
         
         if ((subdivisionShortName != null) && (subdivisionShortName.length() > 1)) {
-        	sb.append(", all√µksusele \"").append(subdivisionShortName).append("\"");
+        	sb.append(", all¸ksusele \"").append(subdivisionShortName).append("\"");
         } else if (subdivisionId > 0) {
-        	sb.append(", all√µksusele ").append(subdivisionId);
+        	sb.append(", all¸ksusele ").append(subdivisionId);
         }
         
         if ((occupationShortName != null) && (occupationShortName.length() > 0)) {

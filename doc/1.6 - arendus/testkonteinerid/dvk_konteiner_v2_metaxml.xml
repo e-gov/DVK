@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dhl:dokument xmlns:dhl="http://www.riik.ee/schemas/dhl/2010/2">
+    <dhl:metainfo xmlns:ma="http://www.riik.ee/schemas/dhl-meta-automatic" xmlns:mm="http://www.riik.ee/schemas/dhl-meta-manual/2010/2">
+        <mm:koostaja_asutuse_nr>87654321</mm:koostaja_asutuse_nr>
+        <mm:saaja_asutuse_nr>99954321</mm:saaja_asutuse_nr>
+        <mm:koostaja_dokumendinimi>Avaldus üritus</mm:koostaja_dokumendinimi>
+        <mm:koostaja_dokumendityyp>Avaldus</mm:koostaja_dokumendityyp>
+        <mm:koostaja_dokumendinr>A-101</mm:koostaja_dokumendinr>
+        <mm:koostaja_failinimi>document.doc</mm:koostaja_failinimi>
+        <mm:koostaja_kataloog>C:\Dokumendid</mm:koostaja_kataloog>
+        <mm:koostaja_votmesona>avaldus</mm:koostaja_votmesona>
+        <mm:koostaja_kokkuvote>Avaldus massiürituse korraldamiseks</mm:koostaja_kokkuvote>
+        <mm:koostaja_kuupaev>2006-02-11T14:11:23+02:00</mm:koostaja_kuupaev>
+        <mm:koostaja_asutuse_nimi>Asutus AS</mm:koostaja_asutuse_nimi>
+        <mm:koostaja_asutuse_kontakt>Lauteri 21a</mm:koostaja_asutuse_kontakt>
+        <mm:autori_osakond>Haldusosakond</mm:autori_osakond>
+        <mm:autori_isikukood>45604020013</mm:autori_isikukood>
+        <mm:autori_nimi>Jaana Lind</mm:autori_nimi>
+        <mm:autori_kontakt>51 22 762</mm:autori_kontakt>
+        <mm:seotud_dokumendinr_koostajal>XY-123</mm:seotud_dokumendinr_koostajal>
+        <mm:seotud_dokumendinr_saajal>?Õ-ZŠ//Ä</mm:seotud_dokumendinr_saajal>
+        <mm:saatja_dokumendinr>AB-123</mm:saatja_dokumendinr>
+        <mm:saatja_kuupaev>2006-02-12T01:02:03+02:00</mm:saatja_kuupaev>
+        <mm:saatja_asutuse_kontakt>Pärnu mnt. 176a</mm:saatja_asutuse_kontakt>
+        <mm:saaja_isikukood>38802280237</mm:saaja_isikukood>
+        <mm:saaja_nimi>Eino Muidugi</mm:saaja_nimi>
+        <mm:saaja_osakond>Sanitaarosakond</mm:saaja_osakond>
+        <mm:saatja_defineeritud mm:valjanimi="Koosolekul osaleja 1">Aksel</mm:saatja_defineeritud>
+        <mm:saatja_defineeritud mm:valjanimi="Koosolekul osaleja 2">Heldur</mm:saatja_defineeritud>
+        <mm:saatja_defineeritud mm:valjanimi="Koosolekul osaleja 3">Mari</mm:saatja_defineeritud>
+        <mm:saatja_defineeritud mm:valjanimi="Koosolekul osaleja 4">Loreida</mm:saatja_defineeritud>
+        <mm:test>false</mm:test>
+        <mm:dokument_liik>Kiri</mm:dokument_liik>
+        <mm:dokument_keel>Eesti</mm:dokument_keel>
+        <mm:dokument_pealkiri>Test dokument</mm:dokument_pealkiri>
+        <mm:versioon_number>1</mm:versioon_number>
+        <mm:dokument_guid>cd171f7c-560d-4a62-8d65-16b87419a58c</mm:dokument_guid>
+        <mm:dokument_viit>1.2/4-6</mm:dokument_viit>
+        <mm:kuupaev_registreerimine>2010-02-12T01:02:03+02:00</mm:kuupaev_registreerimine>
+        <mm:kuupaev_saatmine>2010-02-14T01:02:03+02:00</mm:kuupaev_saatmine>
+        <mm:tahtaeg>2010-02-28T01:02:03+02:00</mm:tahtaeg>
+        <mm:saatja_kontekst>
+          <mm:seosviit>1.1/5-7</mm:seosviit>
+          <mm:kuupaev_saatja_registreerimine>2010-02-04T01:02:03+02:00</mm:kuupaev_saatja_registreerimine>
+          <mm:dokument_saatja_guid>17084b40-08f5-4bcd-a739-c0d08c176bad</mm:dokument_saatja_guid>
+        </mm:saatja_kontekst>
+        <mm:ipr>
+          <mm:ipr_tahtaeg>2012-01-01T00:00:00+02:00</mm:ipr_tahtaeg>
+          <mm:ipr_omanik></mm:ipr_omanik>
+          <mm:reprodutseerimine_keelatud>true</mm:reprodutseerimine_keelatud>
+        </mm:ipr>
+        <mm:juurdepaas_piirang>
+          <mm:piirang>Salastatud</mm:piirang>
+          <mm:piirang_algus>2009-01-01T00:00:00+02:00</mm:piirang_algus>
+          <mm:piirang_lopp>2020-01-01T00:00:00+02:00</mm:piirang_lopp>
+          <mm:piirang_alus>Riigisaladus</mm:piirang_alus>
+        </mm:juurdepaas_piirang>
+        <mm:koostajad>
+          <mm:koostaja>
+            <mm:eesnimi>Marko</mm:eesnimi>
+            <mm:perenimi>Kurm</mm:perenimi>
+            <mm:ametinimetus>Arendaja</mm:ametinimetus>
+            <mm:epost>marko.kurm@microlink.ee</mm:epost>
+            <mm:telefon>543322556</mm:telefon>
+          </mm:koostaja>
+        </mm:koostajad>
+    </dhl:metainfo>
+    <dhl:transport>
+        <dhl:saatja>
+            <dhl:regnr>100845334892</dhl:regnr>
+            <dhl:nimi>Marko Kurm</dhl:nimi>
+            <dhl:asutuse_nimi>Riigikantselei</dhl:asutuse_nimi>
+            <!-- <dhl:ametikoha_kood>SEPP</dhl:ametikoha_kood> -->
+            <dhl:ametikoha_nimetus>Kantselei sekretär</dhl:ametikoha_nimetus>
+            <dhl:ametikoha_lyhinimetus>Knt. sekretär</dhl:ametikoha_lyhinimetus>
+            <!-- <dhl:allyksuse_kood>SEPIKODA</dhl:allyksuse_kood> -->
+            <dhl:allyksuse_nimetus>Finantsosakond</dhl:allyksuse_nimetus>
+            <dhl:allyksuse_lyhinimetus>Fin</dhl:allyksuse_lyhinimetus>
+        </dhl:saatja>
+        <dhl:saaja>
+            <dhl:regnr>100845334999</dhl:regnr>
+            <dhl:asutuse_nimi>Maa-amet</dhl:asutuse_nimi>
+            <!-- <dhl:allyksuse_kood>RMTP</dhl:allyksuse_kood> -->
+            <dhl:allyksuse_lyhinimetus>YLD</dhl:allyksuse_lyhinimetus>
+            <dhl:allyksuse_nimetus>Üldosakond</dhl:allyksuse_nimetus>
+            <dhl:teadmiseks>teadmiseks</dhl:teadmiseks>
+        </dhl:saaja>
+        <dhl:saaja>
+            <dhl:regnr>87654321</dhl:regnr>
+            <dhl:asutuse_nimi>Asutus</dhl:asutuse_nimi>
+            <!-- <dhl:allyksuse_kood>SEPIKODA</dhl:allyksuse_kood> -->
+            <dhl:allyksuse_lyhinimetus>SKoda</dhl:allyksuse_lyhinimetus>
+            <dhl:allyksuse_nimetus>Sepikoda</dhl:allyksuse_nimetus>
+        </dhl:saaja>
+        <dhl:saaja>
+            <dhl:regnr>87654321</dhl:regnr>
+            <dhl:asutuse_nimi>Asutus</dhl:asutuse_nimi>
+            <!-- <dhl:allyksuse_kood>POSTGRE</dhl:allyksuse_kood> -->
+            <dhl:allyksuse_lyhinimetus>PSQLK</dhl:allyksuse_lyhinimetus>
+            <dhl:allyksuse_nimetus>Postgre SQL kasutajad</dhl:allyksuse_nimetus>
+        </dhl:saaja>
+        <dhl:saaja>
+            <dhl:regnr>87654321</dhl:regnr>
+            <dhl:asutuse_nimi>Asutus</dhl:asutuse_nimi>
+            <!-- <dhl:allyksuse_kood>ORACLE</dhl:allyksuse_kood> -->
+            <dhl:allyksuse_lyhinimetus>Ora</dhl:allyksuse_lyhinimetus>
+            <dhl:allyksuse_nimetus>Oracle kasutajad</dhl:allyksuse_nimetus>
+        </dhl:saaja>
+    </dhl:transport>
+    <dhl:ajalugu/>
+    <dhl:metaxml>
+    	<tns:LetterExport xmlns:tns="http://www.riik.ee/schemas/dhl/rkel_letter" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.riik.ee/schemas/dhl/rkel_letter rkel_letter.xsd ">
+		  <tns:Addressees>
+		    <tns:Addressee>
+		      <tns:Organisation>
+		        <tns:organisationName>tns:organisationName</tns:organisationName>
+		        <tns:departmentName>tns:departmentName</tns:departmentName>
+		      </tns:Organisation>
+		      <tns:Person>
+		        <tns:firstname>tns:firstname</tns:firstname>
+		        <tns:surname>tns:surname</tns:surname>
+		        <tns:jobtitle>tns:jobtitle</tns:jobtitle>
+		        <tns:email>tns:email</tns:email>
+		        <tns:telephone>tns:telephone</tns:telephone>
+		      </tns:Person>
+		    </tns:Addressee>
+		  </tns:Addressees>
+		  <tns:Author>
+		    <tns:Organisation>
+		      <tns:organisationName>tns:organisationName</tns:organisationName>
+		      <tns:departmentName>tns:departmentName</tns:departmentName>
+		    </tns:Organisation>
+		    <tns:Person>
+		      <tns:firstname>tns:firstname</tns:firstname>
+		      <tns:surname>tns:surname</tns:surname>
+		      <tns:jobtitle>tns:jobtitle</tns:jobtitle>
+		      <tns:email>tns:email</tns:email>
+		      <tns:telephone>tns:telephone</tns:telephone>
+		    </tns:Person>
+		  </tns:Author>
+		  <tns:Signatures>
+		    <tns:Signatures>
+		      <tns:Person>
+		        <tns:firstname>tns:firstname</tns:firstname>
+		        <tns:surname>tns:surname</tns:surname>
+		        <tns:jobtitle>tns:jobtitle</tns:jobtitle>
+		        <tns:email>tns:email</tns:email>
+		        <tns:telephone>tns:telephone</tns:telephone>
+		      </tns:Person>
+		      <tns:SignatureData>
+		        <tns:SigantureDate>2001-01-01</tns:SigantureDate>
+		        <tns:SignatureTime>12:00:00</tns:SignatureTime>
+		      </tns:SignatureData>
+		    </tns:Signatures>
+		  </tns:Signatures>
+		  <tns:Compilators>
+		    <tns:Compilator>
+		      <tns:firstname>tns:firstname</tns:firstname>
+		      <tns:surname>tns:surname</tns:surname>
+		      <tns:jobtitle>tns:jobtitle</tns:jobtitle>
+		      <tns:email>tns:email</tns:email>
+		      <tns:telephone>tns:telephone</tns:telephone>
+		    </tns:Compilator>
+		  </tns:Compilators>
+		  <tns:LetterMetaData>
+		    <tns:SignDate>2001-01-01</tns:SignDate>
+		    <tns:SenderIdentifier>tns:SenderIdentifier</tns:SenderIdentifier>
+		    <tns:OriginalIdentifier>tns:OriginalIdentifier</tns:OriginalIdentifier>
+		    <tns:Type>tns:Type</tns:Type>
+		    <tns:Languange>tns:Languange</tns:Languange>
+		    <tns:Version>tns:Version</tns:Version>
+		    <tns:Title>tns:Title</tns:Title>
+		    <tns:Deadline>2001-01-01</tns:Deadline>
+		    <tns:Enclosures>
+		      <tns:EnclosureTitle>tns:EnclosureTitle</tns:EnclosureTitle>
+		    </tns:Enclosures>
+		    <tns:AccessRights>
+		      <tns:Restriction>tns:Restriction</tns:Restriction>
+		      <tns:BeginDate>2001-01-01</tns:BeginDate>
+		      <tns:EndDate>2001-01-01</tns:EndDate>
+		      <tns:Reason>tns:Reason</tns:Reason>
+		    </tns:AccessRights>
+		    <tns:IntellectualPropertyRights>
+		      <tns:CopyrightEndDate>2001-01-01</tns:CopyrightEndDate>
+		      <tns:IprOwner>tns:IprOwner</tns:IprOwner>
+		    </tns:IntellectualPropertyRights>
+		    <tns:NoCopies>tns:NoCopies</tns:NoCopies>
+		    <tns:SenderSeriesTitle>tns:SenderSeriesTitle</tns:SenderSeriesTitle>
+		    <tns:SenderFolderTitle>tns:SenderFolderTitle</tns:SenderFolderTitle>
+		    <tns:SenderVitalRecordIndicator>true</tns:SenderVitalRecordIndicator>
+		  </tns:LetterMetaData>
+		  <tns:signeddoc>0</tns:signeddoc>
+		</tns:LetterExport>
+    </dhl:metaxml>
+    <dhl:failid>
+      <dhl:kokku></dhl:kokku>
+      <dhl:fail>
+        <dhl:jrknr>1</dhl:jrknr>
+        <dhl:fail_pealkiri>Test dokument</dhl:fail_pealkiri>
+        <dhl:fail_suurus>779</dhl:fail_suurus>
+        <dhl:fail_tyyp>text/plain</dhl:fail_tyyp>
+        <dhl:fail_nimi>testdoc.txt</dhl:fail_nimi>
+        <dhl:zip_base64_sisu>H4sICN09gUsAC3Rlc3QudHh0AJVSXWvCMBR9ruB/uG9VNoZOHY49iVQoq3W0da8l2ExDmlTyMfD/7ocsaZsqw8lGH3I/Ts4596ZhnAZJBmGcbQBJrbSEQb/nCbwnUglCq6q4NzknDJtevzeE90W0DdIa5Y9Ho/l0NplM58+PvsX5CSF7QhFXEpeY+ObCS79nv/BSqCxPVLZSjWpOah3XsTHTWrEciU+blKcDuW5iXOuuCLeilUS04kXtZdQ0wvg3F4bNDHhQlgYAPCrzrtb4sdVLf3XeQVo/Td00SqRwl1HNiYt3AptW4dISSZWzqiAf5FzUEgtuuM9szSY6YfCOSCB2lkOiXdrFbrwry7Fgd/qv7mkgxVRg9SV8RzhIgyhYZrDcJkkQZ3kWroM0W6zfYJVs1lBoVA5/YndaCMxVroy8VIgd4Q4mT7MbN/7D/hesz5CgFdWCdYPE2yi6EZslcPUA0s3v/o5vL0RkrgsDAAA=</dhl:zip_base64_sisu>
+        <dhl:krypteering>false</dhl:krypteering>
+        <dhl:pohi_dokument>true</dhl:pohi_dokument>
+      </dhl:fail>
+    </dhl:failid>
+    <dhl:konteineri_versioon>2</dhl:konteineri_versioon>
+</dhl:dokument>

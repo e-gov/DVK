@@ -1,0 +1,14 @@
+NB! Enne versioon 1.6.0-i puudub muudatuste logi.
+
+Versioon 1.6.0 – 08.03.2010 - DVK jätkuarenduste raames tehtud muudatused
+- DVK klientide omavahelise suhtluse täiendamine/parandamine
+- DVK konteineri versioon 2
+- Allüksuse ja ametikoha lühinimetuse kasutuselevõtt
+- DVK serveri logimise täiendamine
+- Paketeerimine Maven2 skriptide abil
+- DVK konteineris sisalduvate XML dokumentide automaatne valideerimine
+- Dokumendi staatuste ajaloo säilitamine eraldi tabelis
+- Dokumendi GUID kasutuselevõtt
+- Asutuste hierarhia päringute täiendamine
+- X-tee päringute manuste muudatused
+- Dokumentatsiooni täiendamine – taasteplaan, riskianalüüs, andmemudeli uuendus, versioonihalduse dokumentatsioon

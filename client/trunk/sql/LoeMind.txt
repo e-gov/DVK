@@ -4,22 +4,28 @@
 
 ********************************************************************************
 
+NB! Enne andmebaasi skriptide kasutamist loe läbi dokument dvk_klient_paigaldusjuhend.odt.
+
 Täielik ja kõiki viimaseid uuendusi sisaldav andmebaasiskript asub failis
-server_latest_oracle.sql
+client_latest_[andmebaasinimi].sql
+
+Toetatud andmebaasitarkvarad on Microsoft SQL Server 2000, Microsoft SQL Server 2005, Oracle 10g, PostgreSQL 8.0 või uuemat andmebaasi.
+
+
+
 
 ********************************************************************************
 
                              Kumulatiivsed uuendused
 
 ********************************************************************************
-
 [ November 2006 ]
 
-Kui olete DVK andmebaasiobjektid loonud enne novembrit 2006 ning soovite
+Kui olete DVK andmebaasiobjektid loonud enne novembit 2006 ning soovite
 kasutusele võtta DVK uuendatud versiooni, siis peate andmebaasis
 käivitama novembris 2006 tehtud muudatuste skriptid.
 
-Novembris 2006 tehtud täiendused asuvad failis update_200611/update_200611.sql
+Novembris 2006 tehtud täiendused asuvad kaustas update_200611
 
 
 
@@ -30,7 +36,7 @@ Kui olete DVK andmebaasiobjektid loonud enne veebruari 2007 ning soovite
 kasutusele võtta DVK uuendatud versiooni, siis peate andmebaasis
 käivitama veebruaris 2007 tehtud muudatuste skriptid.
 
-Veebruaris 2007 tehtud täiendused asuvad failis update_200702/update_200702.sql
+Veebruaris 2007 tehtud täiendused asuvad kaustas update_200702
 
 
 
@@ -41,9 +47,8 @@ Kui olete DVK andmebaasiobjektid loonud enne juulit 2008 ning soovite
 kasutusele võtta DVK uuendatud versiooni, siis peate andmebaasis
 käivitama juulis 2008 tehtud muudatuste skriptid.
 
-Juulis 2008 tehtud täiendused asuvad failis update_200807/update_200807.sql
+Juulis 2008 tehtud täiendused asuvad kaustas update_200807
 
-Kui paigalduse ajal tekkisid tõrked ning vajalik on eelmise versiooni taastamine, siis kasutage faili update_200807/rollback_200807.sql
 
 
 
@@ -53,19 +58,15 @@ Kui olete DVK andmebaasiobjektid loonud enne jaanuari 2009 ning soovite
 kasutusele võtta DVK uuendatud versiooni, siis peate andmebaasis
 käivitama jaanuaris 2009 tehtud muudatuste skriptid.
 
-Jaanuaris 2009 tehtud täiendused asuvad failis update_200901/update_200901.sql
-
-Kui paigalduse ajal tekkisid tõrked ning vajalik on eelmise versiooni taastamine, siis kasutage faili update_200901/rollback_200901.sql
+Jaanuaris 2009 tehtud täiendused asuvad kaustas update_200901
 
 
 
 
 [ Veebruar 2010 ]
 
-Kui olete DVK andmebaasiobjektid loonud enne veebruaru 2010 ning soovite
+Kui olete DVK andmebaasiobjektid loonud enne jaanuari 2010 ning soovite
 kasutusele võtta DVK uuendatud versiooni, siis peate andmebaasis
-käivitama veebruaris 2010 tehtud muudatuste skriptid.
+käivitama jaanuaris 2010 tehtud muudatuste skriptid.
 
-Veebriaris 2010 tehtud täiendused asuvad failis update_201002/update_201002.sql
-
-Kui paigalduse ajal tekkisid tõrked ning vajalik on eelmise versiooni taastamine, siis kasutage faili update_201002/rollback_201002.sql
+Jaanuaris 2010 tehtud täiendused asuvad kaustas update_201001

@@ -1,11 +1,11 @@
-DVK tarkvara koosneb klienditarkvarast ja serveritarkvarast. Samuti on olemas DVK API, mille abil saab liidestada DVK klienditarkvara kolmandate infosüsteemidega.
+DVK tarkvara koosneb klienditarkvarast ja serveritarkvarast. Samuti on olemas DVK API, mille abil saab liidestada DVK klienditarkvara kolmandate infosÃ¼steemidega.
 
 SVN-is on DVK tarkvaral viis erinevat alamprojekti:
- 1. DVK-CORE – DVK tarkvara tuumikmeetodid ja parameetrifailid.
- 2. DVK-CLIENT – DVK universaalkliendi tarkvara. Sõltub DVK-CORE projektist.
- 3. DVK-SERVER – DVK serveri tarkvara. Sõltub DVK-CORE ja DVK-CLIENT projektist.
- 4. DVK-API – DVK API tarkvara. DVK universaalkliendi ja kolmandate infosüsteemide liidestamiseks mõeldud teek.
- 5. DOC – DVK tarkvara dokumentatsioon.
+ 1. DVK-CORE - DVK tarkvara tuumikmeetodid ja parameetrifailid.
+ 2. DVK-CLIENT - DVK universaalkliendi tarkvara. SÃµltub DVK-CORE projektist.
+ 3. DVK-SERVER - DVK serveri tarkvara. SÃµltub DVK-CORE ja DVK-CLIENT projektist.
+ 4. DVK-API - DVK API tarkvara. DVK universaalkliendi ja kolmandate infosÃ¼steemide liidestamiseks mÃµeldud teek.
+ 5. DOC - DVK tarkvara dokumentatsioon.
  6. INSTALLERS - DVK universaalkliendi ja serveri tarkvara viimased installatsioonipaketid
 
-Iga alamprojektis on kaust nimega "trunk", mis sisaldab kõige viimast versiooni, mis on eeldatavalt toodanguküps. DVK-ga tutvumiseks alustage DVK spetsifikatsioonist (fail "doc/trunk/dvk_spetsifikatsioon..."), küsimuste puhul abistab Riigi Infosüsteemide Arenduskeskuse kasutajatugi help@ria.ee ja 66 30 230.
+Iga alamprojektis on kaust nimega "trunk", mis sisaldab kÃµige viimast versiooni, mis on eeldatavalt toodangukÃ¼ps. DVK-ga tutvumiseks alustage DVK spetsifikatsioonist (fail "doc/trunk/dvk_spetsifikatsioon..."), kÃ¼simuste puhul abistab Riigi InfosÃ¼steemide Arenduskeskuse kasutajatugi help@ria.ee ja 66 30 230.

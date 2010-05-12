@@ -1,15 +1,15 @@
 ********************************************************************************
 
-                             Täielik andmebaasiskript
+                             TÃ¤ielik andmebaasiskript
 
 ********************************************************************************
 
-NB! Enne andmebaasi skriptide kasutamist loe läbi dokument dvk_klient_paigaldusjuhend.odt.
+NB! Enne andmebaasi skriptide kasutamist loe lÃ¤bi dokument dvk_klient_paigaldusjuhend.odt.
 
-Täielik ja kõiki viimaseid uuendusi sisaldav andmebaasiskript asub failis
+TÃ¤ielik ja kÃµiki viimaseid uuendusi sisaldav andmebaasiskript asub failis
 client_latest_[andmebaasinimi].sql
 
-Toetatud andmebaasitarkvarad on Microsoft SQL Server 2000, Microsoft SQL Server 2005, Oracle 10g, PostgreSQL 8.0 või uuemat andmebaasi.
+Toetatud andmebaasitarkvarad on Microsoft SQL Server 2000, Microsoft SQL Server 2005, Oracle 10g, PostgreSQL 8.0 vÃµi uuemat andmebaasi.
 
 
 
@@ -22,10 +22,10 @@ Toetatud andmebaasitarkvarad on Microsoft SQL Server 2000, Microsoft SQL Server 
 [ November 2006 ]
 
 Kui olete DVK andmebaasiobjektid loonud enne novembit 2006 ning soovite
-kasutusele võtta DVK uuendatud versiooni, siis peate andmebaasis
-käivitama novembris 2006 tehtud muudatuste skriptid.
+kasutusele vÃµtta DVK uuendatud versiooni, siis peate andmebaasis
+kÃ¤ivitama novembris 2006 tehtud muudatuste skriptid.
 
-Novembris 2006 tehtud täiendused asuvad kaustas update_200611
+Novembris 2006 tehtud tÃ¤iendused asuvad kaustas update_200611
 
 
 
@@ -33,10 +33,10 @@ Novembris 2006 tehtud täiendused asuvad kaustas update_200611
 [ Veebruar 2007 ]
 
 Kui olete DVK andmebaasiobjektid loonud enne veebruari 2007 ning soovite
-kasutusele võtta DVK uuendatud versiooni, siis peate andmebaasis
-käivitama veebruaris 2007 tehtud muudatuste skriptid.
+kasutusele vÃµtta DVK uuendatud versiooni, siis peate andmebaasis
+kÃ¤ivitama veebruaris 2007 tehtud muudatuste skriptid.
 
-Veebruaris 2007 tehtud täiendused asuvad kaustas update_200702
+Veebruaris 2007 tehtud tÃ¤iendused asuvad kaustas update_200702
 
 
 
@@ -44,10 +44,10 @@ Veebruaris 2007 tehtud täiendused asuvad kaustas update_200702
 [ Juuli 2008 ]
 
 Kui olete DVK andmebaasiobjektid loonud enne juulit 2008 ning soovite
-kasutusele võtta DVK uuendatud versiooni, siis peate andmebaasis
-käivitama juulis 2008 tehtud muudatuste skriptid.
+kasutusele vÃµtta DVK uuendatud versiooni, siis peate andmebaasis
+kÃ¤ivitama juulis 2008 tehtud muudatuste skriptid.
 
-Juulis 2008 tehtud täiendused asuvad kaustas update_200807
+Juulis 2008 tehtud tÃ¤iendused asuvad kaustas update_200807
 
 
 
@@ -55,10 +55,10 @@ Juulis 2008 tehtud täiendused asuvad kaustas update_200807
 [ Jaanuar 2009 ]
 
 Kui olete DVK andmebaasiobjektid loonud enne jaanuari 2009 ning soovite
-kasutusele võtta DVK uuendatud versiooni, siis peate andmebaasis
-käivitama jaanuaris 2009 tehtud muudatuste skriptid.
+kasutusele vÃµtta DVK uuendatud versiooni, siis peate andmebaasis
+kÃ¤ivitama jaanuaris 2009 tehtud muudatuste skriptid.
 
-Jaanuaris 2009 tehtud täiendused asuvad kaustas update_200901
+Jaanuaris 2009 tehtud tÃ¤iendused asuvad kaustas update_200901
 
 
 
@@ -66,7 +66,7 @@ Jaanuaris 2009 tehtud täiendused asuvad kaustas update_200901
 [ Veebruar 2010 ]
 
 Kui olete DVK andmebaasiobjektid loonud enne jaanuari 2010 ning soovite
-kasutusele võtta DVK uuendatud versiooni, siis peate andmebaasis
-käivitama jaanuaris 2010 tehtud muudatuste skriptid.
+kasutusele vÃµtta DVK uuendatud versiooni, siis peate andmebaasis
+kÃ¤ivitama jaanuaris 2010 tehtud muudatuste skriptid.
 
-Jaanuaris 2010 tehtud täiendused asuvad kaustas update_201001
+Jaanuaris 2010 tehtud tÃ¤iendused asuvad kaustas update_201001

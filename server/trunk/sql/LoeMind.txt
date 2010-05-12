@@ -1,10 +1,10 @@
 ********************************************************************************
 
-                             Täielik andmebaasiskript
+                             TÃ¤ielik andmebaasiskript
 
 ********************************************************************************
 
-Täielik ja kõiki viimaseid uuendusi sisaldav andmebaasiskript asub failis
+TÃ¤ielik ja kÃµiki viimaseid uuendusi sisaldav andmebaasiskript asub failis
 server_latest_oracle.sql
 
 ********************************************************************************
@@ -16,10 +16,10 @@ server_latest_oracle.sql
 [ November 2006 ]
 
 Kui olete DVK andmebaasiobjektid loonud enne novembrit 2006 ning soovite
-kasutusele võtta DVK uuendatud versiooni, siis peate andmebaasis
-käivitama novembris 2006 tehtud muudatuste skriptid.
+kasutusele vÃµtta DVK uuendatud versiooni, siis peate andmebaasis
+kÃ¤ivitama novembris 2006 tehtud muudatuste skriptid.
 
-Novembris 2006 tehtud täiendused asuvad failis update_200611/update_200611.sql
+Novembris 2006 tehtud tÃ¤iendused asuvad failis update_200611/update_200611.sql
 
 
 
@@ -27,10 +27,10 @@ Novembris 2006 tehtud täiendused asuvad failis update_200611/update_200611.sql
 [ Veebruar 2007 ]
 
 Kui olete DVK andmebaasiobjektid loonud enne veebruari 2007 ning soovite
-kasutusele võtta DVK uuendatud versiooni, siis peate andmebaasis
-käivitama veebruaris 2007 tehtud muudatuste skriptid.
+kasutusele vÃµtta DVK uuendatud versiooni, siis peate andmebaasis
+kÃ¤ivitama veebruaris 2007 tehtud muudatuste skriptid.
 
-Veebruaris 2007 tehtud täiendused asuvad failis update_200702/update_200702.sql
+Veebruaris 2007 tehtud tÃ¤iendused asuvad failis update_200702/update_200702.sql
 
 
 
@@ -38,24 +38,24 @@ Veebruaris 2007 tehtud täiendused asuvad failis update_200702/update_200702.sql
 [ Juuli 2008 ]
 
 Kui olete DVK andmebaasiobjektid loonud enne juulit 2008 ning soovite
-kasutusele võtta DVK uuendatud versiooni, siis peate andmebaasis
-käivitama juulis 2008 tehtud muudatuste skriptid.
+kasutusele vÃµtta DVK uuendatud versiooni, siis peate andmebaasis
+kÃ¤ivitama juulis 2008 tehtud muudatuste skriptid.
 
-Juulis 2008 tehtud täiendused asuvad failis update_200807/update_200807.sql
+Juulis 2008 tehtud tÃ¤iendused asuvad failis update_200807/update_200807.sql
 
-Kui paigalduse ajal tekkisid tõrked ning vajalik on eelmise versiooni taastamine, siis kasutage faili update_200807/rollback_200807.sql
+Kui paigalduse ajal tekkisid tÃµrked ning vajalik on eelmise versiooni taastamine, siis kasutage faili update_200807/rollback_200807.sql
 
 
 
 [ Jaanuar 2009 ]
 
 Kui olete DVK andmebaasiobjektid loonud enne jaanuari 2009 ning soovite
-kasutusele võtta DVK uuendatud versiooni, siis peate andmebaasis
-käivitama jaanuaris 2009 tehtud muudatuste skriptid.
+kasutusele vÃµtta DVK uuendatud versiooni, siis peate andmebaasis
+kÃ¤ivitama jaanuaris 2009 tehtud muudatuste skriptid.
 
-Jaanuaris 2009 tehtud täiendused asuvad failis update_200901/update_200901.sql
+Jaanuaris 2009 tehtud tÃ¤iendused asuvad failis update_200901/update_200901.sql
 
-Kui paigalduse ajal tekkisid tõrked ning vajalik on eelmise versiooni taastamine, siis kasutage faili update_200901/rollback_200901.sql
+Kui paigalduse ajal tekkisid tÃµrked ning vajalik on eelmise versiooni taastamine, siis kasutage faili update_200901/rollback_200901.sql
 
 
 
@@ -63,9 +63,9 @@ Kui paigalduse ajal tekkisid tõrked ning vajalik on eelmise versiooni taastamine
 [ Veebruar 2010 ]
 
 Kui olete DVK andmebaasiobjektid loonud enne veebruaru 2010 ning soovite
-kasutusele võtta DVK uuendatud versiooni, siis peate andmebaasis
-käivitama veebruaris 2010 tehtud muudatuste skriptid.
+kasutusele vÃµtta DVK uuendatud versiooni, siis peate andmebaasis
+kÃ¤ivitama veebruaris 2010 tehtud muudatuste skriptid.
 
-Veebriaris 2010 tehtud täiendused asuvad failis update_201002/update_201002.sql
+Veebriaris 2010 tehtud tÃ¤iendused asuvad failis update_201002/update_201002.sql
 
-Kui paigalduse ajal tekkisid tõrked ning vajalik on eelmise versiooni taastamine, siis kasutage faili update_201002/rollback_201002.sql
+Kui paigalduse ajal tekkisid tÃµrked ning vajalik on eelmise versiooni taastamine, siis kasutage faili update_201002/rollback_201002.sql

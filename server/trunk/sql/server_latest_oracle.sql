@@ -715,7 +715,7 @@ create table vastuvotja
     metaxml clob null,
     asutuse_nimi varchar2(500) null,
     allyksus_id number(38,0) null,
-    dok_id_teises_serveris number(38,0) null
+    dok_id_teises_serveris number(38,0) null,
     allyksuse_lyhinimetus varchar2(25) null,
     ametikoha_lyhinimetus varchar2(25) null
 )
@@ -1264,7 +1264,7 @@ table   vahendaja
     asutuse_nimi VARCHAR2(500),
     allyksus_id NUMBER(38,0),
     allyksuse_lyhinimetus varchar2(25) null,
-    ametikoha_lyhinimetus varchar2(25) null
+    ametikoha_lyhinimetus varchar2(25) null,
     PRIMARY KEY (vahendaja_id),
     CONSTRAINT fk_vahendaja_1 FOREIGN KEY (transport_id)
         REFERENCES transport (transport_id) ON DELETE CASCADE,
@@ -1380,3135 +1380,9 @@ STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
 PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT)
 /
 
-
-/* PROTSEDUURID */
-
-create or replace
-procedure Get_Parameters(aar_last_sync out date)
-as
-begin
-    select  aar_viimane_sync
-    into    Get_Parameters.aar_last_sync
-    from    parameetrid
-    where   rownum < 2;
-end;
-/
-
-create or replace
-procedure Save_Parameters(aar_last_sync in date)
-as
-begin
-    update  parameetrid
-    set     aar_viimane_sync = Save_Parameters.aar_last_sync;
-end;
-/
-
-create or replace
-procedure Get_ExpiredDocuments(RC1 out globalPkg.RCT1)
-as
-begin
-    open RC1 for
-    select  t.dokument_id,
-            t.staatus_id,
-            d.sailitustahtaeg
-    from    dokument d
-    inner join
-            transport t on t.dokument_id = d.dokument_id
-    where   d.sailitustahtaeg < sysdate
-            or d.sailitustahtaeg is null;
-end;
-/
-
-create or replace
-procedure Update_DocumentExpirationDate(
-    document_id in number,
-    expiration_date in date)
-as
-begin
-    update  dokument
-    set     sailitustahtaeg = Update_DocumentExpirationDate.expiration_date
-    where   dokument_id = Update_DocumentExpirationDate.document_id;
-end;
-/
-
-create or replace
-procedure Delete_Document(document_id in number)
-as
-begin
-    delete
-    from    dokument
-    where   dokument_id = Delete_Document.document_id;
-end;
-/
-
-create or replace
-procedure Get_SenderBySendingID(
-    sending_id in number,
-    sender_id out number,
-    organization_id out number,
-    position_id out number,
-    division_id out number,
-    personal_id_code out varchar2,
-    name out varchar2,
-    organization_name out varchar2,
-    email out varchar2,
-    department_nr out varchar2,
-    department_name out varchar2,
-    position_short_name out varchar2,
-    division_short_name out varchar2)
-as
-begin
-    select  s.saatja_id,
-            s.asutus_id,
-            s.ametikoht_id,
-            s.allyksus_id,
-            s.isikukood,
-            s.nimi,
-            s.asutuse_nimi,
-            s.email,
-            s.osakonna_nr,
-            s.osakonna_nimi,
-            s.allyksuse_lyhinimetus,
-            s.ametikoha_lyhinimetus
-    into    Get_SenderBySendingID.sender_id,
-            Get_SenderBySendingID.organization_id,
-            Get_SenderBySendingID.position_id,
-            Get_SenderBySendingID.division_id,
-            Get_SenderBySendingID.personal_id_code,
-            Get_SenderBySendingID.name,
-            Get_SenderBySendingID.organization_name,
-            Get_SenderBySendingID.email,
-            Get_SenderBySendingID.department_nr,
-            Get_SenderBySendingID.department_name,
-            Get_SenderBySendingID.division_short_name,
-            Get_SenderBySendingID.position_short_name
-    from    saatja s
-    where   s.transport_id = Get_SenderBySendingID.sending_id
-            and rownum < 2;
-end;
-/
-
-create or replace
-procedure Get_LastSendingByDocID(
-    document_id in number,
-    sending_id out number,
-    sending_start_date out date,
-    sending_end_date out date,
-    send_status_id out number)
-as
-cnt number(38,0) := 0;
-begin
-    select  count(*)
-    into    cnt
-    from    transport t
-    where   t.dokument_id = Get_LastSendingByDocID.document_id;
-    
-    if cnt > 0 then    
-        select  t.transport_id,
-                t.saatmise_algus,
-                t.saatmise_lopp,
-                t.staatus_id
-        into    Get_LastSendingByDocID.sending_id,
-                Get_LastSendingByDocID.sending_start_date,
-                Get_LastSendingByDocID.sending_end_date,
-                Get_LastSendingByDocID.send_status_id
-        from    transport t
-        where   t.transport_id =
-                (
-                    select  max(t1.transport_id)
-                    from    transport t1
-                    where   t1.dokument_id = Get_LastSendingByDocID.document_id
-                )
-                and rownum < 2;
-    else
-        Get_LastSendingByDocID.sending_id := null;
-        Get_LastSendingByDocID.sending_start_date := null;
-        Get_LastSendingByDocID.sending_end_date := null;
-        Get_LastSendingByDocID.send_status_id := null;
-    end if;
-end;
-/
-
-create or replace
-procedure Get_Recipients(
-    sending_id in number,
-    RC1 out globalPkg.RCT1)
-as
-begin
-    open RC1 for
-    select  v.*
-    from    vastuvotja v
-    where   v.transport_id = Get_Recipients.sending_id;
-end;
-/
-
-create or replace
-procedure Add_Sender(
-    sender_id out number,
-    sending_id in number,
-    organization_id in number,
-    position_id in number,
-    division_id in number,
-    personal_id_code in varchar2,
-    email in varchar2,
-    name in varchar2,
-    organization_name in varchar2,
-    department_nr in varchar2,
-    department_name in varchar2,
-    position_short_name in varchar2,
-    division_short_name in varchar2,
-    xtee_isikukood in varchar2,
-    xtee_asutus in varchar2)
-as
-organization_id_ number(38,0) := organization_id;
-position_id_ number(38,0) := position_id;
-division_id_ number(38,0) := division_id;
-begin
-
-    -- Set session scope variables
-    DVKLOG.xtee_isikukood := Add_Sender.xtee_isikukood;
-    DVKLOG.xtee_asutus := Add_Sender.xtee_asutus;
-
-    if organization_id_ = 0 then
-        organization_id_ := null;
-    end if;
-    if position_id_ = 0 then
-        position_id_ := null;
-    end if;
-    if division_id_ = 0 then
-        division_id_ := null;
-    end if;
-    insert
-    into    saatja(
-            saatja_id,
-            transport_id,
-            asutus_id,
-            ametikoht_id,
-            allyksus_id,
-            isikukood,
-            nimi,
-            asutuse_nimi,
-            email,
-            osakonna_nr,
-            osakonna_nimi,
-            allyksuse_lyhinimetus,
-            ametikoha_lyhinimetus)
-    values  (0,
-            Add_Sender.sending_id,
-            Add_Sender.organization_id_,
-            Add_Sender.position_id_,
-            Add_Sender.division_id_,
-            Add_Sender.personal_id_code,
-            Add_Sender.name,
-            Add_Sender.organization_name,
-            Add_Sender.email,
-            Add_Sender.department_nr,
-            Add_Sender.department_name,
-            Add_Sender.division_short_name,
-            Add_Sender.position_short_name);
-    
-    Add_Sender.sender_id := globalPkg.identity;
-end;
-/
-
-create or replace
-procedure Add_Sending(
-    sending_id out number,
-    document_id in number,
-    sending_start_date in date,
-    sending_end_date in date,
-    send_status_id in number,
-    xtee_isikukood in varchar2,
-    xtee_asutus in varchar2)
-as
-begin
-
-    -- Set session scope variables
-    DVKLOG.xtee_isikukood := Add_Sending.xtee_isikukood;
-    DVKLOG.xtee_asutus := Add_Sending.xtee_asutus;
-
-    insert
-    into    transport(
-            transport_id,
-            dokument_id,
-            saatmise_algus,
-            saatmise_lopp,
-            staatus_id)
-    values  (0,
-            Add_Sending.document_id,
-            Add_Sending.sending_start_date,
-            Add_Sending.sending_end_date,
-            Add_Sending.send_status_id);
-    
-    Add_Sending.sending_id := globalPkg.identity;
-end;
-/
-
-create or replace
-procedure Get_DocumentsSentTo(
-    organization_id in number,
-    folder_id in number,
-    user_id in number,
-    division_id in number,
-    division_short_name in varchar2,
-    occupation_id in number,
-    occupation_short_name in varchar2,
-    result_limit in number,
-    RC1 out globalPkg.RCT1)
-as
-division_id_ number(38, 0) := Get_DocumentsSentTo.division_id;
-occupation_id_ number(38, 0) := Get_DocumentsSentTo.occupation_id;
-begin
-    open RC1 for
-    select  *
-    from    dokument d,
-    (
-        -- Dokumendid, mis adresseeriti päringu teostanud isikule (isikukoodi alusel)
-        select  t1.dokument_id
-        from    transport t1, vastuvotja v1, isik i1
-        where   t1.transport_id = v1.transport_id
-                and v1.asutus_id = Get_DocumentsSentTo.organization_id
-                and i1.kood = v1.isikukood
-                and i1.i_id = Get_DocumentsSentTo.user_id
-                and v1.staatus_id = 101
-                and nvl(Get_DocumentsSentTo.division_id_, nvl(v1.allyksus_id,0)) = nvl(v1.allyksus_id,0)
-                and nvl(Get_DocumentsSentTo.division_short_name, nvl(v1.allyksuse_lyhinimetus,' ')) = nvl(v1.allyksuse_lyhinimetus,' ')
-                and nvl(Get_DocumentsSentTo.occupation_id_, nvl(v1.ametikoht_id,0)) = nvl(v1.ametikoht_id,0)
-                and nvl(Get_DocumentsSentTo.occupation_short_name, nvl(v1.ametikoha_lyhinimetus,' ')) = nvl(v1.ametikoha_lyhinimetus,' ')
-                
-        -- Dokumendid, mis adresseeriti päringu teostaja ametikohale (ametikoha ID või lühinimetus)
-        union
-        select  t2.dokument_id
-        from    transport t2, vastuvotja v2
-        where   t2.transport_id = v2.transport_id
-                and v2.asutus_id = Get_DocumentsSentTo.organization_id
-                and v2.allyksus_id is null
-                and v2.isikukood is null
-                and v2.staatus_id = 101
-                and exists
-                (
-                    select  1
-                    from    isik i2, ametikoht_taitmine akt2, ametikoht ak2
-                    where   i2.i_id = Get_DocumentsSentTo.user_id
-                            and ak2.ametikoht_id = v2.ametikoht_id
-                            and akt2.i_id = i2.i_id
-                            and ak2.ametikoht_id = akt2.ametikoht_id
-                            and nvl(akt2.peatatud, 0) = 0
-                            and ak2.asutus_id = v2.asutus_id
-                            and nvl(akt2.alates, add_months(sysdate, -1)) < sysdate
-                            and nvl(akt2.kuni, add_months(sysdate, 1)) > sysdate
-                            and nvl(ak2.alates, add_months(sysdate, -1)) < sysdate
-                            and nvl(ak2.kuni, add_months(sysdate, 1)) > sysdate
-                )
-                and nvl(Get_DocumentsSentTo.division_id_, nvl(v2.allyksus_id,0)) = nvl(v2.allyksus_id,0)
-                and nvl(Get_DocumentsSentTo.division_short_name, nvl(v2.allyksuse_lyhinimetus,' ')) = nvl(v2.allyksuse_lyhinimetus,' ')
-                and nvl(Get_DocumentsSentTo.occupation_id_, nvl(v2.ametikoht_id,0)) = nvl(v2.ametikoht_id,0)
-                and nvl(Get_DocumentsSentTo.occupation_short_name, nvl(v2.ametikoha_lyhinimetus,' ')) = nvl(v2.ametikoha_lyhinimetus,' ')
-        
-        -- Dokumendid, mis adresseeriti päringu teostaja allüksusele
-        union
-        select  t3.dokument_id
-        from    transport t3, vastuvotja v3
-        where   t3.transport_id = v3.transport_id
-                and v3.asutus_id = Get_DocumentsSentTo.organization_id
-                and v3.ametikoht_id is null
-                and v3.isikukood is null
-                and v3.staatus_id = 101
-                and exists
-                (
-                    select  1
-                    from    isik i3, ametikoht_taitmine akt3, ametikoht ak3
-                    where   i3.i_id = Get_DocumentsSentTo.user_id
-                            and ak3.allyksus_id = v3.allyksus_id
-                            and akt3.i_id = i3.i_id
-                            and ak3.ametikoht_id = akt3.ametikoht_id
-                            and nvl(akt3.peatatud, 0) = 0
-                            and ak3.asutus_id = v3.asutus_id
-                            and nvl(akt3.alates, add_months(sysdate, -1)) < sysdate
-                            and nvl(akt3.kuni, add_months(sysdate, 1)) > sysdate
-                            and nvl(ak3.alates, add_months(sysdate, -1)) < sysdate
-                            and nvl(ak3.kuni, add_months(sysdate, 1)) > sysdate
-                )
-                and nvl(Get_DocumentsSentTo.division_id_, nvl(v3.allyksus_id,0)) = nvl(v3.allyksus_id,0)
-                and nvl(Get_DocumentsSentTo.division_short_name, nvl(v3.allyksuse_lyhinimetus,' ')) = nvl(v3.allyksuse_lyhinimetus,' ')
-                and nvl(Get_DocumentsSentTo.occupation_id_, nvl(v3.ametikoht_id,0)) = nvl(v3.ametikoht_id,0)
-                and nvl(Get_DocumentsSentTo.occupation_short_name, nvl(v3.ametikoha_lyhinimetus,' ')) = nvl(v3.ametikoha_lyhinimetus,' ')
-        
-        -- Dokumendid, mis adresseeriti päringu teostaja ametikohale
-        -- päringu teostaja allüksuses (vastupidine juhtum oleks, et
-        -- dokument saadeti mõnele teisele ametikohale samas allüksuses).
-        union
-        select  t4.dokument_id
-        from    transport t4, vastuvotja v4
-        where   t4.transport_id = v4.transport_id
-                and v4.asutus_id = Get_DocumentsSentTo.organization_id
-                and v4.isikukood is null
-                and v4.staatus_id = 101
-                and exists
-                (
-                    select  1
-                    from    isik i4, ametikoht_taitmine akt4, ametikoht ak4
-                    where   i4.i_id = Get_DocumentsSentTo.user_id
-                            and ak4.allyksus_id = v4.allyksus_id
-                            and ak4.ametikoht_id = v4.ametikoht_id
-                            and akt4.i_id = i4.i_id
-                            and ak4.ametikoht_id = akt4.ametikoht_id
-                            and nvl(akt4.peatatud, 0) = 0
-                            and ak4.asutus_id = v4.asutus_id
-                            and nvl(akt4.alates, add_months(sysdate, -1)) < sysdate
-                            and nvl(akt4.kuni, add_months(sysdate, 1)) > sysdate
-                            and nvl(ak4.alates, add_months(sysdate, -1)) < sysdate
-                            and nvl(ak4.kuni, add_months(sysdate, 1)) > sysdate
-                )
-                and nvl(Get_DocumentsSentTo.division_id_, nvl(v4.allyksus_id,0)) = nvl(v4.allyksus_id,0)
-                and nvl(Get_DocumentsSentTo.division_short_name, nvl(v4.allyksuse_lyhinimetus,' ')) = nvl(v4.allyksuse_lyhinimetus,' ')
-                and nvl(Get_DocumentsSentTo.occupation_id_, nvl(v4.ametikoht_id,0)) = nvl(v4.ametikoht_id,0)
-                and nvl(Get_DocumentsSentTo.occupation_short_name, nvl(v4.ametikoha_lyhinimetus,' ')) = nvl(v4.ametikoha_lyhinimetus,' ')
-        
-        -- Juhul kui tegemist on asutuse administraatoriga
-        union
-        select  t5.dokument_id
-        from    transport t5, vastuvotja v5
-        where   t5.transport_id = v5.transport_id
-                and v5.asutus_id = Get_DocumentsSentTo.organization_id
-                and v5.staatus_id = 101
-                and exists
-                (
-                    select  1
-                    from    isik i5, ametikoht_taitmine akt5, ametikoht ak5, oigus_antud oa5
-                    where   i5.i_id = Get_DocumentsSentTo.user_id
-                            and akt5.i_id = i5.i_id
-                            and ak5.ametikoht_id = akt5.ametikoht_id
-                            and oa5.ametikoht_id = akt5.ametikoht_id
-                            and nvl(akt5.peatatud, 0) = 0
-                            and nvl(oa5.peatatud, 0) = 0
-                            and oa5.asutus_id = v5.asutus_id
-                            and ak5.asutus_id = v5.asutus_id
-                            and nvl(akt5.alates, add_months(sysdate, -1)) < sysdate
-                            and nvl(akt5.kuni, add_months(sysdate, 1)) > sysdate
-                            and nvl(oa5.alates, add_months(sysdate, -1)) < sysdate
-                            and nvl(oa5.kuni, add_months(sysdate, 1)) > sysdate
-                            and nvl(ak5.alates, add_months(sysdate, -1)) < sysdate
-                            and nvl(ak5.kuni, add_months(sysdate, 1)) > sysdate
-                            and lower(trim(oa5.roll)) = 'dhl: asutuse administraator'
-                )
-                and nvl(Get_DocumentsSentTo.division_id_, nvl(v5.allyksus_id,0)) = nvl(v5.allyksus_id,0)
-                and nvl(Get_DocumentsSentTo.division_short_name, nvl(v5.allyksuse_lyhinimetus,' ')) = nvl(v5.allyksuse_lyhinimetus,' ')
-                and nvl(Get_DocumentsSentTo.occupation_id_, nvl(v5.ametikoht_id,0)) = nvl(v5.ametikoht_id,0)
-                and nvl(Get_DocumentsSentTo.occupation_short_name, nvl(v5.ametikoha_lyhinimetus,' ')) = nvl(v5.ametikoha_lyhinimetus,' ')
-    ) rights_filter
-    where   d.dokument_id = rights_filter.dokument_id
-            and
-            (
-                Get_DocumentsSentTo.folder_id is null
-                or d.kaust_id = Get_DocumentsSentTo.folder_id
-            )
-            and rownum <= Get_DocumentsSentTo.result_limit;
-end;
-/
-
-create or replace
-procedure Get_NextDocID(
-    document_id out number)
-as
-begin
-    select  sq_dokument_id.nextval
-    into    Get_NextDocID.document_id
-    from    dual;
-end;
-/
-
-create or replace
-procedure Update_Sending(
-    sending_id in number,
-    document_id in number,
-    sending_start_date in date,
-    sending_end_date in date,
-    send_status_id in number)
-as
-begin
-    update  transport
-    set     dokument_id = Update_Sending.document_id,
-            saatmise_algus = Update_Sending.sending_start_date,
-            saatmise_lopp = Update_Sending.sending_end_date,
-            staatus_id = Update_Sending.send_status_id
-    where   transport_id = Update_Sending.sending_id;
-end;
-/
-
-create or replace
-procedure Get_AsutusByRegNr(
-    registrikood in varchar2,
-    id out number,
-    registrikood_vana out varchar2,
-    ks_asutuse_id out number,
-    ks_asutuse_kood out varchar2,
-    nimetus out varchar2,
-    nime_lyhend out varchar2,
-    liik1 out varchar2,
-    liik2 out varchar2,
-    tegevusala out varchar2,
-    tegevuspiirkond out varchar2,
-    maakond out varchar2,
-    asukoht out varchar2,
-    aadress out varchar2,
-    postikood out varchar2,
-    telefon out varchar2,
-    faks out varchar2,
-    e_post out varchar2,
-    www out varchar2,
-    logo out varchar2,
-    asutamise_kp out timestamp,
-    mood_akt_nimi out varchar2,
-    mood_akt_nr out varchar2,
-    mood_akt_kp out timestamp,
-    pm_akt_nimi out varchar2,
-    pm_akt_nr out varchar2,
-    pm_kinnitamise_kp out timestamp,
-    pm_kande_kp out timestamp,
-    loodud out timestamp,
-    muudetud out timestamp,
-    muutja out varchar2,
-    parameetrid out varchar2,
-    dhl_saatmine out number,
-    dhl_otse_saatmine out number,
-    dhs_nimetus out varchar2,
-    toetatav_dvk_versioon out varchar2,
-    server_id out number,
-    aar_id out number)
-as
-cnt number(38,0) := 0;
-begin
-    select  count(*)
-    into    cnt
-    from    asutus a
-    where   a.registrikood = Get_AsutusByRegNr.registrikood
-            and rownum < 2;
-    
-    if cnt > 0 then
-        select  a.asutus_id,
-                a.e_registrikood,
-                a.ks_asutus_id,
-                a.ks_asutus_kood,
-                a.nimetus,
-                a.lnimi,
-                a.liik1,
-                a.liik2,
-                a.tegevusala,
-                a.tegevuspiirkond,
-                a.maakond,
-                a.asukoht,
-                a.aadress,
-                a.postikood,
-                a.telefon,
-                a.faks,
-                a.e_post,
-                a.www,
-                a.logo,
-                a.asutamise_kp,
-                a.mood_akt_nimi,
-                a.mood_akt_nr,
-                a.mood_akt_kp,
-                a.pm_akt_nimi,
-                a.pm_akt_nr,
-                a.pm_kinnitamise_kp,
-                a.pm_kande_kp,
-                a.created,
-                a.last_modified,
-                a.username,
-                a.params,
-                a.dhl_saatmine,
-                a.dhl_otse_saatmine,
-                a.dhs_nimetus,
-                a.toetatav_dvk_versioon,
-                a.server_id,
-                a.aar_id
-        into    Get_AsutusByRegNr.id,
-                Get_AsutusByRegNr.registrikood_vana,
-                Get_AsutusByRegNr.ks_asutuse_id,
-                Get_AsutusByRegNr.ks_asutuse_kood,
-                Get_AsutusByRegNr.nimetus,
-                Get_AsutusByRegNr.nime_lyhend,
-                Get_AsutusByRegNr.liik1,
-                Get_AsutusByRegNr.liik2,
-                Get_AsutusByRegNr.tegevusala,
-                Get_AsutusByRegNr.tegevuspiirkond,
-                Get_AsutusByRegNr.maakond,
-                Get_AsutusByRegNr.asukoht,
-                Get_AsutusByRegNr.aadress,
-                Get_AsutusByRegNr.postikood,
-                Get_AsutusByRegNr.telefon,
-                Get_AsutusByRegNr.faks,
-                Get_AsutusByRegNr.e_post,
-                Get_AsutusByRegNr.www,
-                Get_AsutusByRegNr.logo,
-                Get_AsutusByRegNr.asutamise_kp,
-                Get_AsutusByRegNr.mood_akt_nimi,
-                Get_AsutusByRegNr.mood_akt_nr,
-                Get_AsutusByRegNr.mood_akt_kp,
-                Get_AsutusByRegNr.pm_akt_nimi,
-                Get_AsutusByRegNr.pm_akt_nr,
-                Get_AsutusByRegNr.pm_kinnitamise_kp,
-                Get_AsutusByRegNr.pm_kande_kp,
-                Get_AsutusByRegNr.loodud,
-                Get_AsutusByRegNr.muudetud,
-                Get_AsutusByRegNr.muutja,
-                Get_AsutusByRegNr.parameetrid,
-                Get_AsutusByRegNr.dhl_saatmine,
-                Get_AsutusByRegNr.dhl_otse_saatmine,
-                Get_AsutusByRegNr.dhs_nimetus,
-                Get_AsutusByRegNr.toetatav_dvk_versioon,
-                Get_AsutusByRegNr.server_id,
-                Get_AsutusByRegNr.aar_id
-        from    asutus a
-        where   a.registrikood = Get_AsutusByRegNr.registrikood
-                and rownum < 2;
-    else
-        Get_AsutusByRegNr.id := null;
-        Get_AsutusByRegNr.registrikood_vana := null;
-        Get_AsutusByRegNr.ks_asutuse_id := null;
-        Get_AsutusByRegNr.ks_asutuse_kood := null;
-        Get_AsutusByRegNr.nimetus := null;
-        Get_AsutusByRegNr.nime_lyhend := null;
-        Get_AsutusByRegNr.liik1 := null;
-        Get_AsutusByRegNr.liik2 := null;
-        Get_AsutusByRegNr.tegevusala := null;
-        Get_AsutusByRegNr.tegevuspiirkond := null;
-        Get_AsutusByRegNr.maakond := null;
-        Get_AsutusByRegNr.asukoht := null;
-        Get_AsutusByRegNr.aadress := null;
-        Get_AsutusByRegNr.postikood := null;
-        Get_AsutusByRegNr.telefon := null;
-        Get_AsutusByRegNr.faks := null;
-        Get_AsutusByRegNr.e_post := null;
-        Get_AsutusByRegNr.www := null;
-        Get_AsutusByRegNr.logo := null;
-        Get_AsutusByRegNr.asutamise_kp := null;
-        Get_AsutusByRegNr.mood_akt_nimi := null;
-        Get_AsutusByRegNr.mood_akt_nr := null;
-        Get_AsutusByRegNr.mood_akt_kp := null;
-        Get_AsutusByRegNr.pm_akt_nimi := null;
-        Get_AsutusByRegNr.pm_akt_nr := null;
-        Get_AsutusByRegNr.pm_kinnitamise_kp := null;
-        Get_AsutusByRegNr.pm_kande_kp := null;
-        Get_AsutusByRegNr.loodud := null;
-        Get_AsutusByRegNr.muudetud := null;
-        Get_AsutusByRegNr.muutja := null;
-        Get_AsutusByRegNr.parameetrid := null;
-        Get_AsutusByRegNr.dhl_saatmine := null;
-        Get_AsutusByRegNr.dhl_otse_saatmine := null;
-        Get_AsutusByRegNr.dhs_nimetus := null;
-        Get_AsutusByRegNr.toetatav_dvk_versioon := null;
-        Get_AsutusByRegNr.server_id := null;
-        Get_AsutusByRegNr.aar_id := null;
-    end if;
-end;
-/
-
-create or replace
-procedure Get_AsutusByID(
-    id in number,
-    registrikood out varchar2,
-    registrikood_vana out varchar2,
-    ks_asutuse_id out number,
-    ks_asutuse_kood out varchar2,
-    nimetus out varchar2,
-    nime_lyhend out varchar2,
-    liik1 out varchar2,
-    liik2 out varchar2,
-    tegevusala out varchar2,
-    tegevuspiirkond out varchar2,
-    maakond out varchar2,
-    asukoht out varchar2,
-    aadress out varchar2,
-    postikood out varchar2,
-    telefon out varchar2,
-    faks out varchar2,
-    e_post out varchar2,
-    www out varchar2,
-    logo out varchar2,
-    asutamise_kp out timestamp,
-    mood_akt_nimi out varchar2,
-    mood_akt_nr out varchar2,
-    mood_akt_kp out timestamp,
-    pm_akt_nimi out varchar2,
-    pm_akt_nr out varchar2,
-    pm_kinnitamise_kp out timestamp,
-    pm_kande_kp out timestamp,
-    loodud out timestamp,
-    muudetud out timestamp,
-    muutja out varchar2,
-    parameetrid out varchar2,
-    dhl_saatmine out number,
-    dhl_otse_saatmine out number,
-    dhs_nimetus out varchar2,
-    toetatav_dvk_versioon out varchar2,
-    server_id out number,
-    aar_id out number)
-as
-cnt number(38,0) := 0;
-begin
-    select  count(*)
-    into    cnt
-    from    asutus a
-    where   a.asutus_id = Get_AsutusByID.id
-            and rownum < 2;
-    
-    if cnt > 0 then
-        select  a.registrikood,
-                a.e_registrikood,
-                a.ks_asutus_id,
-                a.ks_asutus_kood,
-                a.nimetus,
-                a.lnimi,
-                a.liik1,
-                a.liik2,
-                a.tegevusala,
-                a.tegevuspiirkond,
-                a.maakond,
-                a.asukoht,
-                a.aadress,
-                a.postikood,
-                a.telefon,
-                a.faks,
-                a.e_post,
-                a.www,
-                a.logo,
-                a.asutamise_kp,
-                a.mood_akt_nimi,
-                a.mood_akt_nr,
-                a.mood_akt_kp,
-                a.pm_akt_nimi,
-                a.pm_akt_nr,
-                a.pm_kinnitamise_kp,
-                a.pm_kande_kp,
-                a.created,
-                a.last_modified,
-                a.username,
-                a.params,
-                a.dhl_saatmine,
-                a.dhl_otse_saatmine,
-                a.dhs_nimetus,
-                a.toetatav_dvk_versioon,
-                a.server_id,
-                a.aar_id
-        into    Get_AsutusByID.registrikood,
-                Get_AsutusByID.registrikood_vana,
-                Get_AsutusByID.ks_asutuse_id,
-                Get_AsutusByID.ks_asutuse_kood,
-                Get_AsutusByID.nimetus,
-                Get_AsutusByID.nime_lyhend,
-                Get_AsutusByID.liik1,
-                Get_AsutusByID.liik2,
-                Get_AsutusByID.tegevusala,
-                Get_AsutusByID.tegevuspiirkond,
-                Get_AsutusByID.maakond,
-                Get_AsutusByID.asukoht,
-                Get_AsutusByID.aadress,
-                Get_AsutusByID.postikood,
-                Get_AsutusByID.telefon,
-                Get_AsutusByID.faks,
-                Get_AsutusByID.e_post,
-                Get_AsutusByID.www,
-                Get_AsutusByID.logo,
-                Get_AsutusByID.asutamise_kp,
-                Get_AsutusByID.mood_akt_nimi,
-                Get_AsutusByID.mood_akt_nr,
-                Get_AsutusByID.mood_akt_kp,
-                Get_AsutusByID.pm_akt_nimi,
-                Get_AsutusByID.pm_akt_nr,
-                Get_AsutusByID.pm_kinnitamise_kp,
-                Get_AsutusByID.pm_kande_kp,
-                Get_AsutusByID.loodud,
-                Get_AsutusByID.muudetud,
-                Get_AsutusByID.muutja,
-                Get_AsutusByID.parameetrid,
-                Get_AsutusByID.dhl_saatmine,
-                Get_AsutusByID.dhl_otse_saatmine,
-                Get_AsutusByID.dhs_nimetus,
-                Get_AsutusByID.toetatav_dvk_versioon,
-                Get_AsutusByID.server_id,
-                Get_AsutusByID.aar_id
-        from    asutus a
-        where   a.asutus_id = Get_AsutusByID.id
-                and rownum < 2;
-    else
-        Get_AsutusByID.registrikood := null;
-        Get_AsutusByID.registrikood_vana := null;
-        Get_AsutusByID.ks_asutuse_id := null;
-        Get_AsutusByID.ks_asutuse_kood := null;
-        Get_AsutusByID.nimetus := null;
-        Get_AsutusByID.nime_lyhend := null;
-        Get_AsutusByID.liik1 := null;
-        Get_AsutusByID.liik2 := null;
-        Get_AsutusByID.tegevusala := null;
-        Get_AsutusByID.tegevuspiirkond := null;
-        Get_AsutusByID.maakond := null;
-        Get_AsutusByID.asukoht := null;
-        Get_AsutusByID.aadress := null;
-        Get_AsutusByID.postikood := null;
-        Get_AsutusByID.telefon := null;
-        Get_AsutusByID.faks := null;
-        Get_AsutusByID.e_post := null;
-        Get_AsutusByID.www := null;
-        Get_AsutusByID.logo := null;
-        Get_AsutusByID.asutamise_kp := null;
-        Get_AsutusByID.mood_akt_nimi := null;
-        Get_AsutusByID.mood_akt_nr := null;
-        Get_AsutusByID.mood_akt_kp := null;
-        Get_AsutusByID.pm_akt_nimi := null;
-        Get_AsutusByID.pm_akt_nr := null;
-        Get_AsutusByID.pm_kinnitamise_kp := null;
-        Get_AsutusByID.pm_kande_kp := null;
-        Get_AsutusByID.loodud := null;
-        Get_AsutusByID.muudetud := null;
-        Get_AsutusByID.muutja := null;
-        Get_AsutusByID.parameetrid := null;
-        Get_AsutusByID.dhl_saatmine := null;
-        Get_AsutusByID.dhl_otse_saatmine := null;
-        Get_AsutusByID.dhs_nimetus := null;
-        Get_AsutusByID.toetatav_dvk_versioon := null;
-        Get_AsutusByID.server_id := null;
-        Get_AsutusByID.aar_id := null;
-    end if;
-end;
-/
-
-create or replace
-procedure Get_AsutusIDByRegNr(
-    registrikood in varchar2,
-    dvk_voimeline in number,
-    id out number)
-as
-cnt number(38,0) := 0;
-begin
-    select  count(*)
-    into    cnt
-    from    asutus a
-    where   a.registrikood = Get_AsutusIDByRegNr.registrikood
-            and (Get_AsutusIDByRegNr.dvk_voimeline < 1 or a.dhl_saatmine = 1);
-    
-    if cnt > 0 then
-        select  a.asutus_id
-        into    Get_AsutusIDByRegNr.id
-        from    asutus a
-        where   a.registrikood = Get_AsutusIDByRegNr.registrikood
-                and (Get_AsutusIDByRegNr.dvk_voimeline < 1 or a.dhl_saatmine = 1)
-                and rownum < 2;
-    else
-        Get_AsutusIDByRegNr.id := 0;
-    end if;
-end;
-/
-
-create or replace
-procedure Get_FolderIdByName(
-    folder_name in varchar2,
-    organization_id in number,
-    parent_id in number,
-    folder_id out number)
-as
-cnt number(38,20);
-begin
-    select  count(*)
-    into    cnt
-    from    kaust k
-    where   upper(k.nimi) = upper(Get_FolderIdByName.folder_name)
-            and
-            (
-                k.asutus_id = Get_FolderIdByName.organization_id
-                or k.asutus_id is null
-            )
-            and k.ylemkaust_id = Get_FolderIdByName.parent_id
-            and rownum < 2;
-    
-    if cnt > 0 then
-        select  k.kaust_id
-        into    Get_FolderIdByName.folder_id
-        from    kaust k
-        where   upper(k.nimi) = upper(Get_FolderIdByName.folder_name)
-                and
-                (
-                    k.asutus_id = Get_FolderIdByName.organization_id
-                    or k.asutus_id is null
-                )
-                and k.ylemkaust_id = Get_FolderIdByName.parent_id
-                and rownum < 2;
-    else
-        Get_FolderIdByName.folder_id := null;
-    end if;
-end;
-/
-
-create or replace
-procedure Get_IsikIDByCode(
-    isikukood in varchar2,
-    id out number)
-as
-cnt number(38,0) := 0;
-begin
-    select  count(*)
-    into    cnt
-    from    isik i
-    where   i.kood = Get_IsikIDByCode.isikukood;
-    
-    if cnt > 0 then
-        select  i.i_id
-        into    Get_IsikIDByCode.id
-        from    isik i
-        where   i.kood = Get_IsikIDByCode.isikukood
-                and rownum < 2;
-    else
-        Get_IsikIDByCode.id := 0;
-    end if;
-end;
-/
-
-create or replace
-procedure Get_PersonCurrentPositionIDs(
-    person_id in number,
-    organization_id in number,
-    RC1 out globalPkg.RCT1)
-as
-begin
-    open RC1 for
-    select  a.ametikoht_id
-    from    ametikoht a, ametikoht_taitmine b
-    where   a.asutus_id = Get_PersonCurrentPositionIDs.organization_id
-            and a.ametikoht_id = b.ametikoht_id
-            and b.i_id = Get_PersonCurrentPositionIDs.person_id
-            and
-            (
-                b.peatatud is null
-                or b.peatatud = 0
-            )
-            and
-            (
-                b.alates is null
-                or b.alates <= sysdate
-            )
-            and
-            (
-                b.kuni is null
-                or b.kuni >= sysdate
-            )
-            and
-            (
-                a.alates is null
-                or a.alates <= sysdate
-            )
-            and
-            (
-                a.kuni is null
-                or a.kuni >= sysdate
-            );
-end;
-/
-
-create or replace
-procedure Get_PersonCurrentRoles(
-    person_id in number,
-    organization_id in number,
-    RC1 out globalPkg.RCT1)
-as
-begin
-    open RC1 for
-    select  distinct a.roll
-    from    oigus_antud a, ametikoht_taitmine b
-    where   a.asutus_id = Get_PersonCurrentRoles.organization_id
-            and a.ametikoht_id = b.ametikoht_id
-            and b.i_id = Get_PersonCurrentRoles.person_id
-            and
-            (
-                b.peatatud is null
-                or b.peatatud = 0
-            )
-            and
-            (
-                b.alates is null
-                or b.alates <= sysdate
-            )
-            and
-            (
-                b.kuni is null
-                or b.kuni >= sysdate
-            )
-            and
-            (
-                a.alates is null
-                or a.alates <= sysdate
-            )
-            and
-            (
-                a.kuni is null
-                or a.kuni >= sysdate
-            )
-            and
-            (
-                a.peatatud is null
-                or a.peatatud = 0
-            );
-end;
-/
-
-CREATE OR REPLACE
-PROCEDURE create_log_triggers
-as
-    sql_string long;
-    pkey_col varchar2(50);
-begin
-for tbl in
-(
-    select table_name from user_tables where table_name <> 'LOGI'
-)
-loop
-    dbms_output.put_line(tbl.table_name);
-    
-    select  cc.column_name
-    into    pkey_col
-    from    user_cons_columns cc, user_constraints c
-    where   cc.constraint_name = c.constraint_name
-            and c.constraint_type = 'P'
-            and cc.table_name = tbl.table_name
-            and rownum < 2;
-    
-    sql_string := 'create or replace trigger TR_' || tbl.table_name || '_LOG
-    after insert or update or delete
-    on ' || tbl.table_name || '
-    referencing old as old new as new
-    for each row
-    declare
-        operation varchar2(100);
-        usr varchar2(20);
-    begin
-        if inserting then
-            operation := ''INSERT'';
-        else
-            if updating then
-                operation := ''UPDATE'';
-            else
-                operation := ''DELETE'';
-            end if;
-        end if;
-        
-        select  user
-        into    usr
-        from    dual;
-        ';
-    
-    for clmn in
-    (
-        select column_name, data_type, data_length from user_tab_columns where table_name = tbl.table_name
-    )
-    loop
-        if (clmn.data_type <> 'CLOB') and (clmn.data_type <> 'BLOB') then
-        sql_string := sql_string || '
-        insert
-        into    logi(log_id,tabel,op,uidcol,tabel_uid,veerg,ctype,vana_vaartus,uus_vaartus,muutmise_aeg,ab_kasutaja,ef_kasutaja,kasutaja_kood,comm,created,last_modified,username,ametikoht)
-        values  (0,''' || tbl.table_name || ''',operation,''' || pkey_col || ''',:old.' || pkey_col || ',''' || clmn.column_name || ''',''' || clmn.data_type || ''',:old.' || clmn.column_name || ',:new.' || clmn.column_name || ',sysdate,usr,'''','''','''',sysdate,sysdate,'''',0);
-        ';
-        end if;
-    end loop;
-    
-    sql_string := sql_string || 'end;';
-
-    execute immediate sql_string;
-end loop;
-end;
-/
-
-CREATE OR REPLACE
-PROCEDURE GET_FOLDERFULLPATH(
-    folder_id in number,
-    folder_path out varchar2)
-as
-cnt number(1,0) := 0;
-folder_name varchar2(4000);
-marker number(38,0) := folder_id;
-separator varchar2(1) := '';
-begin
-    select  count(*)
-    into    cnt
-    from    kaust a
-    where   a.kaust_id = GET_FOLDERFULLPATH.marker;
-    
-    if cnt > 0 then
-        while GET_FOLDERFULLPATH.marker is not null
-        loop
-            select  a.nimi,
-                    a.ylemkaust_id
-            into    GET_FOLDERFULLPATH.folder_name,
-                    GET_FOLDERFULLPATH.marker
-            from    kaust a
-            where   a.kaust_id = GET_FOLDERFULLPATH.marker;
-            
-            GET_FOLDERFULLPATH.folder_path := GET_FOLDERFULLPATH.folder_name || separator || GET_FOLDERFULLPATH.folder_path;
-            if GET_FOLDERFULLPATH.marker > 0 then
-                separator := '/';
-            else
-                separator := '';
-            end if;
-        end loop;
-    else
-        GET_FOLDERFULLPATH.folder_path := '';
-    end if;
-end;
-/
-
-create or replace
-PROCEDURE ADD_FOLDER(
-    folder_name in varchar2,
-    parent_id in number,
-    org_id in number,
-    folder_number in varchar2,
-    folder_id out number,
-    xtee_isikukood in varchar2,
-    xtee_asutus in varchar2)
-as
-begin
-
-    -- Set session scope variables
-    DVKLOG.xtee_isikukood := ADD_FOLDER.xtee_isikukood;
-    DVKLOG.xtee_asutus := ADD_FOLDER.xtee_asutus;
-
-    insert
-    into    kaust(
-            nimi,
-            ylemkaust_id,
-            asutus_id,
-            kausta_number)
-    values  (folder_name,
-            parent_id,
-            org_id,
-            folder_number);
-    
-    ADD_FOLDER.folder_id := globalPkg.identity;
-end;
-/
-
-create or replace
-procedure Get_AsutusList (
-    RC1 out globalPkg.RCT1)
-as
-begin
-    open RC1 for
-    select  *
-    from    asutus
-    where   dhl_saatmine = 1
-            and server_id is null;
-end;
-/
-
-create or replace
-procedure Add_Asutus(
-    id out number,
-    registrikood in varchar2,
-    registrikood_vana in varchar2,
-    ks_asutuse_id in number,
-    ks_asutuse_kood in varchar2,
-    nimetus in varchar2,
-    nime_lyhend in varchar2,
-    liik1 in varchar2,
-    liik2 in varchar2,
-    tegevusala in varchar2,
-    tegevuspiirkond in varchar2,
-    maakond in varchar2,
-    asukoht in varchar2,
-    aadress in varchar2,
-    postikood in varchar2,
-    telefon in varchar2,
-    faks in varchar2,
-    e_post in varchar2,
-    www in varchar2,
-    logo in varchar2,
-    asutamise_kp in timestamp,
-    mood_akt_nimi in varchar2,
-    mood_akt_nr in varchar2,
-    mood_akt_kp in timestamp,
-    pm_akt_nimi in varchar2,
-    pm_akt_nr in varchar2,
-    pm_kinnitamise_kp in timestamp,
-    pm_kande_kp in timestamp,
-    loodud in timestamp,
-    muudetud in timestamp,
-    muutja in varchar2,
-    parameetrid in varchar2,
-    dhl_saatmine in number,
-    dhl_otse_saatmine in number,
-    dhs_nimetus in varchar2,
-    toetatav_dvk_versioon in varchar2,
-    server_id in number,
-    aar_id in number,
-    xtee_isikukood in varchar2,
-    xtee_asutus in varchar2)
-as
-cnt number(38,0) := 0;
-begin
-
-    -- Set session scope variables
-    DVKLOG.xtee_isikukood := Add_Asutus.xtee_isikukood;
-    DVKLOG.xtee_asutus := Add_Asutus.xtee_asutus;
-
-    select  count(*)
-    into    cnt
-    from    asutus a
-    where   a.registrikood = Add_Asutus.registrikood
-            and rownum < 2;
-    
-    if cnt < 1 then
-        insert
-        into    asutus(
-                asutus_id,
-                registrikood,
-                e_registrikood,
-                ks_asutus_id,
-                ks_asutus_kood,
-                nimetus,
-                lnimi,
-                liik1,
-                liik2,
-                tegevusala,
-                tegevuspiirkond,
-                maakond,
-                asukoht,
-                aadress,
-                postikood,
-                telefon,
-                faks,
-                e_post,
-                www,
-                logo,
-                asutamise_kp,
-                mood_akt_nimi,
-                mood_akt_nr,
-                mood_akt_kp,
-                pm_akt_nimi,
-                pm_akt_nr,
-                pm_kinnitamise_kp,
-                pm_kande_kp,
-                created,
-                last_modified,
-                username,
-                params,
-                dhl_saatmine,
-                dhl_otse_saatmine,
-                dhs_nimetus,
-                toetatav_dvk_versioon,
-                server_id,
-                aar_id)
-        values  (0,
-                Add_Asutus.registrikood,
-                Add_Asutus.registrikood_vana,
-                Add_Asutus.ks_asutuse_id,
-                Add_Asutus.ks_asutuse_kood,
-                Add_Asutus.nimetus,
-                Add_Asutus.nime_lyhend,
-                Add_Asutus.liik1,
-                Add_Asutus.liik2,
-                Add_Asutus.tegevusala,
-                Add_Asutus.tegevuspiirkond,
-                Add_Asutus.maakond,
-                Add_Asutus.asukoht,
-                Add_Asutus.aadress,
-                Add_Asutus.postikood,
-                Add_Asutus.telefon,
-                Add_Asutus.faks,
-                Add_Asutus.e_post,
-                Add_Asutus.www,
-                Add_Asutus.logo,
-                Add_Asutus.asutamise_kp,
-                Add_Asutus.mood_akt_nimi,
-                Add_Asutus.mood_akt_nr,
-                Add_Asutus.mood_akt_kp,
-                Add_Asutus.pm_akt_nimi,
-                Add_Asutus.pm_akt_nr,
-                Add_Asutus.pm_kinnitamise_kp,
-                Add_Asutus.pm_kande_kp,
-                Add_Asutus.loodud,
-                Add_Asutus.muudetud,
-                Add_Asutus.muutja,
-                Add_Asutus.parameetrid,
-                Add_Asutus.dhl_saatmine,
-                Add_Asutus.dhl_otse_saatmine,
-                Add_Asutus.dhs_nimetus,
-                Add_Asutus.toetatav_dvk_versioon,
-                Add_Asutus.server_id,
-                Add_Asutus.aar_id);
-        
-        Add_Asutus.id := globalPkg.identity;
-    else
-        select  a.asutus_id
-        into    Add_Asutus.id
-        from    asutus a
-        where   a.registrikood = Add_Asutus.registrikood
-                and rownum < 2;
-    end if;
-end;
-/
-
-create or replace
-procedure Update_Asutus(
-    id in number,
-    registrikood in varchar2,
-    registrikood_vana in varchar2,
-    ks_asutuse_id in number,
-    ks_asutuse_kood in varchar2,
-    nimetus in varchar2,
-    nime_lyhend in varchar2,
-    liik1 in varchar2,
-    liik2 in varchar2,
-    tegevusala in varchar2,
-    tegevuspiirkond in varchar2,
-    maakond in varchar2,
-    asukoht in varchar2,
-    aadress in varchar2,
-    postikood in varchar2,
-    telefon in varchar2,
-    faks in varchar2,
-    e_post in varchar2,
-    www in varchar2,
-    logo in varchar2,
-    asutamise_kp in timestamp,
-    mood_akt_nimi in varchar2,
-    mood_akt_nr in varchar2,
-    mood_akt_kp in timestamp,
-    pm_akt_nimi in varchar2,
-    pm_akt_nr in varchar2,
-    pm_kinnitamise_kp in timestamp,
-    pm_kande_kp in timestamp,
-    loodud in timestamp,
-    muudetud in timestamp,
-    muutja in varchar2,
-    parameetrid in varchar2,
-    dhl_saatmine in number,
-    dhl_otse_saatmine in number,
-    dhs_nimetus in varchar2,
-    toetatav_dvk_versioon in varchar2,
-    server_id in number,
-    aar_id in number,
-    xtee_isikukood in varchar2,
-    xtee_asutus in varchar2)
-as
-begin
-
-    -- Set session scope variables
-    DVKLOG.xtee_isikukood := Update_Asutus.xtee_isikukood;
-    DVKLOG.xtee_asutus := Update_Asutus.xtee_asutus;
-
-    update  asutus
-    set     registrikood = Update_Asutus.registrikood,
-            e_registrikood = Update_Asutus.registrikood_vana,
-            ks_asutus_id = Update_Asutus.ks_asutuse_id,
-            ks_asutus_kood = Update_Asutus.ks_asutuse_kood,
-            nimetus = Update_Asutus.nimetus,
-            lnimi = Update_Asutus.nime_lyhend,
-            liik1 = Update_Asutus.liik1,
-            liik2 = Update_Asutus.liik2,
-            tegevusala = Update_Asutus.tegevusala,
-            tegevuspiirkond = Update_Asutus.tegevuspiirkond,
-            maakond = Update_Asutus.maakond,
-            asukoht = Update_Asutus.asukoht,
-            aadress = Update_Asutus.aadress,
-            postikood = Update_Asutus.postikood,
-            telefon = Update_Asutus.telefon,
-            faks = Update_Asutus.faks,
-            e_post = Update_Asutus.e_post,
-            www = Update_Asutus.www,
-            logo = Update_Asutus.logo,
-            asutamise_kp = Update_Asutus.asutamise_kp,
-            mood_akt_nimi = Update_Asutus.mood_akt_nimi,
-            mood_akt_nr = Update_Asutus.mood_akt_nr,
-            mood_akt_kp = Update_Asutus.mood_akt_kp,
-            pm_akt_nimi = Update_Asutus.pm_akt_nimi,
-            pm_akt_nr = Update_Asutus.pm_akt_nr,
-            pm_kinnitamise_kp = Update_Asutus.pm_kinnitamise_kp,
-            pm_kande_kp = Update_Asutus.pm_kande_kp,
-            created = Update_Asutus.loodud,
-            last_modified = Update_Asutus.muudetud,
-            username = Update_Asutus.muutja,
-            params = Update_Asutus.parameetrid,
-            dhl_saatmine = Update_Asutus.dhl_saatmine,
-            dhl_otse_saatmine = Update_Asutus.dhl_otse_saatmine,
-            dhs_nimetus = Update_Asutus.dhs_nimetus,
-            toetatav_dvk_versioon = Update_Asutus.toetatav_dvk_versioon,
-            server_id = Update_Asutus.server_id,
-            aar_id = Update_Asutus.aar_id
-    where   asutus_id = Update_Asutus.id;
-end;
-/
-
-create or replace
-procedure Get_PersonCurrentDivisionIDs(
-    person_id in number,
-    organization_id in number,
-    RC1 out globalPkg.RCT1)
-as
-begin
-    open RC1 for
-    select  distinct
-            a.allyksus_id
-    from    ametikoht a, ametikoht_taitmine b
-    where   a.asutus_id = Get_PersonCurrentDivisionIDs.organization_id
-            and a.ametikoht_id = b.ametikoht_id
-            and b.i_id = Get_PersonCurrentDivisionIDs.person_id
-            and
-            (
-                b.peatatud is null
-                or b.peatatud = 0
-            )
-            and
-            (
-                b.alates is null
-                or b.alates <= sysdate
-            )
-            and
-            (
-                b.kuni is null
-                or b.kuni >= sysdate
-            )
-            and
-            (
-                a.alates is null
-                or a.alates <= sysdate
-            )
-            and
-            (
-                a.kuni is null
-                or a.kuni >= sysdate
-            );
-end;
-/
-
-create or replace
-procedure Get_AsutusStat(
-    asutus_id in number,
-    vastuvotmata_dokumente out number,
-    vahetatud_dokumente out number)
-as
-begin
-    select  count(*)
-    into    Get_AsutusStat.vastuvotmata_dokumente
-    from    vastuvotja
-    where   asutus_id = Get_AsutusStat.asutus_id
-            and staatus_id = 101;
-    
-    select  (
-                select  count(*)
-                from    vastuvotja
-                where   asutus_id = Get_AsutusStat.asutus_id
-                        and staatus_id = 102
-            ) + (
-                select  count(*)
-                from    saatja
-                where   asutus_id = Get_AsutusStat.asutus_id
-            )
-    into    Get_AsutusStat.vahetatud_dokumente
-    from    dual;
-end;
-/
-
-create or replace
-procedure Get_RecipientTemplates(RC1 out globalPkg.RCT1)
-as
-begin
-    open RC1 for
-    select  v.*
-    from    vastuvotja_mall v
-    order by
-            v.vastuvotja_mall_id;
-end;
-/
-
-create or replace
-procedure Get_ServerByID(
-    server_id in number,
-    andmekogu_nimi out varchar2,
-    aadress out varchar2)
-as
-cnt number(38,0) := 0;
-begin
-    select  count(*)
-    into    cnt
-    from    server s
-    where   s.server_id = Get_ServerByID.server_id
-            and rownum < 2;
-    
-    if cnt > 0 then
-        select  s.andmekogu_nimi,
-                s.aadress
-        into    Get_ServerByID.andmekogu_nimi,
-                Get_ServerByID.aadress
-        from    server s
-        where   s.server_id = Get_ServerByID.server_id
-                and rownum < 2;
-    else
-        Get_ServerByID.andmekogu_nimi := null;
-        Get_ServerByID.aadress := null;
-    end if;
-end;
-/
-
-create or replace
-procedure Add_Proxy(
-    proxy_id out number,
-    sending_id in number,
-    organization_id in number,
-    position_id in number,
-    division_id in number,
-    personal_id_code in varchar2,
-    email in varchar2,
-    name in varchar2,
-    organization_name in varchar2,
-    department_nr in varchar2,
-    department_name in varchar2,
-    position_short_name in varchar2,
-    division_short_name in varchar2,
-    xtee_isikukood in varchar2,
-    xtee_asutus in varchar2)
-as
-organization_id_ number(38,0) := organization_id;
-position_id_ number(38,0) := position_id;
-division_id_ number(38,0) := division_id;
-begin
-
-    -- Set session scope variables
-    DVKLOG.xtee_isikukood := Add_Proxy.xtee_isikukood;
-    DVKLOG.xtee_asutus := Add_Proxy.xtee_asutus;
-
-    if organization_id_ = 0 then
-        organization_id_ := null;
-    end if;
-    if position_id_ = 0 then
-        position_id_ := null;
-    end if;
-    if division_id_ = 0 then
-        division_id_ := null;
-    end if;
-    insert
-    into    vahendaja(
-            vahendaja_id,
-            transport_id,
-            asutus_id,
-            ametikoht_id,
-            allyksus_id,
-            isikukood,
-            nimi,
-            asutuse_nimi,
-            email,
-            osakonna_nr,
-            osakonna_nimi,
-            ametikoha_lyhinimetus,
-            allyksuse_lyhinimetus)
-    values  (0,
-            Add_Proxy.sending_id,
-            Add_Proxy.organization_id_,
-            Add_Proxy.position_id_,
-            Add_Proxy.division_id_,
-            Add_Proxy.personal_id_code,
-            Add_Proxy.name,
-            Add_Proxy.organization_name,
-            Add_Proxy.email,
-            Add_Proxy.department_nr,
-            Add_Proxy.department_name,
-            Add_Proxy.position_short_name,
-            Add_Proxy.division_short_name);
-    
-    Add_Proxy.proxy_id := globalPkg.identity;
-end;
-/
-
-create or replace
-procedure Get_ProxyBySendingID(
-    sending_id in number,
-    proxy_id out number,
-    organization_id out number,
-    position_id out number,
-    division_id out number,
-    personal_id_code out varchar2,
-    name out varchar2,
-    organization_name out varchar2,
-    email out varchar2,
-    department_nr out varchar2,
-    department_name out varchar2,
-    position_short_name out varchar2,
-    division_short_name out varchar2)
-as
-cnt number(38,0) := 0;
-begin
-    select  count(*)
-    into    cnt
-    from    vahendaja v
-    where   v.transport_id = Get_ProxyBySendingID.sending_id
-            and rownum < 2;
-    
-    if cnt > 0 then
-        select  v.vahendaja_id,
-                v.asutus_id,
-                v.ametikoht_id,
-                v.allyksus_id,
-                v.isikukood,
-                v.nimi,
-                v.asutuse_nimi,
-                v.email,
-                v.osakonna_nr,
-                v.osakonna_nimi,
-                v.ametikoha_lyhinimetus,
-                v.allyksuse_lyhinimetus
-        into    Get_ProxyBySendingID.proxy_id,
-                Get_ProxyBySendingID.organization_id,
-                Get_ProxyBySendingID.position_id,
-                Get_ProxyBySendingID.division_id,
-                Get_ProxyBySendingID.personal_id_code,
-                Get_ProxyBySendingID.name,
-                Get_ProxyBySendingID.organization_name,
-                Get_ProxyBySendingID.email,
-                Get_ProxyBySendingID.department_nr,
-                Get_ProxyBySendingID.department_name,
-                Get_ProxyBySendingID.position_short_name,
-                Get_ProxyBySendingID.division_short_name
-        from    vahendaja v
-        where   v.transport_id = Get_ProxyBySendingID.sending_id
-                and rownum < 2;
-    else
-        Get_ProxyBySendingID.proxy_id := null;
-        Get_ProxyBySendingID.organization_id := null;
-        Get_ProxyBySendingID.position_id := null;
-        Get_ProxyBySendingID.division_id := null;
-        Get_ProxyBySendingID.personal_id_code := null;
-        Get_ProxyBySendingID.name := null;
-        Get_ProxyBySendingID.organization_name := null;
-        Get_ProxyBySendingID.email := null;
-        Get_ProxyBySendingID.department_nr := null;
-        Get_ProxyBySendingID.department_name := null;
-        Get_ProxyBySendingID.position_short_name := null;
-        Get_ProxyBySendingID.division_short_name := null;
-    end if;
-end;
-/
-
-create or replace
-procedure Get_Servers(RC1 out globalPkg.RCT1)
-as
-begin
-    open RC1 for
-    select  s.*
-    from    server s;
-end;
-/
-
-create or replace
-procedure Get_NextFragmentID(fragment_id out number)
-as
-begin
-    select  sq_dokumendi_fragment_id.nextval
-    into    Get_NextFragmentID.fragment_id
-    from    dual;
-end;
-/
-
-create or replace
-procedure Get_DocumentFragments(
-    organization_id in number,
-    delivery_session_id in varchar2,
-    is_incoming in number,
-    RC1 out globalPkg.RCT1)
-as
-begin
-    open RC1 for
-    select  f.*
-    from    dokumendi_fragment f
-    where   f.asutus_id = Get_DocumentFragments.organization_id
-            and f.edastus_id = Get_DocumentFragments.delivery_session_id
-            and f.sissetulev = Get_DocumentFragments.is_incoming
-    order by
-            f.fragment_nr;
-end;
-/
-
-create or replace
-procedure Delete_DocumentFragments(
-    organization_id in number,
-    delivery_session_id in varchar2,
-    is_incoming in number)
-as
-begin
-    delete
-    from    dokumendi_fragment f
-    where   f.asutus_id = Delete_DocumentFragments.organization_id
-            and f.edastus_id = Delete_DocumentFragments.delivery_session_id
-            and f.sissetulev = Delete_DocumentFragments.is_incoming;
-end;
-/
-
-create or replace
-procedure Get_AsutusIDByAarID(
-    aar_id in number,
-    id out number)
-as
-cnt number(38,0) := 0;
-begin
-    select  count(*)
-    into    cnt
-    from    asutus a
-    where   a.aar_id = Get_AsutusIDByAarID.aar_id;
-    
-    if cnt > 0 then
-        select  a.asutus_id
-        into    Get_AsutusIDByAarID.id
-        from    asutus a
-        where   a.aar_id = Get_AsutusIDByAarID.aar_id
-                and rownum < 2;
-    else
-        Get_AsutusIDByAarID.id := 0;
-    end if;
-end;
-/
-
-create or replace
-procedure Get_AllyksusByAarID(
-    id out number,
-    asutus_id out number,
-    vanem_id out number,
-    nimetus out varchar2,
-    created out date,
-    last_modified out date,
-    username out varchar2,
-    muutmiste_arv out number,
-    lyhinimetus out varchar2,
-    adr_uri out varchar2,
-    aar_id in number)
-as
-cnt number(38,0) := 0;
-begin
-    select  count(*)
-    into    cnt
-    from    allyksus a
-    where   a.aar_id = Get_AllyksusByAarID.aar_id
-            and rownum < 2;
-    
-    if cnt > 0 then
-        select  a.id,
-                a.asutus_id,
-                a.vanem_id,
-                a.allyksus,
-                a.created,
-                a.last_modified,
-                a.username,
-                a.muutm_arv,
-                a.lyhinimetus,
-                a.adr_uri
-        into    Get_AllyksusByAarID.id,
-                Get_AllyksusByAarID.asutus_id,
-                Get_AllyksusByAarID.vanem_id,
-                Get_AllyksusByAarID.nimetus,
-                Get_AllyksusByAarID.created,
-                Get_AllyksusByAarID.last_modified,
-                Get_AllyksusByAarID.username,
-                Get_AllyksusByAarID.muutmiste_arv,
-                Get_AllyksusByAarID.lyhinimetus,
-                Get_AllyksusByAarID.adr_uri
-        from    allyksus a
-        where   a.aar_id = Get_AllyksusByAarID.aar_id
-                and rownum < 2;
-    else
-        Get_AllyksusByAarID.id := null;
-        Get_AllyksusByAarID.asutus_id := null;
-        Get_AllyksusByAarID.vanem_id := null;
-        Get_AllyksusByAarID.nimetus := null;
-        Get_AllyksusByAarID.created := null;
-        Get_AllyksusByAarID.last_modified := null;
-        Get_AllyksusByAarID.username := null;
-        Get_AllyksusByAarID.muutmiste_arv := null;
-        Get_AllyksusByAarID.lyhinimetus := null;
-        Get_AllyksusByAarID.adr_uri := null;
-    end if;
-end;
-/
-
-create or replace
-procedure Get_AllyksusIdByAarID(
-    id out number,
-    aar_id in number)
-as
-cnt number(38,0) := 0;
-begin
-    select  count(*)
-    into    cnt
-    from    allyksus a
-    where   a.aar_id = Get_AllyksusIdByAarID.aar_id
-            and rownum < 2;
-    
-    if cnt > 0 then
-        select  a.id
-        into    Get_AllyksusIdByAarID.id
-        from    allyksus a
-        where   a.aar_id = Get_AllyksusIdByAarID.aar_id
-                and rownum < 2;
-    else
-        Get_AllyksusIdByAarID.id := null;
-    end if;
-end;
-/
-
-create or replace
-procedure Get_AllyksusList(
-    asutus_id in number,
-    nimetus in varchar2,
-    RC1 out globalPkg.RCT1)
-as
-begin
-    -- Allolev keeruline union all konstruktsioon on kasulik
-    -- OR operaatori vältimiseks (Oracle puhul väga aeglane)
-    open RC1 for
-    select  a.*,
-            null as ks_allyksuse_lyhinimetus
-    from    allyksus a
-    where   a.asutus_id = nvl(Get_AllyksusList.asutus_id, a.asutus_id)
-            and a.allyksus = Get_AllyksusList.nimetus
-            and a.vanem_id is null
-    union all
-    select  a1.*,
-            null as ks_allyksuse_lyhinimetus
-    from    allyksus a1
-    where   a1.asutus_id = nvl(Get_AllyksusList.asutus_id, a1.asutus_id)
-            and Get_AllyksusList.nimetus is null
-            and a1.vanem_id is null
-    union all
-    select  a2.*,
-            ksa2.lyhinimetus as ks_allyksuse_lyhinimetus
-    from    allyksus a2, allyksus ksa2
-    where   a2.asutus_id = nvl(Get_AllyksusList.asutus_id, a2.asutus_id)
-            and a2.allyksus = Get_AllyksusList.nimetus
-            and a2.vanem_id = ksa2.id
-    union all
-    select  a3.*,
-            ksa3.lyhinimetus as ks_allyksuse_lyhinimetus
-    from    allyksus a3, allyksus ksa3
-    where   a3.asutus_id = nvl(Get_AllyksusList.asutus_id, a3.asutus_id)
-            and Get_AllyksusList.nimetus is null
-            and a3.vanem_id = ksa3.id;
-end;
-/
-
-create or replace
-procedure Add_Allyksus(
-    id out number,
-    asutus_id in number,
-    vanem_id in number,
-    nimetus in varchar2,
-    created in date,
-    last_modified in date,
-    username in varchar2,
-    muutmiste_arv in number,
-    aar_id in number,
-    lyhinimetus in varchar2,
-    adr_uri in varchar2)
-as
-asutus_id_ number(38,0) := asutus_id;
-vanem_id_ number(38,0) := vanem_id;
-aar_id_ number(38,0) := aar_id;
-begin
-    if asutus_id_ = 0 then
-        asutus_id_ := null;
-    end if;
-    if vanem_id_ = 0 then
-        vanem_id_ := null;
-    end if;
-    if aar_id_ = 0 then
-        aar_id_ := null;
-    end if;
-
-    insert
-    into    allyksus(
-            id,
-            asutus_id,
-            vanem_id,
-            allyksus,
-            created,
-            last_modified,
-            username,
-            muutm_arv,
-            aar_id,
-            lyhinimetus,
-            adr_uri)
-    values  (0,
-            Add_Allyksus.asutus_id_,
-            Add_Allyksus.vanem_id_,
-            Add_Allyksus.nimetus,
-            Add_Allyksus.created,
-            Add_Allyksus.last_modified,
-            Add_Allyksus.username,
-            Add_Allyksus.muutmiste_arv,
-            Add_Allyksus.aar_id_,
-            Add_Allyksus.lyhinimetus,
-            Add_Allyksus.adr_uri);
-    
-    Add_Allyksus.id := globalPkg.identity;
-end;
-/
-
-create or replace
-procedure Update_Allyksus(
-    id in number,
-    asutus_id in number,
-    vanem_id in number,
-    nimetus in varchar2,
-    created in date,
-    last_modified in date,
-    username in varchar2,
-    muutmiste_arv in number,
-    aar_id in number,
-    lyhinimetus in varchar2,
-    adr_uri in varchar2)
-as
-asutus_id_ number(38,0) := asutus_id;
-vanem_id_ number(38,0) := vanem_id;
-aar_id_ number(38,0) := aar_id;
-begin
-    if asutus_id_ = 0 then
-        asutus_id_ := null;
-    end if;
-    if vanem_id_ = 0 then
-        vanem_id_ := null;
-    end if;
-    if aar_id_ = 0 then
-        aar_id_ := null;
-    end if;
-
-    update  allyksus
-    set     asutus_id = Update_Allyksus.asutus_id_,
-            vanem_id = Update_Allyksus.vanem_id,
-            allyksus = Update_Allyksus.nimetus,
-            created = Update_Allyksus.created,
-            last_modified = Update_Allyksus.last_modified,
-            username = Update_Allyksus.username,
-            muutm_arv = Update_Allyksus.muutmiste_arv,
-            aar_id = Update_Allyksus.aar_id_,
-            lyhinimetus = Update_Allyksus.lyhinimetus,
-            adr_uri = Update_Allyksus.adr_uri
-    where   id = Update_Allyksus.id;
-end;
-/
-
-create or replace
-procedure Get_AmetikohaTaitmineByAarID(
-    id out number,
-    ametikoht_id out number,
-    isik_id out number,
-    alates out date,
-    kuni out date,
-    roll out varchar2,
-    created out date,
-    last_modified out date,
-    username out varchar2,
-    peatatud out number,
-    aar_id in number)
-as
-cnt number(38,0) := 0;
-begin
-    select  count(*)
-    into    cnt
-    from    ametikoht_taitmine a
-    where   a.aar_id = Get_AmetikohaTaitmineByAarID.aar_id
-            and rownum < 2;
-    
-    if cnt > 0 then
-        select  a.taitmine_id,
-                a.ametikoht_id,
-                a.i_id,
-                a.alates,
-                a.kuni,
-                a.roll,
-                a.created,
-                a.last_modified,
-                a.username,
-                a.peatatud
-        into    Get_AmetikohaTaitmineByAarID.id,
-                Get_AmetikohaTaitmineByAarID.ametikoht_id,
-                Get_AmetikohaTaitmineByAarID.isik_id,
-                Get_AmetikohaTaitmineByAarID.alates,
-                Get_AmetikohaTaitmineByAarID.kuni,
-                Get_AmetikohaTaitmineByAarID.roll,
-                Get_AmetikohaTaitmineByAarID.created,
-                Get_AmetikohaTaitmineByAarID.last_modified,
-                Get_AmetikohaTaitmineByAarID.username,
-                Get_AmetikohaTaitmineByAarID.peatatud
-        from    ametikoht_taitmine a
-        where   a.aar_id = Get_AmetikohaTaitmineByAarID.aar_id
-                and rownum < 2;
-    else
-        Get_AmetikohaTaitmineByAarID.id := null;
-        Get_AmetikohaTaitmineByAarID.ametikoht_id := null;
-        Get_AmetikohaTaitmineByAarID.isik_id := null;
-        Get_AmetikohaTaitmineByAarID.alates := null;
-        Get_AmetikohaTaitmineByAarID.kuni := null;
-        Get_AmetikohaTaitmineByAarID.roll := null;
-        Get_AmetikohaTaitmineByAarID.created := null;
-        Get_AmetikohaTaitmineByAarID.last_modified := null;
-        Get_AmetikohaTaitmineByAarID.username := null;
-        Get_AmetikohaTaitmineByAarID.peatatud := null;
-    end if;
-end;
-/
-
-create or replace
-procedure Get_AmetikohaTaitmineList(
-    ametikoht_id in number,
-    isikukood in varchar2,
-    RC1 out globalPkg.RCT1)
-as
-begin
-    open RC1 for
-    select  a.*
-    from    ametikoht_taitmine a
-    inner join
-            isik i on i.i_id = a.i_id
-    where   a.ametikoht_id = Get_AmetikohaTaitmineList.ametikoht_id
-            and i.kood = Get_AmetikohaTaitmineList.isikukood;
-end;
-/
-
-create or replace
-procedure Add_AmetikohaTaitmine(
-    id out number,
-    ametikoht_id in number,
-    isik_id in number,
-    alates in date,
-    kuni in date,
-    roll in varchar2,
-    created in date,
-    last_modified in date,
-    username in varchar2,
-    peatatud in number,
-    aar_id in number)
-as
-ametikoht_id_ number(38,0) := ametikoht_id;
-isik_id_ number(38,0) := isik_id;
-aar_id_ number(38,0) := aar_id;
-begin
-    if ametikoht_id_ = 0 then
-        ametikoht_id_ := null;
-    end if;
-    if isik_id_ = 0 then
-        isik_id_ := null;
-    end if;
-    if aar_id_ = 0 then
-        aar_id_ := null;
-    end if;
-
-    insert
-    into    ametikoht_taitmine(
-            taitmine_id,
-            ametikoht_id,
-            i_id,
-            alates,
-            kuni,
-            roll,
-            created,
-            last_modified,
-            username,
-            peatatud,
-            aar_id)
-    values  (0,
-            Add_AmetikohaTaitmine.ametikoht_id_,
-            Add_AmetikohaTaitmine.isik_id_,
-            Add_AmetikohaTaitmine.alates,
-            Add_AmetikohaTaitmine.kuni,
-            Add_AmetikohaTaitmine.roll,
-            Add_AmetikohaTaitmine.created,
-            Add_AmetikohaTaitmine.last_modified,
-            Add_AmetikohaTaitmine.username,
-            Add_AmetikohaTaitmine.peatatud,
-            Add_AmetikohaTaitmine.aar_id_);
-    
-    Add_AmetikohaTaitmine.id := globalPkg.identity;
-end;
-/
-
-create or replace
-procedure Update_AmetikohaTaitmine(
-    id in number,
-    ametikoht_id in number,
-    isik_id in number,
-    alates in date,
-    kuni in date,
-    roll in varchar2,
-    created in date,
-    last_modified in date,
-    username in varchar2,
-    peatatud in number,
-    aar_id in number)
-as
-ametikoht_id_ number(38,0) := ametikoht_id;
-isik_id_ number(38,0) := isik_id;
-aar_id_ number(38,0) := aar_id;
-begin
-    if ametikoht_id_ = 0 then
-        ametikoht_id_ := null;
-    end if;
-    if isik_id_ = 0 then
-        isik_id_ := null;
-    end if;
-    if aar_id_ = 0 then
-        aar_id_ := null;
-    end if;
-
-    update  ametikoht_taitmine
-    set     ametikoht_id = Update_AmetikohaTaitmine.ametikoht_id_,
-            i_id = Update_AmetikohaTaitmine.isik_id_,
-            alates = Update_AmetikohaTaitmine.alates,
-            kuni = Update_AmetikohaTaitmine.kuni,
-            roll = Update_AmetikohaTaitmine.roll,
-            created = Update_AmetikohaTaitmine.created,
-            last_modified = Update_AmetikohaTaitmine.last_modified,
-            username = Update_AmetikohaTaitmine.username,
-            peatatud = Update_AmetikohaTaitmine.peatatud,
-            aar_id = Update_AmetikohaTaitmine.aar_id_
-    where   taitmine_id = Update_AmetikohaTaitmine.id;
-end;
-/
-
-create or replace
-procedure Get_AmetikohtByAarID(
-    id out number,
-    ks_ametikoht_id out number,
-    asutus_id out number,
-    nimetus out varchar2,
-    alates out date,
-    kuni out date,
-    created out date,
-    last_modified out date,
-    username out varchar2,
-    allyksus_id out number,
-    params out varchar2,
-    lyhinimetus out varchar2,
-    aar_id in number)
-as
-cnt number(38,0) := 0;
-begin
-    select  count(*)
-    into    cnt
-    from    ametikoht a
-    where   a.aar_id = Get_AmetikohtByAarID.aar_id
-            and rownum < 2;
-    
-    if cnt > 0 then
-        select  a.ametikoht_id,
-                a.ks_ametikoht_id,
-                a.asutus_id,
-                a.ametikoht_nimetus,
-                a.alates,
-                a.kuni,
-                a.created,
-                a.last_modified,
-                a.username,
-                a.allyksus_id,
-                a.params,
-                a.lyhinimetus
-        into    Get_AmetikohtByAarID.id,
-                Get_AmetikohtByAarID.ks_ametikoht_id,
-                Get_AmetikohtByAarID.asutus_id,
-                Get_AmetikohtByAarID.nimetus,
-                Get_AmetikohtByAarID.alates,
-                Get_AmetikohtByAarID.kuni,
-                Get_AmetikohtByAarID.created,
-                Get_AmetikohtByAarID.last_modified,
-                Get_AmetikohtByAarID.username,
-                Get_AmetikohtByAarID.allyksus_id,
-                Get_AmetikohtByAarID.params,
-                Get_AmetikohtByAarID.lyhinimetus
-        from    ametikoht a
-        where   a.aar_id = Get_AmetikohtByAarID.aar_id
-                and rownum < 2;
-    else
-        Get_AmetikohtByAarID.id := null;
-        Get_AmetikohtByAarID.ks_ametikoht_id := null;
-        Get_AmetikohtByAarID.asutus_id := null;
-        Get_AmetikohtByAarID.nimetus := null;
-        Get_AmetikohtByAarID.alates := null;
-        Get_AmetikohtByAarID.kuni := null;
-        Get_AmetikohtByAarID.created := null;
-        Get_AmetikohtByAarID.last_modified := null;
-        Get_AmetikohtByAarID.username := null;
-        Get_AmetikohtByAarID.allyksus_id := null;
-        Get_AmetikohtByAarID.params := null;
-        Get_AmetikohtByAarID.lyhinimetus := null;
-    end if;
-end;
-/
-
-create or replace
-procedure Get_AmetikohtIdByAarID(
-    id out number,
-    aar_id in number)
-as
-cnt number(38,0) := 0;
-begin
-    select  count(*)
-    into    cnt
-    from    ametikoht a
-    where   a.aar_id = Get_AmetikohtIdByAarID.aar_id
-            and rownum < 2;
-    
-    if cnt > 0 then
-        select  a.ametikoht_id
-        into    Get_AmetikohtIdByAarID.id
-        from    ametikoht a
-        where   a.aar_id = Get_AmetikohtIdByAarID.aar_id
-                and rownum < 2;
-    else
-        Get_AmetikohtIdByAarID.id := null;
-    end if;
-end;
-/
-
-create or replace
-procedure Get_AmetikohtList(
-    asutus_id in number,
-    nimetus in varchar2,
-    RC1 out globalPkg.RCT1)
-as
-begin
-    -- Allolev keeruline union all konstruktsioon on kasulik
-    -- OR operaatori vältimiseks (Oracle puhul väga aeglane)
-    open RC1 for
-    select  a.*,
-            null as allyksuse_lyhinimetus
-    from    ametikoht a
-    where   a.asutus_id = nvl(Get_AmetikohtList.asutus_id, a.asutus_id)
-            and a.ametikoht_nimetus = Get_AmetikohtList.nimetus
-            and a.allyksus_id is null
-            and nvl(a.alates, add_months(sysdate, -1)) < sysdate
-            and nvl(a.kuni, add_months(sysdate, 1)) > sysdate
-    union all
-    select  a1.*,
-            null as allyksuse_lyhinimetus
-    from    ametikoht a1
-    where   a1.asutus_id = nvl(Get_AmetikohtList.asutus_id, a1.asutus_id)
-            and Get_AmetikohtList.nimetus is null
-            and a1.allyksus_id is null
-            and nvl(a1.alates, add_months(sysdate, -1)) < sysdate
-            and nvl(a1.kuni, add_months(sysdate, 1)) > sysdate
-    union all
-    select  a2.*,
-            y2.lyhinimetus as allyksuse_lyhinimetus
-    from    ametikoht a2, allyksus y2
-    where   a2.asutus_id = nvl(Get_AmetikohtList.asutus_id, a2.asutus_id)
-            and a2.ametikoht_nimetus = Get_AmetikohtList.nimetus
-            and y2.id = a2.allyksus_id
-            and nvl(a2.alates, add_months(sysdate, -1)) < sysdate
-            and nvl(a2.kuni, add_months(sysdate, 1)) > sysdate
-    union all
-    select  a3.*,
-            y3.lyhinimetus as allyksuse_lyhinimetus
-    from    ametikoht a3, allyksus y3
-    where   a3.asutus_id = nvl(Get_AmetikohtList.asutus_id, a3.asutus_id)
-            and Get_AmetikohtList.nimetus is null
-            and y3.id = a3.allyksus_id
-            and nvl(a3.alates, add_months(sysdate, -1)) < sysdate
-            and nvl(a3.kuni, add_months(sysdate, 1)) > sysdate;
-end;
-/
-
-create or replace
-procedure Add_Ametikoht(
-    id out number,
-    ks_ametikoht_id in number,
-    asutus_id in number,
-    nimetus in varchar2,
-    alates in date,
-    kuni in date,
-    created in date,
-    last_modified in date,
-    username in varchar2,
-    allyksus_id in number,
-    params in varchar2,
-    lyhinimetus in varchar2,
-    aar_id in number)
-as
-ks_ametikoht_id_ number(38,0) := ks_ametikoht_id;
-asutus_id_ number(38,0) := asutus_id;
-allyksus_id_ number(38,0) := allyksus_id;
-aar_id_ number(38,0) := aar_id;
-begin
-    if ks_ametikoht_id_ = 0 then
-        ks_ametikoht_id_ := null;
-    end if;
-    if asutus_id_ = 0 then
-        asutus_id_ := null;
-    end if;
-    if allyksus_id_ = 0 then
-        allyksus_id_ := null;
-    end if;
-    if aar_id_ = 0 then
-        aar_id_ := null;
-    end if;
-
-    insert
-    into    ametikoht(
-            ametikoht_id,
-            ks_ametikoht_id,
-            asutus_id,
-            ametikoht_nimetus,
-            alates,
-            kuni,
-            created,
-            last_modified,
-            username,
-            allyksus_id,
-            params,
-            lyhinimetus,
-            aar_id)
-    values  (0,
-            Add_Ametikoht.ks_ametikoht_id_,
-            Add_Ametikoht.asutus_id_,
-            Add_Ametikoht.nimetus,
-            Add_Ametikoht.alates,
-            Add_Ametikoht.kuni,
-            Add_Ametikoht.created,
-            Add_Ametikoht.last_modified,
-            Add_Ametikoht.username,
-            Add_Ametikoht.allyksus_id_,
-            Add_Ametikoht.params,
-            Add_Ametikoht.lyhinimetus,
-            Add_Ametikoht.aar_id_);
-    
-    Add_Ametikoht.id := globalPkg.identity;
-end;
-/
-
-create or replace
-procedure Update_Ametikoht(
-    id in number,
-    ks_ametikoht_id in number,
-    asutus_id in number,
-    nimetus in varchar2,
-    alates in date,
-    kuni in date,
-    created in date,
-    last_modified in date,
-    username in varchar2,
-    allyksus_id in number,
-    params in varchar2,
-    lyhinimetus in varchar2,
-    aar_id in number)
-as
-ks_ametikoht_id_ number(38,0) := ks_ametikoht_id;
-asutus_id_ number(38,0) := asutus_id;
-allyksus_id_ number(38,0) := allyksus_id;
-aar_id_ number(38,0) := aar_id;
-begin
-    if ks_ametikoht_id_ = 0 then
-        ks_ametikoht_id_ := null;
-    end if;
-    if asutus_id_ = 0 then
-        asutus_id_ := null;
-    end if;
-    if allyksus_id_ = 0 then
-        allyksus_id_ := null;
-    end if;
-    if aar_id_ = 0 then
-        aar_id_ := null;
-    end if;
-
-    update  ametikoht
-    set     ks_ametikoht_id = Update_Ametikoht.ks_ametikoht_id_,
-            asutus_id = Update_Ametikoht.asutus_id_,
-            ametikoht_nimetus = Update_Ametikoht.nimetus,
-            alates = Update_Ametikoht.alates,
-            kuni = Update_Ametikoht.kuni,
-            created = Update_Ametikoht.created,
-            last_modified = Update_Ametikoht.last_modified,
-            username = Update_Ametikoht.username,
-            allyksus_id = Update_Ametikoht.allyksus_id_,
-            params = Update_Ametikoht.params,
-            lyhinimetus = Update_Ametikoht.lyhinimetus,
-            aar_id = Update_Ametikoht.aar_id_
-    where   ametikoht_id = Update_Ametikoht.id;
-end;
-/
-
-create or replace
-procedure Get_IsikByCode(
-    id out number,
-    isikukood in varchar2,
-    perenimi out varchar2,
-    eesnimi out varchar2,
-    maakond out varchar2,
-    aadress out varchar2,
-    postiindeks out varchar2,
-    telefon out varchar2,
-    epost out varchar2,
-    www out varchar2,
-    parameetrid out varchar2,
-    loodud out date,
-    muudetud out date,
-    muutja out date)
-as
-cnt number(38,0) := 0;
-begin
-    select  count(*)
-    into    cnt
-    from    isik i
-    where   i.kood = Get_IsikByCode.isikukood
-            and rownum < 2;
-    
-    if cnt > 0 then
-        select  i.i_id,
-                i.perenimi,
-                i.eesnimi,
-                i.maakond,
-                i.aadress,
-                i.postikood,
-                i.telefon,
-                i.e_post,
-                i.www,
-                i.params,
-                i.created,
-                i.last_modified,
-                i.username
-        into    Get_IsikByCode.id,
-                Get_IsikByCode.perenimi,
-                Get_IsikByCode.eesnimi,
-                Get_IsikByCode.maakond,
-                Get_IsikByCode.aadress,
-                Get_IsikByCode.postiindeks,
-                Get_IsikByCode.telefon,
-                Get_IsikByCode.epost,
-                Get_IsikByCode.www,
-                Get_IsikByCode.parameetrid,
-                Get_IsikByCode.loodud,
-                Get_IsikByCode.muudetud,
-                Get_IsikByCode.muutja
-        from    isik i
-        where   i.i_id = Get_IsikByCode.id
-                and rownum < 2;
-    else
-        Get_IsikByCode.id := null;
-        Get_IsikByCode.perenimi := null;
-        Get_IsikByCode.eesnimi := null;
-        Get_IsikByCode.maakond := null;
-        Get_IsikByCode.aadress := null;
-        Get_IsikByCode.postiindeks := null;
-        Get_IsikByCode.telefon := null;
-        Get_IsikByCode.epost := null;
-        Get_IsikByCode.www := null;
-        Get_IsikByCode.parameetrid := null;
-        Get_IsikByCode.loodud := null;
-        Get_IsikByCode.muudetud := null;
-        Get_IsikByCode.muutja := null;
-    end if;
-end;
-/
-
-create or replace
-procedure Add_Isik(
-    id out number,
-    isikukood in varchar2,
-    perenimi in varchar2,
-    eesnimi in varchar2,
-    maakond in varchar2,
-    aadress in varchar2,
-    postiindeks in varchar2,
-    telefon in varchar2,
-    epost in varchar2,
-    www in varchar2,
-    parameetrid in varchar2,
-    created in date,
-    last_modified in date,
-    username in varchar2)
-as
-begin
-    insert
-    into    isik(
-            i_id,
-            kood,
-            perenimi,
-            eesnimi,
-            maakond,
-            aadress,
-            postikood,
-            telefon,
-            e_post,
-            www,
-            params,
-            created,
-            last_modified,
-            username)
-    values  (0,
-            Add_Isik.isikukood,
-            Add_Isik.perenimi,
-            Add_Isik.eesnimi,
-            Add_Isik.maakond,
-            Add_Isik.aadress,
-            Add_Isik.postiindeks,
-            Add_Isik.telefon,
-            Add_Isik.epost,
-            Add_Isik.www,
-            Add_Isik.parameetrid,
-            Add_Isik.created,
-            Add_Isik.last_modified,
-            Add_Isik.username);
-    
-    Add_Isik.id := globalPkg.identity;
-end;
-/
-
-create or replace
-procedure Update_Isik(
-    id in number,
-    isikukood in varchar2,
-    perenimi in varchar2,
-    eesnimi in varchar2,
-    maakond in varchar2,
-    aadress in varchar2,
-    postiindeks in varchar2,
-    telefon in varchar2,
-    epost in varchar2,
-    www in varchar2,
-    parameetrid in varchar2,
-    created in date,
-    last_modified in date,
-    username in varchar2)
-as
-begin
-    update  isik
-    set     kood = Update_Isik.isikukood,
-            perenimi = Update_Isik.perenimi,
-            eesnimi = Update_Isik.eesnimi,
-            maakond = Update_Isik.maakond,
-            aadress = Update_Isik.aadress,
-            postikood = Update_Isik.postiindeks,
-            telefon = Update_Isik.telefon,
-            e_post = Update_Isik.epost,
-            www = Update_Isik.www,
-            params = Update_Isik.parameetrid,
-            created = Update_Isik.created,
-            last_modified = Update_Isik.last_modified,
-            username = Update_Isik.username
-    where   i_id = Update_Isik.id;
-end;
-/
-
-create or replace
-procedure Get_NextRecipientID(
-    recipient_id out number)
-as
-begin
-    select  sq_vastuvotja_id.nextval
-    into    Get_NextRecipientID.recipient_id
-    from    dual;
-end;
-/
-
-create or replace
-procedure Get_AmetikohtIdByShortName(
-    id out number,
-    org_id in number,
-    short_name in varchar2)
-as
-cnt number(38,0) := 0;
-begin
-    select  count(*)
-    into    cnt
-    from    ametikoht a
-    where   a.asutus_id = Get_AmetikohtIdByShortName.org_id
-            and a.lyhinimetus = Get_AmetikohtIdByShortName.short_name
-            and rownum < 2;
-    
-    if cnt > 0 then
-        select  a.ametikoht_id
-        into    Get_AmetikohtIdByShortName.id
-        from    ametikoht a
-        where   a.asutus_id = Get_AmetikohtIdByShortName.org_id
-                and a.lyhinimetus = Get_AmetikohtIdByShortName.short_name
-                and rownum < 2;
-    else
-        Get_AmetikohtIdByShortName.id := null;
-    end if;
-end;
-/
-
-create or replace
-procedure Get_AllyksusIdByShortName(
-    id out number,
-    org_id in number,
-    short_name in varchar2)
-as
-cnt number(38,0) := 0;
-begin
-    select  count(*)
-    into    cnt
-    from    allyksus a
-    where   a.asutus_id = Get_AllyksusIdByShortName.org_id
-            and a.lyhinimetus = Get_AllyksusIdByShortName.short_name
-            and rownum < 2;
-    
-    if cnt > 0 then
-        select  a.id
-        into    Get_AllyksusIdByShortName.id
-        from    allyksus a
-        where   a.asutus_id = Get_AllyksusIdByShortName.org_id
-                and a.lyhinimetus = Get_AllyksusIdByShortName.short_name
-                and rownum < 2;
-    else
-        Get_AllyksusIdByShortName.id := null;
-    end if;
-end;
-/
-
-create or replace
-procedure Get_AllyksusStat(
-    asutus_id in number,
-    allyksus_id in number,
-    vastuvotmata_dokumente out number,
-    vahetatud_dokumente out number)
-as
-begin
-    select  count(*)
-    into    Get_AllyksusStat.vastuvotmata_dokumente
-    from    vastuvotja
-    where   asutus_id = Get_AllyksusStat.asutus_id
-            and allyksus_id = Get_AllyksusStat.allyksus_id
-            and staatus_id = 101;
-    
-    select  (
-                select  count(*)
-                from    vastuvotja
-                where   asutus_id = Get_AllyksusStat.asutus_id
-                        and allyksus_id = Get_AllyksusStat.allyksus_id
-                        and staatus_id = 102
-            ) + (
-                select  count(*)
-                from    saatja
-                where   asutus_id = Get_AllyksusStat.asutus_id
-                        and allyksus_id = Get_AllyksusStat.allyksus_id
-            )
-    into    Get_AllyksusStat.vahetatud_dokumente
-    from    dual;
-end;
-/
-
-create or replace
-procedure Get_AmetikohtStat(
-    asutus_id in number,
-    ametikoht_id in number,
-    vastuvotmata_dokumente out number,
-    vahetatud_dokumente out number)
-as
-begin
-    select  count(*)
-    into    Get_AmetikohtStat.vastuvotmata_dokumente
-    from    vastuvotja
-    where   asutus_id = Get_AmetikohtStat.asutus_id
-            and ametikoht_id = Get_AmetikohtStat.ametikoht_id
-            and staatus_id = 101;
-    
-    select  (
-                select  count(*)
-                from    vastuvotja
-                where   asutus_id = Get_AmetikohtStat.asutus_id
-                        and ametikoht_id = Get_AmetikohtStat.ametikoht_id
-                        and staatus_id = 102
-            ) + (
-                select  count(*)
-                from    saatja
-                where   asutus_id = Get_AmetikohtStat.asutus_id
-                        and ametikoht_id = Get_AmetikohtStat.ametikoht_id
-            )
-    into    Get_AmetikohtStat.vahetatud_dokumente
-    from    dual;
-end;
-/
-
-create or replace
-procedure Get_DocumentStatusHistory(
-    document_id in number,
-    RC1 out globalPkg.RCT1)
-as
-begin
-    open RC1 for
-    select  a.staatuse_ajalugu_id,
-            a.vastuvotja_id,
-            a.staatus_id,
-            a.staatuse_muutmise_aeg,
-            a.fault_code,
-            a.fault_actor,
-            a.fault_string,
-            a.fault_detail,
-            a.vastuvotja_staatus_id,
-            a.metaxml,
-            org.registrikood as asutuse_regnr,
-            v.isikukood,
-            v.allyksuse_lyhinimetus,
-            v.ametikoha_lyhinimetus
-    from    staatuse_ajalugu a, vastuvotja v, transport t, asutus org
-    where   v.vastuvotja_id = a.vastuvotja_id
-            and t.transport_id = v.transport_id
-            and org.asutus_id = v.asutus_id
-            and t.dokument_id = Get_DocumentStatusHistory.document_id;
-end;
-/
-
-create or replace procedure Get_LastSendingByDocGUID(
-    document_guid in varchar,
-    sending_id out number,
-    sending_start_date out date,
-    sending_end_date out date,
-    send_status_id out number,
-    document_id out number)
-as
-cnt number(38,0) := 0;
-begin
-
-    select  count(*)
-    into    cnt
-    from    transport t, dokument d
-    where   t.dokument_id = d.dokument_id and
-            d.guid = Get_LastSendingByDocGUID.document_guid;
-    
-    if cnt > 0 then    
-        select  t.transport_id,
-                t.saatmise_algus,
-                t.saatmise_lopp,
-                t.staatus_id
-        into    Get_LastSendingByDocGUID.sending_id,
-                Get_LastSendingByDocGUID.sending_start_date,
-                Get_LastSendingByDocGUID.sending_end_date,
-                Get_LastSendingByDocGUID.send_status_id
-        from    transport t
-        where   t.transport_id =
-                (
-                    select  max(t1.transport_id)
-                    from    transport t1, dokument d2
-                    where   t1.dokument_id = d2.dokument_id and
-                            d2.guid = Get_LastSendingByDocGUID.document_guid
-                )
-                and rownum < 2;
-                
-        select dokument_id into Get_LastSendingByDocGUID.document_id
-        from dokument
-        where guid = Get_LastSendingByDocGUID.document_guid;
-    else
-        Get_LastSendingByDocGUID.sending_id := null;
-        Get_LastSendingByDocGUID.sending_start_date := null;
-        Get_LastSendingByDocGUID.sending_end_date := null;
-        Get_LastSendingByDocGUID.send_status_id := null;
-    end if;
-end;
-/
-
-create or replace
-PROCEDURE ADD_DOKUMENT(
-  dokument_id IN NUMBER,
-  asutus_id IN NUMBER,
-  kaust_id IN NUMBER,
-  sisu IN CLOB,
-  sailitustahtaeg IN DATE,
-  suurus IN NUMBER,
-  versioon IN NUMBER,
-  guid IN VARCHAR2,
-  xtee_isikukood IN VARCHAR2,
-  xtee_asutus IN VARCHAR2
-) AS
-
-BEGIN
-
-  -- Set session scope variables
-  DVKLOG.xtee_isikukood := ADD_DOKUMENT.xtee_isikukood;
-  DVKLOG.xtee_asutus := ADD_DOKUMENT.xtee_asutus;
-
-  INSERT INTO dokument (
-    dokument_id,
-    asutus_id,
-    kaust_id,
-    sisu,
-    sailitustahtaeg,
-    suurus,
-    versioon,
-    guid
-  ) VALUES (
-    ADD_DOKUMENT.dokument_id,
-    ADD_DOKUMENT.asutus_id,
-    ADD_DOKUMENT.kaust_id,
-    ADD_DOKUMENT.sisu,
-    ADD_DOKUMENT.sailitustahtaeg,
-    ADD_DOKUMENT.suurus,
-    ADD_DOKUMENT.versioon,
-    ADD_DOKUMENT.guid
-  );
-
-END;
-/
-
-------- Generated by SYS.DBMS_METADATA on 6-juuni-2008 at 16:06:34 -------
-
-  CREATE INDEX "ASUTUS_ID_IDX" ON "SAATJA" ("ASUTUS_ID") 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
-  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT)
-/
-------- Generated by SYS.DBMS_METADATA on 6-juuni-2008 at 16:06:51 -------
-
-  CREATE INDEX "ASUTUS_ID_IDX1" ON "DOKUMENT" ("ASUTUS_ID") 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
-  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT)
-/
-------- Generated by SYS.DBMS_METADATA on 6-juuni-2008 at 16:07:09 -------
-
-  CREATE INDEX "ASUTUS_ID_IDX2" ON "VASTUVOTJA" ("ASUTUS_ID") 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
-  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT)
-/
-------- Generated by SYS.DBMS_METADATA on 6-juuni-2008 at 16:07:29 -------
-
-  CREATE UNIQUE INDEX "DOKUMENT_ID_IDX" ON "TRANSPORT" ("DOKUMENT_ID") 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
-  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT)
-/
-------- Generated by SYS.DBMS_METADATA on 6-juuni-2008 at 16:08:00 -------
-
-  CREATE UNIQUE INDEX "TRANSPORT_ID_IDX" ON "SAATJA" ("TRANSPORT_ID") 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
-  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT)
-/
-------- Generated by SYS.DBMS_METADATA on 6-juuni-2008 at 16:08:15 -------
-
-  CREATE INDEX "TRANSPORT_ID_IDX1" ON "VASTUVOTJA" ("TRANSPORT_ID") 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
-  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
-  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT)
-/
-
-
-create index "ALLYKSUS_LYHINIMETUS_IDX" on "ALLYKSUS"(nvl(lyhinimetus,' '))
-PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
- STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
- PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT)
-/
-
-create index "AMETIKOHT_LYHINIMETUS_IDX" on "AMETIKOHT"(nvl(lyhinimetus,' '))
-PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
- STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
- PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT)
-/
-
-create or replace
-PROCEDURE ADD_DOKUMENT_FRAGMENT(
-  fragment_id in number,
-  sissetulev in number,
-  asutus_id in number,
-  edastus_id in varchar2,
-  fragment_nr in number,
-  fragmente_kokku in number,
-  loodud in date,
-  sisu in blob,
-  xtee_isikukood in varchar2,
-  xtee_asutus in varchar2
-) AS 
-BEGIN
-
-  -- Set session scope variables
-  DVKLOG.xtee_isikukood := ADD_DOKUMENT_FRAGMENT.xtee_isikukood;
-  DVKLOG.xtee_asutus := ADD_DOKUMENT_FRAGMENT.xtee_asutus;
-  
-  INSERT INTO dokumendi_fragment (
-    fragment_id,
-    sissetulev,
-    asutus_id,
-    edastus_id,
-    fragment_nr,
-    fragmente_kokku,
-    loodud,
-    sisu
-  ) VALUES (
-    ADD_DOKUMENT_FRAGMENT.fragment_id,
-    ADD_DOKUMENT_FRAGMENT.sissetulev,
-    ADD_DOKUMENT_FRAGMENT.asutus_id,
-    ADD_DOKUMENT_FRAGMENT.edastus_id,
-    ADD_DOKUMENT_FRAGMENT.fragment_nr,
-    ADD_DOKUMENT_FRAGMENT.fragmente_kokku,
-    ADD_DOKUMENT_FRAGMENT.loodud,
-    ADD_DOKUMENT_FRAGMENT.sisu
-  );
-
-  NULL;
-END ADD_DOKUMENT_FRAGMENT;
-/
-
-CREATE OR REPLACE PROCEDURE ADD_STAATUSE_AJALUGU(
-  staatuse_ajalugu_id in number,
-  vastuvotja_id in number,
-  staatus_id in number,
-  staatuse_muutmise_aeg in date,
-  fault_code in varchar2,
-  fault_actor in varchar2,
-  fault_string in varchar2,
-  fault_detail in varchar2,
-  vastuvotja_staatus_id in number,
-  metaxml in clob,
-  xtee_isikukood in varchar2,
-  xtee_asutus in varchar2,
-  staatuse_ajalugu_id_out out number
-) AS
-BEGIN
-
-  -- Set session scope variables
-  DVKLOG.xtee_isikukood := ADD_STAATUSE_AJALUGU.xtee_isikukood;
-  DVKLOG.xtee_asutus := ADD_STAATUSE_AJALUGU.xtee_asutus;
-
-  INSERT INTO staatuse_ajalugu (
-    staatuse_ajalugu_id,
-    vastuvotja_id,
-    staatus_id,
-    staatuse_muutmise_aeg,
-    fault_code,
-    fault_actor,
-    fault_string,
-    fault_detail,
-    vastuvotja_staatus_id,
-    metaxml
-  ) VALUES (
-    ADD_STAATUSE_AJALUGU.staatuse_ajalugu_id,
-    ADD_STAATUSE_AJALUGU.vastuvotja_id,
-    ADD_STAATUSE_AJALUGU.staatus_id,
-    ADD_STAATUSE_AJALUGU.staatuse_muutmise_aeg,
-    ADD_STAATUSE_AJALUGU.fault_code,
-    ADD_STAATUSE_AJALUGU.fault_actor,
-    ADD_STAATUSE_AJALUGU.fault_string,
-    ADD_STAATUSE_AJALUGU.fault_detail,
-    ADD_STAATUSE_AJALUGU.vastuvotja_staatus_id,
-    ADD_STAATUSE_AJALUGU.metaxml
-  ) RETURNING staatuse_ajalugu_id INTO staatuse_ajalugu_id_out;
-
-END;
-/
-
-CREATE OR REPLACE
-PROCEDURE ADD_VASTUVOTJA (
-  vastuvotja_id in vastuvotja.vastuvotja_id%TYPE, 
-  transport_id in vastuvotja.transport_id%TYPE, 
-  asutus_id in vastuvotja.asutus_id%TYPE, 
-  ametikoht_id in vastuvotja.ametikoht_id%TYPE, 
-  allyksus_id in vastuvotja.allyksus_id%TYPE, 
-  isikukood in vastuvotja.isikukood%TYPE, 
-  nimi in vastuvotja.nimi%TYPE, 
-  asutuse_nimi in vastuvotja.asutuse_nimi%TYPE, 
-  email in vastuvotja.email%TYPE, 
-  osakonna_nr in vastuvotja.osakonna_nr%TYPE, 
-  osakonna_nimi in vastuvotja.osakonna_nimi%TYPE, 
-  saatmisviis_id in vastuvotja.saatmisviis_id%TYPE, 
-  staatus_id in vastuvotja.staatus_id%TYPE, 
-  saatmise_algus in vastuvotja.saatmise_algus%TYPE, 
-  saatmise_lopp in vastuvotja.saatmise_lopp%TYPE, 
-  fault_code in vastuvotja.fault_code%TYPE, 
-  fault_actor in vastuvotja.fault_actor%TYPE, 
-  fault_string in vastuvotja.fault_string%TYPE, 
-  fault_detail in vastuvotja.fault_detail%TYPE, 
-  vastuvotja_staatus_id in vastuvotja.vastuvotja_staatus_id%TYPE, 
-  metaxml in vastuvotja.metaxml%TYPE, 
-  dok_id_teises_serveris in vastuvotja.dok_id_teises_serveris%TYPE, 
-  allyksuse_lyhinimetus in vastuvotja.allyksuse_lyhinimetus%TYPE, 
-  ametikoha_lyhinimetus in vastuvotja.ametikoha_lyhinimetus%TYPE,
-  xtee_isikukood in varchar2,
-  xtee_asutus in varchar2
-) AS 
-BEGIN
-  
-  -- Set session scope variables
-  DVKLOG.xtee_isikukood := ADD_VASTUVOTJA.xtee_isikukood;
-  DVKLOG.xtee_asutus := ADD_VASTUVOTJA.xtee_asutus;
-  
-  INSERT INTO vastuvotja (
-    VASTUVOTJA_ID,
-    TRANSPORT_ID,
-    ASUTUS_ID,
-    AMETIKOHT_ID,
-    ISIKUKOOD,
-    NIMI,
-    EMAIL,
-    OSAKONNA_NR,
-    OSAKONNA_NIMI,
-    SAATMISVIIS_ID,
-    STAATUS_ID,
-    SAATMISE_ALGUS,
-    SAATMISE_LOPP,
-    FAULT_CODE,
-    FAULT_ACTOR,
-    FAULT_STRING,
-    FAULT_DETAIL,
-    VASTUVOTJA_STAATUS_ID,
-    METAXML,
-    ASUTUSE_NIMI,
-    ALLYKSUS_ID,
-    DOK_ID_TEISES_SERVERIS,
-    ALLYKSUSE_LYHINIMETUS,
-    AMETIKOHA_LYHINIMETUS
-  ) VALUES (
-    ADD_VASTUVOTJA.VASTUVOTJA_ID,
-    ADD_VASTUVOTJA.TRANSPORT_ID,
-    ADD_VASTUVOTJA.ASUTUS_ID,
-    ADD_VASTUVOTJA.AMETIKOHT_ID,
-    ADD_VASTUVOTJA.ISIKUKOOD,
-    ADD_VASTUVOTJA.NIMI,
-    ADD_VASTUVOTJA.EMAIL,
-    ADD_VASTUVOTJA.OSAKONNA_NR,
-    ADD_VASTUVOTJA.OSAKONNA_NIMI,
-    ADD_VASTUVOTJA.SAATMISVIIS_ID,
-    ADD_VASTUVOTJA.STAATUS_ID,
-    ADD_VASTUVOTJA.SAATMISE_ALGUS,
-    ADD_VASTUVOTJA.SAATMISE_LOPP,
-    ADD_VASTUVOTJA.FAULT_CODE,
-    ADD_VASTUVOTJA.FAULT_ACTOR,
-    ADD_VASTUVOTJA.FAULT_STRING,
-    ADD_VASTUVOTJA.FAULT_DETAIL,
-    ADD_VASTUVOTJA.VASTUVOTJA_STAATUS_ID,
-    ADD_VASTUVOTJA.METAXML,
-    ADD_VASTUVOTJA.ASUTUSE_NIMI,
-    ADD_VASTUVOTJA.ALLYKSUS_ID,
-    ADD_VASTUVOTJA.DOK_ID_TEISES_SERVERIS,
-    ADD_VASTUVOTJA.ALLYKSUSE_LYHINIMETUS,
-    ADD_VASTUVOTJA.AMETIKOHA_LYHINIMETUS
-  );
-  
-END ADD_VASTUVOTJA;
-/
-
-create or replace
-PROCEDURE UPDATE_VASTUVOTJA (
-  vastuvotja_id in vastuvotja.vastuvotja_id%TYPE, 
-  transport_id in vastuvotja.transport_id%TYPE, 
-  asutus_id in vastuvotja.asutus_id%TYPE, 
-  ametikoht_id in vastuvotja.ametikoht_id%TYPE, 
-  allyksus_id in vastuvotja.allyksus_id%TYPE, 
-  isikukood in vastuvotja.isikukood%TYPE, 
-  nimi in vastuvotja.nimi%TYPE, 
-  asutuse_nimi in vastuvotja.asutuse_nimi%TYPE, 
-  email in vastuvotja.email%TYPE, 
-  osakonna_nr in vastuvotja.osakonna_nr%TYPE, 
-  osakonna_nimi in vastuvotja.osakonna_nimi%TYPE, 
-  saatmisviis_id in vastuvotja.saatmisviis_id%TYPE, 
-  staatus_id in vastuvotja.staatus_id%TYPE, 
-  saatmise_algus in vastuvotja.saatmise_algus%TYPE, 
-  saatmise_lopp in vastuvotja.saatmise_lopp%TYPE, 
-  fault_code in vastuvotja.fault_code%TYPE, 
-  fault_actor in vastuvotja.fault_actor%TYPE, 
-  fault_string in vastuvotja.fault_string%TYPE, 
-  fault_detail in vastuvotja.fault_detail%TYPE, 
-  vastuvotja_staatus_id in vastuvotja.vastuvotja_staatus_id%TYPE, 
-  metaxml in vastuvotja.metaxml%TYPE, 
-  dok_id_teises_serveris in vastuvotja.dok_id_teises_serveris%TYPE, 
-  allyksuse_lyhinimetus in vastuvotja.allyksuse_lyhinimetus%TYPE, 
-  ametikoha_lyhinimetus in vastuvotja.ametikoha_lyhinimetus%TYPE,
-  xtee_isikukood in varchar2,
-  xtee_asutus in varchar2
-) AS 
-BEGIN
-  
-  -- Set session scope variables
-  DVKLOG.xtee_isikukood := UPDATE_VASTUVOTJA.xtee_isikukood;
-  DVKLOG.xtee_asutus := UPDATE_VASTUVOTJA.xtee_asutus;
-  
-  UPDATE vastuvotja set
-    TRANSPORT_ID = UPDATE_VASTUVOTJA.TRANSPORT_ID,
-    ASUTUS_ID = UPDATE_VASTUVOTJA.ASUTUS_ID,
-    AMETIKOHT_ID = UPDATE_VASTUVOTJA.AMETIKOHT_ID,
-    ISIKUKOOD = UPDATE_VASTUVOTJA.ISIKUKOOD,
-    NIMI = UPDATE_VASTUVOTJA.NIMI,
-    EMAIL = UPDATE_VASTUVOTJA.EMAIL,
-    OSAKONNA_NR = UPDATE_VASTUVOTJA.OSAKONNA_NR,
-    OSAKONNA_NIMI = UPDATE_VASTUVOTJA.OSAKONNA_NIMI,
-    SAATMISVIIS_ID = UPDATE_VASTUVOTJA.SAATMISVIIS_ID,
-    STAATUS_ID = UPDATE_VASTUVOTJA.STAATUS_ID,
-    SAATMISE_ALGUS = UPDATE_VASTUVOTJA.SAATMISE_ALGUS,
-    SAATMISE_LOPP = UPDATE_VASTUVOTJA.SAATMISE_LOPP,
-    FAULT_CODE = UPDATE_VASTUVOTJA.FAULT_CODE,
-    FAULT_ACTOR = UPDATE_VASTUVOTJA.FAULT_ACTOR,
-    FAULT_STRING = UPDATE_VASTUVOTJA.FAULT_STRING,
-    FAULT_DETAIL = UPDATE_VASTUVOTJA.FAULT_DETAIL,
-    VASTUVOTJA_STAATUS_ID = UPDATE_VASTUVOTJA.VASTUVOTJA_STAATUS_ID,
-    METAXML = UPDATE_VASTUVOTJA.METAXML,
-    ASUTUSE_NIMI = UPDATE_VASTUVOTJA.ASUTUSE_NIMI,
-    ALLYKSUS_ID = UPDATE_VASTUVOTJA.ALLYKSUS_ID,
-    DOK_ID_TEISES_SERVERIS = UPDATE_VASTUVOTJA.DOK_ID_TEISES_SERVERIS,
-    ALLYKSUSE_LYHINIMETUS = UPDATE_VASTUVOTJA.ALLYKSUSE_LYHINIMETUS,
-    AMETIKOHA_LYHINIMETUS = UPDATE_VASTUVOTJA.AMETIKOHA_LYHINIMETUS
-  WHERE VASTUVOTJA_ID = UPDATE_VASTUVOTJA.VASTUVOTJA_ID;
-  
-END UPDATE_VASTUVOTJA;
-/
-
--- Insert conversion data
-CREATE OR REPLACE DIRECTORY DIR_TEMP_KONV AS '&KONVERSIOON_DIRECTORY';
-
-DECLARE
-
-    v_inputFile VARCHAR2(100) := 'v2_v1.xsl';
-    v_dir VARCHAR2(100) := 'DIR_TEMP_KONV';
-    v_conversion_id konversioon.id%TYPE;  
-  
-    dest_clob   CLOB;
-    src_clob    BFILE  := BFILENAME(v_dir, v_inputFile);
-    dst_offset  number := 1 ;
-    src_offset  number := 1 ;
-    lang_ctx    number := DBMS_LOB.DEFAULT_LANG_CTX;
-    warning     number;
-  
-BEGIN
-
-  -- insert a NULL record to lock
-  INSERT INTO konversioon (
-    version, 
-    result_version, 
-    xslt
-  ) VALUES (
-    2,
-    1,
-    EMPTY_CLOB()
-  ) RETURNING id INTO v_conversion_id;
-  
-  -- lock record
-  SELECT xslt
-  INTO dest_clob
-  FROM konversioon
-  WHERE id = v_conversion_id FOR UPDATE;
-
-  DBMS_LOB.OPEN(src_clob, DBMS_LOB.LOB_READONLY);
-
-  DBMS_LOB.LoadCLOBFromFile(
-          DEST_LOB     => dest_clob
-        , SRC_BFILE    => src_clob
-        , AMOUNT       => DBMS_LOB.GETLENGTH(src_clob)
-        , DEST_OFFSET  => dst_offset
-        , SRC_OFFSET   => src_offset
-        , BFILE_CSID   => DBMS_LOB.DEFAULT_CSID
-        , LANG_CONTEXT => lang_ctx
-        , WARNING      => warning
-    );
-
-  -- update the blob field
-  UPDATE konversioon
-  SET xslt = dest_clob
-  WHERE id = v_conversion_id;
-
-  -- close file
-  dbms_lob.fileclose(src_clob);
-  
-  EXCEPTION
-    WHEN OTHERS THEN
-      dbms_lob.fileclose(src_clob);
-  
-END;
-/
+/* LOGIMISPROTSEDUURID */
 
 CREATE OR REPLACE PACKAGE DVKLOG AS 
-
-  -- Enable debugging
-  debug_on BOOLEAN := TRUE;
   
   -- Logimise muutujad
   xtee_isikukood VARCHAR2(100);
@@ -4688,27 +1562,12 @@ CREATE OR REPLACE PACKAGE DVKLOG AS
     logi_old IN logi%ROWTYPE,
     operation IN VARCHAR2
   );
-  
-  PROCEDURE debug (
-    message IN VARCHAR2
-  );
 
 END DVKLOG;
 /
 
 
 CREATE OR REPLACE PACKAGE BODY DVKLOG AS
-
-  PROCEDURE debug(
-    message IN VARCHAR2
-  ) AS
-    PRAGMA AUTONOMOUS_TRANSACTION;
-  BEGIN
-    IF(DVKLOG.debug_on) THEN
-      INSERT INTO debug VALUES (message);
-    END IF;
-    COMMIT;
-  END debug;
 
   PROCEDURE LOG_DOKUMENT(
     dokument_new IN dokument%ROWTYPE,
@@ -4723,7 +1582,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
   
   BEGIN
   
-    DEBUG('DVKLOG.LOG_DOKUMENT started...');
+    --DEBUG('DVKLOG.LOG_DOKUMENT started...');
   
     -- Current user
     SELECT USER INTO usr FROM dual;
@@ -4739,7 +1598,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
   
     -- dokument_id changed
     IF(NVL(dokument_new.dokument_id, 0) != NVL(dokument_old.dokument_id, 0)) THEN    
-      DEBUG('dokument_id changed');
+      --DEBUG('dokument_id changed');
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('dokument_id');
     
       INSERT INTO logi(
@@ -4789,7 +1648,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     
     -- asutus_id changed
     IF(NVL(dokument_new.asutus_id, 0) != NVL(dokument_old.asutus_id, 0)) THEN    
-      DEBUG('asutus_id changed');
+      --DEBUG('asutus_id changed');
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = upper('dokument') AND upper(column_name) = upper('asutus_id');
     
       INSERT INTO logi(
@@ -4839,7 +1698,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     
     -- kaust_id changed
     IF(NVL(dokument_new.kaust_id, 0) != NVL(dokument_old.kaust_id, 0)) THEN    
-      DEBUG('kaust_id changed');
+      --DEBUG('kaust_id changed');
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = upper('dokument') AND upper(column_name) = upper('kaust_id');
     
       INSERT INTO logi(
@@ -4889,7 +1748,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     
     -- sailitustahtaeg changed
     IF(NVL(dokument_new.sailitustahtaeg, sysdate) != NVL(dokument_old.sailitustahtaeg, sysdate)) THEN    
-      DEBUG('sailitustahtaeg changed');
+      --DEBUG('sailitustahtaeg changed');
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = upper('dokument') AND upper(column_name) = upper('sailitustahtaeg');
     
       INSERT INTO logi(
@@ -4939,7 +1798,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     
     -- eelmise_versiooni_id changed
     IF(NVL(dokument_new.eelmise_versiooni_id, 0) != NVL(dokument_old.eelmise_versiooni_id, 0)) THEN    
-      DEBUG('eelmise_versiooni_id changed');
+      --DEBUG('eelmise_versiooni_id changed');
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = upper('dokument') AND upper(column_name) = upper('eelmise_versiooni_id');
     
       INSERT INTO logi(
@@ -4989,7 +1848,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     
     -- versioon changed
     IF(NVL(dokument_new.versioon, 0) != NVL(dokument_old.versioon, 0)) THEN    
-      DEBUG('versioon changed');
+      --DEBUG('versioon changed');
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = upper('dokument') AND upper(column_name) = upper('versioon');
     
       INSERT INTO logi(
@@ -5039,7 +1898,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     
     -- suurus changed
     IF(NVL(dokument_new.suurus, 0) != NVL(dokument_old.suurus, 0)) THEN    
-      DEBUG('suurus changed');
+      --DEBUG('suurus changed');
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = upper('dokument') AND upper(column_name) = upper('suurus');
     
       INSERT INTO logi(
@@ -5089,7 +1948,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     
     -- guid changed
     IF(NVL(dokument_new.guid, ' ') != NVL(dokument_old.guid, ' ')) THEN    
-      DEBUG('guid changed');
+      --DEBUG('guid changed');
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = upper('dokument') AND upper(column_name) = upper('guid');
     
       INSERT INTO logi(
@@ -20511,7 +17370,7 @@ DECLARE
   dokument_old dokument%ROWTYPE;
 BEGIN
 
-  DVKLOG.debug('TR_DOKUMENT_LOG started...');
+  --DEBUG('TR_DOKUMENT_LOG started...');
 
   if inserting then
     operation := 'INSERT';
@@ -21589,3 +18448,3128 @@ END;
 
 ALTER TRIGGER TR_VASTUVOTJA_STAATUS_LOG ENABLE;
 / 
+
+
+/* PROTSEDUURID */
+
+create or replace
+procedure Get_Parameters(aar_last_sync out date)
+as
+begin
+    select  aar_viimane_sync
+    into    Get_Parameters.aar_last_sync
+    from    parameetrid
+    where   rownum < 2;
+end;
+/
+
+create or replace
+procedure Save_Parameters(aar_last_sync in date)
+as
+begin
+    update  parameetrid
+    set     aar_viimane_sync = Save_Parameters.aar_last_sync;
+end;
+/
+
+create or replace
+procedure Get_ExpiredDocuments(RC1 out globalPkg.RCT1)
+as
+begin
+    open RC1 for
+    select  t.dokument_id,
+            t.staatus_id,
+            d.sailitustahtaeg
+    from    dokument d
+    inner join
+            transport t on t.dokument_id = d.dokument_id
+    where   d.sailitustahtaeg < sysdate
+            or d.sailitustahtaeg is null;
+end;
+/
+
+create or replace
+procedure Update_DocumentExpirationDate(
+    document_id in number,
+    expiration_date in date)
+as
+begin
+    update  dokument
+    set     sailitustahtaeg = Update_DocumentExpirationDate.expiration_date
+    where   dokument_id = Update_DocumentExpirationDate.document_id;
+end;
+/
+
+create or replace
+procedure Delete_Document(document_id in number)
+as
+begin
+    delete
+    from    dokument
+    where   dokument_id = Delete_Document.document_id;
+end;
+/
+
+create or replace
+procedure Get_SenderBySendingID(
+    sending_id in number,
+    sender_id out number,
+    organization_id out number,
+    position_id out number,
+    division_id out number,
+    personal_id_code out varchar2,
+    name out varchar2,
+    organization_name out varchar2,
+    email out varchar2,
+    department_nr out varchar2,
+    department_name out varchar2,
+    position_short_name out varchar2,
+    division_short_name out varchar2)
+as
+begin
+    select  s.saatja_id,
+            s.asutus_id,
+            s.ametikoht_id,
+            s.allyksus_id,
+            s.isikukood,
+            s.nimi,
+            s.asutuse_nimi,
+            s.email,
+            s.osakonna_nr,
+            s.osakonna_nimi,
+            s.allyksuse_lyhinimetus,
+            s.ametikoha_lyhinimetus
+    into    Get_SenderBySendingID.sender_id,
+            Get_SenderBySendingID.organization_id,
+            Get_SenderBySendingID.position_id,
+            Get_SenderBySendingID.division_id,
+            Get_SenderBySendingID.personal_id_code,
+            Get_SenderBySendingID.name,
+            Get_SenderBySendingID.organization_name,
+            Get_SenderBySendingID.email,
+            Get_SenderBySendingID.department_nr,
+            Get_SenderBySendingID.department_name,
+            Get_SenderBySendingID.division_short_name,
+            Get_SenderBySendingID.position_short_name
+    from    saatja s
+    where   s.transport_id = Get_SenderBySendingID.sending_id
+            and rownum < 2;
+end;
+/
+
+create or replace
+procedure Get_LastSendingByDocID(
+    document_id in number,
+    sending_id out number,
+    sending_start_date out date,
+    sending_end_date out date,
+    send_status_id out number)
+as
+cnt number(38,0) := 0;
+begin
+    select  count(*)
+    into    cnt
+    from    transport t
+    where   t.dokument_id = Get_LastSendingByDocID.document_id;
+    
+    if cnt > 0 then    
+        select  t.transport_id,
+                t.saatmise_algus,
+                t.saatmise_lopp,
+                t.staatus_id
+        into    Get_LastSendingByDocID.sending_id,
+                Get_LastSendingByDocID.sending_start_date,
+                Get_LastSendingByDocID.sending_end_date,
+                Get_LastSendingByDocID.send_status_id
+        from    transport t
+        where   t.transport_id =
+                (
+                    select  max(t1.transport_id)
+                    from    transport t1
+                    where   t1.dokument_id = Get_LastSendingByDocID.document_id
+                )
+                and rownum < 2;
+    else
+        Get_LastSendingByDocID.sending_id := null;
+        Get_LastSendingByDocID.sending_start_date := null;
+        Get_LastSendingByDocID.sending_end_date := null;
+        Get_LastSendingByDocID.send_status_id := null;
+    end if;
+end;
+/
+
+create or replace
+procedure Get_Recipients(
+    sending_id in number,
+    RC1 out globalPkg.RCT1)
+as
+begin
+    open RC1 for
+    select  v.*
+    from    vastuvotja v
+    where   v.transport_id = Get_Recipients.sending_id;
+end;
+/
+
+create or replace
+procedure Add_Sender(
+    sender_id out number,
+    sending_id in number,
+    organization_id in number,
+    position_id in number,
+    division_id in number,
+    personal_id_code in varchar2,
+    email in varchar2,
+    name in varchar2,
+    organization_name in varchar2,
+    department_nr in varchar2,
+    department_name in varchar2,
+    position_short_name in varchar2,
+    division_short_name in varchar2,
+    xtee_isikukood in varchar2,
+    xtee_asutus in varchar2)
+as
+organization_id_ number(38,0) := organization_id;
+position_id_ number(38,0) := position_id;
+division_id_ number(38,0) := division_id;
+begin
+
+    -- Set session scope variables
+    DVKLOG.xtee_isikukood := Add_Sender.xtee_isikukood;
+    DVKLOG.xtee_asutus := Add_Sender.xtee_asutus;
+
+    if organization_id_ = 0 then
+        organization_id_ := null;
+    end if;
+    if position_id_ = 0 then
+        position_id_ := null;
+    end if;
+    if division_id_ = 0 then
+        division_id_ := null;
+    end if;
+    insert
+    into    saatja(
+            saatja_id,
+            transport_id,
+            asutus_id,
+            ametikoht_id,
+            allyksus_id,
+            isikukood,
+            nimi,
+            asutuse_nimi,
+            email,
+            osakonna_nr,
+            osakonna_nimi,
+            allyksuse_lyhinimetus,
+            ametikoha_lyhinimetus)
+    values  (0,
+            Add_Sender.sending_id,
+            Add_Sender.organization_id_,
+            Add_Sender.position_id_,
+            Add_Sender.division_id_,
+            Add_Sender.personal_id_code,
+            Add_Sender.name,
+            Add_Sender.organization_name,
+            Add_Sender.email,
+            Add_Sender.department_nr,
+            Add_Sender.department_name,
+            Add_Sender.division_short_name,
+            Add_Sender.position_short_name);
+    
+    Add_Sender.sender_id := globalPkg.identity;
+end;
+/
+
+create or replace
+procedure Add_Sending(
+    sending_id out number,
+    document_id in number,
+    sending_start_date in date,
+    sending_end_date in date,
+    send_status_id in number,
+    xtee_isikukood in varchar2,
+    xtee_asutus in varchar2)
+as
+begin
+
+    -- Set session scope variables
+    DVKLOG.xtee_isikukood := Add_Sending.xtee_isikukood;
+    DVKLOG.xtee_asutus := Add_Sending.xtee_asutus;
+
+    insert
+    into    transport(
+            transport_id,
+            dokument_id,
+            saatmise_algus,
+            saatmise_lopp,
+            staatus_id)
+    values  (0,
+            Add_Sending.document_id,
+            Add_Sending.sending_start_date,
+            Add_Sending.sending_end_date,
+            Add_Sending.send_status_id);
+    
+    Add_Sending.sending_id := globalPkg.identity;
+end;
+/
+
+create or replace
+procedure Get_DocumentsSentTo(
+    organization_id in number,
+    folder_id in number,
+    user_id in number,
+    division_id in number,
+    division_short_name in varchar2,
+    occupation_id in number,
+    occupation_short_name in varchar2,
+    result_limit in number,
+    RC1 out globalPkg.RCT1)
+as
+division_id_ number(38, 0) := Get_DocumentsSentTo.division_id;
+occupation_id_ number(38, 0) := Get_DocumentsSentTo.occupation_id;
+begin
+    open RC1 for
+    select  *
+    from    dokument d,
+    (
+        -- Dokumendid, mis adresseeriti päringu teostanud isikule (isikukoodi alusel)
+        select  t1.dokument_id
+        from    transport t1, vastuvotja v1, isik i1
+        where   t1.transport_id = v1.transport_id
+                and v1.asutus_id = Get_DocumentsSentTo.organization_id
+                and i1.kood = v1.isikukood
+                and i1.i_id = Get_DocumentsSentTo.user_id
+                and v1.staatus_id = 101
+                and nvl(Get_DocumentsSentTo.division_id_, nvl(v1.allyksus_id,0)) = nvl(v1.allyksus_id,0)
+                and nvl(Get_DocumentsSentTo.division_short_name, nvl(v1.allyksuse_lyhinimetus,' ')) = nvl(v1.allyksuse_lyhinimetus,' ')
+                and nvl(Get_DocumentsSentTo.occupation_id_, nvl(v1.ametikoht_id,0)) = nvl(v1.ametikoht_id,0)
+                and nvl(Get_DocumentsSentTo.occupation_short_name, nvl(v1.ametikoha_lyhinimetus,' ')) = nvl(v1.ametikoha_lyhinimetus,' ')
+                
+        -- Dokumendid, mis adresseeriti päringu teostaja ametikohale (ametikoha ID või lühinimetus)
+        union
+        select  t2.dokument_id
+        from    transport t2, vastuvotja v2
+        where   t2.transport_id = v2.transport_id
+                and v2.asutus_id = Get_DocumentsSentTo.organization_id
+                and v2.allyksus_id is null
+                and v2.isikukood is null
+                and v2.staatus_id = 101
+                and exists
+                (
+                    select  1
+                    from    isik i2, ametikoht_taitmine akt2, ametikoht ak2
+                    where   i2.i_id = Get_DocumentsSentTo.user_id
+                            and ak2.ametikoht_id = v2.ametikoht_id
+                            and akt2.i_id = i2.i_id
+                            and ak2.ametikoht_id = akt2.ametikoht_id
+                            and nvl(akt2.peatatud, 0) = 0
+                            and ak2.asutus_id = v2.asutus_id
+                            and nvl(akt2.alates, add_months(sysdate, -1)) < sysdate
+                            and nvl(akt2.kuni, add_months(sysdate, 1)) > sysdate
+                            and nvl(ak2.alates, add_months(sysdate, -1)) < sysdate
+                            and nvl(ak2.kuni, add_months(sysdate, 1)) > sysdate
+                )
+                and nvl(Get_DocumentsSentTo.division_id_, nvl(v2.allyksus_id,0)) = nvl(v2.allyksus_id,0)
+                and nvl(Get_DocumentsSentTo.division_short_name, nvl(v2.allyksuse_lyhinimetus,' ')) = nvl(v2.allyksuse_lyhinimetus,' ')
+                and nvl(Get_DocumentsSentTo.occupation_id_, nvl(v2.ametikoht_id,0)) = nvl(v2.ametikoht_id,0)
+                and nvl(Get_DocumentsSentTo.occupation_short_name, nvl(v2.ametikoha_lyhinimetus,' ')) = nvl(v2.ametikoha_lyhinimetus,' ')
+        
+        -- Dokumendid, mis adresseeriti päringu teostaja allüksusele
+        union
+        select  t3.dokument_id
+        from    transport t3, vastuvotja v3
+        where   t3.transport_id = v3.transport_id
+                and v3.asutus_id = Get_DocumentsSentTo.organization_id
+                and v3.ametikoht_id is null
+                and v3.isikukood is null
+                and v3.staatus_id = 101
+                and exists
+                (
+                    select  1
+                    from    isik i3, ametikoht_taitmine akt3, ametikoht ak3
+                    where   i3.i_id = Get_DocumentsSentTo.user_id
+                            and ak3.allyksus_id = v3.allyksus_id
+                            and akt3.i_id = i3.i_id
+                            and ak3.ametikoht_id = akt3.ametikoht_id
+                            and nvl(akt3.peatatud, 0) = 0
+                            and ak3.asutus_id = v3.asutus_id
+                            and nvl(akt3.alates, add_months(sysdate, -1)) < sysdate
+                            and nvl(akt3.kuni, add_months(sysdate, 1)) > sysdate
+                            and nvl(ak3.alates, add_months(sysdate, -1)) < sysdate
+                            and nvl(ak3.kuni, add_months(sysdate, 1)) > sysdate
+                )
+                and nvl(Get_DocumentsSentTo.division_id_, nvl(v3.allyksus_id,0)) = nvl(v3.allyksus_id,0)
+                and nvl(Get_DocumentsSentTo.division_short_name, nvl(v3.allyksuse_lyhinimetus,' ')) = nvl(v3.allyksuse_lyhinimetus,' ')
+                and nvl(Get_DocumentsSentTo.occupation_id_, nvl(v3.ametikoht_id,0)) = nvl(v3.ametikoht_id,0)
+                and nvl(Get_DocumentsSentTo.occupation_short_name, nvl(v3.ametikoha_lyhinimetus,' ')) = nvl(v3.ametikoha_lyhinimetus,' ')
+        
+        -- Dokumendid, mis adresseeriti päringu teostaja ametikohale
+        -- päringu teostaja allüksuses (vastupidine juhtum oleks, et
+        -- dokument saadeti mõnele teisele ametikohale samas allüksuses).
+        union
+        select  t4.dokument_id
+        from    transport t4, vastuvotja v4
+        where   t4.transport_id = v4.transport_id
+                and v4.asutus_id = Get_DocumentsSentTo.organization_id
+                and v4.isikukood is null
+                and v4.staatus_id = 101
+                and exists
+                (
+                    select  1
+                    from    isik i4, ametikoht_taitmine akt4, ametikoht ak4
+                    where   i4.i_id = Get_DocumentsSentTo.user_id
+                            and ak4.allyksus_id = v4.allyksus_id
+                            and ak4.ametikoht_id = v4.ametikoht_id
+                            and akt4.i_id = i4.i_id
+                            and ak4.ametikoht_id = akt4.ametikoht_id
+                            and nvl(akt4.peatatud, 0) = 0
+                            and ak4.asutus_id = v4.asutus_id
+                            and nvl(akt4.alates, add_months(sysdate, -1)) < sysdate
+                            and nvl(akt4.kuni, add_months(sysdate, 1)) > sysdate
+                            and nvl(ak4.alates, add_months(sysdate, -1)) < sysdate
+                            and nvl(ak4.kuni, add_months(sysdate, 1)) > sysdate
+                )
+                and nvl(Get_DocumentsSentTo.division_id_, nvl(v4.allyksus_id,0)) = nvl(v4.allyksus_id,0)
+                and nvl(Get_DocumentsSentTo.division_short_name, nvl(v4.allyksuse_lyhinimetus,' ')) = nvl(v4.allyksuse_lyhinimetus,' ')
+                and nvl(Get_DocumentsSentTo.occupation_id_, nvl(v4.ametikoht_id,0)) = nvl(v4.ametikoht_id,0)
+                and nvl(Get_DocumentsSentTo.occupation_short_name, nvl(v4.ametikoha_lyhinimetus,' ')) = nvl(v4.ametikoha_lyhinimetus,' ')
+        
+        -- Juhul kui tegemist on asutuse administraatoriga
+        union
+        select  t5.dokument_id
+        from    transport t5, vastuvotja v5
+        where   t5.transport_id = v5.transport_id
+                and v5.asutus_id = Get_DocumentsSentTo.organization_id
+                and v5.staatus_id = 101
+                and exists
+                (
+                    select  1
+                    from    isik i5, ametikoht_taitmine akt5, ametikoht ak5, oigus_antud oa5
+                    where   i5.i_id = Get_DocumentsSentTo.user_id
+                            and akt5.i_id = i5.i_id
+                            and ak5.ametikoht_id = akt5.ametikoht_id
+                            and oa5.ametikoht_id = akt5.ametikoht_id
+                            and nvl(akt5.peatatud, 0) = 0
+                            and nvl(oa5.peatatud, 0) = 0
+                            and oa5.asutus_id = v5.asutus_id
+                            and ak5.asutus_id = v5.asutus_id
+                            and nvl(akt5.alates, add_months(sysdate, -1)) < sysdate
+                            and nvl(akt5.kuni, add_months(sysdate, 1)) > sysdate
+                            and nvl(oa5.alates, add_months(sysdate, -1)) < sysdate
+                            and nvl(oa5.kuni, add_months(sysdate, 1)) > sysdate
+                            and nvl(ak5.alates, add_months(sysdate, -1)) < sysdate
+                            and nvl(ak5.kuni, add_months(sysdate, 1)) > sysdate
+                            and lower(trim(oa5.roll)) = 'dhl: asutuse administraator'
+                )
+                and nvl(Get_DocumentsSentTo.division_id_, nvl(v5.allyksus_id,0)) = nvl(v5.allyksus_id,0)
+                and nvl(Get_DocumentsSentTo.division_short_name, nvl(v5.allyksuse_lyhinimetus,' ')) = nvl(v5.allyksuse_lyhinimetus,' ')
+                and nvl(Get_DocumentsSentTo.occupation_id_, nvl(v5.ametikoht_id,0)) = nvl(v5.ametikoht_id,0)
+                and nvl(Get_DocumentsSentTo.occupation_short_name, nvl(v5.ametikoha_lyhinimetus,' ')) = nvl(v5.ametikoha_lyhinimetus,' ')
+    ) rights_filter
+    where   d.dokument_id = rights_filter.dokument_id
+            and
+            (
+                Get_DocumentsSentTo.folder_id is null
+                or d.kaust_id = Get_DocumentsSentTo.folder_id
+            )
+            and rownum <= Get_DocumentsSentTo.result_limit;
+end;
+/
+
+create or replace
+procedure Get_NextDocID(
+    document_id out number)
+as
+begin
+    select  sq_dokument_id.nextval
+    into    Get_NextDocID.document_id
+    from    dual;
+end;
+/
+
+create or replace
+procedure Update_Sending(
+    sending_id in number,
+    document_id in number,
+    sending_start_date in date,
+    sending_end_date in date,
+    send_status_id in number)
+as
+begin
+    update  transport
+    set     dokument_id = Update_Sending.document_id,
+            saatmise_algus = Update_Sending.sending_start_date,
+            saatmise_lopp = Update_Sending.sending_end_date,
+            staatus_id = Update_Sending.send_status_id
+    where   transport_id = Update_Sending.sending_id;
+end;
+/
+
+create or replace
+procedure Get_AsutusByRegNr(
+    registrikood in varchar2,
+    id out number,
+    registrikood_vana out varchar2,
+    ks_asutuse_id out number,
+    ks_asutuse_kood out varchar2,
+    nimetus out varchar2,
+    nime_lyhend out varchar2,
+    liik1 out varchar2,
+    liik2 out varchar2,
+    tegevusala out varchar2,
+    tegevuspiirkond out varchar2,
+    maakond out varchar2,
+    asukoht out varchar2,
+    aadress out varchar2,
+    postikood out varchar2,
+    telefon out varchar2,
+    faks out varchar2,
+    e_post out varchar2,
+    www out varchar2,
+    logo out varchar2,
+    asutamise_kp out timestamp,
+    mood_akt_nimi out varchar2,
+    mood_akt_nr out varchar2,
+    mood_akt_kp out timestamp,
+    pm_akt_nimi out varchar2,
+    pm_akt_nr out varchar2,
+    pm_kinnitamise_kp out timestamp,
+    pm_kande_kp out timestamp,
+    loodud out timestamp,
+    muudetud out timestamp,
+    muutja out varchar2,
+    parameetrid out varchar2,
+    dhl_saatmine out number,
+    dhl_otse_saatmine out number,
+    dhs_nimetus out varchar2,
+    toetatav_dvk_versioon out varchar2,
+    server_id out number,
+    aar_id out number)
+as
+cnt number(38,0) := 0;
+begin
+    select  count(*)
+    into    cnt
+    from    asutus a
+    where   a.registrikood = Get_AsutusByRegNr.registrikood
+            and rownum < 2;
+    
+    if cnt > 0 then
+        select  a.asutus_id,
+                a.e_registrikood,
+                a.ks_asutus_id,
+                a.ks_asutus_kood,
+                a.nimetus,
+                a.lnimi,
+                a.liik1,
+                a.liik2,
+                a.tegevusala,
+                a.tegevuspiirkond,
+                a.maakond,
+                a.asukoht,
+                a.aadress,
+                a.postikood,
+                a.telefon,
+                a.faks,
+                a.e_post,
+                a.www,
+                a.logo,
+                a.asutamise_kp,
+                a.mood_akt_nimi,
+                a.mood_akt_nr,
+                a.mood_akt_kp,
+                a.pm_akt_nimi,
+                a.pm_akt_nr,
+                a.pm_kinnitamise_kp,
+                a.pm_kande_kp,
+                a.created,
+                a.last_modified,
+                a.username,
+                a.params,
+                a.dhl_saatmine,
+                a.dhl_otse_saatmine,
+                a.dhs_nimetus,
+                a.toetatav_dvk_versioon,
+                a.server_id,
+                a.aar_id
+        into    Get_AsutusByRegNr.id,
+                Get_AsutusByRegNr.registrikood_vana,
+                Get_AsutusByRegNr.ks_asutuse_id,
+                Get_AsutusByRegNr.ks_asutuse_kood,
+                Get_AsutusByRegNr.nimetus,
+                Get_AsutusByRegNr.nime_lyhend,
+                Get_AsutusByRegNr.liik1,
+                Get_AsutusByRegNr.liik2,
+                Get_AsutusByRegNr.tegevusala,
+                Get_AsutusByRegNr.tegevuspiirkond,
+                Get_AsutusByRegNr.maakond,
+                Get_AsutusByRegNr.asukoht,
+                Get_AsutusByRegNr.aadress,
+                Get_AsutusByRegNr.postikood,
+                Get_AsutusByRegNr.telefon,
+                Get_AsutusByRegNr.faks,
+                Get_AsutusByRegNr.e_post,
+                Get_AsutusByRegNr.www,
+                Get_AsutusByRegNr.logo,
+                Get_AsutusByRegNr.asutamise_kp,
+                Get_AsutusByRegNr.mood_akt_nimi,
+                Get_AsutusByRegNr.mood_akt_nr,
+                Get_AsutusByRegNr.mood_akt_kp,
+                Get_AsutusByRegNr.pm_akt_nimi,
+                Get_AsutusByRegNr.pm_akt_nr,
+                Get_AsutusByRegNr.pm_kinnitamise_kp,
+                Get_AsutusByRegNr.pm_kande_kp,
+                Get_AsutusByRegNr.loodud,
+                Get_AsutusByRegNr.muudetud,
+                Get_AsutusByRegNr.muutja,
+                Get_AsutusByRegNr.parameetrid,
+                Get_AsutusByRegNr.dhl_saatmine,
+                Get_AsutusByRegNr.dhl_otse_saatmine,
+                Get_AsutusByRegNr.dhs_nimetus,
+                Get_AsutusByRegNr.toetatav_dvk_versioon,
+                Get_AsutusByRegNr.server_id,
+                Get_AsutusByRegNr.aar_id
+        from    asutus a
+        where   a.registrikood = Get_AsutusByRegNr.registrikood
+                and rownum < 2;
+    else
+        Get_AsutusByRegNr.id := null;
+        Get_AsutusByRegNr.registrikood_vana := null;
+        Get_AsutusByRegNr.ks_asutuse_id := null;
+        Get_AsutusByRegNr.ks_asutuse_kood := null;
+        Get_AsutusByRegNr.nimetus := null;
+        Get_AsutusByRegNr.nime_lyhend := null;
+        Get_AsutusByRegNr.liik1 := null;
+        Get_AsutusByRegNr.liik2 := null;
+        Get_AsutusByRegNr.tegevusala := null;
+        Get_AsutusByRegNr.tegevuspiirkond := null;
+        Get_AsutusByRegNr.maakond := null;
+        Get_AsutusByRegNr.asukoht := null;
+        Get_AsutusByRegNr.aadress := null;
+        Get_AsutusByRegNr.postikood := null;
+        Get_AsutusByRegNr.telefon := null;
+        Get_AsutusByRegNr.faks := null;
+        Get_AsutusByRegNr.e_post := null;
+        Get_AsutusByRegNr.www := null;
+        Get_AsutusByRegNr.logo := null;
+        Get_AsutusByRegNr.asutamise_kp := null;
+        Get_AsutusByRegNr.mood_akt_nimi := null;
+        Get_AsutusByRegNr.mood_akt_nr := null;
+        Get_AsutusByRegNr.mood_akt_kp := null;
+        Get_AsutusByRegNr.pm_akt_nimi := null;
+        Get_AsutusByRegNr.pm_akt_nr := null;
+        Get_AsutusByRegNr.pm_kinnitamise_kp := null;
+        Get_AsutusByRegNr.pm_kande_kp := null;
+        Get_AsutusByRegNr.loodud := null;
+        Get_AsutusByRegNr.muudetud := null;
+        Get_AsutusByRegNr.muutja := null;
+        Get_AsutusByRegNr.parameetrid := null;
+        Get_AsutusByRegNr.dhl_saatmine := null;
+        Get_AsutusByRegNr.dhl_otse_saatmine := null;
+        Get_AsutusByRegNr.dhs_nimetus := null;
+        Get_AsutusByRegNr.toetatav_dvk_versioon := null;
+        Get_AsutusByRegNr.server_id := null;
+        Get_AsutusByRegNr.aar_id := null;
+    end if;
+end;
+/
+
+create or replace
+procedure Get_AsutusByID(
+    id in number,
+    registrikood out varchar2,
+    registrikood_vana out varchar2,
+    ks_asutuse_id out number,
+    ks_asutuse_kood out varchar2,
+    nimetus out varchar2,
+    nime_lyhend out varchar2,
+    liik1 out varchar2,
+    liik2 out varchar2,
+    tegevusala out varchar2,
+    tegevuspiirkond out varchar2,
+    maakond out varchar2,
+    asukoht out varchar2,
+    aadress out varchar2,
+    postikood out varchar2,
+    telefon out varchar2,
+    faks out varchar2,
+    e_post out varchar2,
+    www out varchar2,
+    logo out varchar2,
+    asutamise_kp out timestamp,
+    mood_akt_nimi out varchar2,
+    mood_akt_nr out varchar2,
+    mood_akt_kp out timestamp,
+    pm_akt_nimi out varchar2,
+    pm_akt_nr out varchar2,
+    pm_kinnitamise_kp out timestamp,
+    pm_kande_kp out timestamp,
+    loodud out timestamp,
+    muudetud out timestamp,
+    muutja out varchar2,
+    parameetrid out varchar2,
+    dhl_saatmine out number,
+    dhl_otse_saatmine out number,
+    dhs_nimetus out varchar2,
+    toetatav_dvk_versioon out varchar2,
+    server_id out number,
+    aar_id out number)
+as
+cnt number(38,0) := 0;
+begin
+    select  count(*)
+    into    cnt
+    from    asutus a
+    where   a.asutus_id = Get_AsutusByID.id
+            and rownum < 2;
+    
+    if cnt > 0 then
+        select  a.registrikood,
+                a.e_registrikood,
+                a.ks_asutus_id,
+                a.ks_asutus_kood,
+                a.nimetus,
+                a.lnimi,
+                a.liik1,
+                a.liik2,
+                a.tegevusala,
+                a.tegevuspiirkond,
+                a.maakond,
+                a.asukoht,
+                a.aadress,
+                a.postikood,
+                a.telefon,
+                a.faks,
+                a.e_post,
+                a.www,
+                a.logo,
+                a.asutamise_kp,
+                a.mood_akt_nimi,
+                a.mood_akt_nr,
+                a.mood_akt_kp,
+                a.pm_akt_nimi,
+                a.pm_akt_nr,
+                a.pm_kinnitamise_kp,
+                a.pm_kande_kp,
+                a.created,
+                a.last_modified,
+                a.username,
+                a.params,
+                a.dhl_saatmine,
+                a.dhl_otse_saatmine,
+                a.dhs_nimetus,
+                a.toetatav_dvk_versioon,
+                a.server_id,
+                a.aar_id
+        into    Get_AsutusByID.registrikood,
+                Get_AsutusByID.registrikood_vana,
+                Get_AsutusByID.ks_asutuse_id,
+                Get_AsutusByID.ks_asutuse_kood,
+                Get_AsutusByID.nimetus,
+                Get_AsutusByID.nime_lyhend,
+                Get_AsutusByID.liik1,
+                Get_AsutusByID.liik2,
+                Get_AsutusByID.tegevusala,
+                Get_AsutusByID.tegevuspiirkond,
+                Get_AsutusByID.maakond,
+                Get_AsutusByID.asukoht,
+                Get_AsutusByID.aadress,
+                Get_AsutusByID.postikood,
+                Get_AsutusByID.telefon,
+                Get_AsutusByID.faks,
+                Get_AsutusByID.e_post,
+                Get_AsutusByID.www,
+                Get_AsutusByID.logo,
+                Get_AsutusByID.asutamise_kp,
+                Get_AsutusByID.mood_akt_nimi,
+                Get_AsutusByID.mood_akt_nr,
+                Get_AsutusByID.mood_akt_kp,
+                Get_AsutusByID.pm_akt_nimi,
+                Get_AsutusByID.pm_akt_nr,
+                Get_AsutusByID.pm_kinnitamise_kp,
+                Get_AsutusByID.pm_kande_kp,
+                Get_AsutusByID.loodud,
+                Get_AsutusByID.muudetud,
+                Get_AsutusByID.muutja,
+                Get_AsutusByID.parameetrid,
+                Get_AsutusByID.dhl_saatmine,
+                Get_AsutusByID.dhl_otse_saatmine,
+                Get_AsutusByID.dhs_nimetus,
+                Get_AsutusByID.toetatav_dvk_versioon,
+                Get_AsutusByID.server_id,
+                Get_AsutusByID.aar_id
+        from    asutus a
+        where   a.asutus_id = Get_AsutusByID.id
+                and rownum < 2;
+    else
+        Get_AsutusByID.registrikood := null;
+        Get_AsutusByID.registrikood_vana := null;
+        Get_AsutusByID.ks_asutuse_id := null;
+        Get_AsutusByID.ks_asutuse_kood := null;
+        Get_AsutusByID.nimetus := null;
+        Get_AsutusByID.nime_lyhend := null;
+        Get_AsutusByID.liik1 := null;
+        Get_AsutusByID.liik2 := null;
+        Get_AsutusByID.tegevusala := null;
+        Get_AsutusByID.tegevuspiirkond := null;
+        Get_AsutusByID.maakond := null;
+        Get_AsutusByID.asukoht := null;
+        Get_AsutusByID.aadress := null;
+        Get_AsutusByID.postikood := null;
+        Get_AsutusByID.telefon := null;
+        Get_AsutusByID.faks := null;
+        Get_AsutusByID.e_post := null;
+        Get_AsutusByID.www := null;
+        Get_AsutusByID.logo := null;
+        Get_AsutusByID.asutamise_kp := null;
+        Get_AsutusByID.mood_akt_nimi := null;
+        Get_AsutusByID.mood_akt_nr := null;
+        Get_AsutusByID.mood_akt_kp := null;
+        Get_AsutusByID.pm_akt_nimi := null;
+        Get_AsutusByID.pm_akt_nr := null;
+        Get_AsutusByID.pm_kinnitamise_kp := null;
+        Get_AsutusByID.pm_kande_kp := null;
+        Get_AsutusByID.loodud := null;
+        Get_AsutusByID.muudetud := null;
+        Get_AsutusByID.muutja := null;
+        Get_AsutusByID.parameetrid := null;
+        Get_AsutusByID.dhl_saatmine := null;
+        Get_AsutusByID.dhl_otse_saatmine := null;
+        Get_AsutusByID.dhs_nimetus := null;
+        Get_AsutusByID.toetatav_dvk_versioon := null;
+        Get_AsutusByID.server_id := null;
+        Get_AsutusByID.aar_id := null;
+    end if;
+end;
+/
+
+create or replace
+procedure Get_AsutusIDByRegNr(
+    registrikood in varchar2,
+    dvk_voimeline in number,
+    id out number)
+as
+cnt number(38,0) := 0;
+begin
+    select  count(*)
+    into    cnt
+    from    asutus a
+    where   a.registrikood = Get_AsutusIDByRegNr.registrikood
+            and (Get_AsutusIDByRegNr.dvk_voimeline < 1 or a.dhl_saatmine = 1);
+    
+    if cnt > 0 then
+        select  a.asutus_id
+        into    Get_AsutusIDByRegNr.id
+        from    asutus a
+        where   a.registrikood = Get_AsutusIDByRegNr.registrikood
+                and (Get_AsutusIDByRegNr.dvk_voimeline < 1 or a.dhl_saatmine = 1)
+                and rownum < 2;
+    else
+        Get_AsutusIDByRegNr.id := 0;
+    end if;
+end;
+/
+
+create or replace
+procedure Get_FolderIdByName(
+    folder_name in varchar2,
+    organization_id in number,
+    parent_id in number,
+    folder_id out number)
+as
+cnt number(38,20);
+begin
+    select  count(*)
+    into    cnt
+    from    kaust k
+    where   upper(k.nimi) = upper(Get_FolderIdByName.folder_name)
+            and
+            (
+                k.asutus_id = Get_FolderIdByName.organization_id
+                or k.asutus_id is null
+            )
+            and k.ylemkaust_id = Get_FolderIdByName.parent_id
+            and rownum < 2;
+    
+    if cnt > 0 then
+        select  k.kaust_id
+        into    Get_FolderIdByName.folder_id
+        from    kaust k
+        where   upper(k.nimi) = upper(Get_FolderIdByName.folder_name)
+                and
+                (
+                    k.asutus_id = Get_FolderIdByName.organization_id
+                    or k.asutus_id is null
+                )
+                and k.ylemkaust_id = Get_FolderIdByName.parent_id
+                and rownum < 2;
+    else
+        Get_FolderIdByName.folder_id := null;
+    end if;
+end;
+/
+
+create or replace
+procedure Get_IsikIDByCode(
+    isikukood in varchar2,
+    id out number)
+as
+cnt number(38,0) := 0;
+begin
+    select  count(*)
+    into    cnt
+    from    isik i
+    where   i.kood = Get_IsikIDByCode.isikukood;
+    
+    if cnt > 0 then
+        select  i.i_id
+        into    Get_IsikIDByCode.id
+        from    isik i
+        where   i.kood = Get_IsikIDByCode.isikukood
+                and rownum < 2;
+    else
+        Get_IsikIDByCode.id := 0;
+    end if;
+end;
+/
+
+create or replace
+procedure Get_PersonCurrentPositionIDs(
+    person_id in number,
+    organization_id in number,
+    RC1 out globalPkg.RCT1)
+as
+begin
+    open RC1 for
+    select  a.ametikoht_id
+    from    ametikoht a, ametikoht_taitmine b
+    where   a.asutus_id = Get_PersonCurrentPositionIDs.organization_id
+            and a.ametikoht_id = b.ametikoht_id
+            and b.i_id = Get_PersonCurrentPositionIDs.person_id
+            and
+            (
+                b.peatatud is null
+                or b.peatatud = 0
+            )
+            and
+            (
+                b.alates is null
+                or b.alates <= sysdate
+            )
+            and
+            (
+                b.kuni is null
+                or b.kuni >= sysdate
+            )
+            and
+            (
+                a.alates is null
+                or a.alates <= sysdate
+            )
+            and
+            (
+                a.kuni is null
+                or a.kuni >= sysdate
+            );
+end;
+/
+
+create or replace
+procedure Get_PersonCurrentRoles(
+    person_id in number,
+    organization_id in number,
+    RC1 out globalPkg.RCT1)
+as
+begin
+    open RC1 for
+    select  distinct a.roll
+    from    oigus_antud a, ametikoht_taitmine b
+    where   a.asutus_id = Get_PersonCurrentRoles.organization_id
+            and a.ametikoht_id = b.ametikoht_id
+            and b.i_id = Get_PersonCurrentRoles.person_id
+            and
+            (
+                b.peatatud is null
+                or b.peatatud = 0
+            )
+            and
+            (
+                b.alates is null
+                or b.alates <= sysdate
+            )
+            and
+            (
+                b.kuni is null
+                or b.kuni >= sysdate
+            )
+            and
+            (
+                a.alates is null
+                or a.alates <= sysdate
+            )
+            and
+            (
+                a.kuni is null
+                or a.kuni >= sysdate
+            )
+            and
+            (
+                a.peatatud is null
+                or a.peatatud = 0
+            );
+end;
+/
+
+CREATE OR REPLACE
+PROCEDURE create_log_triggers
+as
+    sql_string long;
+    pkey_col varchar2(50);
+begin
+for tbl in
+(
+    select table_name from user_tables where table_name <> 'LOGI'
+)
+loop
+    dbms_output.put_line(tbl.table_name);
+    
+    select  cc.column_name
+    into    pkey_col
+    from    user_cons_columns cc, user_constraints c
+    where   cc.constraint_name = c.constraint_name
+            and c.constraint_type = 'P'
+            and cc.table_name = tbl.table_name
+            and rownum < 2;
+    
+    sql_string := 'create or replace trigger TR_' || tbl.table_name || '_LOG
+    after insert or update or delete
+    on ' || tbl.table_name || '
+    referencing old as old new as new
+    for each row
+    declare
+        operation varchar2(100);
+        usr varchar2(20);
+    begin
+        if inserting then
+            operation := ''INSERT'';
+        else
+            if updating then
+                operation := ''UPDATE'';
+            else
+                operation := ''DELETE'';
+            end if;
+        end if;
+        
+        select  user
+        into    usr
+        from    dual;
+        ';
+    
+    for clmn in
+    (
+        select column_name, data_type, data_length from user_tab_columns where table_name = tbl.table_name
+    )
+    loop
+        if (clmn.data_type <> 'CLOB') and (clmn.data_type <> 'BLOB') then
+        sql_string := sql_string || '
+        insert
+        into    logi(log_id,tabel,op,uidcol,tabel_uid,veerg,ctype,vana_vaartus,uus_vaartus,muutmise_aeg,ab_kasutaja,ef_kasutaja,kasutaja_kood,comm,created,last_modified,username,ametikoht)
+        values  (0,''' || tbl.table_name || ''',operation,''' || pkey_col || ''',:old.' || pkey_col || ',''' || clmn.column_name || ''',''' || clmn.data_type || ''',:old.' || clmn.column_name || ',:new.' || clmn.column_name || ',sysdate,usr,'''','''','''',sysdate,sysdate,'''',0);
+        ';
+        end if;
+    end loop;
+    
+    sql_string := sql_string || 'end;';
+
+    execute immediate sql_string;
+end loop;
+end;
+/
+
+CREATE OR REPLACE
+PROCEDURE GET_FOLDERFULLPATH(
+    folder_id in number,
+    folder_path out varchar2)
+as
+cnt number(1,0) := 0;
+folder_name varchar2(4000);
+marker number(38,0) := folder_id;
+separator varchar2(1) := '';
+begin
+    select  count(*)
+    into    cnt
+    from    kaust a
+    where   a.kaust_id = GET_FOLDERFULLPATH.marker;
+    
+    if cnt > 0 then
+        while GET_FOLDERFULLPATH.marker is not null
+        loop
+            select  a.nimi,
+                    a.ylemkaust_id
+            into    GET_FOLDERFULLPATH.folder_name,
+                    GET_FOLDERFULLPATH.marker
+            from    kaust a
+            where   a.kaust_id = GET_FOLDERFULLPATH.marker;
+            
+            GET_FOLDERFULLPATH.folder_path := GET_FOLDERFULLPATH.folder_name || separator || GET_FOLDERFULLPATH.folder_path;
+            if GET_FOLDERFULLPATH.marker > 0 then
+                separator := '/';
+            else
+                separator := '';
+            end if;
+        end loop;
+    else
+        GET_FOLDERFULLPATH.folder_path := '';
+    end if;
+end;
+/
+
+create or replace
+PROCEDURE ADD_FOLDER(
+    folder_name in varchar2,
+    parent_id in number,
+    org_id in number,
+    folder_number in varchar2,
+    folder_id out number,
+    xtee_isikukood in varchar2,
+    xtee_asutus in varchar2)
+as
+begin
+
+    -- Set session scope variables
+    DVKLOG.xtee_isikukood := ADD_FOLDER.xtee_isikukood;
+    DVKLOG.xtee_asutus := ADD_FOLDER.xtee_asutus;
+
+    insert
+    into    kaust(
+            nimi,
+            ylemkaust_id,
+            asutus_id,
+            kausta_number)
+    values  (folder_name,
+            parent_id,
+            org_id,
+            folder_number);
+    
+    ADD_FOLDER.folder_id := globalPkg.identity;
+end;
+/
+
+create or replace
+procedure Get_AsutusList (
+    RC1 out globalPkg.RCT1)
+as
+begin
+    open RC1 for
+    select  *
+    from    asutus
+    where   dhl_saatmine = 1
+            and server_id is null;
+end;
+/
+
+create or replace
+procedure Add_Asutus(
+    id out number,
+    registrikood in varchar2,
+    registrikood_vana in varchar2,
+    ks_asutuse_id in number,
+    ks_asutuse_kood in varchar2,
+    nimetus in varchar2,
+    nime_lyhend in varchar2,
+    liik1 in varchar2,
+    liik2 in varchar2,
+    tegevusala in varchar2,
+    tegevuspiirkond in varchar2,
+    maakond in varchar2,
+    asukoht in varchar2,
+    aadress in varchar2,
+    postikood in varchar2,
+    telefon in varchar2,
+    faks in varchar2,
+    e_post in varchar2,
+    www in varchar2,
+    logo in varchar2,
+    asutamise_kp in timestamp,
+    mood_akt_nimi in varchar2,
+    mood_akt_nr in varchar2,
+    mood_akt_kp in timestamp,
+    pm_akt_nimi in varchar2,
+    pm_akt_nr in varchar2,
+    pm_kinnitamise_kp in timestamp,
+    pm_kande_kp in timestamp,
+    loodud in timestamp,
+    muudetud in timestamp,
+    muutja in varchar2,
+    parameetrid in varchar2,
+    dhl_saatmine in number,
+    dhl_otse_saatmine in number,
+    dhs_nimetus in varchar2,
+    toetatav_dvk_versioon in varchar2,
+    server_id in number,
+    aar_id in number,
+    xtee_isikukood in varchar2,
+    xtee_asutus in varchar2)
+as
+cnt number(38,0) := 0;
+begin
+
+    -- Set session scope variables
+    DVKLOG.xtee_isikukood := Add_Asutus.xtee_isikukood;
+    DVKLOG.xtee_asutus := Add_Asutus.xtee_asutus;
+
+    select  count(*)
+    into    cnt
+    from    asutus a
+    where   a.registrikood = Add_Asutus.registrikood
+            and rownum < 2;
+    
+    if cnt < 1 then
+        insert
+        into    asutus(
+                asutus_id,
+                registrikood,
+                e_registrikood,
+                ks_asutus_id,
+                ks_asutus_kood,
+                nimetus,
+                lnimi,
+                liik1,
+                liik2,
+                tegevusala,
+                tegevuspiirkond,
+                maakond,
+                asukoht,
+                aadress,
+                postikood,
+                telefon,
+                faks,
+                e_post,
+                www,
+                logo,
+                asutamise_kp,
+                mood_akt_nimi,
+                mood_akt_nr,
+                mood_akt_kp,
+                pm_akt_nimi,
+                pm_akt_nr,
+                pm_kinnitamise_kp,
+                pm_kande_kp,
+                created,
+                last_modified,
+                username,
+                params,
+                dhl_saatmine,
+                dhl_otse_saatmine,
+                dhs_nimetus,
+                toetatav_dvk_versioon,
+                server_id,
+                aar_id)
+        values  (0,
+                Add_Asutus.registrikood,
+                Add_Asutus.registrikood_vana,
+                Add_Asutus.ks_asutuse_id,
+                Add_Asutus.ks_asutuse_kood,
+                Add_Asutus.nimetus,
+                Add_Asutus.nime_lyhend,
+                Add_Asutus.liik1,
+                Add_Asutus.liik2,
+                Add_Asutus.tegevusala,
+                Add_Asutus.tegevuspiirkond,
+                Add_Asutus.maakond,
+                Add_Asutus.asukoht,
+                Add_Asutus.aadress,
+                Add_Asutus.postikood,
+                Add_Asutus.telefon,
+                Add_Asutus.faks,
+                Add_Asutus.e_post,
+                Add_Asutus.www,
+                Add_Asutus.logo,
+                Add_Asutus.asutamise_kp,
+                Add_Asutus.mood_akt_nimi,
+                Add_Asutus.mood_akt_nr,
+                Add_Asutus.mood_akt_kp,
+                Add_Asutus.pm_akt_nimi,
+                Add_Asutus.pm_akt_nr,
+                Add_Asutus.pm_kinnitamise_kp,
+                Add_Asutus.pm_kande_kp,
+                Add_Asutus.loodud,
+                Add_Asutus.muudetud,
+                Add_Asutus.muutja,
+                Add_Asutus.parameetrid,
+                Add_Asutus.dhl_saatmine,
+                Add_Asutus.dhl_otse_saatmine,
+                Add_Asutus.dhs_nimetus,
+                Add_Asutus.toetatav_dvk_versioon,
+                Add_Asutus.server_id,
+                Add_Asutus.aar_id);
+        
+        Add_Asutus.id := globalPkg.identity;
+    else
+        select  a.asutus_id
+        into    Add_Asutus.id
+        from    asutus a
+        where   a.registrikood = Add_Asutus.registrikood
+                and rownum < 2;
+    end if;
+end;
+/
+
+create or replace
+procedure Update_Asutus(
+    id in number,
+    registrikood in varchar2,
+    registrikood_vana in varchar2,
+    ks_asutuse_id in number,
+    ks_asutuse_kood in varchar2,
+    nimetus in varchar2,
+    nime_lyhend in varchar2,
+    liik1 in varchar2,
+    liik2 in varchar2,
+    tegevusala in varchar2,
+    tegevuspiirkond in varchar2,
+    maakond in varchar2,
+    asukoht in varchar2,
+    aadress in varchar2,
+    postikood in varchar2,
+    telefon in varchar2,
+    faks in varchar2,
+    e_post in varchar2,
+    www in varchar2,
+    logo in varchar2,
+    asutamise_kp in timestamp,
+    mood_akt_nimi in varchar2,
+    mood_akt_nr in varchar2,
+    mood_akt_kp in timestamp,
+    pm_akt_nimi in varchar2,
+    pm_akt_nr in varchar2,
+    pm_kinnitamise_kp in timestamp,
+    pm_kande_kp in timestamp,
+    loodud in timestamp,
+    muudetud in timestamp,
+    muutja in varchar2,
+    parameetrid in varchar2,
+    dhl_saatmine in number,
+    dhl_otse_saatmine in number,
+    dhs_nimetus in varchar2,
+    toetatav_dvk_versioon in varchar2,
+    server_id in number,
+    aar_id in number,
+    xtee_isikukood in varchar2,
+    xtee_asutus in varchar2)
+as
+begin
+
+    -- Set session scope variables
+    DVKLOG.xtee_isikukood := Update_Asutus.xtee_isikukood;
+    DVKLOG.xtee_asutus := Update_Asutus.xtee_asutus;
+
+    update  asutus
+    set     registrikood = Update_Asutus.registrikood,
+            e_registrikood = Update_Asutus.registrikood_vana,
+            ks_asutus_id = Update_Asutus.ks_asutuse_id,
+            ks_asutus_kood = Update_Asutus.ks_asutuse_kood,
+            nimetus = Update_Asutus.nimetus,
+            lnimi = Update_Asutus.nime_lyhend,
+            liik1 = Update_Asutus.liik1,
+            liik2 = Update_Asutus.liik2,
+            tegevusala = Update_Asutus.tegevusala,
+            tegevuspiirkond = Update_Asutus.tegevuspiirkond,
+            maakond = Update_Asutus.maakond,
+            asukoht = Update_Asutus.asukoht,
+            aadress = Update_Asutus.aadress,
+            postikood = Update_Asutus.postikood,
+            telefon = Update_Asutus.telefon,
+            faks = Update_Asutus.faks,
+            e_post = Update_Asutus.e_post,
+            www = Update_Asutus.www,
+            logo = Update_Asutus.logo,
+            asutamise_kp = Update_Asutus.asutamise_kp,
+            mood_akt_nimi = Update_Asutus.mood_akt_nimi,
+            mood_akt_nr = Update_Asutus.mood_akt_nr,
+            mood_akt_kp = Update_Asutus.mood_akt_kp,
+            pm_akt_nimi = Update_Asutus.pm_akt_nimi,
+            pm_akt_nr = Update_Asutus.pm_akt_nr,
+            pm_kinnitamise_kp = Update_Asutus.pm_kinnitamise_kp,
+            pm_kande_kp = Update_Asutus.pm_kande_kp,
+            created = Update_Asutus.loodud,
+            last_modified = Update_Asutus.muudetud,
+            username = Update_Asutus.muutja,
+            params = Update_Asutus.parameetrid,
+            dhl_saatmine = Update_Asutus.dhl_saatmine,
+            dhl_otse_saatmine = Update_Asutus.dhl_otse_saatmine,
+            dhs_nimetus = Update_Asutus.dhs_nimetus,
+            toetatav_dvk_versioon = Update_Asutus.toetatav_dvk_versioon,
+            server_id = Update_Asutus.server_id,
+            aar_id = Update_Asutus.aar_id
+    where   asutus_id = Update_Asutus.id;
+end;
+/
+
+create or replace
+procedure Get_PersonCurrentDivisionIDs(
+    person_id in number,
+    organization_id in number,
+    RC1 out globalPkg.RCT1)
+as
+begin
+    open RC1 for
+    select  distinct
+            a.allyksus_id
+    from    ametikoht a, ametikoht_taitmine b
+    where   a.asutus_id = Get_PersonCurrentDivisionIDs.organization_id
+            and a.ametikoht_id = b.ametikoht_id
+            and b.i_id = Get_PersonCurrentDivisionIDs.person_id
+            and
+            (
+                b.peatatud is null
+                or b.peatatud = 0
+            )
+            and
+            (
+                b.alates is null
+                or b.alates <= sysdate
+            )
+            and
+            (
+                b.kuni is null
+                or b.kuni >= sysdate
+            )
+            and
+            (
+                a.alates is null
+                or a.alates <= sysdate
+            )
+            and
+            (
+                a.kuni is null
+                or a.kuni >= sysdate
+            );
+end;
+/
+
+create or replace
+procedure Get_AsutusStat(
+    asutus_id in number,
+    vastuvotmata_dokumente out number,
+    vahetatud_dokumente out number)
+as
+begin
+    select  count(*)
+    into    Get_AsutusStat.vastuvotmata_dokumente
+    from    vastuvotja
+    where   asutus_id = Get_AsutusStat.asutus_id
+            and staatus_id = 101;
+    
+    select  (
+                select  count(*)
+                from    vastuvotja
+                where   asutus_id = Get_AsutusStat.asutus_id
+                        and staatus_id = 102
+            ) + (
+                select  count(*)
+                from    saatja
+                where   asutus_id = Get_AsutusStat.asutus_id
+            )
+    into    Get_AsutusStat.vahetatud_dokumente
+    from    dual;
+end;
+/
+
+create or replace
+procedure Get_RecipientTemplates(RC1 out globalPkg.RCT1)
+as
+begin
+    open RC1 for
+    select  v.*
+    from    vastuvotja_mall v
+    order by
+            v.vastuvotja_mall_id;
+end;
+/
+
+create or replace
+procedure Get_ServerByID(
+    server_id in number,
+    andmekogu_nimi out varchar2,
+    aadress out varchar2)
+as
+cnt number(38,0) := 0;
+begin
+    select  count(*)
+    into    cnt
+    from    server s
+    where   s.server_id = Get_ServerByID.server_id
+            and rownum < 2;
+    
+    if cnt > 0 then
+        select  s.andmekogu_nimi,
+                s.aadress
+        into    Get_ServerByID.andmekogu_nimi,
+                Get_ServerByID.aadress
+        from    server s
+        where   s.server_id = Get_ServerByID.server_id
+                and rownum < 2;
+    else
+        Get_ServerByID.andmekogu_nimi := null;
+        Get_ServerByID.aadress := null;
+    end if;
+end;
+/
+
+create or replace
+procedure Add_Proxy(
+    proxy_id out number,
+    sending_id in number,
+    organization_id in number,
+    position_id in number,
+    division_id in number,
+    personal_id_code in varchar2,
+    email in varchar2,
+    name in varchar2,
+    organization_name in varchar2,
+    department_nr in varchar2,
+    department_name in varchar2,
+    position_short_name in varchar2,
+    division_short_name in varchar2,
+    xtee_isikukood in varchar2,
+    xtee_asutus in varchar2)
+as
+organization_id_ number(38,0) := organization_id;
+position_id_ number(38,0) := position_id;
+division_id_ number(38,0) := division_id;
+begin
+
+    -- Set session scope variables
+    DVKLOG.xtee_isikukood := Add_Proxy.xtee_isikukood;
+    DVKLOG.xtee_asutus := Add_Proxy.xtee_asutus;
+
+    if organization_id_ = 0 then
+        organization_id_ := null;
+    end if;
+    if position_id_ = 0 then
+        position_id_ := null;
+    end if;
+    if division_id_ = 0 then
+        division_id_ := null;
+    end if;
+    insert
+    into    vahendaja(
+            vahendaja_id,
+            transport_id,
+            asutus_id,
+            ametikoht_id,
+            allyksus_id,
+            isikukood,
+            nimi,
+            asutuse_nimi,
+            email,
+            osakonna_nr,
+            osakonna_nimi,
+            ametikoha_lyhinimetus,
+            allyksuse_lyhinimetus)
+    values  (0,
+            Add_Proxy.sending_id,
+            Add_Proxy.organization_id_,
+            Add_Proxy.position_id_,
+            Add_Proxy.division_id_,
+            Add_Proxy.personal_id_code,
+            Add_Proxy.name,
+            Add_Proxy.organization_name,
+            Add_Proxy.email,
+            Add_Proxy.department_nr,
+            Add_Proxy.department_name,
+            Add_Proxy.position_short_name,
+            Add_Proxy.division_short_name);
+    
+    Add_Proxy.proxy_id := globalPkg.identity;
+end;
+/
+
+create or replace
+procedure Get_ProxyBySendingID(
+    sending_id in number,
+    proxy_id out number,
+    organization_id out number,
+    position_id out number,
+    division_id out number,
+    personal_id_code out varchar2,
+    name out varchar2,
+    organization_name out varchar2,
+    email out varchar2,
+    department_nr out varchar2,
+    department_name out varchar2,
+    position_short_name out varchar2,
+    division_short_name out varchar2)
+as
+cnt number(38,0) := 0;
+begin
+    select  count(*)
+    into    cnt
+    from    vahendaja v
+    where   v.transport_id = Get_ProxyBySendingID.sending_id
+            and rownum < 2;
+    
+    if cnt > 0 then
+        select  v.vahendaja_id,
+                v.asutus_id,
+                v.ametikoht_id,
+                v.allyksus_id,
+                v.isikukood,
+                v.nimi,
+                v.asutuse_nimi,
+                v.email,
+                v.osakonna_nr,
+                v.osakonna_nimi,
+                v.ametikoha_lyhinimetus,
+                v.allyksuse_lyhinimetus
+        into    Get_ProxyBySendingID.proxy_id,
+                Get_ProxyBySendingID.organization_id,
+                Get_ProxyBySendingID.position_id,
+                Get_ProxyBySendingID.division_id,
+                Get_ProxyBySendingID.personal_id_code,
+                Get_ProxyBySendingID.name,
+                Get_ProxyBySendingID.organization_name,
+                Get_ProxyBySendingID.email,
+                Get_ProxyBySendingID.department_nr,
+                Get_ProxyBySendingID.department_name,
+                Get_ProxyBySendingID.position_short_name,
+                Get_ProxyBySendingID.division_short_name
+        from    vahendaja v
+        where   v.transport_id = Get_ProxyBySendingID.sending_id
+                and rownum < 2;
+    else
+        Get_ProxyBySendingID.proxy_id := null;
+        Get_ProxyBySendingID.organization_id := null;
+        Get_ProxyBySendingID.position_id := null;
+        Get_ProxyBySendingID.division_id := null;
+        Get_ProxyBySendingID.personal_id_code := null;
+        Get_ProxyBySendingID.name := null;
+        Get_ProxyBySendingID.organization_name := null;
+        Get_ProxyBySendingID.email := null;
+        Get_ProxyBySendingID.department_nr := null;
+        Get_ProxyBySendingID.department_name := null;
+        Get_ProxyBySendingID.position_short_name := null;
+        Get_ProxyBySendingID.division_short_name := null;
+    end if;
+end;
+/
+
+create or replace
+procedure Get_Servers(RC1 out globalPkg.RCT1)
+as
+begin
+    open RC1 for
+    select  s.*
+    from    server s;
+end;
+/
+
+create or replace
+procedure Get_NextFragmentID(fragment_id out number)
+as
+begin
+    select  sq_dokumendi_fragment_id.nextval
+    into    Get_NextFragmentID.fragment_id
+    from    dual;
+end;
+/
+
+create or replace
+procedure Get_DocumentFragments(
+    organization_id in number,
+    delivery_session_id in varchar2,
+    is_incoming in number,
+    RC1 out globalPkg.RCT1)
+as
+begin
+    open RC1 for
+    select  f.*
+    from    dokumendi_fragment f
+    where   f.asutus_id = Get_DocumentFragments.organization_id
+            and f.edastus_id = Get_DocumentFragments.delivery_session_id
+            and f.sissetulev = Get_DocumentFragments.is_incoming
+    order by
+            f.fragment_nr;
+end;
+/
+
+create or replace
+procedure Delete_DocumentFragments(
+    organization_id in number,
+    delivery_session_id in varchar2,
+    is_incoming in number)
+as
+begin
+    delete
+    from    dokumendi_fragment f
+    where   f.asutus_id = Delete_DocumentFragments.organization_id
+            and f.edastus_id = Delete_DocumentFragments.delivery_session_id
+            and f.sissetulev = Delete_DocumentFragments.is_incoming;
+end;
+/
+
+create or replace
+procedure Get_AsutusIDByAarID(
+    aar_id in number,
+    id out number)
+as
+cnt number(38,0) := 0;
+begin
+    select  count(*)
+    into    cnt
+    from    asutus a
+    where   a.aar_id = Get_AsutusIDByAarID.aar_id;
+    
+    if cnt > 0 then
+        select  a.asutus_id
+        into    Get_AsutusIDByAarID.id
+        from    asutus a
+        where   a.aar_id = Get_AsutusIDByAarID.aar_id
+                and rownum < 2;
+    else
+        Get_AsutusIDByAarID.id := 0;
+    end if;
+end;
+/
+
+create or replace
+procedure Get_AllyksusByAarID(
+    id out number,
+    asutus_id out number,
+    vanem_id out number,
+    nimetus out varchar2,
+    created out date,
+    last_modified out date,
+    username out varchar2,
+    muutmiste_arv out number,
+    lyhinimetus out varchar2,
+    adr_uri out varchar2,
+    aar_id in number)
+as
+cnt number(38,0) := 0;
+begin
+    select  count(*)
+    into    cnt
+    from    allyksus a
+    where   a.aar_id = Get_AllyksusByAarID.aar_id
+            and rownum < 2;
+    
+    if cnt > 0 then
+        select  a.id,
+                a.asutus_id,
+                a.vanem_id,
+                a.allyksus,
+                a.created,
+                a.last_modified,
+                a.username,
+                a.muutm_arv,
+                a.lyhinimetus,
+                a.adr_uri
+        into    Get_AllyksusByAarID.id,
+                Get_AllyksusByAarID.asutus_id,
+                Get_AllyksusByAarID.vanem_id,
+                Get_AllyksusByAarID.nimetus,
+                Get_AllyksusByAarID.created,
+                Get_AllyksusByAarID.last_modified,
+                Get_AllyksusByAarID.username,
+                Get_AllyksusByAarID.muutmiste_arv,
+                Get_AllyksusByAarID.lyhinimetus,
+                Get_AllyksusByAarID.adr_uri
+        from    allyksus a
+        where   a.aar_id = Get_AllyksusByAarID.aar_id
+                and rownum < 2;
+    else
+        Get_AllyksusByAarID.id := null;
+        Get_AllyksusByAarID.asutus_id := null;
+        Get_AllyksusByAarID.vanem_id := null;
+        Get_AllyksusByAarID.nimetus := null;
+        Get_AllyksusByAarID.created := null;
+        Get_AllyksusByAarID.last_modified := null;
+        Get_AllyksusByAarID.username := null;
+        Get_AllyksusByAarID.muutmiste_arv := null;
+        Get_AllyksusByAarID.lyhinimetus := null;
+        Get_AllyksusByAarID.adr_uri := null;
+    end if;
+end;
+/
+
+create or replace
+procedure Get_AllyksusIdByAarID(
+    id out number,
+    aar_id in number)
+as
+cnt number(38,0) := 0;
+begin
+    select  count(*)
+    into    cnt
+    from    allyksus a
+    where   a.aar_id = Get_AllyksusIdByAarID.aar_id
+            and rownum < 2;
+    
+    if cnt > 0 then
+        select  a.id
+        into    Get_AllyksusIdByAarID.id
+        from    allyksus a
+        where   a.aar_id = Get_AllyksusIdByAarID.aar_id
+                and rownum < 2;
+    else
+        Get_AllyksusIdByAarID.id := null;
+    end if;
+end;
+/
+
+create or replace
+procedure Get_AllyksusList(
+    asutus_id in number,
+    nimetus in varchar2,
+    RC1 out globalPkg.RCT1)
+as
+begin
+    -- Allolev keeruline union all konstruktsioon on kasulik
+    -- OR operaatori vältimiseks (Oracle puhul väga aeglane)
+    open RC1 for
+    select  a.*,
+            null as ks_allyksuse_lyhinimetus
+    from    allyksus a
+    where   a.asutus_id = nvl(Get_AllyksusList.asutus_id, a.asutus_id)
+            and a.allyksus = Get_AllyksusList.nimetus
+            and a.vanem_id is null
+    union all
+    select  a1.*,
+            null as ks_allyksuse_lyhinimetus
+    from    allyksus a1
+    where   a1.asutus_id = nvl(Get_AllyksusList.asutus_id, a1.asutus_id)
+            and Get_AllyksusList.nimetus is null
+            and a1.vanem_id is null
+    union all
+    select  a2.*,
+            ksa2.lyhinimetus as ks_allyksuse_lyhinimetus
+    from    allyksus a2, allyksus ksa2
+    where   a2.asutus_id = nvl(Get_AllyksusList.asutus_id, a2.asutus_id)
+            and a2.allyksus = Get_AllyksusList.nimetus
+            and a2.vanem_id = ksa2.id
+    union all
+    select  a3.*,
+            ksa3.lyhinimetus as ks_allyksuse_lyhinimetus
+    from    allyksus a3, allyksus ksa3
+    where   a3.asutus_id = nvl(Get_AllyksusList.asutus_id, a3.asutus_id)
+            and Get_AllyksusList.nimetus is null
+            and a3.vanem_id = ksa3.id;
+end;
+/
+
+create or replace
+procedure Add_Allyksus(
+    id out number,
+    asutus_id in number,
+    vanem_id in number,
+    nimetus in varchar2,
+    created in date,
+    last_modified in date,
+    username in varchar2,
+    muutmiste_arv in number,
+    aar_id in number,
+    lyhinimetus in varchar2,
+    adr_uri in varchar2)
+as
+asutus_id_ number(38,0) := asutus_id;
+vanem_id_ number(38,0) := vanem_id;
+aar_id_ number(38,0) := aar_id;
+begin
+    if asutus_id_ = 0 then
+        asutus_id_ := null;
+    end if;
+    if vanem_id_ = 0 then
+        vanem_id_ := null;
+    end if;
+    if aar_id_ = 0 then
+        aar_id_ := null;
+    end if;
+
+    insert
+    into    allyksus(
+            id,
+            asutus_id,
+            vanem_id,
+            allyksus,
+            created,
+            last_modified,
+            username,
+            muutm_arv,
+            aar_id,
+            lyhinimetus,
+            adr_uri)
+    values  (0,
+            Add_Allyksus.asutus_id_,
+            Add_Allyksus.vanem_id_,
+            Add_Allyksus.nimetus,
+            Add_Allyksus.created,
+            Add_Allyksus.last_modified,
+            Add_Allyksus.username,
+            Add_Allyksus.muutmiste_arv,
+            Add_Allyksus.aar_id_,
+            Add_Allyksus.lyhinimetus,
+            Add_Allyksus.adr_uri);
+    
+    Add_Allyksus.id := globalPkg.identity;
+end;
+/
+
+create or replace
+procedure Update_Allyksus(
+    id in number,
+    asutus_id in number,
+    vanem_id in number,
+    nimetus in varchar2,
+    created in date,
+    last_modified in date,
+    username in varchar2,
+    muutmiste_arv in number,
+    aar_id in number,
+    lyhinimetus in varchar2,
+    adr_uri in varchar2)
+as
+asutus_id_ number(38,0) := asutus_id;
+vanem_id_ number(38,0) := vanem_id;
+aar_id_ number(38,0) := aar_id;
+begin
+    if asutus_id_ = 0 then
+        asutus_id_ := null;
+    end if;
+    if vanem_id_ = 0 then
+        vanem_id_ := null;
+    end if;
+    if aar_id_ = 0 then
+        aar_id_ := null;
+    end if;
+
+    update  allyksus
+    set     asutus_id = Update_Allyksus.asutus_id_,
+            vanem_id = Update_Allyksus.vanem_id,
+            allyksus = Update_Allyksus.nimetus,
+            created = Update_Allyksus.created,
+            last_modified = Update_Allyksus.last_modified,
+            username = Update_Allyksus.username,
+            muutm_arv = Update_Allyksus.muutmiste_arv,
+            aar_id = Update_Allyksus.aar_id_,
+            lyhinimetus = Update_Allyksus.lyhinimetus,
+            adr_uri = Update_Allyksus.adr_uri
+    where   id = Update_Allyksus.id;
+end;
+/
+
+create or replace
+procedure Get_AmetikohaTaitmineByAarID(
+    id out number,
+    ametikoht_id out number,
+    isik_id out number,
+    alates out date,
+    kuni out date,
+    roll out varchar2,
+    created out date,
+    last_modified out date,
+    username out varchar2,
+    peatatud out number,
+    aar_id in number)
+as
+cnt number(38,0) := 0;
+begin
+    select  count(*)
+    into    cnt
+    from    ametikoht_taitmine a
+    where   a.aar_id = Get_AmetikohaTaitmineByAarID.aar_id
+            and rownum < 2;
+    
+    if cnt > 0 then
+        select  a.taitmine_id,
+                a.ametikoht_id,
+                a.i_id,
+                a.alates,
+                a.kuni,
+                a.roll,
+                a.created,
+                a.last_modified,
+                a.username,
+                a.peatatud
+        into    Get_AmetikohaTaitmineByAarID.id,
+                Get_AmetikohaTaitmineByAarID.ametikoht_id,
+                Get_AmetikohaTaitmineByAarID.isik_id,
+                Get_AmetikohaTaitmineByAarID.alates,
+                Get_AmetikohaTaitmineByAarID.kuni,
+                Get_AmetikohaTaitmineByAarID.roll,
+                Get_AmetikohaTaitmineByAarID.created,
+                Get_AmetikohaTaitmineByAarID.last_modified,
+                Get_AmetikohaTaitmineByAarID.username,
+                Get_AmetikohaTaitmineByAarID.peatatud
+        from    ametikoht_taitmine a
+        where   a.aar_id = Get_AmetikohaTaitmineByAarID.aar_id
+                and rownum < 2;
+    else
+        Get_AmetikohaTaitmineByAarID.id := null;
+        Get_AmetikohaTaitmineByAarID.ametikoht_id := null;
+        Get_AmetikohaTaitmineByAarID.isik_id := null;
+        Get_AmetikohaTaitmineByAarID.alates := null;
+        Get_AmetikohaTaitmineByAarID.kuni := null;
+        Get_AmetikohaTaitmineByAarID.roll := null;
+        Get_AmetikohaTaitmineByAarID.created := null;
+        Get_AmetikohaTaitmineByAarID.last_modified := null;
+        Get_AmetikohaTaitmineByAarID.username := null;
+        Get_AmetikohaTaitmineByAarID.peatatud := null;
+    end if;
+end;
+/
+
+create or replace
+procedure Get_AmetikohaTaitmineList(
+    ametikoht_id in number,
+    isikukood in varchar2,
+    RC1 out globalPkg.RCT1)
+as
+begin
+    open RC1 for
+    select  a.*
+    from    ametikoht_taitmine a
+    inner join
+            isik i on i.i_id = a.i_id
+    where   a.ametikoht_id = Get_AmetikohaTaitmineList.ametikoht_id
+            and i.kood = Get_AmetikohaTaitmineList.isikukood;
+end;
+/
+
+create or replace
+procedure Add_AmetikohaTaitmine(
+    id out number,
+    ametikoht_id in number,
+    isik_id in number,
+    alates in date,
+    kuni in date,
+    roll in varchar2,
+    created in date,
+    last_modified in date,
+    username in varchar2,
+    peatatud in number,
+    aar_id in number)
+as
+ametikoht_id_ number(38,0) := ametikoht_id;
+isik_id_ number(38,0) := isik_id;
+aar_id_ number(38,0) := aar_id;
+begin
+    if ametikoht_id_ = 0 then
+        ametikoht_id_ := null;
+    end if;
+    if isik_id_ = 0 then
+        isik_id_ := null;
+    end if;
+    if aar_id_ = 0 then
+        aar_id_ := null;
+    end if;
+
+    insert
+    into    ametikoht_taitmine(
+            taitmine_id,
+            ametikoht_id,
+            i_id,
+            alates,
+            kuni,
+            roll,
+            created,
+            last_modified,
+            username,
+            peatatud,
+            aar_id)
+    values  (0,
+            Add_AmetikohaTaitmine.ametikoht_id_,
+            Add_AmetikohaTaitmine.isik_id_,
+            Add_AmetikohaTaitmine.alates,
+            Add_AmetikohaTaitmine.kuni,
+            Add_AmetikohaTaitmine.roll,
+            Add_AmetikohaTaitmine.created,
+            Add_AmetikohaTaitmine.last_modified,
+            Add_AmetikohaTaitmine.username,
+            Add_AmetikohaTaitmine.peatatud,
+            Add_AmetikohaTaitmine.aar_id_);
+    
+    Add_AmetikohaTaitmine.id := globalPkg.identity;
+end;
+/
+
+create or replace
+procedure Update_AmetikohaTaitmine(
+    id in number,
+    ametikoht_id in number,
+    isik_id in number,
+    alates in date,
+    kuni in date,
+    roll in varchar2,
+    created in date,
+    last_modified in date,
+    username in varchar2,
+    peatatud in number,
+    aar_id in number)
+as
+ametikoht_id_ number(38,0) := ametikoht_id;
+isik_id_ number(38,0) := isik_id;
+aar_id_ number(38,0) := aar_id;
+begin
+    if ametikoht_id_ = 0 then
+        ametikoht_id_ := null;
+    end if;
+    if isik_id_ = 0 then
+        isik_id_ := null;
+    end if;
+    if aar_id_ = 0 then
+        aar_id_ := null;
+    end if;
+
+    update  ametikoht_taitmine
+    set     ametikoht_id = Update_AmetikohaTaitmine.ametikoht_id_,
+            i_id = Update_AmetikohaTaitmine.isik_id_,
+            alates = Update_AmetikohaTaitmine.alates,
+            kuni = Update_AmetikohaTaitmine.kuni,
+            roll = Update_AmetikohaTaitmine.roll,
+            created = Update_AmetikohaTaitmine.created,
+            last_modified = Update_AmetikohaTaitmine.last_modified,
+            username = Update_AmetikohaTaitmine.username,
+            peatatud = Update_AmetikohaTaitmine.peatatud,
+            aar_id = Update_AmetikohaTaitmine.aar_id_
+    where   taitmine_id = Update_AmetikohaTaitmine.id;
+end;
+/
+
+create or replace
+procedure Get_AmetikohtByAarID(
+    id out number,
+    ks_ametikoht_id out number,
+    asutus_id out number,
+    nimetus out varchar2,
+    alates out date,
+    kuni out date,
+    created out date,
+    last_modified out date,
+    username out varchar2,
+    allyksus_id out number,
+    params out varchar2,
+    lyhinimetus out varchar2,
+    aar_id in number)
+as
+cnt number(38,0) := 0;
+begin
+    select  count(*)
+    into    cnt
+    from    ametikoht a
+    where   a.aar_id = Get_AmetikohtByAarID.aar_id
+            and rownum < 2;
+    
+    if cnt > 0 then
+        select  a.ametikoht_id,
+                a.ks_ametikoht_id,
+                a.asutus_id,
+                a.ametikoht_nimetus,
+                a.alates,
+                a.kuni,
+                a.created,
+                a.last_modified,
+                a.username,
+                a.allyksus_id,
+                a.params,
+                a.lyhinimetus
+        into    Get_AmetikohtByAarID.id,
+                Get_AmetikohtByAarID.ks_ametikoht_id,
+                Get_AmetikohtByAarID.asutus_id,
+                Get_AmetikohtByAarID.nimetus,
+                Get_AmetikohtByAarID.alates,
+                Get_AmetikohtByAarID.kuni,
+                Get_AmetikohtByAarID.created,
+                Get_AmetikohtByAarID.last_modified,
+                Get_AmetikohtByAarID.username,
+                Get_AmetikohtByAarID.allyksus_id,
+                Get_AmetikohtByAarID.params,
+                Get_AmetikohtByAarID.lyhinimetus
+        from    ametikoht a
+        where   a.aar_id = Get_AmetikohtByAarID.aar_id
+                and rownum < 2;
+    else
+        Get_AmetikohtByAarID.id := null;
+        Get_AmetikohtByAarID.ks_ametikoht_id := null;
+        Get_AmetikohtByAarID.asutus_id := null;
+        Get_AmetikohtByAarID.nimetus := null;
+        Get_AmetikohtByAarID.alates := null;
+        Get_AmetikohtByAarID.kuni := null;
+        Get_AmetikohtByAarID.created := null;
+        Get_AmetikohtByAarID.last_modified := null;
+        Get_AmetikohtByAarID.username := null;
+        Get_AmetikohtByAarID.allyksus_id := null;
+        Get_AmetikohtByAarID.params := null;
+        Get_AmetikohtByAarID.lyhinimetus := null;
+    end if;
+end;
+/
+
+create or replace
+procedure Get_AmetikohtIdByAarID(
+    id out number,
+    aar_id in number)
+as
+cnt number(38,0) := 0;
+begin
+    select  count(*)
+    into    cnt
+    from    ametikoht a
+    where   a.aar_id = Get_AmetikohtIdByAarID.aar_id
+            and rownum < 2;
+    
+    if cnt > 0 then
+        select  a.ametikoht_id
+        into    Get_AmetikohtIdByAarID.id
+        from    ametikoht a
+        where   a.aar_id = Get_AmetikohtIdByAarID.aar_id
+                and rownum < 2;
+    else
+        Get_AmetikohtIdByAarID.id := null;
+    end if;
+end;
+/
+
+create or replace
+procedure Get_AmetikohtList(
+    asutus_id in number,
+    nimetus in varchar2,
+    RC1 out globalPkg.RCT1)
+as
+begin
+    -- Allolev keeruline union all konstruktsioon on kasulik
+    -- OR operaatori vältimiseks (Oracle puhul väga aeglane)
+    open RC1 for
+    select  a.*,
+            null as allyksuse_lyhinimetus
+    from    ametikoht a
+    where   a.asutus_id = nvl(Get_AmetikohtList.asutus_id, a.asutus_id)
+            and a.ametikoht_nimetus = Get_AmetikohtList.nimetus
+            and a.allyksus_id is null
+            and nvl(a.alates, add_months(sysdate, -1)) < sysdate
+            and nvl(a.kuni, add_months(sysdate, 1)) > sysdate
+    union all
+    select  a1.*,
+            null as allyksuse_lyhinimetus
+    from    ametikoht a1
+    where   a1.asutus_id = nvl(Get_AmetikohtList.asutus_id, a1.asutus_id)
+            and Get_AmetikohtList.nimetus is null
+            and a1.allyksus_id is null
+            and nvl(a1.alates, add_months(sysdate, -1)) < sysdate
+            and nvl(a1.kuni, add_months(sysdate, 1)) > sysdate
+    union all
+    select  a2.*,
+            y2.lyhinimetus as allyksuse_lyhinimetus
+    from    ametikoht a2, allyksus y2
+    where   a2.asutus_id = nvl(Get_AmetikohtList.asutus_id, a2.asutus_id)
+            and a2.ametikoht_nimetus = Get_AmetikohtList.nimetus
+            and y2.id = a2.allyksus_id
+            and nvl(a2.alates, add_months(sysdate, -1)) < sysdate
+            and nvl(a2.kuni, add_months(sysdate, 1)) > sysdate
+    union all
+    select  a3.*,
+            y3.lyhinimetus as allyksuse_lyhinimetus
+    from    ametikoht a3, allyksus y3
+    where   a3.asutus_id = nvl(Get_AmetikohtList.asutus_id, a3.asutus_id)
+            and Get_AmetikohtList.nimetus is null
+            and y3.id = a3.allyksus_id
+            and nvl(a3.alates, add_months(sysdate, -1)) < sysdate
+            and nvl(a3.kuni, add_months(sysdate, 1)) > sysdate;
+end;
+/
+
+create or replace
+procedure Add_Ametikoht(
+    id out number,
+    ks_ametikoht_id in number,
+    asutus_id in number,
+    nimetus in varchar2,
+    alates in date,
+    kuni in date,
+    created in date,
+    last_modified in date,
+    username in varchar2,
+    allyksus_id in number,
+    params in varchar2,
+    lyhinimetus in varchar2,
+    aar_id in number)
+as
+ks_ametikoht_id_ number(38,0) := ks_ametikoht_id;
+asutus_id_ number(38,0) := asutus_id;
+allyksus_id_ number(38,0) := allyksus_id;
+aar_id_ number(38,0) := aar_id;
+begin
+    if ks_ametikoht_id_ = 0 then
+        ks_ametikoht_id_ := null;
+    end if;
+    if asutus_id_ = 0 then
+        asutus_id_ := null;
+    end if;
+    if allyksus_id_ = 0 then
+        allyksus_id_ := null;
+    end if;
+    if aar_id_ = 0 then
+        aar_id_ := null;
+    end if;
+
+    insert
+    into    ametikoht(
+            ametikoht_id,
+            ks_ametikoht_id,
+            asutus_id,
+            ametikoht_nimetus,
+            alates,
+            kuni,
+            created,
+            last_modified,
+            username,
+            allyksus_id,
+            params,
+            lyhinimetus,
+            aar_id)
+    values  (0,
+            Add_Ametikoht.ks_ametikoht_id_,
+            Add_Ametikoht.asutus_id_,
+            Add_Ametikoht.nimetus,
+            Add_Ametikoht.alates,
+            Add_Ametikoht.kuni,
+            Add_Ametikoht.created,
+            Add_Ametikoht.last_modified,
+            Add_Ametikoht.username,
+            Add_Ametikoht.allyksus_id_,
+            Add_Ametikoht.params,
+            Add_Ametikoht.lyhinimetus,
+            Add_Ametikoht.aar_id_);
+    
+    Add_Ametikoht.id := globalPkg.identity;
+end;
+/
+
+create or replace
+procedure Update_Ametikoht(
+    id in number,
+    ks_ametikoht_id in number,
+    asutus_id in number,
+    nimetus in varchar2,
+    alates in date,
+    kuni in date,
+    created in date,
+    last_modified in date,
+    username in varchar2,
+    allyksus_id in number,
+    params in varchar2,
+    lyhinimetus in varchar2,
+    aar_id in number)
+as
+ks_ametikoht_id_ number(38,0) := ks_ametikoht_id;
+asutus_id_ number(38,0) := asutus_id;
+allyksus_id_ number(38,0) := allyksus_id;
+aar_id_ number(38,0) := aar_id;
+begin
+    if ks_ametikoht_id_ = 0 then
+        ks_ametikoht_id_ := null;
+    end if;
+    if asutus_id_ = 0 then
+        asutus_id_ := null;
+    end if;
+    if allyksus_id_ = 0 then
+        allyksus_id_ := null;
+    end if;
+    if aar_id_ = 0 then
+        aar_id_ := null;
+    end if;
+
+    update  ametikoht
+    set     ks_ametikoht_id = Update_Ametikoht.ks_ametikoht_id_,
+            asutus_id = Update_Ametikoht.asutus_id_,
+            ametikoht_nimetus = Update_Ametikoht.nimetus,
+            alates = Update_Ametikoht.alates,
+            kuni = Update_Ametikoht.kuni,
+            created = Update_Ametikoht.created,
+            last_modified = Update_Ametikoht.last_modified,
+            username = Update_Ametikoht.username,
+            allyksus_id = Update_Ametikoht.allyksus_id_,
+            params = Update_Ametikoht.params,
+            lyhinimetus = Update_Ametikoht.lyhinimetus,
+            aar_id = Update_Ametikoht.aar_id_
+    where   ametikoht_id = Update_Ametikoht.id;
+end;
+/
+
+create or replace
+procedure Get_IsikByCode(
+    id out number,
+    isikukood in varchar2,
+    perenimi out varchar2,
+    eesnimi out varchar2,
+    maakond out varchar2,
+    aadress out varchar2,
+    postiindeks out varchar2,
+    telefon out varchar2,
+    epost out varchar2,
+    www out varchar2,
+    parameetrid out varchar2,
+    loodud out date,
+    muudetud out date,
+    muutja out date)
+as
+cnt number(38,0) := 0;
+begin
+    select  count(*)
+    into    cnt
+    from    isik i
+    where   i.kood = Get_IsikByCode.isikukood
+            and rownum < 2;
+    
+    if cnt > 0 then
+        select  i.i_id,
+                i.perenimi,
+                i.eesnimi,
+                i.maakond,
+                i.aadress,
+                i.postikood,
+                i.telefon,
+                i.e_post,
+                i.www,
+                i.params,
+                i.created,
+                i.last_modified,
+                i.username
+        into    Get_IsikByCode.id,
+                Get_IsikByCode.perenimi,
+                Get_IsikByCode.eesnimi,
+                Get_IsikByCode.maakond,
+                Get_IsikByCode.aadress,
+                Get_IsikByCode.postiindeks,
+                Get_IsikByCode.telefon,
+                Get_IsikByCode.epost,
+                Get_IsikByCode.www,
+                Get_IsikByCode.parameetrid,
+                Get_IsikByCode.loodud,
+                Get_IsikByCode.muudetud,
+                Get_IsikByCode.muutja
+        from    isik i
+        where   i.i_id = Get_IsikByCode.id
+                and rownum < 2;
+    else
+        Get_IsikByCode.id := null;
+        Get_IsikByCode.perenimi := null;
+        Get_IsikByCode.eesnimi := null;
+        Get_IsikByCode.maakond := null;
+        Get_IsikByCode.aadress := null;
+        Get_IsikByCode.postiindeks := null;
+        Get_IsikByCode.telefon := null;
+        Get_IsikByCode.epost := null;
+        Get_IsikByCode.www := null;
+        Get_IsikByCode.parameetrid := null;
+        Get_IsikByCode.loodud := null;
+        Get_IsikByCode.muudetud := null;
+        Get_IsikByCode.muutja := null;
+    end if;
+end;
+/
+
+create or replace
+procedure Add_Isik(
+    id out number,
+    isikukood in varchar2,
+    perenimi in varchar2,
+    eesnimi in varchar2,
+    maakond in varchar2,
+    aadress in varchar2,
+    postiindeks in varchar2,
+    telefon in varchar2,
+    epost in varchar2,
+    www in varchar2,
+    parameetrid in varchar2,
+    created in date,
+    last_modified in date,
+    username in varchar2)
+as
+begin
+    insert
+    into    isik(
+            i_id,
+            kood,
+            perenimi,
+            eesnimi,
+            maakond,
+            aadress,
+            postikood,
+            telefon,
+            e_post,
+            www,
+            params,
+            created,
+            last_modified,
+            username)
+    values  (0,
+            Add_Isik.isikukood,
+            Add_Isik.perenimi,
+            Add_Isik.eesnimi,
+            Add_Isik.maakond,
+            Add_Isik.aadress,
+            Add_Isik.postiindeks,
+            Add_Isik.telefon,
+            Add_Isik.epost,
+            Add_Isik.www,
+            Add_Isik.parameetrid,
+            Add_Isik.created,
+            Add_Isik.last_modified,
+            Add_Isik.username);
+    
+    Add_Isik.id := globalPkg.identity;
+end;
+/
+
+create or replace
+procedure Update_Isik(
+    id in number,
+    isikukood in varchar2,
+    perenimi in varchar2,
+    eesnimi in varchar2,
+    maakond in varchar2,
+    aadress in varchar2,
+    postiindeks in varchar2,
+    telefon in varchar2,
+    epost in varchar2,
+    www in varchar2,
+    parameetrid in varchar2,
+    created in date,
+    last_modified in date,
+    username in varchar2)
+as
+begin
+    update  isik
+    set     kood = Update_Isik.isikukood,
+            perenimi = Update_Isik.perenimi,
+            eesnimi = Update_Isik.eesnimi,
+            maakond = Update_Isik.maakond,
+            aadress = Update_Isik.aadress,
+            postikood = Update_Isik.postiindeks,
+            telefon = Update_Isik.telefon,
+            e_post = Update_Isik.epost,
+            www = Update_Isik.www,
+            params = Update_Isik.parameetrid,
+            created = Update_Isik.created,
+            last_modified = Update_Isik.last_modified,
+            username = Update_Isik.username
+    where   i_id = Update_Isik.id;
+end;
+/
+
+create or replace
+procedure Get_NextRecipientID(
+    recipient_id out number)
+as
+begin
+    select  sq_vastuvotja_id.nextval
+    into    Get_NextRecipientID.recipient_id
+    from    dual;
+end;
+/
+
+create or replace
+procedure Get_AmetikohtIdByShortName(
+    id out number,
+    org_id in number,
+    short_name in varchar2)
+as
+cnt number(38,0) := 0;
+begin
+    select  count(*)
+    into    cnt
+    from    ametikoht a
+    where   a.asutus_id = Get_AmetikohtIdByShortName.org_id
+            and a.lyhinimetus = Get_AmetikohtIdByShortName.short_name
+            and rownum < 2;
+    
+    if cnt > 0 then
+        select  a.ametikoht_id
+        into    Get_AmetikohtIdByShortName.id
+        from    ametikoht a
+        where   a.asutus_id = Get_AmetikohtIdByShortName.org_id
+                and a.lyhinimetus = Get_AmetikohtIdByShortName.short_name
+                and rownum < 2;
+    else
+        Get_AmetikohtIdByShortName.id := null;
+    end if;
+end;
+/
+
+create or replace
+procedure Get_AllyksusIdByShortName(
+    id out number,
+    org_id in number,
+    short_name in varchar2)
+as
+cnt number(38,0) := 0;
+begin
+    select  count(*)
+    into    cnt
+    from    allyksus a
+    where   a.asutus_id = Get_AllyksusIdByShortName.org_id
+            and a.lyhinimetus = Get_AllyksusIdByShortName.short_name
+            and rownum < 2;
+    
+    if cnt > 0 then
+        select  a.id
+        into    Get_AllyksusIdByShortName.id
+        from    allyksus a
+        where   a.asutus_id = Get_AllyksusIdByShortName.org_id
+                and a.lyhinimetus = Get_AllyksusIdByShortName.short_name
+                and rownum < 2;
+    else
+        Get_AllyksusIdByShortName.id := null;
+    end if;
+end;
+/
+
+create or replace
+procedure Get_AllyksusStat(
+    asutus_id in number,
+    allyksus_id in number,
+    vastuvotmata_dokumente out number,
+    vahetatud_dokumente out number)
+as
+begin
+    select  count(*)
+    into    Get_AllyksusStat.vastuvotmata_dokumente
+    from    vastuvotja
+    where   asutus_id = Get_AllyksusStat.asutus_id
+            and allyksus_id = Get_AllyksusStat.allyksus_id
+            and staatus_id = 101;
+    
+    select  (
+                select  count(*)
+                from    vastuvotja
+                where   asutus_id = Get_AllyksusStat.asutus_id
+                        and allyksus_id = Get_AllyksusStat.allyksus_id
+                        and staatus_id = 102
+            ) + (
+                select  count(*)
+                from    saatja
+                where   asutus_id = Get_AllyksusStat.asutus_id
+                        and allyksus_id = Get_AllyksusStat.allyksus_id
+            )
+    into    Get_AllyksusStat.vahetatud_dokumente
+    from    dual;
+end;
+/
+
+create or replace
+procedure Get_AmetikohtStat(
+    asutus_id in number,
+    ametikoht_id in number,
+    vastuvotmata_dokumente out number,
+    vahetatud_dokumente out number)
+as
+begin
+    select  count(*)
+    into    Get_AmetikohtStat.vastuvotmata_dokumente
+    from    vastuvotja
+    where   asutus_id = Get_AmetikohtStat.asutus_id
+            and ametikoht_id = Get_AmetikohtStat.ametikoht_id
+            and staatus_id = 101;
+    
+    select  (
+                select  count(*)
+                from    vastuvotja
+                where   asutus_id = Get_AmetikohtStat.asutus_id
+                        and ametikoht_id = Get_AmetikohtStat.ametikoht_id
+                        and staatus_id = 102
+            ) + (
+                select  count(*)
+                from    saatja
+                where   asutus_id = Get_AmetikohtStat.asutus_id
+                        and ametikoht_id = Get_AmetikohtStat.ametikoht_id
+            )
+    into    Get_AmetikohtStat.vahetatud_dokumente
+    from    dual;
+end;
+/
+
+create or replace
+procedure Get_DocumentStatusHistory(
+    document_id in number,
+    RC1 out globalPkg.RCT1)
+as
+begin
+    open RC1 for
+    select  a.staatuse_ajalugu_id,
+            a.vastuvotja_id,
+            a.staatus_id,
+            a.staatuse_muutmise_aeg,
+            a.fault_code,
+            a.fault_actor,
+            a.fault_string,
+            a.fault_detail,
+            a.vastuvotja_staatus_id,
+            a.metaxml,
+            org.registrikood as asutuse_regnr,
+            v.isikukood,
+            v.allyksuse_lyhinimetus,
+            v.ametikoha_lyhinimetus
+    from    staatuse_ajalugu a, vastuvotja v, transport t, asutus org
+    where   v.vastuvotja_id = a.vastuvotja_id
+            and t.transport_id = v.transport_id
+            and org.asutus_id = v.asutus_id
+            and t.dokument_id = Get_DocumentStatusHistory.document_id;
+end;
+/
+
+create or replace procedure Get_LastSendingByDocGUID(
+    document_guid in varchar,
+    sending_id out number,
+    sending_start_date out date,
+    sending_end_date out date,
+    send_status_id out number,
+    document_id out number)
+as
+cnt number(38,0) := 0;
+begin
+
+    select  count(*)
+    into    cnt
+    from    transport t, dokument d
+    where   t.dokument_id = d.dokument_id and
+            d.guid = Get_LastSendingByDocGUID.document_guid;
+    
+    if cnt > 0 then    
+        select  t.transport_id,
+                t.saatmise_algus,
+                t.saatmise_lopp,
+                t.staatus_id
+        into    Get_LastSendingByDocGUID.sending_id,
+                Get_LastSendingByDocGUID.sending_start_date,
+                Get_LastSendingByDocGUID.sending_end_date,
+                Get_LastSendingByDocGUID.send_status_id
+        from    transport t
+        where   t.transport_id =
+                (
+                    select  max(t1.transport_id)
+                    from    transport t1, dokument d2
+                    where   t1.dokument_id = d2.dokument_id and
+                            d2.guid = Get_LastSendingByDocGUID.document_guid
+                )
+                and rownum < 2;
+                
+        select dokument_id into Get_LastSendingByDocGUID.document_id
+        from dokument
+        where guid = Get_LastSendingByDocGUID.document_guid;
+    else
+        Get_LastSendingByDocGUID.sending_id := null;
+        Get_LastSendingByDocGUID.sending_start_date := null;
+        Get_LastSendingByDocGUID.sending_end_date := null;
+        Get_LastSendingByDocGUID.send_status_id := null;
+    end if;
+end;
+/
+
+create or replace
+PROCEDURE ADD_DOKUMENT(
+  dokument_id IN NUMBER,
+  asutus_id IN NUMBER,
+  kaust_id IN NUMBER,
+  sisu IN CLOB,
+  sailitustahtaeg IN DATE,
+  suurus IN NUMBER,
+  versioon IN NUMBER,
+  guid IN VARCHAR2,
+  xtee_isikukood IN VARCHAR2,
+  xtee_asutus IN VARCHAR2
+) AS
+
+BEGIN
+
+  -- Set session scope variables
+  DVKLOG.xtee_isikukood := ADD_DOKUMENT.xtee_isikukood;
+  DVKLOG.xtee_asutus := ADD_DOKUMENT.xtee_asutus;
+
+  INSERT INTO dokument (
+    dokument_id,
+    asutus_id,
+    kaust_id,
+    sisu,
+    sailitustahtaeg,
+    suurus,
+    versioon,
+    guid
+  ) VALUES (
+    ADD_DOKUMENT.dokument_id,
+    ADD_DOKUMENT.asutus_id,
+    ADD_DOKUMENT.kaust_id,
+    ADD_DOKUMENT.sisu,
+    ADD_DOKUMENT.sailitustahtaeg,
+    ADD_DOKUMENT.suurus,
+    ADD_DOKUMENT.versioon,
+    ADD_DOKUMENT.guid
+  );
+
+END;
+/
+
+------- Generated by SYS.DBMS_METADATA on 6-juuni-2008 at 16:06:34 -------
+
+  CREATE INDEX "ASUTUS_ID_IDX" ON "SAATJA" ("ASUTUS_ID") 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT)
+/
+------- Generated by SYS.DBMS_METADATA on 6-juuni-2008 at 16:06:51 -------
+
+  CREATE INDEX "ASUTUS_ID_IDX1" ON "DOKUMENT" ("ASUTUS_ID") 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT)
+/
+------- Generated by SYS.DBMS_METADATA on 6-juuni-2008 at 16:07:09 -------
+
+  CREATE INDEX "ASUTUS_ID_IDX2" ON "VASTUVOTJA" ("ASUTUS_ID") 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT)
+/
+------- Generated by SYS.DBMS_METADATA on 6-juuni-2008 at 16:07:29 -------
+
+  CREATE UNIQUE INDEX "DOKUMENT_ID_IDX" ON "TRANSPORT" ("DOKUMENT_ID") 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT)
+/
+------- Generated by SYS.DBMS_METADATA on 6-juuni-2008 at 16:08:00 -------
+
+  CREATE UNIQUE INDEX "TRANSPORT_ID_IDX" ON "SAATJA" ("TRANSPORT_ID") 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT)
+/
+------- Generated by SYS.DBMS_METADATA on 6-juuni-2008 at 16:08:15 -------
+
+  CREATE INDEX "TRANSPORT_ID_IDX1" ON "VASTUVOTJA" ("TRANSPORT_ID") 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT)
+/
+
+
+create index "ALLYKSUS_LYHINIMETUS_IDX" on "ALLYKSUS"(nvl(lyhinimetus,' '))
+PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+ STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+ PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT)
+/
+
+create index "AMETIKOHT_LYHINIMETUS_IDX" on "AMETIKOHT"(nvl(lyhinimetus,' '))
+PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+ STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+ PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT)
+/
+
+create or replace
+PROCEDURE ADD_DOKUMENT_FRAGMENT(
+  fragment_id in number,
+  sissetulev in number,
+  asutus_id in number,
+  edastus_id in varchar2,
+  fragment_nr in number,
+  fragmente_kokku in number,
+  loodud in date,
+  sisu in blob,
+  xtee_isikukood in varchar2,
+  xtee_asutus in varchar2
+) AS 
+BEGIN
+
+  -- Set session scope variables
+  DVKLOG.xtee_isikukood := ADD_DOKUMENT_FRAGMENT.xtee_isikukood;
+  DVKLOG.xtee_asutus := ADD_DOKUMENT_FRAGMENT.xtee_asutus;
+  
+  INSERT INTO dokumendi_fragment (
+    fragment_id,
+    sissetulev,
+    asutus_id,
+    edastus_id,
+    fragment_nr,
+    fragmente_kokku,
+    loodud,
+    sisu
+  ) VALUES (
+    ADD_DOKUMENT_FRAGMENT.fragment_id,
+    ADD_DOKUMENT_FRAGMENT.sissetulev,
+    ADD_DOKUMENT_FRAGMENT.asutus_id,
+    ADD_DOKUMENT_FRAGMENT.edastus_id,
+    ADD_DOKUMENT_FRAGMENT.fragment_nr,
+    ADD_DOKUMENT_FRAGMENT.fragmente_kokku,
+    ADD_DOKUMENT_FRAGMENT.loodud,
+    ADD_DOKUMENT_FRAGMENT.sisu
+  );
+
+  NULL;
+END ADD_DOKUMENT_FRAGMENT;
+/
+
+CREATE OR REPLACE PROCEDURE ADD_STAATUSE_AJALUGU(
+  staatuse_ajalugu_id in number,
+  vastuvotja_id in number,
+  staatus_id in number,
+  staatuse_muutmise_aeg in date,
+  fault_code in varchar2,
+  fault_actor in varchar2,
+  fault_string in varchar2,
+  fault_detail in varchar2,
+  vastuvotja_staatus_id in number,
+  metaxml in clob,
+  xtee_isikukood in varchar2,
+  xtee_asutus in varchar2,
+  staatuse_ajalugu_id_out out number
+) AS
+BEGIN
+
+  -- Set session scope variables
+  DVKLOG.xtee_isikukood := ADD_STAATUSE_AJALUGU.xtee_isikukood;
+  DVKLOG.xtee_asutus := ADD_STAATUSE_AJALUGU.xtee_asutus;
+
+  INSERT INTO staatuse_ajalugu (
+    staatuse_ajalugu_id,
+    vastuvotja_id,
+    staatus_id,
+    staatuse_muutmise_aeg,
+    fault_code,
+    fault_actor,
+    fault_string,
+    fault_detail,
+    vastuvotja_staatus_id,
+    metaxml
+  ) VALUES (
+    ADD_STAATUSE_AJALUGU.staatuse_ajalugu_id,
+    ADD_STAATUSE_AJALUGU.vastuvotja_id,
+    ADD_STAATUSE_AJALUGU.staatus_id,
+    ADD_STAATUSE_AJALUGU.staatuse_muutmise_aeg,
+    ADD_STAATUSE_AJALUGU.fault_code,
+    ADD_STAATUSE_AJALUGU.fault_actor,
+    ADD_STAATUSE_AJALUGU.fault_string,
+    ADD_STAATUSE_AJALUGU.fault_detail,
+    ADD_STAATUSE_AJALUGU.vastuvotja_staatus_id,
+    ADD_STAATUSE_AJALUGU.metaxml
+  ) RETURNING staatuse_ajalugu_id INTO staatuse_ajalugu_id_out;
+
+END;
+/
+
+CREATE OR REPLACE
+PROCEDURE ADD_VASTUVOTJA (
+  vastuvotja_id in vastuvotja.vastuvotja_id%TYPE, 
+  transport_id in vastuvotja.transport_id%TYPE, 
+  asutus_id in vastuvotja.asutus_id%TYPE, 
+  ametikoht_id in vastuvotja.ametikoht_id%TYPE, 
+  allyksus_id in vastuvotja.allyksus_id%TYPE, 
+  isikukood in vastuvotja.isikukood%TYPE, 
+  nimi in vastuvotja.nimi%TYPE, 
+  asutuse_nimi in vastuvotja.asutuse_nimi%TYPE, 
+  email in vastuvotja.email%TYPE, 
+  osakonna_nr in vastuvotja.osakonna_nr%TYPE, 
+  osakonna_nimi in vastuvotja.osakonna_nimi%TYPE, 
+  saatmisviis_id in vastuvotja.saatmisviis_id%TYPE, 
+  staatus_id in vastuvotja.staatus_id%TYPE, 
+  saatmise_algus in vastuvotja.saatmise_algus%TYPE, 
+  saatmise_lopp in vastuvotja.saatmise_lopp%TYPE, 
+  fault_code in vastuvotja.fault_code%TYPE, 
+  fault_actor in vastuvotja.fault_actor%TYPE, 
+  fault_string in vastuvotja.fault_string%TYPE, 
+  fault_detail in vastuvotja.fault_detail%TYPE, 
+  vastuvotja_staatus_id in vastuvotja.vastuvotja_staatus_id%TYPE, 
+  metaxml in vastuvotja.metaxml%TYPE, 
+  dok_id_teises_serveris in vastuvotja.dok_id_teises_serveris%TYPE, 
+  allyksuse_lyhinimetus in vastuvotja.allyksuse_lyhinimetus%TYPE, 
+  ametikoha_lyhinimetus in vastuvotja.ametikoha_lyhinimetus%TYPE,
+  xtee_isikukood in varchar2,
+  xtee_asutus in varchar2
+) AS 
+BEGIN
+  
+  -- Set session scope variables
+  DVKLOG.xtee_isikukood := ADD_VASTUVOTJA.xtee_isikukood;
+  DVKLOG.xtee_asutus := ADD_VASTUVOTJA.xtee_asutus;
+  
+  INSERT INTO vastuvotja (
+    VASTUVOTJA_ID,
+    TRANSPORT_ID,
+    ASUTUS_ID,
+    AMETIKOHT_ID,
+    ISIKUKOOD,
+    NIMI,
+    EMAIL,
+    OSAKONNA_NR,
+    OSAKONNA_NIMI,
+    SAATMISVIIS_ID,
+    STAATUS_ID,
+    SAATMISE_ALGUS,
+    SAATMISE_LOPP,
+    FAULT_CODE,
+    FAULT_ACTOR,
+    FAULT_STRING,
+    FAULT_DETAIL,
+    VASTUVOTJA_STAATUS_ID,
+    METAXML,
+    ASUTUSE_NIMI,
+    ALLYKSUS_ID,
+    DOK_ID_TEISES_SERVERIS,
+    ALLYKSUSE_LYHINIMETUS,
+    AMETIKOHA_LYHINIMETUS
+  ) VALUES (
+    ADD_VASTUVOTJA.VASTUVOTJA_ID,
+    ADD_VASTUVOTJA.TRANSPORT_ID,
+    ADD_VASTUVOTJA.ASUTUS_ID,
+    ADD_VASTUVOTJA.AMETIKOHT_ID,
+    ADD_VASTUVOTJA.ISIKUKOOD,
+    ADD_VASTUVOTJA.NIMI,
+    ADD_VASTUVOTJA.EMAIL,
+    ADD_VASTUVOTJA.OSAKONNA_NR,
+    ADD_VASTUVOTJA.OSAKONNA_NIMI,
+    ADD_VASTUVOTJA.SAATMISVIIS_ID,
+    ADD_VASTUVOTJA.STAATUS_ID,
+    ADD_VASTUVOTJA.SAATMISE_ALGUS,
+    ADD_VASTUVOTJA.SAATMISE_LOPP,
+    ADD_VASTUVOTJA.FAULT_CODE,
+    ADD_VASTUVOTJA.FAULT_ACTOR,
+    ADD_VASTUVOTJA.FAULT_STRING,
+    ADD_VASTUVOTJA.FAULT_DETAIL,
+    ADD_VASTUVOTJA.VASTUVOTJA_STAATUS_ID,
+    ADD_VASTUVOTJA.METAXML,
+    ADD_VASTUVOTJA.ASUTUSE_NIMI,
+    ADD_VASTUVOTJA.ALLYKSUS_ID,
+    ADD_VASTUVOTJA.DOK_ID_TEISES_SERVERIS,
+    ADD_VASTUVOTJA.ALLYKSUSE_LYHINIMETUS,
+    ADD_VASTUVOTJA.AMETIKOHA_LYHINIMETUS
+  );
+  
+END ADD_VASTUVOTJA;
+/
+
+create or replace
+PROCEDURE UPDATE_VASTUVOTJA (
+  vastuvotja_id in vastuvotja.vastuvotja_id%TYPE, 
+  transport_id in vastuvotja.transport_id%TYPE, 
+  asutus_id in vastuvotja.asutus_id%TYPE, 
+  ametikoht_id in vastuvotja.ametikoht_id%TYPE, 
+  allyksus_id in vastuvotja.allyksus_id%TYPE, 
+  isikukood in vastuvotja.isikukood%TYPE, 
+  nimi in vastuvotja.nimi%TYPE, 
+  asutuse_nimi in vastuvotja.asutuse_nimi%TYPE, 
+  email in vastuvotja.email%TYPE, 
+  osakonna_nr in vastuvotja.osakonna_nr%TYPE, 
+  osakonna_nimi in vastuvotja.osakonna_nimi%TYPE, 
+  saatmisviis_id in vastuvotja.saatmisviis_id%TYPE, 
+  staatus_id in vastuvotja.staatus_id%TYPE, 
+  saatmise_algus in vastuvotja.saatmise_algus%TYPE, 
+  saatmise_lopp in vastuvotja.saatmise_lopp%TYPE, 
+  fault_code in vastuvotja.fault_code%TYPE, 
+  fault_actor in vastuvotja.fault_actor%TYPE, 
+  fault_string in vastuvotja.fault_string%TYPE, 
+  fault_detail in vastuvotja.fault_detail%TYPE, 
+  vastuvotja_staatus_id in vastuvotja.vastuvotja_staatus_id%TYPE, 
+  metaxml in vastuvotja.metaxml%TYPE, 
+  dok_id_teises_serveris in vastuvotja.dok_id_teises_serveris%TYPE, 
+  allyksuse_lyhinimetus in vastuvotja.allyksuse_lyhinimetus%TYPE, 
+  ametikoha_lyhinimetus in vastuvotja.ametikoha_lyhinimetus%TYPE,
+  xtee_isikukood in varchar2,
+  xtee_asutus in varchar2
+) AS 
+BEGIN
+  
+  -- Set session scope variables
+  DVKLOG.xtee_isikukood := UPDATE_VASTUVOTJA.xtee_isikukood;
+  DVKLOG.xtee_asutus := UPDATE_VASTUVOTJA.xtee_asutus;
+  
+  UPDATE vastuvotja set
+    TRANSPORT_ID = UPDATE_VASTUVOTJA.TRANSPORT_ID,
+    ASUTUS_ID = UPDATE_VASTUVOTJA.ASUTUS_ID,
+    AMETIKOHT_ID = UPDATE_VASTUVOTJA.AMETIKOHT_ID,
+    ISIKUKOOD = UPDATE_VASTUVOTJA.ISIKUKOOD,
+    NIMI = UPDATE_VASTUVOTJA.NIMI,
+    EMAIL = UPDATE_VASTUVOTJA.EMAIL,
+    OSAKONNA_NR = UPDATE_VASTUVOTJA.OSAKONNA_NR,
+    OSAKONNA_NIMI = UPDATE_VASTUVOTJA.OSAKONNA_NIMI,
+    SAATMISVIIS_ID = UPDATE_VASTUVOTJA.SAATMISVIIS_ID,
+    STAATUS_ID = UPDATE_VASTUVOTJA.STAATUS_ID,
+    SAATMISE_ALGUS = UPDATE_VASTUVOTJA.SAATMISE_ALGUS,
+    SAATMISE_LOPP = UPDATE_VASTUVOTJA.SAATMISE_LOPP,
+    FAULT_CODE = UPDATE_VASTUVOTJA.FAULT_CODE,
+    FAULT_ACTOR = UPDATE_VASTUVOTJA.FAULT_ACTOR,
+    FAULT_STRING = UPDATE_VASTUVOTJA.FAULT_STRING,
+    FAULT_DETAIL = UPDATE_VASTUVOTJA.FAULT_DETAIL,
+    VASTUVOTJA_STAATUS_ID = UPDATE_VASTUVOTJA.VASTUVOTJA_STAATUS_ID,
+    METAXML = UPDATE_VASTUVOTJA.METAXML,
+    ASUTUSE_NIMI = UPDATE_VASTUVOTJA.ASUTUSE_NIMI,
+    ALLYKSUS_ID = UPDATE_VASTUVOTJA.ALLYKSUS_ID,
+    DOK_ID_TEISES_SERVERIS = UPDATE_VASTUVOTJA.DOK_ID_TEISES_SERVERIS,
+    ALLYKSUSE_LYHINIMETUS = UPDATE_VASTUVOTJA.ALLYKSUSE_LYHINIMETUS,
+    AMETIKOHA_LYHINIMETUS = UPDATE_VASTUVOTJA.AMETIKOHA_LYHINIMETUS
+  WHERE VASTUVOTJA_ID = UPDATE_VASTUVOTJA.VASTUVOTJA_ID;
+  
+END UPDATE_VASTUVOTJA;
+/
+
+-- Insert conversion data
+CREATE OR REPLACE DIRECTORY DIR_TEMP_KONV AS '&KONVERSIOON_DIRECTORY';
+
+DECLARE
+
+    v_inputFile VARCHAR2(100) := 'v2_v1.xsl';
+    v_dir VARCHAR2(100) := 'DIR_TEMP_KONV';
+    v_conversion_id konversioon.id%TYPE;  
+  
+    dest_clob   CLOB;
+    src_clob    BFILE  := BFILENAME(v_dir, v_inputFile);
+    dst_offset  number := 1 ;
+    src_offset  number := 1 ;
+    lang_ctx    number := DBMS_LOB.DEFAULT_LANG_CTX;
+    warning     number;
+  
+BEGIN
+
+  -- insert a NULL record to lock
+  INSERT INTO konversioon (
+    version, 
+    result_version, 
+    xslt
+  ) VALUES (
+    2,
+    1,
+    EMPTY_CLOB()
+  ) RETURNING id INTO v_conversion_id;
+  
+  -- lock record
+  SELECT xslt
+  INTO dest_clob
+  FROM konversioon
+  WHERE id = v_conversion_id FOR UPDATE;
+
+  DBMS_LOB.OPEN(src_clob, DBMS_LOB.LOB_READONLY);
+
+  DBMS_LOB.LoadCLOBFromFile(
+          DEST_LOB     => dest_clob
+        , SRC_BFILE    => src_clob
+        , AMOUNT       => DBMS_LOB.GETLENGTH(src_clob)
+        , DEST_OFFSET  => dst_offset
+        , SRC_OFFSET   => src_offset
+        , BFILE_CSID   => DBMS_LOB.DEFAULT_CSID
+        , LANG_CONTEXT => lang_ctx
+        , WARNING      => warning
+    );
+
+  -- update the blob field
+  UPDATE konversioon
+  SET xslt = dest_clob
+  WHERE id = v_conversion_id;
+
+  -- close file
+  dbms_lob.fileclose(src_clob);
+  
+  EXCEPTION
+    WHEN OTHERS THEN
+      dbms_lob.fileclose(src_clob);
+  
+END;
+/

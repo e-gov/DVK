@@ -26,6 +26,16 @@ ADD (
     versioon number(10) default 1
 );
 
+alter table dokumendi_fail add (
+	valine_manus number(1,0) default 0 not null
+)
+/
+
+alter table dokumendi_metaandmed add(
+    kommentaar varchar2(4000) null
+)
+/
+
 alter
 table   allyksus
 add
@@ -163,6 +173,36 @@ PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS
 STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
 PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT)
 /
+
+create table konversioon
+(
+	id number(38,0) primary key not null,
+	version number(10,0) not null,
+	result_version number(10,0) not null,
+	xslt clob not null
+)
+/
+
+create sequence sq_konv_id
+start with 1
+increment by 1
+minvalue 1
+nomaxvalue
+nocache
+/
+
+create trigger tr_konv_id
+    before insert
+    on konversioon
+    for each row
+begin
+    select  sq_konv_id.nextval
+    into    globalPkg.identity
+    from    dual;
+    :new.id := globalPkg.identity;
+end;
+/
+
 
 insert
 into    staatuse_ajalugu(
@@ -574,7 +614,7 @@ procedure Get_AmetikohtList(
 as
 begin
     -- Allolev keeruline union all konstruktsioon on kasulik
-    -- OR operaatori vältimiseks (Oracle puhul väga aeglane)
+    -- OR operaatori v�ltimiseks (Oracle puhul v�ga aeglane)
     open RC1 for
     select  a.*,
             null as allyksuse_lyhinimetus
@@ -582,8 +622,6 @@ begin
     where   a.asutus_id = nvl(Get_AmetikohtList.asutus_id, a.asutus_id)
             and a.ametikoht_nimetus = Get_AmetikohtList.nimetus
             and a.allyksus_id is null
-            and nvl(a.alates, add_months(sysdate, -1)) < sysdate
-            and nvl(a.kuni, add_months(sysdate, 1)) > sysdate
     union all
     select  a1.*,
             null as allyksuse_lyhinimetus
@@ -591,8 +629,6 @@ begin
     where   a1.asutus_id = nvl(Get_AmetikohtList.asutus_id, a1.asutus_id)
             and Get_AmetikohtList.nimetus is null
             and a1.allyksus_id is null
-            and nvl(a1.alates, add_months(sysdate, -1)) < sysdate
-            and nvl(a1.kuni, add_months(sysdate, 1)) > sysdate
     union all
     select  a2.*,
             y2.lyhinimetus as allyksuse_lyhinimetus
@@ -600,20 +636,15 @@ begin
     where   a2.asutus_id = nvl(Get_AmetikohtList.asutus_id, a2.asutus_id)
             and a2.ametikoht_nimetus = Get_AmetikohtList.nimetus
             and y2.id = a2.allyksus_id
-            and nvl(a2.alates, add_months(sysdate, -1)) < sysdate
-            and nvl(a2.kuni, add_months(sysdate, 1)) > sysdate
     union all
     select  a3.*,
             y3.lyhinimetus as allyksuse_lyhinimetus
     from    ametikoht a3, allyksus y3
     where   a3.asutus_id = nvl(Get_AmetikohtList.asutus_id, a3.asutus_id)
             and Get_AmetikohtList.nimetus is null
-            and y3.id = a3.allyksus_id
-            and nvl(a3.alates, add_months(sysdate, -1)) < sysdate
-            and nvl(a3.kuni, add_months(sysdate, 1)) > sysdate;
+            and y3.id = a3.allyksus_id;
 end;
 /
-
 
 create or replace
 procedure Get_AllyksusList(
@@ -623,7 +654,7 @@ procedure Get_AllyksusList(
 as
 begin
     -- Allolev keeruline union all konstruktsioon on kasulik
-    -- OR operaatori vältimiseks (Oracle puhul väga aeglane)
+    -- OR operaatori v�ltimiseks (Oracle puhul v�ga aeglane)
     open RC1 for
     select  a.*,
             null as ks_allyksuse_lyhinimetus
@@ -674,7 +705,7 @@ begin
     select  *
     from    dokument d,
     (
-        -- Dokumendid, mis adresseeriti päringu teostanud isikule (isikukoodi alusel)
+        -- Dokumendid, mis adresseeriti p�ringu teostanud isikule (isikukoodi alusel)
         select  t1.dokument_id
         from    transport t1, vastuvotja v1, isik i1
         where   t1.transport_id = v1.transport_id
@@ -687,7 +718,7 @@ begin
                 and nvl(Get_DocumentsSentTo.occupation_id_, nvl(v1.ametikoht_id,0)) = nvl(v1.ametikoht_id,0)
                 and nvl(Get_DocumentsSentTo.occupation_short_name, nvl(v1.ametikoha_lyhinimetus,' ')) = nvl(v1.ametikoha_lyhinimetus,' ')
                 
-        -- Dokumendid, mis adresseeriti päringu teostaja ametikohale (ametikoha ID või lühinimetus)
+        -- Dokumendid, mis adresseeriti p�ringu teostaja ametikohale (ametikoha ID v�i l�hinimetus)
         union
         select  t2.dokument_id
         from    transport t2, vastuvotja v2
@@ -716,7 +747,7 @@ begin
                 and nvl(Get_DocumentsSentTo.occupation_id_, nvl(v2.ametikoht_id,0)) = nvl(v2.ametikoht_id,0)
                 and nvl(Get_DocumentsSentTo.occupation_short_name, nvl(v2.ametikoha_lyhinimetus,' ')) = nvl(v2.ametikoha_lyhinimetus,' ')
         
-        -- Dokumendid, mis adresseeriti päringu teostaja allüksusele
+        -- Dokumendid, mis adresseeriti p�ringu teostaja all�ksusele
         union
         select  t3.dokument_id
         from    transport t3, vastuvotja v3
@@ -745,9 +776,9 @@ begin
                 and nvl(Get_DocumentsSentTo.occupation_id_, nvl(v3.ametikoht_id,0)) = nvl(v3.ametikoht_id,0)
                 and nvl(Get_DocumentsSentTo.occupation_short_name, nvl(v3.ametikoha_lyhinimetus,' ')) = nvl(v3.ametikoha_lyhinimetus,' ')
         
-        -- Dokumendid, mis adresseeriti päringu teostaja ametikohale
-        -- päringu teostaja allüksuses (vastupidine juhtum oleks, et
-        -- dokument saadeti mõnele teisele ametikohale samas allüksuses).
+        -- Dokumendid, mis adresseeriti p�ringu teostaja ametikohale
+        -- p�ringu teostaja all�ksuses (vastupidine juhtum oleks, et
+        -- dokument saadeti m�nele teisele ametikohale samas all�ksuses).
         union
         select  t4.dokument_id
         from    transport t4, vastuvotja v4
@@ -1873,69 +1904,6 @@ BEGIN
 END UPDATE_VASTUVOTJA;
 /
 
--- Insert conversion data
-CREATE OR REPLACE DIRECTORY DIR_TEMP_KONV AS '&KONVERSIOON_DIRECTORY';
-
-DECLARE
-
-    v_inputFile VARCHAR2(100) := 'v2_v1.xsl';
-    v_dir VARCHAR2(100) := 'DIR_TEMP_KONV';
-    v_conversion_id konversioon.id%TYPE;  
-  
-    dest_clob   CLOB;
-    src_clob    BFILE  := BFILENAME(v_dir, v_inputFile);
-    dst_offset  number := 1 ;
-    src_offset  number := 1 ;
-    lang_ctx    number := DBMS_LOB.DEFAULT_LANG_CTX;
-    warning     number;
-  
-BEGIN
-
-  -- insert a NULL record to lock
-  INSERT INTO konversioon (
-    version, 
-    result_version, 
-    xslt
-  ) VALUES (
-    2,
-    1,
-    EMPTY_CLOB()
-  ) RETURNING id INTO v_conversion_id;
-  
-  -- lock record
-  SELECT xslt
-  INTO dest_clob
-  FROM konversioon
-  WHERE id = v_conversion_id FOR UPDATE;
-
-  DBMS_LOB.OPEN(src_clob, DBMS_LOB.LOB_READONLY);
-
-  DBMS_LOB.LoadCLOBFromFile(
-          DEST_LOB     => dest_clob
-        , SRC_BFILE    => src_clob
-        , AMOUNT       => DBMS_LOB.GETLENGTH(src_clob)
-        , DEST_OFFSET  => dst_offset
-        , SRC_OFFSET   => src_offset
-        , BFILE_CSID   => DBMS_LOB.DEFAULT_CSID
-        , LANG_CONTEXT => lang_ctx
-        , WARNING      => warning
-    );
-
-  -- update the blob field
-  UPDATE konversioon
-  SET xslt = dest_clob
-  WHERE id = v_conversion_id;
-
-  -- close file
-  dbms_lob.fileclose(src_clob);
-  
-  EXCEPTION
-    WHEN OTHERS THEN
-      dbms_lob.fileclose(src_clob);
-  
-END;
-/
-
 CREATE OR REPLACE PACKAGE DVKLOG AS 
 
   -- Enable debugging
@@ -2120,9 +2088,9 @@ CREATE OR REPLACE PACKAGE DVKLOG AS
     operation IN VARCHAR2
   );
   
-  PROCEDURE debug (
+  /*PROCEDURE debug (
     message IN VARCHAR2
-  );
+  );*/
 
 END DVKLOG;
 /
@@ -2130,7 +2098,7 @@ END DVKLOG;
 
 CREATE OR REPLACE PACKAGE BODY DVKLOG AS
 
-  PROCEDURE debug(
+  /*PROCEDURE debug(
     message IN VARCHAR2
   ) AS
     PRAGMA AUTONOMOUS_TRANSACTION;
@@ -2139,7 +2107,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
       INSERT INTO debug VALUES (message);
     END IF;
     COMMIT;
-  END debug;
+  END debug;*/
 
   PROCEDURE LOG_DOKUMENT(
     dokument_new IN dokument%ROWTYPE,
@@ -2154,7 +2122,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
   
   BEGIN
   
-    DEBUG('DVKLOG.LOG_DOKUMENT started...');
+    --DEBUG('DVKLOG.LOG_DOKUMENT started...');
   
     -- Current user
     SELECT USER INTO usr FROM dual;
@@ -2170,7 +2138,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
   
     -- dokument_id changed
     IF(NVL(dokument_new.dokument_id, 0) != NVL(dokument_old.dokument_id, 0)) THEN    
-      DEBUG('dokument_id changed');
+      --DEBUG('dokument_id changed');
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('dokument_id');
     
       INSERT INTO logi(
@@ -2220,7 +2188,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     
     -- asutus_id changed
     IF(NVL(dokument_new.asutus_id, 0) != NVL(dokument_old.asutus_id, 0)) THEN    
-      DEBUG('asutus_id changed');
+      --DEBUG('asutus_id changed');
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = upper('dokument') AND upper(column_name) = upper('asutus_id');
     
       INSERT INTO logi(
@@ -2270,7 +2238,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     
     -- kaust_id changed
     IF(NVL(dokument_new.kaust_id, 0) != NVL(dokument_old.kaust_id, 0)) THEN    
-      DEBUG('kaust_id changed');
+      --DEBUG('kaust_id changed');
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = upper('dokument') AND upper(column_name) = upper('kaust_id');
     
       INSERT INTO logi(
@@ -2320,7 +2288,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     
     -- sailitustahtaeg changed
     IF(NVL(dokument_new.sailitustahtaeg, sysdate) != NVL(dokument_old.sailitustahtaeg, sysdate)) THEN    
-      DEBUG('sailitustahtaeg changed');
+      --DEBUG('sailitustahtaeg changed');
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = upper('dokument') AND upper(column_name) = upper('sailitustahtaeg');
     
       INSERT INTO logi(
@@ -2370,7 +2338,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     
     -- eelmise_versiooni_id changed
     IF(NVL(dokument_new.eelmise_versiooni_id, 0) != NVL(dokument_old.eelmise_versiooni_id, 0)) THEN    
-      DEBUG('eelmise_versiooni_id changed');
+      --DEBUG('eelmise_versiooni_id changed');
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = upper('dokument') AND upper(column_name) = upper('eelmise_versiooni_id');
     
       INSERT INTO logi(
@@ -2420,7 +2388,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     
     -- versioon changed
     IF(NVL(dokument_new.versioon, 0) != NVL(dokument_old.versioon, 0)) THEN    
-      DEBUG('versioon changed');
+      --DEBUG('versioon changed');
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = upper('dokument') AND upper(column_name) = upper('versioon');
     
       INSERT INTO logi(
@@ -2470,7 +2438,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     
     -- suurus changed
     IF(NVL(dokument_new.suurus, 0) != NVL(dokument_old.suurus, 0)) THEN    
-      DEBUG('suurus changed');
+      --DEBUG('suurus changed');
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = upper('dokument') AND upper(column_name) = upper('suurus');
     
       INSERT INTO logi(
@@ -2520,7 +2488,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     
     -- guid changed
     IF(NVL(dokument_new.guid, ' ') != NVL(dokument_old.guid, ' ')) THEN    
-      DEBUG('guid changed');
+      --DEBUG('guid changed');
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = upper('dokument') AND upper(column_name) = upper('guid');
     
       INSERT INTO logi(
@@ -17942,7 +17910,7 @@ DECLARE
   dokument_old dokument%ROWTYPE;
 BEGIN
 
-  DVKLOG.debug('TR_DOKUMENT_LOG started...');
+  --DVKLOG.debug('TR_DOKUMENT_LOG started...');
 
   if inserting then
     operation := 'INSERT';

@@ -12,10 +12,12 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.Writer;
 import java.sql.CallableStatement;
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -196,9 +198,10 @@ public class Document {
         try {
 	    	if (conn != null) {
 	    		boolean defaultAutoCommit = conn.getAutoCommit();
+                FileInputStream fis = null;
+                InputStreamReader r = null;
 	            conn.setAutoCommit(false);
 		    	try {
-		    		
 		    		Calendar cal = Calendar.getInstance();
 		    		m_id = getNextID(conn);
 		    		
@@ -212,6 +215,7 @@ public class Document {
 		    		cs.setInt(1, m_id);
 		    		cs.setInt(2, m_organizationID);
 		    		cs.setInt(3, m_folderID);
+		    		cs.setString(4, " ");
 		    		cs.setTimestamp(5, CommonMethods.sqlDateFromDate(m_conservationDeadline), cal);
 		    		
 		    		if(fileSize > 0) {
@@ -231,22 +235,47 @@ public class Document {
 		    			cs.setString(10, null);
 		    		}
 		    		
-		    		// XML to CLOB
-		    		int fileCharsCount = CommonMethods.getCharacterCountInFile(m_filePath);
-		    		inStream = new FileInputStream(m_filePath);
-		            inReader = new InputStreamReader(inStream, "UTF-8");
-		            reader = new BufferedReader(inReader);
-		    		cs.setCharacterStream(4, reader, fileCharsCount);
-		    		
 		    		// Execute
 		    		cs.execute();
 		    		cs.close();
-		    		conn.commit();
 		    		
+		    		// XML to CLOB
+		    		// int fileCharsCount = CommonMethods.getCharacterCountInFile(m_filePath);
+		    		// inStream = new FileInputStream(m_filePath);
+		            // inReader = new InputStreamReader(inStream, "UTF-8");
+		            // reader = new BufferedReader(inReader);
+		    		// cs.setCharacterStream(4, reader, fileCharsCount);
+                    if (file.exists()) {
+                        Statement stmt = conn.createStatement();
+                        ResultSet rs = stmt.executeQuery("SELECT sisu FROM dokument WHERE dokument_id=" + String.valueOf(m_id) + " FOR UPDATE");
+                        if (rs.next()) {
+                            Clob sisu = rs.getClob(1);
+                            Writer clobWriter = sisu.setCharacterStream(0);
+                            fis = new FileInputStream(m_filePath);
+                            r = new InputStreamReader(fis, "UTF-8");
+                            char[] cbuffer = new char[Settings.getDBBufferSize()];
+                            int nread = 0;
+                            while ((nread = r.read(cbuffer)) > 0) {
+                                clobWriter.write(cbuffer, 0, nread);
+                            }
+                            CommonMethods.safeCloseWriter(clobWriter);
+                            CommonMethods.safeCloseReader(r);
+                            CommonMethods.safeCloseStream(fis);
+                        } else {
+                        	throw new Exception("Failed writing document contents to database, ID " + String.valueOf(m_id) + " returned empty recordset!");
+                        }
+                        stmt.close();
+                    } else {
+                    	throw new Exception("Document file " + m_filePath + " of document "+ String.valueOf(m_id) +" does not exist and therefore cannot be saved into database!");
+                    }
+		    		
+		    		// Execute
+		    		conn.commit();
 	    		} catch(Exception e) {
 	    			logger.error("Exception while saving document to database: ", e);
 	    			conn.rollback();
                     conn.setAutoCommit(defaultAutoCommit);
+                    throw e;
 	    		} finally {
 	    			CommonMethods.safeCloseReader(reader);
 	                CommonMethods.safeCloseReader(inReader);

@@ -113,7 +113,7 @@ public abstract class Container
 
 	protected abstract Version getInternalVersion();
 
-	protected static Container marshal(Reader reader, Version version) throws MappingException, MarshalException,
+	public static Container marshal(Reader reader, Version version) throws MappingException, MarshalException,
 		ValidationException, IOException {
 		Container dhl = null;
 

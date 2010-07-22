@@ -3,6 +3,7 @@ package dvk.api.container;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.URL;
 
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
@@ -42,10 +43,14 @@ public abstract class Container
 			switch (version)
 				{
 				case Ver1:
-					mapping.loadMapping(CastorMappingsFileVer1);
+					URL mappingURL = mapping.getClassLoader().getResource(CastorMappingsFileVer1);
+					mapping.loadMapping( mappingURL );
+					//mapping.loadMapping(CastorMappingsFileVer1);
 					break;
 				case Ver2:
-					mapping.loadMapping(CastorMappingsFileVer2);
+					URL mappingURL2 = mapping.getClassLoader().getResource(CastorMappingsFileVer2);
+					mapping.loadMapping( mappingURL2 );
+					//mapping.loadMapping(CastorMappingsFileVer2);
 					break;
 				default:
 					throw new RuntimeException("Unexpected version: " + version);

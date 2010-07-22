@@ -14,7 +14,7 @@
 		<map-to xml="dokument" ns-uri="http://www.riik.ee/schemas/dhl/2010/2" ns-prefix="dhl" />
 
 		<field name="version" type="integer">
-			<bind-xml name="konteineri_versioon" node="attribute" />
+			<bind-xml name="konteineri_versioon" />
 		</field>
 
 		<field name="metainfo" type="dvk.api.container.v2.Metainfo">

@@ -3,7 +3,7 @@
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 	<!-- Generated 2.02.2010 20:05:51 by Hibernate Tools 3.2.4.GA -->
 <hibernate-mapping>
-	<class name="dvk.api.ml.PojoMessageRecipient" table="DHL_MESSAGE_RECIPIENT" schema="DVK">
+	<class name="dvk.api.ml.PojoMessageRecipient" table="DHL_MESSAGE_RECIPIENT">
 		<id name="id" type="big_decimal">
 			<column name="ID" precision="38" scale="0" />
 			<generator class="assigned" />

@@ -3,7 +3,7 @@
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <!-- Generated 7.02.2010 22:22:31 by Hibernate Tools 3.2.4.GA -->
 <hibernate-mapping>
-    <class name="dvk.api.ml.PojoOrganization" table="DHL_ORGANIZATION" schema="DVK">
+    <class name="dvk.api.ml.PojoOrganization" table="DHL_ORGANIZATION">
         <id name="orgCode" type="string">
             <column name="ORG_CODE" length="20" />
             <generator class="assigned" />

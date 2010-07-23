@@ -557,7 +557,6 @@ public class Util
 		byte[] buf = new byte[lineLength / 4 * 3];
 		while (true) {
 			int len = in.read(buf);
-			LOG.debug("Encoding: " + new String(buf));
 			if (len <= 0)
 				break;
 			out.write(Base64Coder.encode(buf, len));

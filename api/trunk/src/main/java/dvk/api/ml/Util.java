@@ -32,6 +32,7 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.logging.Log;
+import org.apache.log4j.Logger;
 import org.apache.xerces.impl.dv.util.Base64;
 import org.hibernate.Session;
 import org.hibernate.TypeMismatchException;
@@ -54,6 +55,8 @@ public class Util
 	private static String[] shortDateFormats;
 	public final static String NewLine = System.getProperty("line.separator");
 
+	private static Logger LOG = Logger.getLogger(Util.class);
+	
 	/**
 	 * Returns true if list is null or it's empty.
 	 * 
@@ -554,14 +557,19 @@ public class Util
 		byte[] buf = new byte[lineLength / 4 * 3];
 		while (true) {
 			int len = in.read(buf);
+			LOG.debug("Encoding: " + new String(buf));
 			if (len <= 0)
 				break;
 			out.write(Base64Coder.encode(buf, len));
-			out.newLine();
+			out.write("\n");
+			//out.newLine();
 		}
 	}
 
 	public static String zipAndEncode(String filePath) {
+		
+		LOG.debug("Encoding file: " + filePath);
+		
 		try {
 			ByteArrayOutputStream zipOut = new ByteArrayOutputStream();
 

@@ -257,7 +257,7 @@ public interface IMessage extends IMessageObserver, IDvkElement
 	 *          proxy's name
 	 */
 	void setProxyName(String proxyName);
-
+	
 	/**
 	 * Sets recipient's department number of the message.
 	 * 
@@ -314,6 +314,12 @@ public interface IMessage extends IMessageObserver, IDvkElement
 	 */
 	void setRecipientPositionName(String recipientPositionName);
 
+	/**
+	 * Sets proxy's DHL GUID
+	 * @param guid
+	 */
+	void setDhlGuid(String guid);
+	
 	/**
 	 * Adds an existing message recipient to a pending list of message recipients if it doesn't
 	 * contain such a message recipient yet and will change its message DHL ID after message's or

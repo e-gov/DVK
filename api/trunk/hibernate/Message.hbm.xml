@@ -122,6 +122,9 @@
         <property name="recipientPositionName" type="string">
             <column name="RECIPIENT_POSITION_NAME" length="100" />
         </property>
+        <property name="dhlGuid" type="string">
+            <column name="DHL_GUID" length="100" />
+        </property>
     </class>
 	<sql-query name="CreateNewMessage" callable="true">
 	    <return alias="new_msg" class="dvk.api.ml.PojoMessage">

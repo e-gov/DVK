@@ -286,4 +286,11 @@ public interface IMessageObserver extends IElementObserver
 	 * @return {@link String}
 	 */
 	String getRecipientPositionName();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	String getDhlGuid();
+	
 }

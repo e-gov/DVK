@@ -440,6 +440,8 @@ class DvkMessage extends DescendantsContainerFacade<PojoMessage> implements IMes
 		}
 	}
 
+	
+	
 	public Clob getMetaxml() {
 		return pojo.metaxml;
 	}
@@ -473,6 +475,17 @@ class DvkMessage extends DescendantsContainerFacade<PojoMessage> implements IMes
 		}
 	}
 
+	public String getDhlGuid() {
+		return pojo.dhlGuid;
+	}
+
+	public void setDhlGuid(String guid) {
+		if (!hasSameValue(pojo.dhlGuid, guid)) {
+			pojo.dhlGuid = guid;
+			setDirty(true);
+		}
+	}
+	
 	public String getProxyOrgName() {
 		return pojo.proxyOrgName;
 	}

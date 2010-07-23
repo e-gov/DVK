@@ -103,6 +103,16 @@ public class PojoMessage implements IMessageObserver, java.io.Serializable
 	protected BigDecimal recipientPositionId;
 	protected String recipientPositionName;
 
+	protected String dhlGuid;
+	
+	public String getDhlGuid() {
+		return dhlGuid;
+	}
+
+	public void setDhlGuid(String dhlGuid) {
+		this.dhlGuid = dhlGuid;
+	}
+
 	public PojoMessage() {
 	}
 

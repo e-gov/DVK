@@ -10,14 +10,26 @@
     <process_name>[db_process_name]</process_name>
     <instance_name>[mssql_instance_name]</instance_name>
     <schema_name>[postgres_schema_name]</schema_name>
-    <dvk_settings>
-      <service_url>http://[TURVASERVER]/cgi-bin/consumer_proxy</service_url>
-      <send_documents_ver>1</send_documents_ver> <!-- V�imalikud v��rtused: 1, 2 -->
-      <receive_documents_ver>1</receive_documents_ver> <!-- V�imalikud v��rtused: 1, 2, 3 -->
-      <mark_documents_received_ver>1</mark_documents_received_ver> <!-- V�imalikud v��rtused: 1, 2 -->
-      <get_send_status_ver>1</get_send_status_ver> <!-- V�imalikud v��rtused: 1 -->
-      <get_sending_options_ver>1</get_sending_options_ver> <!-- V�imalikud v��rtused: 1, 2 -->
-      <default_status_id>0</default_status_id> <!-- V�imalikud v��rtused: 0-11 -->
+    
+	<dvk_settings>
+      <!-- Kui siin service_url väärtus määramata jätta, siis kasutab rakendus antud andmebaasi puhul
+	  üldist (dvk_client.properties failis määratud) turvaserveri aadressi -->
+	  <service_url>http://[TURVASERVER]/cgi-bin/consumer_proxy</service_url>
+      
+	  <send_documents_ver>1</send_documents_ver> <!-- Võimalikud väärtused: 1, 2, 3 -->
+      <receive_documents_ver>1</receive_documents_ver> <!-- Võimalikud väärtused: 1, 2, 3, 4 -->
+      <mark_documents_received_ver>1</mark_documents_received_ver> <!-- Võimalikud väärtused: 1, 2, 3 -->
+      <get_send_status_ver>1</get_send_status_ver> <!-- Võimalikud väärtused: 1, 2 -->
+      <get_sending_options_ver>1</get_sending_options_ver> <!-- Võimalikud väärtused: 1, 2, 3 -->
+      <get_subdivision_list_ver>1</get_subdivision_list_ver> <!-- Võimalikud väärtused: 1, 2 -->
+      <get_occupation_list_ver>1</get_occupation_list_ver> <!-- Võimalikud väärtused: 1, 2 -->
+      <default_status_id>0</default_status_id> <!-- Võimalikud väärtused: 0-11 -->
     </dvk_settings>
+    
+	<!-- Kui parameetri "db_to_db_communication_only" väärtuseks on "true", siis ei ürita
+	rakendus antud andmebaasi andmeid DVK keskserveriga sünkroniseerida. Selliselt kirjeldatud
+	andmebaasiühendused on kasulikud selleks, et universaalklient saaks vajadusel asutusesiseselt
+	dokumendid otse ühest andmebaasist teise saata. -->
+	<db_to_db_communication_only>false</db_to_db_communication_only>
   </database>
 </databases>

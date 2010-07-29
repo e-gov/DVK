@@ -1,5 +1,6 @@
 package dvk.api.container.v2;
 
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -101,9 +102,23 @@ public class ContainerVer2 extends Container
 			in.close();
 		}
 	}
-
+	
+	public static ContainerVer2 parseFile(String fileName) throws MappingException, MarshalException, ValidationException, IOException {
+		ContainerVer2 result = null;		
+		if (fileName == null || fileName.trim().equals("")) {
+			LOG.error("Cannot parse DVK Container: empty filename.");
+			result = null;
+		}
+		
+		FileReader fr = new FileReader(fileName);
+		result = (ContainerVer2) Container.marshal(fr, Version.Ver2);
+		fr.close();
+		
+		return result;
+	}
+	
 	public static ContainerVer2 parse(Reader reader) throws MappingException, MarshalException, ValidationException, IOException {
-		if (reader == null || !reader.ready()) {
+		if (reader == null) {
 			LOG.error("Cannot parse DVK Container: reader not initialized.");
 			return null;
 		}

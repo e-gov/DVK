@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+
+import org.apache.log4j.Logger;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.Marshaller;
@@ -14,6 +16,9 @@ import dvk.api.ml.Util;
 
 public class ContainerVer2 extends Container
 {
+	
+	private static Logger LOG = Logger.getLogger(ContainerVer2.class);
+	
 	private Transport transport;
 	private Metainfo metainfo;
 	private Ajalugu ajalugu;
@@ -99,6 +104,7 @@ public class ContainerVer2 extends Container
 
 	public static ContainerVer2 parse(Reader reader) throws MappingException, MarshalException, ValidationException, IOException {
 		if (reader == null || !reader.ready()) {
+			LOG.error("Cannot parse DVK Container: reader not initialized.");
 			return null;
 		}
 		

@@ -1,6 +1,7 @@
 package dvk.api.container.v2;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import org.exolab.castor.mapping.MappingException;
@@ -96,6 +97,14 @@ public class ContainerVer2 extends Container
 		}
 	}
 
+	public static ContainerVer2 parse(Reader reader) throws MappingException, MarshalException, ValidationException, IOException {
+		if (reader == null || !reader.ready()) {
+			return null;
+		}
+		
+		return (ContainerVer2) Container.marshal(reader, Version.Ver2);		
+	}
+	
 	public void createDescendants(boolean metainfo, boolean transport, boolean ajalugu, boolean metaxml, boolean failid) {
 		if (metainfo) {
 			if (this.metainfo == null) {

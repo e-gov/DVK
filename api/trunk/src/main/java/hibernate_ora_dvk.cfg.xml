@@ -9,7 +9,7 @@
 		<property name="hibernate.connection.username">dvkclient</property>
 		<property name="hibernate.connection.password">dvkclient123</property>
 		<property name="connection.autocommit">false</property>
-		<property name="show_sql">true</property>
+		<property name="show_sql">false</property>
 		<property name="use_outer_join">false</property>
 		<property name="hibernate.cache.use_second_level_cache">false</property>
 		<property name="cache.provider_class">org.hibernate.cache.NoCacheProvider</property>
@@ -19,7 +19,7 @@
 		<property name="hibernate.c3p0.timeout">1800</property>
 		<property name="hibernate.c3p0.max_statements">50</property>
 		<property name="hibernate.connection.pool_size">10</property>
-		<property name="hibernate.hbm2ddl.auto">update</property>
+		<!-- <property name="hibernate.hbm2ddl.auto">update</property> -->
 		<!-- Mapping files -->
 		<mapping resource="dvkapi/Counter.hbm.xml"/>
 		<mapping resource="dvkapi/Subdivision.hbm.xml"/>

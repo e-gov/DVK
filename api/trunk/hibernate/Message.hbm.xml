@@ -6,7 +6,9 @@
     <class name="dvk.api.ml.PojoMessage" table="DHL_MESSAGE">
         <id name="dhlMessageId" type="long">
             <column name="DHL_MESSAGE_ID" precision="10" scale="0" />
-            <generator class="assigned" />
+            <generator class="sequence">
+				<param name="sequence">SQ_DHL_MESSAGE_ID</param>
+			</generator>
         </id>
         <property name="isIncoming" type="boolean">
             <column name="IS_INCOMING" precision="1" scale="0" not-null="true" />

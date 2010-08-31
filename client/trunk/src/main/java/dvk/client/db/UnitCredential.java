@@ -6,6 +6,7 @@ import dvk.core.CommonStructures;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 
@@ -139,46 +140,41 @@ public class UnitCredential {
         m_folders = new ArrayList<String>();
     }
 
-    public static UnitCredential[] getCredentials(OrgSettings settings) {
-        try {
-            Connection conn = DBConnection.getConnection(settings);
-            if (conn != null) {
-                conn.setAutoCommit(false);
-                CallableStatement cs = DBConnection.getStatementForResultSet("Get_DhlSettings", 0, settings, conn);
-                ResultSet rs = DBConnection.getResultSet(cs, settings, 0);
-                ArrayList<UnitCredential> result = new ArrayList<UnitCredential>();
-                while (rs.next()) {
-                    UnitCredential item = new UnitCredential();
-                    item.setId(rs.getInt("id"));
-                    item.setInstitutionCode(rs.getString("institution_code"));
-                    item.setInstitutionName(rs.getString("institution_name"));
-                    item.setPersonalIdCode(rs.getString("personal_id_code"));
-                    item.setUnitID(rs.getInt("unit_id"));
-                    item.setDivisionID(rs.getInt("subdivision_code"));
-                    item.setOccupationID(rs.getInt("occupation_code"));
-                    item.setDivisionShortName(rs.getString("subdivision_short_name"));
-                    item.setOccupationShortName(rs.getString("occupation_short_name"));
-                    item.setDivisionName(rs.getString("subdivision_name"));
-                    item.setOccupationName(rs.getString("occupation_name"));
-                    item.setContainerVersion(rs.getInt("container_version"));
-                    item.setFolders(loadFolders(item.getId(), conn, settings));
-                    result.add(item);
-                }
-                rs.close();
-                cs.close();
-                conn.close();
-
-                UnitCredential[] credentials = new UnitCredential[result.size()];
-                for (int i = 0; i < result.size(); ++i) {
-                    credentials[i] = result.get(i);
-                }
-                return credentials;
-            } else {
-                return new UnitCredential[] { };
+    public static UnitCredential[] getCredentials(OrgSettings settings) throws Exception {
+        Connection conn = DBConnection.getConnection(settings);
+        if (conn != null) {
+            conn.setAutoCommit(false);
+            CallableStatement cs = DBConnection.getStatementForResultSet("Get_DhlSettings", 0, settings, conn);
+            ResultSet rs = DBConnection.getResultSet(cs, settings, 0);
+            ArrayList<UnitCredential> result = new ArrayList<UnitCredential>();
+            while (rs.next()) {
+                UnitCredential item = new UnitCredential();
+                item.setId(rs.getInt("id"));
+                item.setInstitutionCode(rs.getString("institution_code"));
+                item.setInstitutionName(rs.getString("institution_name"));
+                item.setPersonalIdCode(rs.getString("personal_id_code"));
+                item.setUnitID(rs.getInt("unit_id"));
+                item.setDivisionID(rs.getInt("subdivision_code"));
+                item.setOccupationID(rs.getInt("occupation_code"));
+                item.setDivisionShortName(rs.getString("subdivision_short_name"));
+                item.setOccupationShortName(rs.getString("occupation_short_name"));
+                item.setDivisionName(rs.getString("subdivision_name"));
+                item.setOccupationName(rs.getString("occupation_name"));
+                item.setContainerVersion(rs.getInt("container_version"));
+                item.setFolders(loadFolders(item.getId(), conn, settings));
+                result.add(item);
             }
-        } catch (Exception ex) {
-            CommonMethods.logError(ex, "clnt.db.UnitCredential", "getCredentials");
-            return new UnitCredential[] { };
+            rs.close();
+            cs.close();
+            conn.close();
+
+            UnitCredential[] credentials = new UnitCredential[result.size()];
+            for (int i = 0; i < result.size(); ++i) {
+                credentials[i] = result.get(i);
+            }
+            return credentials;
+        } else {
+        	throw new Exception("Database connection is NULL!");
         }
     }
 
@@ -210,14 +206,33 @@ public class UnitCredential {
         try {
             Connection conn = DBConnection.getConnection(db);
             if (conn != null) {
-                CallableStatement cs = conn.prepareCall("{call Get_AsutusStat(?,?)}");
+                int parNr = 1;
+            	CallableStatement cs = conn.prepareCall("{call Get_AsutusStat(?,?)}");
                 if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
                     cs = conn.prepareCall("{? = call \"Get_AsutusStat\"(?)}");
                 }
-                cs.registerOutParameter(1, Types.INTEGER);
-                cs.setInt(2, unitID);
+                
+                // Mingil põhjusel toimib SQL Anywhere JDBC klient
+                // korrektselt ainult juhul, kui väljundparameetrid asuvad kõige lõpus.
+                // Vastasel juhul liigutatakse kõik väljundparameetrile
+                // järgnevad sisendparameetrid ühe koha võrra edasi.
+                if (!CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                	parNr++;
+                }
+                
+                cs.setInt(parNr++, unitID);
+                if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                	cs.registerOutParameter(parNr, Types.INTEGER);
+                } else {
+                	cs.registerOutParameter(1, Types.INTEGER);
+                }
                 cs.execute();
-                int result = cs.getInt(1);
+                int result = 0;
+                if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                	result = cs.getInt(parNr);
+                } else {
+                	result = cs.getInt(1);
+                }
                 cs.close();
                 conn.close();
 

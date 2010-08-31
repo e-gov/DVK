@@ -15,12 +15,10 @@ import dvk.core.FileSplitResult;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.sql.CallableStatement;
 import java.sql.Clob;
 import java.sql.Connection;
@@ -75,7 +73,7 @@ public class DhlMessage implements Cloneable {
     private boolean m_statusUpdateNeeded;
     private String m_metaXML;    
     private String m_queryID; // X-tee pÃµringu pÃµise ID
-    private ArrayList<MessageRecipient> m_recipients; // sõnumi saajad
+    private ArrayList<MessageRecipient> m_recipients; // sï¿½numi saajad
     private String m_recipientDepartmentNr;
     private String m_recipientDepartmentName;
     private String m_recipientEmail;
@@ -547,19 +545,25 @@ public class DhlMessage implements Cloneable {
                     	String itemDataFile = CommonMethods.createPipelineFile(0);
                     	this.setFilePath(itemDataFile);
                     	
-                    	if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    		CommonMethods.writeToFile(itemDataFile, rs.getString("data").getBytes("UTF-8"));
+                    	if (CommonStructures.PROVIDER_TYPE_POSTGRE.equalsIgnoreCase(db.getDbProvider())
+                        	|| CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                    		byte[] containerData = rs.getString("data").getBytes("UTF-8");
+                    		logger.debug("Container data was read from database. Container size: " + containerData.length + " bytes.");
+                    		CommonMethods.writeToFile(itemDataFile, containerData);
                     	} else {
 	                        Clob tmpBlob = rs.getClob("data");
 	                        Reader r = tmpBlob.getCharacterStream();
 	                        FileOutputStream fos = new FileOutputStream(itemDataFile);
 	                        OutputStreamWriter out = new OutputStreamWriter(fos, "UTF-8");
-	                        int actualReadLength = 0;
 	                        try {
+		                        long totalSize = 0;
+		                        int actualReadLength = 0;
 	                            char[] charbuf = new char[Settings.getDBBufferSize()];
 	                            while ((actualReadLength = r.read(charbuf)) > 0) {
 	                                out.write(charbuf, 0, actualReadLength);
+	                                totalSize += actualReadLength;
 	                            }
+	                            logger.debug("Container data was read from database. Container size: " + totalSize + " characters.");
 	                        } catch (Exception e) {
 	                            CommonMethods.logError(e, "dhl.Document", "getDocumentsSentTo");
 	                            throw e;
@@ -658,19 +662,25 @@ public class DhlMessage implements Cloneable {
                         String itemDataFile = CommonMethods.createPipelineFile(docCounter);
                         item.setFilePath(itemDataFile);
                     	
-                    	if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    		CommonMethods.writeToFile(itemDataFile, rs.getString("data").getBytes("UTF-8"));
+                    	if (CommonStructures.PROVIDER_TYPE_POSTGRE.equalsIgnoreCase(db.getDbProvider())
+                    		|| CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                    		byte[] containerData = rs.getString("data").getBytes("UTF-8");
+                    		logger.debug("Container data was read from database. Container size: " + containerData.length + " bytes.");
+                    		CommonMethods.writeToFile(itemDataFile, containerData);
                     	} else {
 	                        Clob tmpBlob = rs.getClob("data");
 	                        Reader r = tmpBlob.getCharacterStream();
 	                        FileOutputStream fos = new FileOutputStream(itemDataFile);
 	                        OutputStreamWriter out = new OutputStreamWriter(fos, "UTF-8");
-	                        int actualReadLength = 0;
 	                        try {
+		                        long totalSize = 0;
+		                        int actualReadLength = 0;
 	                            char[] charbuf = new char[Settings.getDBBufferSize()];
 	                            while ((actualReadLength = r.read(charbuf)) > 0) {
 	                                out.write(charbuf, 0, actualReadLength);
+	                                totalSize += actualReadLength;
 	                            }
+	                            logger.debug("Container data was read from database. Container size: " + totalSize + " characters.");
 	                        } catch (Exception e) {
 	                            CommonMethods.logError(e, "dvk.client.businesslayer.DhlMessage", "getList");
 	                            throw e;
@@ -737,14 +747,15 @@ public class DhlMessage implements Cloneable {
         }
     }
     
-    public int addToDB(OrgSettings db) throws FileNotFoundException, SQLException, UnsupportedEncodingException {
+    public int addToDB(OrgSettings db) throws Exception {
         FileInputStream inStream = null;
         InputStreamReader inReader = null;
         BufferedReader reader = null;
         try {
-            // Loendame failis olevad tühed kokku, kuna Oracle JDBC draiver tahab
-            // kindlasti teada, kui pikk on CLOB väljale kirjutatav stream.
+            // Loendame failis olevad tÃ¤hed kokku, kuna Oracle JDBC draiver tahab
+            // kindlasti teada, kui pikk on CLOB vÃ¤ljale kirjutatav stream.
             int fileCharsCount = CommonMethods.getCharacterCountInFile(m_filePath);
+            logger.debug("Going to write container data to database. Container length: " + fileCharsCount + " characters.");
             
             inStream = new FileInputStream(m_filePath);
             inReader = new InputStreamReader(inStream, "UTF-8");
@@ -753,54 +764,73 @@ public class DhlMessage implements Cloneable {
             Connection conn = DBConnection.getConnection(db);
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
+                
+                int parNr = 1;
                 CallableStatement cs = conn.prepareCall("{call Add_DhlMessage(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
                     cs = conn.prepareCall("{? = call \"Add_DhlMessage\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 }
-                cs.registerOutParameter(1, Types.INTEGER);
-                cs.setInt(2, (m_isIncoming ? 1 : 0));
-                cs.setCharacterStream(3, reader, fileCharsCount);
-                cs.setInt(4, m_dhlID);
-                cs.setString(5, m_title);
-                cs.setString(6, m_senderOrgCode);
-                cs.setString(7, m_senderOrgName);
-                cs.setString(8, m_senderPersonCode);
-                cs.setString(9, m_senderName);
-                cs.setString(10, m_recipientOrgCode);
-                cs.setString(11, m_recipientOrgName);
-                cs.setString(12, m_recipientPersonCode);
-                cs.setString(13, m_recipientName);
-                cs.setString(14, m_caseName);
-                cs.setString(15, m_dhlFolderName);
-                cs.setInt(16, m_sendingStatusID);
-                cs.setInt(17, m_unitID);
-                cs.setTimestamp(18, CommonMethods.sqlDateFromDate(m_sendingDate), cal);
-                cs.setTimestamp(19, CommonMethods.sqlDateFromDate(m_receivedDate), cal);
-                cs.setInt(20, m_localItemID);
-                cs.setInt(21, m_recipientStatusID);
-                cs.setString(22, m_faultCode);
-                cs.setString(23, m_faultActor);
-                cs.setString(24, m_faultString);
-                cs.setString(25, m_faultDetail);
-                cs.setInt(26, (m_statusUpdateNeeded ? 1 : 0));
-                cs.setString(27, m_metaXML);
-                cs.setString(28, m_queryID);
-                cs.setString(29, m_proxyOrgCode);
-                cs.setString(30, m_proxyOrgName);
-                cs.setString(31, m_proxyPersonCode);
-                cs.setString(32, m_proxyName);
-                cs.setString(33, m_recipientDepartmentNr);
-                cs.setString(34, m_recipientDepartmentName);
-                cs.setString(35, m_recipientEmail);
-                cs.setInt(36, m_recipientDivisionID);
-                cs.setString(37, m_recipientDivisionName);
-                cs.setInt(38, m_recipientPositionID);
-                cs.setString(39, m_recipientPositionName);
-                cs.setString(40, m_recipientDivisionCode);
-                cs.setString(41, m_recipientPositionCode);
-                cs.setString(42, m_dhlGuid);
+                
+                // Mingil pÃµhjusel toimib SQL Anywhere JDBC klient
+                // korrektselt ainult juhul, kui vÃ¤ljundparameetrid asuvad kÃµige lÃµpus.
+                // Vastasel juhul liigutatakse kÃµik vÃ¤ljundparameetrile
+                // jÃ¤rgnevad sisendparameetrid Ã¼he koha vÃµrra edasi.
+                if (!CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                	parNr++;
+                }
+                
+                cs.setInt(parNr++, (m_isIncoming ? 1 : 0));
+                cs.setCharacterStream(parNr++, reader, fileCharsCount);
+                cs.setInt(parNr++, m_dhlID);
+                cs.setString(parNr++, m_title);
+                cs.setString(parNr++, m_senderOrgCode);
+                cs.setString(parNr++, m_senderOrgName);
+                cs.setString(parNr++, m_senderPersonCode);
+                cs.setString(parNr++, m_senderName);
+                cs.setString(parNr++, m_recipientOrgCode);
+                cs.setString(parNr++, m_recipientOrgName);
+                cs.setString(parNr++, m_recipientPersonCode);
+                cs.setString(parNr++, m_recipientName);
+                cs.setString(parNr++, m_caseName);
+                cs.setString(parNr++, m_dhlFolderName);
+                cs.setInt(parNr++, m_sendingStatusID);
+                cs.setInt(parNr++, m_unitID);
+                cs.setTimestamp(parNr++, CommonMethods.sqlDateFromDate(m_sendingDate), cal);
+                cs.setTimestamp(parNr++, CommonMethods.sqlDateFromDate(m_receivedDate), cal);
+                cs.setInt(parNr++, m_localItemID);
+                cs.setInt(parNr++, m_recipientStatusID);
+                cs.setString(parNr++, m_faultCode);
+                cs.setString(parNr++, m_faultActor);
+                cs.setString(parNr++, m_faultString);
+                cs.setString(parNr++, m_faultDetail);
+                cs.setInt(parNr++, (m_statusUpdateNeeded ? 1 : 0));
+                cs.setString(parNr++, m_metaXML);
+                cs.setString(parNr++, m_queryID);
+                cs.setString(parNr++, m_proxyOrgCode);
+                cs.setString(parNr++, m_proxyOrgName);
+                cs.setString(parNr++, m_proxyPersonCode);
+                cs.setString(parNr++, m_proxyName);
+                cs.setString(parNr++, m_recipientDepartmentNr);
+                cs.setString(parNr++, m_recipientDepartmentName);
+                cs.setString(parNr++, m_recipientEmail);
+                cs.setInt(parNr++, m_recipientDivisionID);
+                cs.setString(parNr++, m_recipientDivisionName);
+                cs.setInt(parNr++, m_recipientPositionID);
+                cs.setString(parNr++, m_recipientPositionName);
+                cs.setString(parNr++, m_recipientDivisionCode);
+                cs.setString(parNr++, m_recipientPositionCode);
+                cs.setString(parNr++, m_dhlGuid);
+                if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                	cs.registerOutParameter(parNr, Types.INTEGER);
+                } else {
+                	cs.registerOutParameter(1, Types.INTEGER);
+                }
                 cs.execute();
-                m_id = cs.getInt(1);
+                if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                	m_id = cs.getInt(parNr);
+                } else {
+                	m_id = cs.getInt(1);
+                }
                 cs.close();
                 conn.close();
 
@@ -824,9 +854,10 @@ public class DhlMessage implements Cloneable {
         InputStreamReader inReader = null;
         BufferedReader reader = null;
         try {
-            // Loendame failis olevad tühed kokku, kuna Oracle JDBC draiver tahab
-            // kindlasti teada, kui pikk on CLOB väljale kirjutatav stream.
+            // Loendame failis olevad tÃ¤hed kokku, kuna Oracle JDBC draiver tahab
+            // kindlasti teada, kui pikk on CLOB vÃ¤ljale kirjutatav stream.
             int fileCharsCount = CommonMethods.getCharacterCountInFile(m_filePath);
+            logger.debug("Going to write container data to database. Container length: " + fileCharsCount + " characters.");
             
             inStream = new FileInputStream(m_filePath);
             inReader = new InputStreamReader(inStream, "UTF-8");
@@ -915,17 +946,36 @@ public class DhlMessage implements Cloneable {
         try {
             Connection conn = DBConnection.getConnection(db);
             if (conn != null) {
-                CallableStatement cs = conn.prepareCall("{call Get_DhlMessageID(?,?,?,?,?)}");
+            	int parNr = 1;
+            	CallableStatement cs = conn.prepareCall("{call Get_DhlMessageID(?,?,?,?,?)}");
                 if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
                     cs = conn.prepareCall("{? = call \"Get_DhlMessageID\"(?,?,?,?)}");
                 }
-                cs.registerOutParameter(1, Types.INTEGER);
-                cs.setInt(2, dhlID);
-                cs.setString(3, producerName);
-                cs.setString(4, serviceURL);
-                cs.setInt(5, (isIncoming ? 1 : 0));
+                
+                // Mingil pÃµhjusel toimib SQL Anywhere JDBC klient
+                // korrektselt ainult juhul, kui vÃ¤ljundparameetrid asuvad kÃµige lÃµpus.
+                // Vastasel juhul liigutatakse kÃµik vÃ¤ljundparameetrile
+                // jÃ¤rgnevad sisendparameetrid Ã¼he koha vÃµrra edasi.
+                if (!CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                	parNr++;
+                }
+                
+                cs.setInt(parNr++, dhlID);
+                cs.setString(parNr++, producerName);
+                cs.setString(parNr++, serviceURL);
+                cs.setInt(parNr++, (isIncoming ? 1 : 0));
+                if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                	cs.registerOutParameter(parNr, Types.INTEGER);
+                } else {
+                	cs.registerOutParameter(1, Types.INTEGER);
+                }
                 cs.execute();
-                int result = cs.getInt(1);
+                int result = 0;
+                if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                	result = cs.getInt(parNr);
+                } else {
+                	result = cs.getInt(1);
+                }
                 cs.close();
                 conn.close();
 
@@ -941,19 +991,38 @@ public class DhlMessage implements Cloneable {
     
     public static int getMessageID(String dhlGuid, String producerName, String serviceURL, boolean isIncoming, OrgSettings db) {
         try {
-            Connection conn = DBConnection.getConnection(db);
+        	Connection conn = DBConnection.getConnection(db);
             if (conn != null) {
+            	int parNr = 1;
                 CallableStatement cs = conn.prepareCall("{call Get_DhlMessageIDByGuid(?,?,?,?,?)}");
                 if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
                     cs = conn.prepareCall("{? = call \"Get_DhlMessageIDByGuid\"(?,?,?,?)}");
                 }
-                cs.registerOutParameter(1, Types.INTEGER);
-                cs.setString(2, dhlGuid);
-                cs.setString(3, producerName);
-                cs.setString(4, serviceURL);
-                cs.setInt(5, (isIncoming ? 1 : 0));
+                
+                // Mingil pÃµhjusel toimib SQL Anywhere JDBC klient
+                // korrektselt ainult juhul, kui vÃ¤ljundparameetrid asuvad kÃµige lÃµpus.
+                // Vastasel juhul liigutatakse kÃµik vÃ¤ljundparameetrile
+                // jÃ¤rgnevad sisendparameetrid Ã¼he koha vÃµrra edasi.
+                if (!CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                	parNr++;
+                }
+                
+                cs.setString(parNr++, dhlGuid);
+                cs.setString(parNr++, producerName);
+                cs.setString(parNr++, serviceURL);
+                cs.setInt(parNr++, (isIncoming ? 1 : 0));
+                if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                	cs.registerOutParameter(parNr, Types.INTEGER);
+                } else {
+                	cs.registerOutParameter(1, Types.INTEGER);
+                }
                 cs.execute();
-                int result = cs.getInt(1);
+                int result = 0;
+                if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                	result = cs.getInt(parNr);
+                } else {
+                	result = cs.getInt(1);
+                }
                 cs.close();
                 conn.close();
 
@@ -1027,7 +1096,7 @@ public class DhlMessage implements Cloneable {
                 if (originalRecipient != null) {
                 	logger.debug("Original recipient is defined. Saving messageRecipient to database.");
                     // Kuna antud juhul on ilmselt tegemist DVK serveri poolel automaatselt
-                    // lisatud adressaadiga, siis jääb siin määramata saatmise pÃµringu ID
+                    // lisatud adressaadiga, siis jÃ¤Ã¤b siin mÃ¤Ã¤ramata saatmise pÃµringu ID
                     originalRecipient.setSendingDate(r.getSendingDate());
                     originalRecipient.setSendingStatusID(r.getSendingStatusID());
                     originalRecipient.setReceivedDate(r.getReceivedDate());
@@ -1051,7 +1120,7 @@ public class DhlMessage implements Cloneable {
             	for (int i = 0; i < item.getHistory().size(); i++) {
             		DocumentStatusHistory historyItem = item.getHistory().get(i); 
 
-            		// Ãµritame nÃµÃµd adressaadi andmete määramata adressaadi ID ka tuvastada
+            		// Ãµritame nÃµÃµd adressaadi andmete mï¿½ï¿½ramata adressaadi ID ka tuvastada
 	                int recipientId = MessageRecipient.getId(messageID, historyItem.getOrgCode(), historyItem.getPersonCode(), historyItem.getSubdivisionShortName(), historyItem.getOccupationShortName(), db);
 	                if (recipientId > 0) {
 	                	historyItem.setRecipientId(recipientId);
@@ -1186,19 +1255,25 @@ public class DhlMessage implements Cloneable {
                         String itemDataFile = CommonMethods.createPipelineFile(docCounter);
                         item.setFilePath(itemDataFile);
                     	
-                    	if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    		CommonMethods.writeToFile(itemDataFile, rs.getString("data").getBytes("UTF-8"));
+                    	if (CommonStructures.PROVIDER_TYPE_POSTGRE.equalsIgnoreCase(db.getDbProvider())
+                            || CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                    		byte[] containerData = rs.getString("data").getBytes("UTF-8");
+                    		logger.debug("Container data was read from database. Container size: " + containerData.length + " bytes.");
+                    		CommonMethods.writeToFile(itemDataFile, containerData);
                     	} else {
 	                        Clob tmpBlob = rs.getClob("data");
 	                        Reader r = tmpBlob.getCharacterStream();
 	                        FileOutputStream fos = new FileOutputStream(itemDataFile);
 	                        OutputStreamWriter out = new OutputStreamWriter(fos, "UTF-8");
-	                        int actualReadLength = 0;
 	                        try {
+		                        long totalSize = 0;
+		                        int actualReadLength = 0;
 	                            char[] charbuf = new char[Settings.getDBBufferSize()];
 	                            while ((actualReadLength = r.read(charbuf)) > 0) {
 	                                out.write(charbuf, 0, actualReadLength);
+	                                totalSize += actualReadLength;
 	                            }
+	                            logger.debug("Container data was read from database. Container size: " + totalSize + " characters.");
 	                        } catch (Exception e) {
 	                            CommonMethods.logError(e, "dhl.Document", "getDocumentsSentTo");
 	                            throw e;
@@ -1290,19 +1365,25 @@ public class DhlMessage implements Cloneable {
                         String itemDataFile = CommonMethods.createPipelineFile(docCounter);
                         item.setFilePath(itemDataFile);
                     	
-                    	if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    		CommonMethods.writeToFile(itemDataFile, rs.getString("data").getBytes("UTF-8"));
+                    	if (CommonStructures.PROVIDER_TYPE_POSTGRE.equalsIgnoreCase(db.getDbProvider())
+                            || CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                    		byte[] containerData = rs.getString("data").getBytes("UTF-8");
+                    		logger.debug("Container data was read from database. Container size: " + containerData.length + " bytes.");
+                    		CommonMethods.writeToFile(itemDataFile, containerData);
                     	} else {
 	                        Clob tmpBlob = rs.getClob("data");
 	                        Reader r = tmpBlob.getCharacterStream();
 	                        FileOutputStream fos = new FileOutputStream(itemDataFile);
 	                        OutputStreamWriter out = new OutputStreamWriter(fos, "UTF-8");
-	                        int actualReadLength = 0;
 	                        try {
-	                            char[] charbuf = new char[Settings.getDBBufferSize()];
+		                        long totalSize = 0;
+		                        int actualReadLength = 0;
+	                        	char[] charbuf = new char[Settings.getDBBufferSize()];
 	                            while ((actualReadLength = r.read(charbuf)) > 0) {
 	                                out.write(charbuf, 0, actualReadLength);
+	                                totalSize += actualReadLength;
 	                            }
+	                            logger.debug("Container data was read from database. Container size: " + totalSize + " characters.");
 	                        } catch (Exception e) {
 	                            CommonMethods.logError(e, "dhl.Document", "getDocumentsSentTo");
 	                            throw e;
@@ -1401,11 +1482,11 @@ public class DhlMessage implements Cloneable {
         units = null;
     }
     
-    // Lisab sõnumi XMLi transpordi saajate osasse etteantud saajad (eemaldab üleliigsed)
-    // väljastab uue faili PATHi, eisalgne faile jääb ka alles
+    // Lisab sï¿½numi XMLi transpordi saajate osasse etteantud saajad (eemaldab ï¿½leliigsed)
+    // vï¿½ljastab uue faili PATHi, eisalgne faile jï¿½ï¿½b ka alles
     public String CreateNewFile(ArrayList<String> allowedOrgs, int containerVersion)throws Exception{
         String newFile = "";
-        // Kopeerime dokumendi faili uueks tööfailiks
+        // Kopeerime dokumendi faili uueks tï¿½ï¿½failiks
         String simplifiedFile = CommonMethods.createPipelineFile(0);
         if (CommonMethods.copyFile(getFilePath(), simplifiedFile)) {
             newFile = CommonMethods.createPipelineFile(1);
@@ -1439,7 +1520,7 @@ public class DhlMessage implements Cloneable {
     public String createNewFile(ArrayList<MessageRecipient> allowedRecipients, int containerVersion) throws Exception{
         String newFile = "";
         
-        // Kopeerime dokumendi faili uueks tööfailiks
+        // Kopeerime dokumendi faili uueks tï¿½ï¿½failiks
         String simplifiedFile = CommonMethods.createPipelineFile(0);
         if (CommonMethods.copyFile(this.m_filePath, simplifiedFile)) {
             newFile = CommonMethods.createPipelineFile(1);
@@ -1616,7 +1697,7 @@ public class DhlMessage implements Cloneable {
                                     addr.add(a);
                                     
                                     // Kui tegemist on esimese leitud kohaliku adressaadiga, siis kirjutame
-                                    // selle andmed kohe ka sõnumi kÃµlge.
+                                    // selle andmed kohe ka sï¿½numi kÃµlge.
                                     if (addr.size() == 1) {
                                         templateMessage.m_recipientOrgCode = recipientOrgCode;
                                         templateMessage.m_recipientOrgName = recipientOrgName;
@@ -1815,10 +1896,10 @@ public class DhlMessage implements Cloneable {
             reader.close();
         }
 
-        // Kui dokumendi pealkiri ei ole esitatud väljal mm:koostaja_dokumendinimi, siis
-        // väärtustame selle Riigikantselei XML-is oleva pealkirja või dokumendiliigi
-        // määramata (dokumendiliigi määramata väärtustamine on kasulik ennekõike Kodanikuportaali)
-        // andmete puhul, kuna seal on reeglina pealkiri väärtustamata.
+        // Kui dokumendi pealkiri ei ole esitatud vï¿½ljal mm:koostaja_dokumendinimi, siis
+        // vï¿½ï¿½rtustame selle Riigikantselei XML-is oleva pealkirja vï¿½i dokumendiliigi
+        // mï¿½ï¿½ramata (dokumendiliigi mï¿½ï¿½ramata vï¿½ï¿½rtustamine on kasulik ennekï¿½ike Kodanikuportaali)
+        // andmete puhul, kuna seal on reeglina pealkiri vï¿½ï¿½rtustamata.
         if (templateMessage != null) {
             if ((templateMessage.m_title == null) || (templateMessage.m_title.length() < 1)) {
                 if ((rkTitle != null) && (rkTitle.length() > 0)) {
@@ -1894,7 +1975,7 @@ public class DhlMessage implements Cloneable {
         for (int i = 0; i < messages.size(); ++i) {
             DhlMessage msg = messages.get(i);
             
-            // Kui saadetava sõnumi GUID on määramata, siis anname sõnumile GUID-i
+            // Kui saadetava sï¿½numi GUID on mï¿½ï¿½ramata, siis anname sï¿½numile GUID-i
             // ja salvestame selle kohe ka andmebaasi.
             if ((msg.getDhlGuid() == null) || (msg.getDhlGuid().length() < 1)) {
             	msg.setDhlGuid(generateGUID());
@@ -1973,88 +2054,88 @@ public class DhlMessage implements Cloneable {
                     if (reader.getLocalName().equalsIgnoreCase(TAG_DOKUMENT) && reader.isStartElement()) {
                         hierarchy.push(TAG_DOKUMENT);
                     } else if (reader.getLocalName().equalsIgnoreCase(TAG_DOKUMENT) && reader.isEndElement()) {
-                        if (hierarchy.peek() == TAG_DOKUMENT) {
+                        if (TAG_DOKUMENT.equalsIgnoreCase(hierarchy.peek())) {
                             hierarchy.pop();
                             break;
                         }
-                    } else if (reader.getLocalName().equalsIgnoreCase(TAG_TRANSPORT) && reader.isStartElement() && (hierarchy.peek() == TAG_DOKUMENT)) {
+                    } else if (reader.getLocalName().equalsIgnoreCase(TAG_TRANSPORT) && reader.isStartElement() && TAG_DOKUMENT.equalsIgnoreCase(hierarchy.peek())) {
                         hierarchy.push(TAG_TRANSPORT);
-                    } else if (reader.getLocalName().equalsIgnoreCase(TAG_TRANSPORT) && reader.isEndElement() && (hierarchy.peek() == TAG_TRANSPORT)) {
-                        if (hierarchy.peek() == TAG_TRANSPORT) {
+                    } else if (reader.getLocalName().equalsIgnoreCase(TAG_TRANSPORT) && reader.isEndElement() && TAG_TRANSPORT.equalsIgnoreCase(hierarchy.peek())) {
+                        if (TAG_TRANSPORT.equalsIgnoreCase(hierarchy.peek())) {
                             hierarchy.pop();
                         }
-                    } else if (reader.getLocalName().equalsIgnoreCase(TAG_SAAJA) && reader.isStartElement() && (hierarchy.peek() == TAG_TRANSPORT)) {
+                    } else if (reader.getLocalName().equalsIgnoreCase(TAG_SAAJA) && reader.isStartElement() && TAG_TRANSPORT.equalsIgnoreCase(hierarchy.peek())) {
                         hierarchy.push(TAG_SAAJA);
                         item = new SimpleAddressData();
-                    } else if (reader.getLocalName().equalsIgnoreCase(TAG_SAAJA) && reader.isEndElement() && (hierarchy.peek() == TAG_SAAJA)) {
-                        if (hierarchy.peek() == TAG_SAAJA) {
+                    } else if (reader.getLocalName().equalsIgnoreCase(TAG_SAAJA) && reader.isEndElement() && TAG_SAAJA.equalsIgnoreCase(hierarchy.peek())) {
+                        if (TAG_SAAJA.equalsIgnoreCase(hierarchy.peek())) {
                             hierarchy.pop();
                             result.add(item);
                         }
-                    } else if (reader.getLocalName().equalsIgnoreCase("regnr") && reader.isStartElement() && (hierarchy.peek() == TAG_SAAJA)) {
+                    } else if (reader.getLocalName().equalsIgnoreCase("regnr") && reader.isStartElement() && TAG_SAAJA.equalsIgnoreCase(hierarchy.peek())) {
                         reader.next();
                         if (reader.isCharacters()) {
                             item.setOrgCode(reader.getText().trim());
                         }
-                    } else if (reader.getLocalName().equalsIgnoreCase("asutuse_nimi") && reader.isStartElement() && (hierarchy.peek() == TAG_SAAJA)) {
+                    } else if (reader.getLocalName().equalsIgnoreCase("asutuse_nimi") && reader.isStartElement() && TAG_SAAJA.equalsIgnoreCase(hierarchy.peek())) {
                         reader.next();
                         if (reader.isCharacters()) {
                             item.setOrgName(reader.getText().trim());
                         }
-                    } else if (reader.getLocalName().equalsIgnoreCase("isikukood") && reader.isStartElement() && (hierarchy.peek() == TAG_SAAJA)) {
+                    } else if (reader.getLocalName().equalsIgnoreCase("isikukood") && reader.isStartElement() && TAG_SAAJA.equalsIgnoreCase(hierarchy.peek())) {
                         reader.next();
                         if (reader.isCharacters()) {
                             item.setPersonCode(reader.getText().trim());
                         }
-                    } else if (reader.getLocalName().equalsIgnoreCase("nimi") && reader.isStartElement() && (hierarchy.peek() == TAG_SAAJA)) {
+                    } else if (reader.getLocalName().equalsIgnoreCase("nimi") && reader.isStartElement() && TAG_SAAJA.equalsIgnoreCase(hierarchy.peek())) {
                         reader.next();
                         if (reader.isCharacters()) {
                             item.setPersonName(reader.getText().trim());
                         }
-                    } else if (reader.getLocalName().equalsIgnoreCase("epost") && reader.isStartElement() && (hierarchy.peek() == TAG_SAAJA)) {
+                    } else if (reader.getLocalName().equalsIgnoreCase("epost") && reader.isStartElement() && TAG_SAAJA.equalsIgnoreCase(hierarchy.peek())) {
                         reader.next();
                         if (reader.isCharacters()) {
                             item.setEmail(reader.getText().trim());
                         }
-                    } else if (reader.getLocalName().equalsIgnoreCase("osakonna_kood") && reader.isStartElement() && (hierarchy.peek() == TAG_SAAJA)) {
+                    } else if (reader.getLocalName().equalsIgnoreCase("osakonna_kood") && reader.isStartElement() && TAG_SAAJA.equalsIgnoreCase(hierarchy.peek())) {
                         reader.next();
                         if (reader.isCharacters()) {
                             item.setDepartmentNr(reader.getText().trim());
                         }
-                    } else if (reader.getLocalName().equalsIgnoreCase("osakonna_nimi") && reader.isStartElement() && (hierarchy.peek() == TAG_SAAJA)) {
+                    } else if (reader.getLocalName().equalsIgnoreCase("osakonna_nimi") && reader.isStartElement() && TAG_SAAJA.equalsIgnoreCase(hierarchy.peek())) {
                         reader.next();
                         if (reader.isCharacters()) {
                             item.setDepartmentName(reader.getText().trim());
                         }
-                    } else if (reader.getLocalName().equalsIgnoreCase("ametikoha_kood") && reader.isStartElement() && (hierarchy.peek() == TAG_SAAJA)) {
+                    } else if (reader.getLocalName().equalsIgnoreCase("ametikoha_kood") && reader.isStartElement() && TAG_SAAJA.equalsIgnoreCase(hierarchy.peek())) {
                         reader.next();
                         if (reader.isCharacters()) {
                             item.setPositionID(CommonMethods.toIntSafe(reader.getText().trim(), 0));
                         }
-                    } else if (reader.getLocalName().equalsIgnoreCase("allyksuse_kood") && reader.isStartElement() && (hierarchy.peek() == TAG_SAAJA)) {
+                    } else if (reader.getLocalName().equalsIgnoreCase("allyksuse_kood") && reader.isStartElement() && TAG_SAAJA.equalsIgnoreCase(hierarchy.peek())) {
                         reader.next();
                         if (reader.isCharacters()) {
                             item.setDivisionID(CommonMethods.toIntSafe(reader.getText().trim(), 0));
                         }
-                    } else if (reader.getLocalName().equalsIgnoreCase("ametikoha_lyhinimetus") && reader.isStartElement() && (hierarchy.peek() == TAG_SAAJA)) {
+                    } else if (reader.getLocalName().equalsIgnoreCase("ametikoha_lyhinimetus") && reader.isStartElement() && TAG_SAAJA.equalsIgnoreCase(hierarchy.peek())) {
                         reader.next();
                         if (reader.isCharacters()) {
                         	item.setPositionCode(reader.getText().trim());
                         }
-                    } else if (reader.getLocalName().equalsIgnoreCase("allyksuse_lyhinimetus") && reader.isStartElement() && (hierarchy.peek() == TAG_SAAJA)) {
+                    } else if (reader.getLocalName().equalsIgnoreCase("allyksuse_lyhinimetus") && reader.isStartElement() && TAG_SAAJA.equalsIgnoreCase(hierarchy.peek())) {
                         reader.next();
                         if (reader.isCharacters()) {
                         	item.setDivisionCode(reader.getText().trim());
                         }
-                    } else if (reader.getLocalName().equalsIgnoreCase("ametikoha_nimetus") && reader.isStartElement() && (hierarchy.peek() == TAG_SAAJA)) {
+                    } else if (reader.getLocalName().equalsIgnoreCase("ametikoha_nimetus") && reader.isStartElement() && TAG_SAAJA.equalsIgnoreCase(hierarchy.peek())) {
                         reader.next();
                         if (reader.isCharacters()) {
                             item.setPositionName(reader.getText().trim());
                         }
-                    } else if (reader.getLocalName().equalsIgnoreCase("allyksuse_nimetus") && reader.isStartElement() && (hierarchy.peek() == TAG_SAAJA)) {
+                    } else if (reader.getLocalName().equalsIgnoreCase("allyksuse_nimetus") && reader.isStartElement() && TAG_SAAJA.equalsIgnoreCase(hierarchy.peek())) {
                         reader.next();
                         if (reader.isCharacters()) {
-                            item.setDepartmentName(reader.getText().trim());
+                            item.setDivisionName(reader.getText().trim());
                         }
                     }
                     
@@ -2075,7 +2156,7 @@ public class DhlMessage implements Cloneable {
     	org.w3c.dom.Document currentXmlContent = CommonMethods.xmlDocumentFromFile(filePath, true);
         Element transportNode = null;
 
-        // Tuvastame katse-eksituse meetodil õige nimeruumi.
+        // Tuvastame katse-eksituse meetodil ï¿½ige nimeruumi.
         String namespaceUri = CommonStructures.DhlNamespace;
         NodeList foundNodes = currentXmlContent.getDocumentElement().getElementsByTagNameNS(namespaceUri, "transport");
         if (foundNodes.getLength() < 1) {
@@ -2115,7 +2196,7 @@ public class DhlMessage implements Cloneable {
                 	personalIdCode = CommonMethods.getNodeText(personalIdNodes.item(0));
                 }
                 
-                // Adressaadi allüksuse kood XML konteineris
+                // Adressaadi allï¿½ksuse kood XML konteineris
             	NodeList subdivisionNodes = recipientRoot.getElementsByTagNameNS(namespaceUri, "allyksuse_kood");
                 if (subdivisionNodes.getLength() > 0) {
                 	try {
@@ -2137,13 +2218,13 @@ public class DhlMessage implements Cloneable {
                 	}
                 }
                 
-                // Adressaadi allüksuse lühinimetus XML konteineris
+                // Adressaadi allï¿½ksuse lï¿½hinimetus XML konteineris
             	NodeList subdivisionSnNodes = recipientRoot.getElementsByTagNameNS(namespaceUri, "allyksuse_lyhinimetus");
                 if (subdivisionSnNodes.getLength() > 0) {
                 	subdivisionShortName = CommonMethods.getNodeText(subdivisionSnNodes.item(0));
                 }
                 
-                // Adressaadi ametikoha lühinimetus XML konteineris
+                // Adressaadi ametikoha lï¿½hinimetus XML konteineris
             	NodeList occupationSnNodes = recipientRoot.getElementsByTagNameNS(namespaceUri, "ametikoha_lyhinimetus");
                 if (occupationSnNodes.getLength() > 0) {
                 	occupationShortName = CommonMethods.getNodeText(occupationSnNodes.item(0));
@@ -2164,23 +2245,23 @@ public class DhlMessage implements Cloneable {
                 if (!recipientFound) {
                     transportNode.removeChild(recipientRoot);
                     logger.info("");
-                	logger.info("Failist välja visatud asutus");
+                	logger.info("Failist vï¿½lja visatud asutus");
                 	logger.info("Reg nr: " + regNr);
                 	logger.info("Isikukood: " + personalIdCode);
-                	logger.info("allüksuse ID: " + String.valueOf(subdivisionId));
+                	logger.info("allï¿½ksuse ID: " + String.valueOf(subdivisionId));
                 	logger.info("Ametikoha ID: " + String.valueOf(occupationId));
-                	logger.info("allüksuse lühinimetus: " + subdivisionShortName);
-                	logger.info("Ametikoha lühinimetus: " + occupationShortName);
+                	logger.info("allï¿½ksuse lï¿½hinimetus: " + subdivisionShortName);
+                	logger.info("Ametikoha lï¿½hinimetus: " + occupationShortName);
                 } else {
                 	recipientIndex++;
                 	logger.info("");
                 	logger.info("Uude faili lubatud asutus.");
                 	logger.info("Reg nr: " + regNr);
                 	logger.info("Isikukood: " + personalIdCode);
-                	logger.info("allüksuse ID: " + String.valueOf(subdivisionId));
+                	logger.info("allï¿½ksuse ID: " + String.valueOf(subdivisionId));
                 	logger.info("Ametikoha ID: " + String.valueOf(occupationId));
-                	logger.info("allüksuse lühinimetus: " + subdivisionShortName);
-                	logger.info("Ametikoha lühinimetus: " + occupationShortName);
+                	logger.info("allï¿½ksuse lï¿½hinimetus: " + subdivisionShortName);
+                	logger.info("Ametikoha lï¿½hinimetus: " + occupationShortName);
                 }
             }
             
@@ -2195,7 +2276,7 @@ public class DhlMessage implements Cloneable {
                 }
             }
             
-            // Märgime antud DVK serveri sõnumi vahendajaks
+            // Mï¿½rgime antud DVK serveri sï¿½numi vahendajaks
             if (addProxy){
                 Element elProxy = currentXmlContent.createElementNS(namespaceUri, defaultPrefix + ":vahendaja");
                 elProxy = CommonMethods.appendTextNode(currentXmlContent, elProxy, "regnr", Settings.Client_DefaultOrganizationCode, defaultPrefix, namespaceUri);
@@ -2209,11 +2290,11 @@ public class DhlMessage implements Cloneable {
     }
     
     /**
-     * Jaotab sõnumi iga erineva edastuskanali jaoks omaette alamsõnumiteks.
-     * Alamsõnumid erinevad üksteisest DVK konteineri <transport> elemendis
+     * Jaotab sï¿½numi iga erineva edastuskanali jaoks omaette alamsï¿½numiteks.
+     * Alamsï¿½numid erinevad ï¿½ksteisest DVK konteineri <transport> elemendis
      * asuvate adressaatide poolest.
      * 
-     * @return		Alamsõnumite nimekiri
+     * @return		Alamsï¿½numite nimekiri
      */
     public ArrayList<DhlMessage> splitMessageByDeliveryChannel(OrgSettings myDatabase, ArrayList<OrgSettings> allKnownDatabases, int containerVersion) throws Exception {
     	
@@ -2225,7 +2306,7 @@ public class DhlMessage implements Cloneable {
     		this.m_recipients = MessageRecipient.getList(this.m_id, myDatabase);
     	}
     	
-		// Kontrollime, kas mõnedele adressaatidele saaks otse andmebaasist
+		// Kontrollime, kas mï¿½nedele adressaatidele saaks otse andmebaasist
     	// andmebaasi saata.
     	// 
     	// Esmalt eraldame adressaatide hulgast need adressaadid, kes
@@ -2245,16 +2326,16 @@ public class DhlMessage implements Cloneable {
     	}
     	logger.info("Minuga samas asutuses on " + String.valueOf(myOrgRecipients.size()) + " adressaati.");
     	
-    	// Kui mõni adressaat on saatjaga samas asutuses, siis tuvastame,
-    	// kas meil on teada andmebaasiühendus dokumendi otse saatmiseks.
+    	// Kui mï¿½ni adressaat on saatjaga samas asutuses, siis tuvastame,
+    	// kas meil on teada andmebaasiï¿½hendus dokumendi otse saatmiseks.
     	//
-		// Isegi juhul, kui sama dokument lüheb samas andmebaasis mitmele
+		// Isegi juhul, kui sama dokument lï¿½heb samas andmebaasis mitmele
 		// adressaadile, saadame ta sinna mitmes eksemplaris. Vastasel juhul
-		// ei saa adressaadipõhiselt jälgida, milline adressaat on dokumendi
-		// kätte saanud ja milline mitte.
+		// ei saa adressaadipï¿½hiselt jï¿½lgida, milline adressaat on dokumendi
+		// kï¿½tte saanud ja milline mitte.
 		for (OrgSettings db : allKnownDatabases) {
 			// Teise andmebaasi dhl_settings andmebaasis on kirjas, millise
-			// asutuse, allüksuse ja ametikohaga on tegemist.
+			// asutuse, allï¿½ksuse ja ametikohaga on tegemist.
 			UnitCredential[] orgsInDB = UnitCredential.getCredentials(db);
 			for (int j = 0; j < orgsInDB.length; j++) {
 				UnitCredential cred = orgsInDB[j];
@@ -2295,14 +2376,14 @@ public class DhlMessage implements Cloneable {
     		centralServerMessage.loadRecipientsFromXML();
     		
         	// Leiame nimekirja erinevatest serveritest, kuhu antud dokument tuleks saata.
-        	// S.t. kui dokument peab jõudma erinevatele adressaatidele erinevate serverite kaudu
+        	// S.t. kui dokument peab jï¿½udma erinevatele adressaatidele erinevate serverite kaudu
         	ArrayList<DhlCapability> destinationServers = DhlCapability.getListByMessageID(centralServerMessage.getId(), myDatabase);
             
-        	// Võtame filtreerimiseks välja kõigi teadaolevate asutuste nimekirja
+        	// Vï¿½tame filtreerimiseks vï¿½lja kï¿½igi teadaolevate asutuste nimekirja
         	ArrayList<DhlCapability> allKnownOrgs = DhlCapability.getList(myDatabase);
         	
-        	// Kui serverite massiiv on tühi, siis lisame sinna
-            // ühe tühja väärtuse DVK keskserveri jaoks
+        	// Kui serverite massiiv on tï¿½hi, siis lisame sinna
+            // ï¿½he tï¿½hja vï¿½ï¿½rtuse DVK keskserveri jaoks
             if (destinationServers == null) {
             	destinationServers = new ArrayList<DhlCapability>();
             }
@@ -2315,9 +2396,9 @@ public class DhlMessage implements Cloneable {
                 destinationServers.add(defaultServer);
             }
             
-            // Komplekteerime erinevate serverite jaoks omaette alamsõnumid
+            // Komplekteerime erinevate serverite jaoks omaette alamsï¿½numid
             for (int i = 0; i < destinationServers.size(); i++){
-                // Paneme kokku konkreetsesse serverisse saadetavate saajate sõnumi,
+                // Paneme kokku konkreetsesse serverisse saadetavate saajate sï¿½numi,
             	// ehk siis  eemaldame saajate hulgast need, kes selles sihtserveris ei paikne
                 String currentProducer = destinationServers.get(i).getDhlDirectProducerName();
                 String currentServiceUrl = destinationServers.get(i).getDhlDirectServiceUrl();
@@ -2328,7 +2409,7 @@ public class DhlMessage implements Cloneable {
                     currentProducer = Settings.Client_ProducerName;
                 }
                 
-                // Filtreerime välja asutused, kes saavad sõnumit aktiivse (indexiga i) DVK serveri kaudu
+                // Filtreerime vï¿½lja asutused, kes saavad sï¿½numit aktiivse (indexiga i) DVK serveri kaudu
                 ArrayList<String> orgs = DhlCapability.getOrgsByCapability(destinationServers.get(i), myDatabase); // nimekiri asutuse koodidest
                 if ((orgs != null) && (orgs.size() > 0)) {
                 	DhlMessage newMessage = (DhlMessage)centralServerMessage.clone();
@@ -2338,8 +2419,8 @@ public class DhlMessage implements Cloneable {
                     	if (orgs.contains(mr.getRecipientOrgCode())){
                             allowedOrgs.add(mr.getRecipientOrgCode());
                         } else {
-                        	// Kontrollime, kas me sellist asutust üldse tunneme.
-                        	// Kui ei tunne, siis ärme teda igaks juhuks välja viska.
+                        	// Kontrollime, kas me sellist asutust ï¿½ldse tunneme.
+                        	// Kui ei tunne, siis ï¿½rme teda igaks juhuks vï¿½lja viska.
                         	boolean orgFound = false;
                         	for (int j = 0; j < allKnownOrgs.size(); j++) {
                         		if (CommonMethods.stringsEqualIgnoreNull(allKnownOrgs.get(i).getOrgCode(), mr.getRecipientOrgCode())) {
@@ -2353,14 +2434,14 @@ public class DhlMessage implements Cloneable {
                         }
                     }
                     
-                    String newFilePath = newMessage.CreateNewFile(allowedOrgs, containerVersion); // eemldada sõnumi XMList need saajad, kes aktiivse serveri kaudu kirja ei saa
+                    String newFilePath = newMessage.CreateNewFile(allowedOrgs, containerVersion); // eemldada sï¿½numi XMList need saajad, kes aktiivse serveri kaudu kirja ei saa
                     newMessage.setFilePath(newFilePath);
                     
                     newMessage.getDeliveryChannel().setServiceUrl(currentServiceUrl);
                     newMessage.getDeliveryChannel().setProducerName(currentProducer);
                     
-                    // Paneme keskserveri kaudu saadetavad sõnumid ettepoole,
-                    // et saatmisel saaks keskserveri ID võimalikult kiiresti kätte.
+                    // Paneme keskserveri kaudu saadetavad sï¿½numid ettepoole,
+                    // et saatmisel saaks keskserveri ID vï¿½imalikult kiiresti kï¿½tte.
                     result.add(0, newMessage);
                     logger.info("Added message clone for central server delivery");
                 }
@@ -2372,11 +2453,11 @@ public class DhlMessage implements Cloneable {
 
     
     /**
-     * Arvutab adressaadipõhiste staatuse koodide alusel välja kogu sõnumi
+     * Arvutab adressaadipï¿½histe staatuse koodide alusel vï¿½lja kogu sï¿½numi
      * staatuse ja uuendab seda andmebaasis.
      * 
-     * @param messageId		sõnumi kohalik ID
-     * @param db			Andmebaasiühenduse seaded
+     * @param messageId		sï¿½numi kohalik ID
+     * @param db			Andmebaasiï¿½henduse seaded
      */
     public static void calculateAndUpdateMessageStatus(int messageId, OrgSettings db) {
     	ArrayList<MessageRecipient> recipients = MessageRecipient.getList(messageId, db);

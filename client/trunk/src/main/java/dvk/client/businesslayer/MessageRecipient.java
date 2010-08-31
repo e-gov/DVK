@@ -45,7 +45,7 @@ public class MessageRecipient {
     private String m_faultString;
     private String m_faultDetail;
     private String m_metaXML;
-    private int m_dhlID; // s�numi saatmisel pannakse siis vastuv�tva DVK serveri poolt dokumendile antud ID v��rtus
+    private int m_dhlID; // sõnumi saatmisel pannakse siis vastuvõtva DVK serveri poolt dokumendile antud ID väärtus
     private String m_producerName;
     private String m_serviceURL;
 
@@ -112,14 +112,14 @@ public class MessageRecipient {
     }
 
     /**
-     * @return			Adressaadi all�ksuse l�hinimi
+     * @return			Adressaadi allüksuse lühinimi
      */
     public String getRecipientDivisionCode() {
         return this.m_recipientDivisionCode;
     }
 
     /**
-     * @param value		Adressaadi all�ksuse l�hinimi
+     * @param value		Adressaadi allüksuse lühinimi
      */
     public void setRecipientDivisionCode(String value) {
         this.m_recipientDivisionCode = value;
@@ -360,6 +360,7 @@ public class MessageRecipient {
     	logger.debug("m_serviceURL: " + m_serviceURL);
     	logger.debug("m_recipientDivisionID" + m_recipientDivisionID);
     	logger.debug("m_recipientPositionID: " + m_recipientPositionID);
+    	logger.debug("m_recipientDivisionName: " + m_recipientDivisionName);
     	logger.debug("m_recipientPositionName: " + m_recipientPositionName);
     	logger.debug("m_recipientDivisionCode: " + m_recipientDivisionCode);
     	logger.debug("m_recipientPositionCode: " + m_recipientPositionCode);
@@ -375,14 +376,25 @@ public class MessageRecipient {
                 if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
                     cs = conn.prepareCall("{? = call \"Save_DhlMessageRecipient\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 }
+                
+                // Mingil põhjusel toimib SQL Anywhere JDBC klient
+                // korrektselt ainult juhul, kui väljundparameetrid asuvad kõige lõpus.
+                // Vastasel juhul liigutatakse kõik väljundparameetrile
+                // järgnevad sisendparameetrid ühe koha võrra edasi.
+                if (!CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                	parNr++;
+                }
 
-                cs.registerOutParameter(parNr++, Types.INTEGER);
                 cs.setInt(parNr++, m_messageID);
                 cs.setString(parNr++, m_recipientOrgCode);
                 cs.setString(parNr++, m_recipientOrgName);
                 cs.setString(parNr++, m_recipientPersonCode);
                 cs.setString(parNr++, m_recipientName);
-                cs.setTimestamp(parNr++, CommonMethods.sqlDateFromDate(m_sendingDate), cal);
+            	if (m_sendingDate != null) {
+            		cs.setTimestamp(parNr++, CommonMethods.sqlDateFromDate(m_sendingDate), cal);
+            	} else {
+            		cs.setNull(parNr++, Types.TIMESTAMP);
+            	}
                 if (m_receivedDate != null) {
                     cs.setTimestamp(parNr++, CommonMethods.sqlDateFromDate(m_receivedDate), cal);
                 } else {
@@ -404,8 +416,18 @@ public class MessageRecipient {
                 cs.setString(parNr++, m_recipientPositionName);
                 cs.setString(parNr++, m_recipientDivisionCode);
                 cs.setString(parNr++, m_recipientPositionCode);
+                if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                	cs.registerOutParameter(parNr, Types.INTEGER);
+                } else {
+                	cs.registerOutParameter(1, Types.INTEGER);
+                }
                 cs.execute();
-                m_id = cs.getInt(1);
+                if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                	m_id = cs.getInt(parNr);
+                } else {
+                	m_id = cs.getInt(1);
+                }
+                logger.debug("m_id: " + m_id);
                 cs.close();
                 conn.commit();
                 conn.close();
@@ -427,28 +449,42 @@ public class MessageRecipient {
         }
     }
     
-    public static int getId(int messageId, String orgCode, String personCode, String subdivisionShortName, String occupationShortName, OrgSettings db) throws SQLException {
+    public static int getId(int messageId, String orgCode, String personCode, String subdivisionShortName, String occupationShortName, OrgSettings db) throws Exception {
         int result = 0;
     	Connection conn = null;
         try {
             conn = DBConnection.getConnection(db);
             if (conn != null) {
-                Calendar cal = Calendar.getInstance();
-
                 int parNr = 1;
                 CallableStatement cs = conn.prepareCall("{call Get_DhlMessageRecipientId(?,?,?,?,?,?)}");
                 if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
                     cs = conn.prepareCall("{? = call \"Get_DhlMessageRecipientId\"(?,?,?,?,?)}");
                 }
 
-                cs.registerOutParameter(parNr++, Types.INTEGER);
+                // Mingil põhjusel toimib SQL Anywhere JDBC klient
+                // korrektselt ainult juhul, kui väljundparameetrid asuvad kõige lõpus.
+                // Vastasel juhul liigutatakse kõik väljundparameetrile
+                // järgnevad sisendparameetrid ühe koha võrra edasi.
+                if (!CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                	parNr++;
+                }
+
                 cs.setInt(parNr++, messageId);
                 cs.setString(parNr++, orgCode);
                 cs.setString(parNr++, personCode);
                 cs.setString(parNr++, subdivisionShortName);
                 cs.setString(parNr++, occupationShortName);
+                if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                	cs.registerOutParameter(parNr, Types.INTEGER);
+                } else {
+                	cs.registerOutParameter(1, Types.INTEGER);
+                }
                 cs.execute();
-                result = cs.getInt(1);
+                if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                	result = cs.getInt(parNr);
+                } else {
+                	result = cs.getInt(1);
+                }
                 cs.close();
                 conn.commit();
                 conn.close();

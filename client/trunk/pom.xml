@@ -4,11 +4,11 @@
   <artifactId>client</artifactId>
   <packaging>jar</packaging>
   <name>dvk-client</name>
-  <version>1.6.0</version>  
+  <version>1.6.1</version>  
   
   <!-- Properties -->
   <properties>
-  	<dvkCoreDir>C:\development\ws\dvkclean\core</dvkCoreDir>
+  	<dvkCoreDir>C:\Projektid\dvk\dvk_core</dvkCoreDir>
   </properties>
   
   <!-- Dependencies -->

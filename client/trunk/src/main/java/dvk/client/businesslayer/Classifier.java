@@ -79,7 +79,7 @@ public class Classifier {
         }
     }
     
-    public boolean saveToDB(OrgSettings db) {
+    public boolean saveToDB(OrgSettings db) throws Exception {
     	boolean result = false;
     	Connection conn = DBConnection.getConnection(db);
     	try {
@@ -136,7 +136,7 @@ public class Classifier {
         return result;
     }
     
-    public static void duplicateSettingsToDB(OrgSettings db) {
+    public static void duplicateSettingsToDB(OrgSettings db) throws Exception {
         Classifier classif = new Classifier("STATUS_CANCELED", Settings.Client_StatusCanceled);
         classif.saveToDB(db);
         classif = new Classifier("STATUS_RECEIVED", Settings.Client_StatusReceived);

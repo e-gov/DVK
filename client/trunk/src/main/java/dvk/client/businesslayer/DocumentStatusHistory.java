@@ -147,7 +147,7 @@ public class DocumentStatusHistory {
     	this.m_occupationShortName = "";
     }
     
-    public int saveToDB(OrgSettings db) throws SQLException {
+    public int saveToDB(OrgSettings db) throws Exception {
         int result = 0;
     	Connection conn = DBConnection.getConnection(db);
         if (conn != null) {
@@ -159,8 +159,15 @@ public class DocumentStatusHistory {
                 if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
                     cs = conn.prepareCall("{? = call \"Save_DhlStatusHistory\"(?,?,?,?,?,?,?,?,?,?)}");
                 }
+                
+                // Mingil põhjusel toimib SQL Anywhere JDBC klient
+                // korrektselt ainult juhul, kui väljundparameetrid asuvad kõige lõpus.
+                // Vastasel juhul liigutatakse kõik väljundparameetrile
+                // järgnevad sisendparameetrid ühe koha võrra edasi.
+                if (!CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                	parNr++;
+                }
 
-                cs.registerOutParameter(parNr++, Types.INTEGER);
                 cs.setInt(parNr++, m_recipientId);
                 cs.setInt(parNr++, m_serverSideId);
                 cs.setInt(parNr++, m_sendingStatusId);
@@ -178,8 +185,17 @@ public class DocumentStatusHistory {
                 }
                 cs = CommonMethods.setNullableIntParam(cs, parNr++, m_recipientStatusId);
                 cs.setString(parNr++, m_metaXML);
+                if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                	cs.registerOutParameter(parNr, Types.INTEGER);
+                } else {
+                	cs.registerOutParameter(1, Types.INTEGER);
+                }
                 cs.execute();
-                m_id = cs.getInt(1);
+                if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                	m_id = cs.getInt(parNr);
+                } else {
+                	m_id = cs.getInt(1);
+                }
                 cs.close();
                 conn.commit();
             } finally {

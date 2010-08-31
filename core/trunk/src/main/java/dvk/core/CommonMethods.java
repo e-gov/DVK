@@ -449,6 +449,13 @@ public class CommonMethods {
         }
         return new java.sql.Timestamp(date.getTime());
     }
+    
+    public static java.sql.Date sqlDateFromDate2(java.util.Date date) {
+        if (date == null) {
+            return null;
+        }
+        return new java.sql.Date(date.getTime());
+    }
 
     public static boolean booleanFromXML(String xmlBool) {
         if (xmlBool == null) {

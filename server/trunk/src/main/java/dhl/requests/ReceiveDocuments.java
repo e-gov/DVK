@@ -18,7 +18,6 @@ import dhl.users.Asutus;
 import dhl.users.UserProfile;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.sql.Connection;
@@ -856,7 +855,13 @@ public class ReceiveDocuments {
             	metainfoNode = currentXmlContent.createElementNS(CommonStructures.DhlNamespaceV2, defaultPrefix + ":metainfo");
             }
             
-            currentXmlContent.getDocumentElement().appendChild(metainfoNode);
+            // Lisame metainfo elemendi esimeseks elemendiks
+            try {
+            	currentXmlContent.getDocumentElement().insertBefore(metainfoNode, currentXmlContent.getDocumentElement().getFirstChild());
+            } catch (Exception ex) {
+            	logger.warn("Failed to add \"metainfo\" element as first element in container. Adding as last.");
+            	currentXmlContent.getDocumentElement().appendChild(metainfoNode);
+            }
         }
 
         String prefix = metainfoNode.lookupPrefix(CommonStructures.AutomaticMetadataNamespace);

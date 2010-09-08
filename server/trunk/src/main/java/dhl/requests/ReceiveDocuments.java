@@ -820,6 +820,11 @@ public class ReceiveDocuments {
     {
     	logger.debug("Constructing document from XML. File: " + filePath);
         Document currentXmlContent = CommonMethods.xmlDocumentFromFile(filePath, true);
+        
+        if (currentXmlContent == null) {
+        	throw new Exception("Failed to process XML contents of document " + documentData.getId() + "! Document XML is empty or invalid.");
+        }
+        
         Element metainfoNode = null;
 
         NodeList foundNodes = null;

@@ -1,0 +1,304 @@
+#letters {
+background:#f1f1f1 url(bg04.gif) no-repeat -730px 100%;
+padding:5px 10px 9px
+}
+
+#letters .active a span {
+color:#fff
+}
+
+#letters li {
+background:none;
+padding:0 2px 0 0
+}
+
+#letters li a {
+cursor:pointer;
+height:21px;
+overflow:hidden;
+padding-right:5px;
+text-decoration:none !important
+}
+
+#letters li a:hover span,#letters li a:focus span {
+background-position:0 -21px
+}
+
+#letters li a:hover,#letters li a:focus {
+background-position:100% -21px
+}
+
+#letters li span {
+line-height:normal;
+padding:2px 0 3px 5px
+}
+
+#letters li,#letters li a,#letters li span {
+float:left
+}
+
+#letters li.active a {
+background-position:100% 0
+}
+
+#letters li.active a,#letters li.active a span,#letters li a:hover,#letters li a:hover span,#letters li a:focus,#letters li a:focus span {
+background:url(bg15.gif) no-repeat 0 0
+}
+
+#letters li.active span {
+background-position:0 0 !important
+}
+
+#letters li.disabled span {
+color:#999;
+padding:2px 5px 3px
+}
+
+#letters p a,.letters2 p a {
+text-decoration:underline
+}
+
+#letters p,#letters ul {
+margin-top:0;
+padding:0
+}
+
+#letters p,.letters2 p {
+background:none;
+float:right;
+margin-top:2px;
+text-align:right;
+width:80px
+}
+
+#letters ul {
+float:left;
+font-size:14px;
+font-weight:700;
+margin-left:0 !important;
+width:620px
+}
+
+*+html div.tools p,* html div.tools p {
+margin-top:3px
+}
+
+.letters2 {
+background:none !important;
+margin-top:1.2em;
+padding:0 !important
+}
+
+.letters2 ul {
+float:left;
+width:600px !important
+}
+
+.schedule-nav {
+float:right !important;
+margin-right:0 !important
+}
+
+.schedule-nav .next {
+background-image:url(dot11.gif);
+background-position:100% 5px;
+padding-right:9px
+}
+
+.schedule-nav .prev {
+padding-left:9px
+}
+
+.schedule-nav .prev,.schedule-nav .next {
+background:url(dot10.gif) no-repeat 0 5px;
+margin-top:3px
+}
+
+.schedule-nav span {
+padding:0 8px
+}
+
+div.filter {
+background:#f1f1f1 url(bg04.gif) no-repeat -730px 100%;
+margin-top:0;
+padding:1px 15px 14px
+}
+
+div.filter label {
+display:block;
+padding-bottom:.1em
+}
+
+div.filter label,div.filter input,div.filter select {
+margin-right:3px;
+vertical-align:middle
+}
+
+div.filter p {
+float:left;
+margin:0;
+padding:.5em .5em 0 0;
+white-space:nowrap
+}
+
+div.filter p.action {
+padding-top:1.9em
+}
+
+div.filter p.check {
+padding-top:1.7em
+}
+
+div.filter p.check label {
+display:inline;
+padding:0
+}
+
+div.filter-outer {
+background:url(bg04.gif) no-repeat 0 0;
+margin-top:1em;
+padding-top:3px
+}
+
+div.filter-outer .check {
+display:block;
+padding:.7em 0
+}
+
+div.filter-outer .check input {
+margin-right:0
+}
+
+div.filter-outer input,div.filter-outer button,div.filter-outer label,div.filter-outer select {
+margin-right:.5em;
+vertical-align:middle
+}
+
+div.filter-outer p {
+background:#f1f1f1 url(bg04.gif) no-repeat -730px 100%;
+margin-top:0;
+padding:12px 15px 14px
+}
+
+div.tools {
+margin-top:2em
+}
+
+div.tools .button {
+margin-top:1px
+}
+
+div.tools .select2 select {
+margin-right:.3em
+}
+
+div.tools .shows {
+margin-right:.5em
+}
+
+div.tools label,div.tools input {
+vertical-align:middle
+}
+
+div.tools p {
+margin-top:2px
+}
+
+div.tools-a {
+float:left;
+width:350px
+}
+
+div.tools-a p,div.tools2 p {
+float:left;
+margin-right:20px
+}
+
+div.tools-b {
+float:right;
+width:350px
+}
+
+div.tools-b p {
+float:right;
+margin-left:20px
+}
+
+div.tools2 div.tools-a {
+width:250px
+}
+
+div.tools2 div.tools-b {
+width:450px
+}
+
+div.tools2,div.tools3 {
+margin-top:1em
+}
+
+div.tools4,div.tools .select2,div.tools .select {
+margin-top:0
+}
+
+img.letter {
+display:block;
+margin-left:auto;
+margin-right:auto
+}
+
+input,input.date,input.date-range,input.date-range-multi {
+border:1px solid;
+border-color:#b0b0b0 #e0e0e0 #e0e0e0 #b0b0b0;
+min-height:15px;
+padding:2px;
+width:150px
+}
+
+input.date-range,input.date-range-multi {
+background:#fff url(ico_cal.gif) no-repeat;
+background-position:151px 35%;
+cursor:pointer;
+padding-right:18px;
+width:150px
+}
+
+p.subrow-toggle a {
+background:url(http://proto.eesti.ee/wm/ylevaade_html/gfx/bg_details.gif) no-repeat 0 2px;
+padding-left:18px
+}
+
+td.toggle-subrow a {
+background:url(http://proto.eesti.ee/wm/ylevaade_html/gfx/bg_subrow_toggle.png) no-repeat 0 0;
+display:block;
+margin-left:auto;
+margin-right:auto;
+overflow:hidden;
+text-indent:-5000px;
+width:12px
+}
+
+td.toggle-subrow a.open {
+background-position:-25px 0
+}
+
+td.toggle-subrow a.open:hover,td.toggle-subrow a.open:focus {
+background-position:-75px 0
+}
+
+td.toggle-subrow a:hover,td.toggle-subrow a:focus {
+background-position:-50px 0
+}
+
+th {
+background:#E8E8E8 url(http://proto.eesti.ee/wm/ylevaade_html/gfx/bg_table_th.gif) repeat-x 0 0;
+background-attachment:initial;
+background-color:#E8E8E8;
+background-image:url(http://proto.eesti.ee/wm/ylevaade_html/gfx/bg_table_th.gif);
+border:1px solid silver;
+padding:7px 6px
+}
+
+tr.subrow td {
+background:#EBF6FF;
+font-size:11px
+}

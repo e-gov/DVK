@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="et" lang="et">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Dokumendivahetuskeskuse Prototüüp: Saadetud dokumendid</title>
+    <link rel="stylesheet" href="gfx/lisa.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="https://www.eesti.ee/css/rp.css" type="text/css" media="all" />
+    <link id="normal_css" rel="stylesheet" href="https://www.eesti.ee/css/rp_2.css" type="text/css"
+    media="all" />
+    <link rel="stylesheet" href="https://www.eesti.ee/css/facelift.css" type="text/css"
+    media="all" />
+    <link rel="stylesheet" href="https://www.eesti.ee/css/print.css" type="text/css"
+    media="print" />
+    <link rel="stylesheet" href="http://proto.eesti.ee/wm/ylevaade_html/cal/jquery.datepick.css"
+    type="text/css" media="all" />
+  </head>
+  <body>
+    <script type="text/javascript" src="https://www.eesti.ee/gfx/js/rp.js"></script>
+    <script type="text/javascript" src="https://www.eesti.ee/gfx/js/sorttable.js"></script>
+    <!--[if IE 6]><style>#content ul.lipikud {margin-left: -5px;}</style><![endif]-->
+    <!--[if IE]><style>#content table.ie_bugfix {width: auto;} #content ul.lipikud li a, #content ul.lipikud li .link {display: inline-block;}</style><![endif]-->
+    <!--[if IE]><script type="text/javascript">var isIE = true; window.onresize = function () {lipikud_redraw();};</script><![endif]-->
+    <script type="text/javascript" src="http://proto.eesti.ee/wm/ylevaade_html/js/jquery.min.js">
+    </script>
+    <script type="text/javascript"
+    src="http://proto.eesti.ee/wm/ylevaade_html/cal/jquery.datepick.js"></script>
+    <script type="text/javascript"
+    src="http://proto.eesti.ee/wm/ylevaade_html/js/jquery.tooltip.min.js"></script>
+    <script type="text/javascript"
+    src="http://proto.eesti.ee/wm/ylevaade_html/js/jquery.example.min.js"></script>
+    <script type="text/javascript"
+    src="http://proto.eesti.ee/wm/ylevaade_html/js/jquery.bgiframe.min.js"></script>
+    <script type="text/javascript" src="http://proto.eesti.ee/wm/ylevaade_html/js/custom.js">
+    </script>
+    <script type="text/javascript">
+      <!--
+                $(document).ready(function(){
+                        $("input[title]").example(function() {
+                                return $(this).attr('title');
+                        });
+                        $(function(){
+                                        $("tr.subrow").css("display","none");
+                                });
+                });
+                -->
+    </script>
+    <div id="content">
+      <div style="width:730px;">
+        <h1>
+          <a onclick="toggleMenu(document.getElementsByTagName('li')[0]);"
+          href="index.html">Dokumendivahetuskeskus</a>
+        </h1>
+        <div class="lipikud_kast">
+          <ul class="lipikud">
+            <li>
+              <span class="link">
+                <a href="index.html">Viimased</a>
+              </span>
+            </li>
+            <li>
+              <span class="link">
+                <a href="vastuvoetud.html">Vastuvõetud</a>
+              </span>
+            </li>
+            <li class="active">
+              <span class="link">
+                <a href="saadetud.html">Saadetud</a>
+              </span>
+            </li>
+            <li>
+              <span class="link">
+                <a href="abiinfo.html">Abiinfo</a>
+              </span>
+            </li>
+          </ul>
+        </div>
+        <h2>Saadetud dokumendid</h2>
+        <div class="filter-outer">
+          <p>
+            <label for="sender">Saaja:</label>
+            <input id="sender" class="text" type="text" title="Nimetus" />
+            <label for="sender">Ajavahemik:</label>
+            <input class="date-range" maxlength="28" type="text"
+            title="(pp.kk.aaaa) - (pp.kk.aaaa)" />
+            <label for="t01">Tulemusi lehel:</label>
+            <select id="t01">
+              <option>25</option>
+              <option>50</option>
+            </select>
+            <button type="submit" class="sp1">
+              <span>
+                <strong>Otsi</strong>
+              </span>
+            </button>
+          </p>
+        </div>
+        <div class="tools clear">
+          <div class="tools-a">
+            <p class="help">
+              <a href="#">Abiinfo</a>
+            </p>
+          </div>
+          <div class="tools-b">
+            <p>
+            <span class="shows">Näitan
+            <strong>16-30</strong>,</span>Kokku
+            <strong>105</strong></p>
+          </div>
+        </div>
+        <table class="sortable full">
+          <tr>
+            <th class="sorttable_nosort">&#160;</th>
+            <th class="sorttable_nosort">&#160;</th>
+            <th>ID</th>
+            <th>Kellelt</th>
+            <th>Saadetud</th>
+            <th>Kaust</th>
+          </tr>
+          <tr>
+            <td class="toggle-subrow">
+              <a href="#" title="Näita detailinfot">Ava</a>
+            </td>
+            <td>
+              <img src="gfx/unread.gif" alt="Lugemata" title="Lugemata" class="letter" />
+            </td>
+            <td>
+              <a href="in_dokument.html">1234</a>
+            </td>
+            <td>Eesti Energia AS</td>
+            <td>01.01.2008 13:33</td>
+            <td>/</td>
+          </tr>
+          <tr class="subrow">
+            <td colspan="6">
+              <table class="subrow_info">
+                <tr>
+                  <td>
+                    <strong>Staatus:</strong>
+                  </td>
+                  <td>101: Saatmata</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Saaja(d):</strong>
+                  </td>
+                  <td>Riigi Infosüsteemide Arenduskeskus (vastuvõtmata)
+                  <br />Rahandusministeerium (vastuvõtmata)</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Saadetud:</strong>
+                  </td>
+                  <td>01.01.2008 13:33</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Säilitustähtaeg:</strong>
+                  </td>
+                  <td>01.01.2018 13:33</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Dokument:</strong>
+                  </td>
+                  <td>
+                    <a onclick="alert('Avaneb manuse salvestus/avamise dialoogiaken');" href="#">
+                    Dokument.ddoc (45 Kb)</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>XML:</strong>
+                  </td>
+                  <td>
+                    <a onclick="alert('Avaneb xmli salvestus/avamise dialoogiaken');" href="#">Ava
+                    XML</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td class="toggle-subrow">
+              <a href="#" title="Näita detailinfot">Ava</a>
+            </td>
+            <td>
+              <img src="gfx/read.gif" alt="Loetud" title="Loetud" class="letter" />
+            </td>
+            <td>
+              <a href="in_dokument.html">1235</a>
+            </td>
+            <td>RMK</td>
+            <td>01.01.2008 13:33</td>
+            <td>/TEST</td>
+          </tr>
+          <tr class="subrow">
+            <td colspan="6">
+              <table class="subrow_info">
+                <tr>
+                  <td>
+                    <strong>Staatus:</strong>
+                  </td>
+                  <td>101: Saatmata</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Saaja(d):</strong>
+                  </td>
+                  <td>Riigi Infosüsteemide Arenduskeskus (vastuvõtmata)
+                  <br />Rahandusministeerium (vastuvõtmata)</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Saadetud:</strong>
+                  </td>
+                  <td>01.01.2008 13:33</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Säilitustähtaeg:</strong>
+                  </td>
+                  <td>01.01.2018 13:33</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Dokument:</strong>
+                  </td>
+                  <td>
+                    <a onclick="alert('Avaneb manuse salvestus/avamise dialoogiaken');" href="#">
+                    Dokument.ddoc (45 Kb)</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>XML:</strong>
+                  </td>
+                  <td>
+                    <a onclick="alert('Avaneb xmli salvestus/avamise dialoogiaken');" href="#">Ava
+                    XML</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td class="toggle-subrow">
+              <a href="#" title="Näita detailinfot">Ava</a>
+            </td>
+            <td>
+              <img src="gfx/read.gif" alt="Loetud" title="Loetud" class="letter" />
+            </td>
+            <td>
+              <a href="in_dokument.html">1236</a>
+            </td>
+            <td>Tallinna Linnavalitsus</td>
+            <td>01.01.2008 13:33</td>
+            <td>/</td>
+          </tr>
+          <tr class="subrow">
+            <td colspan="6">
+              <table class="subrow_info">
+                <tr>
+                  <td>
+                    <strong>Staatus:</strong>
+                  </td>
+                  <td>101: Saatmata</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Saaja(d):</strong>
+                  </td>
+                  <td>Riigi Infosüsteemide Arenduskeskus (vastuvõtmata)
+                  <br />Rahandusministeerium (vastuvõtmata)</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Saadetud:</strong>
+                  </td>
+                  <td>01.01.2008 13:33</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Säilitustähtaeg:</strong>
+                  </td>
+                  <td>01.01.2018 13:33</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Dokument:</strong>
+                  </td>
+                  <td>
+                    <a onclick="alert('Avaneb manuse salvestus/avamise dialoogiaken');" href="#">
+                    Dokument.ddoc (45 Kb)</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>XML:</strong>
+                  </td>
+                  <td>
+                    <a onclick="alert('Avaneb xmli salvestus/avamise dialoogiaken');" href="#">Ava
+                    XML</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td class="toggle-subrow">
+              <a href="#" title="Näita detailinfot">Ava</a>
+            </td>
+            <td>
+              <img src="gfx/unread.gif" alt="Lugemata" title="Lugemata" class="letter" />
+            </td>
+            <td>
+              <a href="in_dokument.html">1237</a>
+            </td>
+            <td>Politsei- ja Piirivalveamet</td>
+            <td>01.01.2008 13:33</td>
+            <td>/</td>
+          </tr>
+          <tr class="subrow">
+            <td colspan="6">
+              <table class="subrow_info">
+                <tr>
+                  <td>
+                    <strong>Staatus:</strong>
+                  </td>
+                  <td>101: Saatmata</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Saaja(d):</strong>
+                  </td>
+                  <td>Riigi Infosüsteemide Arenduskeskus (vastuvõtmata)
+                  <br />Rahandusministeerium (vastuvõtmata)</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Saadetud:</strong>
+                  </td>
+                  <td>01.01.2008 13:33</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Säilitustähtaeg:</strong>
+                  </td>
+                  <td>01.01.2018 13:33</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Dokument:</strong>
+                  </td>
+                  <td>
+                    <a onclick="alert('Avaneb manuse salvestus/avamise dialoogiaken');" href="#">
+                    Dokument.ddoc (45 Kb)</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>XML:</strong>
+                  </td>
+                  <td>
+                    <a onclick="alert('Avaneb xmli salvestus/avamise dialoogiaken');" href="#">Ava
+                    XML</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td class="toggle-subrow">
+              <a href="#" title="Näita detailinfot">Ava</a>
+            </td>
+            <td>
+              <img src="gfx/unread.gif" alt="Lugemata" title="Lugemata" class="letter" />
+            </td>
+            <td>
+              <a href="in_dokument.html">1239</a>
+            </td>
+            <td>Maksu- ja Tolliamet</td>
+            <td>01.01.2008 13:33</td>
+            <td>/</td>
+          </tr>
+          <tr class="subrow">
+            <td colspan="6">
+              <table class="subrow_info">
+                <tr>
+                  <td>
+                    <strong>Staatus:</strong>
+                  </td>
+                  <td>101: Saatmata</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Saaja(d):</strong>
+                  </td>
+                  <td>Riigi Infosüsteemide Arenduskeskus (vastuvõtmata)
+                  <br />Rahandusministeerium (vastuvõtmata)</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Saadetud:</strong>
+                  </td>
+                  <td>01.01.2008 13:33</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Säilitustähtaeg:</strong>
+                  </td>
+                  <td>01.01.2018 13:33</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Dokument:</strong>
+                  </td>
+                  <td>
+                    <a onclick="alert('Avaneb manuse salvestus/avamise dialoogiaken');" href="#">
+                    Dokument.ddoc (45 Kb)</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>XML:</strong>
+                  </td>
+                  <td>
+                    <a onclick="alert('Avaneb xmli salvestus/avamise dialoogiaken');" href="#">Ava
+                    XML</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>

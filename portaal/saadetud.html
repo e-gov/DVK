@@ -78,16 +78,13 @@
         <h2>Saadetud dokumendid</h2>
         <div class="filter-outer">
           <p>
+            <label for="id">ID:</label>
+            <input id="id" class="id" type="text" title="ID" />
             <label for="sender">Saaja:</label>
             <input id="sender" class="text" type="text" title="Nimetus" />
-            <label for="sender">Ajavahemik:</label>
+            <label for="date-range">Ajavahemik:</label>
             <input class="date-range" maxlength="28" type="text"
             title="(pp.kk.aaaa) - (pp.kk.aaaa)" />
-            <label for="t01">Tulemusi lehel:</label>
-            <select id="t01">
-              <option>25</option>
-              <option>50</option>
-            </select>
             <button type="submit" class="sp1">
               <span>
                 <strong>Otsi</strong>
@@ -95,6 +92,7 @@
             </button>
           </p>
         </div>
+			
         <div class="tools clear">
           <div class="tools-a">
             <p class="help">
@@ -102,12 +100,31 @@
             </p>
           </div>
           <div class="tools-b">
-            <p>
-            <span class="shows">Näitan
-            <strong>16-30</strong>,</span>Kokku
-            <strong>105</strong></p>
+            <p class="select"> 
+							<label for="t01">Tulemusi lehel:</label> 
+							<select id="t01"> 
+								<option>25</option> 
+								<option>50</option> 
+							</select> 
+						</p> 
+						 
           </div>
         </div>
+		<div class="openshows">
+          <div class="open">
+            <p class="subrow-toggle">
+          <a href="#" class="open">Ava detailinfo</a>
+          <span>|</span>
+          <a href="#" class="close">Sulge detailinfo</a>
+            </p>
+          </div>
+          <div class="shows">
+            <p><span class="shows">Näitan <strong>16-30</strong>,</span> Kokku <strong>105</strong></p>
+					 
+          </div>
+        </div>
+
+        
         <table class="sortable full">
           <tr>
             <th class="sorttable_nosort">&#160;</th>
@@ -125,7 +142,7 @@
               <img src="gfx/unread.gif" alt="Lugemata" title="Lugemata" class="letter" />
             </td>
             <td>
-              <a href="in_dokument.html">1234</a>
+              <a href="1234.html">1234</a>
             </td>
             <td>Eesti Energia AS</td>
             <td>01.01.2008 13:33</td>
@@ -161,7 +178,7 @@
                 </tr>
                 <tr>
                   <td>
-                    <strong>Dokument:</strong>
+                    <strong>Manus:</strong>
                   </td>
                   <td>
                     <a onclick="alert('Avaneb manuse salvestus/avamise dialoogiaken');" href="#">
@@ -188,7 +205,7 @@
               <img src="gfx/read.gif" alt="Loetud" title="Loetud" class="letter" />
             </td>
             <td>
-              <a href="in_dokument.html">1235</a>
+              <a href="1234.html">1235</a>
             </td>
             <td>RMK</td>
             <td>01.01.2008 13:33</td>
@@ -224,7 +241,7 @@
                 </tr>
                 <tr>
                   <td>
-                    <strong>Dokument:</strong>
+                    <strong>Manus:</strong>
                   </td>
                   <td>
                     <a onclick="alert('Avaneb manuse salvestus/avamise dialoogiaken');" href="#">
@@ -251,7 +268,7 @@
               <img src="gfx/read.gif" alt="Loetud" title="Loetud" class="letter" />
             </td>
             <td>
-              <a href="in_dokument.html">1236</a>
+              <a href="1234.html">1236</a>
             </td>
             <td>Tallinna Linnavalitsus</td>
             <td>01.01.2008 13:33</td>
@@ -287,7 +304,7 @@
                 </tr>
                 <tr>
                   <td>
-                    <strong>Dokument:</strong>
+                    <strong>Manus:</strong>
                   </td>
                   <td>
                     <a onclick="alert('Avaneb manuse salvestus/avamise dialoogiaken');" href="#">
@@ -314,7 +331,7 @@
               <img src="gfx/unread.gif" alt="Lugemata" title="Lugemata" class="letter" />
             </td>
             <td>
-              <a href="in_dokument.html">1237</a>
+              <a href="1234.html">1237</a>
             </td>
             <td>Politsei- ja Piirivalveamet</td>
             <td>01.01.2008 13:33</td>
@@ -350,7 +367,7 @@
                 </tr>
                 <tr>
                   <td>
-                    <strong>Dokument:</strong>
+                    <strong>Manus:</strong>
                   </td>
                   <td>
                     <a onclick="alert('Avaneb manuse salvestus/avamise dialoogiaken');" href="#">
@@ -377,7 +394,7 @@
               <img src="gfx/unread.gif" alt="Lugemata" title="Lugemata" class="letter" />
             </td>
             <td>
-              <a href="in_dokument.html">1239</a>
+              <a href="1234.html">1239</a>
             </td>
             <td>Maksu- ja Tolliamet</td>
             <td>01.01.2008 13:33</td>
@@ -413,7 +430,7 @@
                 </tr>
                 <tr>
                   <td>
-                    <strong>Dokument:</strong>
+                    <strong>Manus:</strong>
                   </td>
                   <td>
                     <a onclick="alert('Avaneb manuse salvestus/avamise dialoogiaken');" href="#">

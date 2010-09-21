@@ -1,3 +1,9 @@
+P.help A,
+A.help {
+    padding-left: 18px;
+    background: url(ico_help.gif) no-repeat 0 1px;
+}
+
 #letters {
 background:#f1f1f1 url(bg04.gif) no-repeat -730px 100%;
 padding:5px 10px 9px
@@ -157,7 +163,8 @@ padding:0
 div.filter-outer {
 background:url(bg04.gif) no-repeat 0 0;
 margin-top:1em;
-padding-top:3px
+padding-top:3px;
+text-align:center;
 }
 
 div.filter-outer .check {
@@ -239,11 +246,77 @@ margin-top:1em
 div.tools4,div.tools .select2,div.tools .select {
 margin-top:0
 }
+div.openshows {
+margin-top:2em;
+vertical-align:middle;
+}
+
+div.openshows .button {
+margin-top:1px
+}
+
+div.openshows .select2 select {
+margin-right:.3em
+}
+
+div.openshows .shows {
+margin-right:.5em
+}
+
+div.openshows label,div.openshows input {
+vertical-align:middle
+}
+
+div.openshows p {
+margin-top:2px
+}
+
+div.open {
+float:left;
+width:350px;
+vertical-align:middle;
+}
+
+div.open p,div.openshows2 p {
+float:left;
+margin-right:20px
+}
+
+div.shows {
+float:right;
+width:350px;
+vertical-align:middle;
+}
+
+div.shows p {
+float:right;
+margin-left:20px
+}
+
+div.openshows2 div.open {
+width:250px
+}
+
+div.openshows2 div.shows {
+width:450px
+}
+
+div.openshows2,div.openshows3 {
+margin-top:1em
+}
+
+div.openshows4,div.openshows .select2,div.openshows .select {
+margin-top:0
+}
 
 img.letter {
 display:block;
 margin-left:auto;
 margin-right:auto
+}
+img.letter2 {
+margin-right: 3px;
+vertical-align:bottom
 }
 
 input,input.date,input.date-range,input.date-range-multi {
@@ -252,6 +325,9 @@ border-color:#b0b0b0 #e0e0e0 #e0e0e0 #b0b0b0;
 min-height:15px;
 padding:2px;
 width:150px
+}
+input.id {
+width:60px
 }
 
 input.date-range,input.date-range-multi {
@@ -302,3 +378,84 @@ tr.subrow td {
 background:#EBF6FF;
 font-size:11px
 }
+BUTTON,
+BUTTON SPAN {
+	position: relative;
+	height: 26px;
+	font-size: 12px;
+	line-height: 15px;
+}
+BUTTON {
+	width: auto;
+	overflow: visible;
+	margin: 0px;
+	padding: 0;
+	border: none;
+	background: none;
+	vertical-align: top;
+}
+BUTTON SPAN,
+BUTTON STRONG {
+	display: block;
+	background: #4d9e00 url(bg_button.png) no-repeat 0 0;
+	cursor: pointer;
+}
+BUTTON SPAN {
+	padding-right: 14px;
+	background-position: 100% 0;
+	white-space: nowrap;
+}
+BUTTON STRONG {
+	padding: 5px 0 6px 13px;
+	color: #fff;
+}
+BUTTON:hover SPAN,
+BUTTON:focus SPAN {
+	background-position: 100% -26px;
+}
+BUTTON:hover STRONG,
+BUTTON:focus STRONG {
+	background-position: 0 -26px;
+	color: #fff200;
+	text-shadow: #1d5230 1px 1px 0;
+}
+BUTTON:active SPAN {
+	background-position: 100% -52px;
+}
+BUTTON:active STRONG {
+	background-position: 0 -52px;
+	color: #fff200;
+}
+BUTTON::-moz-focus-inner {
+	padding: 0;
+	border: none;
+}
+BUTTON.sp1,
+BUTTON.sp1 SPAN {
+	height: 24px;
+	line-height: 13px;
+}
+BUTTON.sp1 SPAN,
+BUTTON.sp1 STRONG {
+	background-image: url(bg_button2.png);
+}
+BUTTON.sp1 STRONG {
+	padding: 5px 0 5px 13px;
+}
+BUTTON.sp1:hover SPAN,
+BUTTON.sp1:focus SPAN {
+	background-position: 100% -24px;
+}
+BUTTON.sp1:hover STRONG,
+BUTTON.sp1:focus STRONG {
+	background-position: 0 -24px;
+}
+BUTTON.sp1:active SPAN {
+	background-position: 100% -48px;
+}
+BUTTON.sp1:active STRONG {
+	background-position: 0 -48px;
+}
+
+
+

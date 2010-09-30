@@ -1,7 +1,6 @@
 package dvk.client.db;
 
 import dvk.client.conf.OrgSettings;
-import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -74,6 +73,9 @@ public class DBConnection {
         } else if (settings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_SQLANYWHERE)) {
         	Class.forName("com.sybase.jdbc3.jdbc.SybDriver").newInstance();
             connectionString = "jdbc:sybase:Tds:" + settings.getServerName() + ":" + settings.getServerPort();
+            if ((settings.getDatabaseName() != null) && (settings.getDatabaseName().length() > 0)) {
+            	connectionString += "?ServiceName=" + settings.getDatabaseName();
+            }
             connection = DriverManager.getConnection(connectionString, connInfo);
         } else {
         	throw new Exception("Incorrect DB provider type: " + settings.getDbProvider());

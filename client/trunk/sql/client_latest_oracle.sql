@@ -6,9 +6,6 @@ PACKAGE globalPkg AUTHID CURRENT_USER AS
 END;
 /
 
-GRANT EXECUTE ON globalpkg TO public
-/
-
 CREATE TABLE dhl_message
 (
     dhl_message_id number(10,0) NOT NULL,

@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="et" lang="et">
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-    <title>Dokumendivahetuskeskuse Prototüüp: Dokument nr 1234</title>
+    <title>DVK: Dokument nr 1234</title>
     <link rel="stylesheet" href="gfx/lisa.css" type="text/css" media="all" />
     <link rel="stylesheet" href="https://www.eesti.ee/css/rp.css" type="text/css" media="all" />
     <link id="normal_css" rel="stylesheet" href="https://www.eesti.ee/css/rp_2.css" type="text/css"
@@ -12,39 +12,17 @@
     media="all" />
     <link rel="stylesheet" href="https://www.eesti.ee/css/print.css" type="text/css"
     media="print" />
-    <link rel="stylesheet" href="http://proto.eesti.ee/wm/ylevaade_html/cal/jquery.datepick.css"
+    <link rel="stylesheet" href="gfx/jquery.datepick.css"
     type="text/css" media="all" />
   </head>
   <body>
     <script type="text/javascript" src="https://www.eesti.ee/gfx/js/rp.js"></script>
-    <script type="text/javascript" src="https://www.eesti.ee/gfx/js/sorttable.js"></script>
     <!--[if IE 6]><style>#content ul.lipikud {margin-left: -5px;}</style><![endif]-->
     <!--[if IE]><style>#content table.ie_bugfix {width: auto;} #content ul.lipikud li a, #content ul.lipikud li .link {display: inline-block;}</style><![endif]-->
     <!--[if IE]><script type="text/javascript">var isIE = true; window.onresize = function () {lipikud_redraw();};</script><![endif]-->
-    <script type="text/javascript" src="http://proto.eesti.ee/wm/ylevaade_html/js/jquery.min.js">
-    </script>
-    <script type="text/javascript"
-    src="http://proto.eesti.ee/wm/ylevaade_html/cal/jquery.datepick.js"></script>
-    <script type="text/javascript"
-    src="http://proto.eesti.ee/wm/ylevaade_html/js/jquery.tooltip.min.js"></script>
-    <script type="text/javascript"
-    src="http://proto.eesti.ee/wm/ylevaade_html/js/jquery.example.min.js"></script>
-    <script type="text/javascript"
-    src="http://proto.eesti.ee/wm/ylevaade_html/js/jquery.bgiframe.min.js"></script>
-    <script type="text/javascript" src="http://proto.eesti.ee/wm/ylevaade_html/js/custom.js">
-    </script>
-    <script type="text/javascript">
-      <!--
-                $(document).ready(function(){
-                        $("input[title]").example(function() {
-                                return $(this).attr('title');
-                        });
-                        $(function(){
-                                        $("tr.subrow").css("display","none");
-                                });
-                });
-                -->
-    </script>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jquery.datepick.js"></script>
+    <script type="text/javascript" src="js/dvk.js"></script>
     <div id="content">
       <div style="width:730px;">
         <h1>
@@ -116,7 +94,36 @@
 	</tr> 
 	<tr> 
 		<td class="col1">Saaja(d):</td> 
-		<td>Riigi Infosüsteemide Arenduskeskus (vastuvõtmata<img src="gfx/unread.gif" alt="Lugemata" title="Lugemata" class="letter2" />)<br />Rahandusministeerium (vastuvõtmata<img src="gfx/unread.gif" alt="Lugemata" title="Lugemata" class="letter2" />)</td> 
+		<td>Riigi Infosüsteemide Arenduskeskus (<a class="toggle-moreinfo">vastuvõtmata<img src="gfx/unread.gif" alt="Lugemata" title="Lugemata" class="letter2" /></a>)
+		<div class="moreinfo">
+			<table class="form">
+				<tr>
+					<td class="col1">Allüksus:</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td class="col1">Ametikoht:</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td class="col1">Saadud:</td>
+					<td>01.01.2008 13:33</td>
+				</tr>
+				<tr>
+					<td class="col1">:</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td class="col1">:</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td class="col1">:</td>
+					<td></td>
+				</tr>
+	        </table>
+		</div>
+		<br />Rahandusministeerium (<a class="toggle-moreinfo">vastuvõtmata<img src="gfx/unread.gif" alt="Lugemata" title="Lugemata" class="letter2" /></a>)</td>
 	</tr> 
 	<tr> 
 		<td class="col1">Saadetud:</td> 
@@ -125,14 +132,10 @@
 	<tr> 
 		<td class="col1">Säilitustähtaeg:</td> 
 		<td>01.01.2018 13:33</td> 
-	</tr> 
-	<tr> 
-		<td class="col1">Manus:</td> 
-		<td>Dokument.ddoc (45 Kb)</td> 
-	</tr> 
+	</tr>
 	<tr> 
 		<td class="col1">XML:</td> 
-		<td><a onclick="alert('Avaneb xmli salvestus/avamise dialoogiaken');" href="#">Ava XML</a></td> 
+		<td><a onclick="alert('Avaneb xmli salvestus/avamise dialoogiaken');" href="#">Ava XML (43 Kb)</a></td>
 	</tr> 
 </table> 
     </div>

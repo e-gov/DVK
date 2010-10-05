@@ -1,0 +1,332 @@
+/* Default style sheet for jQuery date picker v3.7.0. */
+
+#datepick-div TH,
+#datepick-div TD,
+.datepick-inline TH,
+.datepick-inline TD {
+	color: #000;
+	font-size: 12px;
+	line-height: 1.25;
+	font-family: Arial, Helvetica, sans-serif;
+}
+#datepick-div,
+.datepick-inline {
+	width: 15em;
+	margin: 0;
+	padding: 1px;
+	background: #e0e0e0;
+}
+#datepick-div {
+	display: none;
+	border: 1px solid #808080;
+	z-index: 999999; /*must have*/
+}
+.datepick-inline {
+	float: left;
+	display: block;
+	border: 0;
+}
+.datepick-rtl {
+	direction: rtl;
+}
+.datepick-dialog {
+	padding: 5px !important;
+	border: 4px ridge #ddd !important;
+}
+.datepick-disabled {
+	position: absolute;
+	z-index: 100;
+	background-color: white;
+	opacity: 0.5;
+	filter: alpha(opacity=50);
+}
+button.datepick-trigger {
+	width: 25px;
+	padding: 0px;
+}
+img.datepick-trigger {
+	margin: 2px;
+	vertical-align: middle;
+}
+.datepick-prompt {
+	float: left;
+	padding: 2px;
+}
+* html .datepick-prompt { /* IE6 */
+	width: 15em;
+}
+.datepick-control,
+.datepick-links,
+.datepick-header,
+.datepick {
+	clear: both;
+	float: left;
+	width: 100%;
+}
+.datepick-control {
+	display: none;
+	background: #404040;
+	padding: 2px 0;
+}
+.datepick-links {
+	background: #000;
+	padding: 1px 0;
+	color: #fff;
+}
+.datepick-links,
+.datepick-control {
+	font-size: 11px;
+	line-height: 1.273;
+	font-weight: bold;
+}
+.datepick-links a {
+	outline: none;
+}
+.datepick-prev,
+.datepick-next,
+.datepick-prev a,
+.datepick-next a,
+.datepick-prev label,
+.datepick-next label {
+	display: block;
+	width: 24px;
+	height: 19px;
+	overflow: hidden;
+	padding: 0;
+	text-align: left;
+}
+.datepick-prev a,
+.datepick-next a,
+.datepick-prev label,
+.datepick-next label {
+	background: url(bg_nav.gif) no-repeat;
+}
+.datepick-prev,
+.datepick-next {
+	text-indent: -5000px;
+}
+.datepick-prev a {
+	background-position: 100% 0;
+}
+.datepick-prev a:hover {
+	background-position: 100% -19px;
+}
+.datepick-prev label {
+	background-position: 100% -38px;
+}
+.datepick-next a {
+	background-position: 100% -57px;
+}
+.datepick-next a:hover {
+	background-position: 100% -76px;
+}
+.datepick-next label {
+	background-position: 100% -95px;
+}
+.datepick-links label {
+	color: #808080;
+}
+.datepick-prev,
+.datepick-clear {
+	float: left;
+}
+.datepick-clear {
+	width: 34%;
+}
+.datepick-rtl .datepick-prev,
+.datepick-rtl .datepick-clear {
+	float: right;
+	text-align: right;
+}
+.datepick-current {
+	position: absolute;
+	left: 50%;
+	width: 120px;
+	overflow: hidden;
+	margin-left: -60px;
+	padding-top: 2px;
+	text-align: center;
+}
+.datepick-current a {
+	color: #fff;
+}
+.datepick-current a:hover {
+	color: #5dac10;
+}
+.datepick-next,
+.datepick-close {
+	float: right;
+	text-align: right;
+}
+.datepick-close {
+	width: 34%;
+}
+.datepick-rtl .datepick-next,
+.datepick-rtl .datepick-close {
+	float: left;
+	text-align: left;
+}
+.datepick-header,
+.datepick-header select {
+	color: #000;
+	font-weight: bold;
+	font-size: 11px !important;
+	line-height: 1.273 !important;
+}
+.datepick-header {
+	padding: 3px 0;
+	background: #e8e8e8;
+	text-align: center;
+	font-weight: bold;
+}
+.datepick-header select {
+	margin: 0 1px;
+	padding: 1px;
+	border: 1px solid;
+	border-color: #c0c0c0 #d8d8d8 #d8d8d8 #c0c0c0;
+	background: #fff;
+	vertical-align: top;
+}
+.datepick-header span {
+	display: inline-block;
+	padding: 3px 0;
+}
+.datepick {
+	margin: 0;
+	border-collapse: collapse;
+	text-align: center;
+	font-size: 100%;
+}
+.datepick a {
+	display: block;
+	color: #202020;
+}
+.datepick-title-row {
+	background: #e8e8e8 url(bg_head.gif) repeat-x 0 0;
+}
+.datepick-title-row th {
+	border: 1px solid;
+	border-color: #d0d0d0 #e0e0e0 #e0e0e0;
+	color: #202020;
+	font-size: 11px !important;
+	line-height: 1.273 !important;
+	font-weight: bold;
+	text-align: center;
+	text-transform: uppercase;
+}
+.datepick-title-row span {
+	display: block;
+	padding: 3px 1px;
+	cursor: help;
+}
+.datepick-days-row {
+	background: #eee;
+	color: #666;
+}
+.datepick-week-col {
+	background: #808080;
+	color: #fff;
+}
+.datepick-days-cell {
+	border: 1px solid #e0e0e0 !important;
+	background: #fff;
+	color: #000;
+	text-align: center;
+}
+.datepick-days-cell a {
+	padding: 2px 1px !important;
+	border: 1px solid #fff;
+}
+.datepick-other-month {
+	background: #fff;
+}
+.datepick-week-over {
+	background: #ddd;
+}
+.datepick-unselectable {
+	padding: 3px 1px;
+	border-color: #f0f0f0;
+	background: #f0f0f0;
+	color: #808080 !important;
+	cursor: default;
+}
+.datepick-today a {
+	border-color: #606060 !important;
+}
+.datepick-current-day,
+.datepick-current-day a {
+	color: #000 !important;
+}
+.datepick-current-day {
+	background: #5dac10 !important;
+}
+.datepick-current-day a {
+	border-color: #5dac10;
+}
+.datepick-days-cell-over {
+	background: #5dac10;
+	color: #000;
+}
+.datepick-days-cell-over a {
+	border-color: #606060;
+}
+.datepick-status {
+	background: #ddd;
+	width: 100%;
+	font-size: 80%;
+	text-align: center;
+}
+#datepick-div a,
+.datepick-inline a {
+	cursor: pointer;
+	margin: 0;
+	padding: 0;
+	text-decoration: none;
+}
+.datepick-control a {
+	padding: 2px 5px !important;
+	color: #eee;
+}
+.datepick-title-row a {
+	color: #eee;
+}
+.datepick-control a:hover {
+	background: #5dac10;
+	color: #000;
+}
+.datepick-title-row a:hover {
+	background: #ddd;
+	color: #333;
+}
+.datepick-one-month {
+	float: left;
+	width: 15em;
+}
+.datepick-new-row {
+	clear: left;
+}
+.datepick-multi .datepick {
+	border-left: 2px solid #d0d0d0;
+}
+*+html .datepick-multi .datepick {
+	border-left: 1px solid #c0c0c0;
+}
+* html .datepick-multi .datepick {
+	border-left: 1px solid #c0c0c0;
+}
+.datepick-multi .datepick-new-row .datepick {
+	border-left: 1px solid #e0e0e0 !important;
+}
+
+/* ___________ IE6 IFRAME FIX ________ */
+.datepick-cover {
+	display: none; /*sorry for IE5*/
+	display/**/: block; /*sorry for IE5*/
+	position: absolute; /*must have*/
+	z-index: -1; /*must have*/
+	filter: mask(); /*must have*/
+	top: -1px; /*must have*/
+	left: -1px; /*must have*/
+	width: 187px; /*must have*/
+	height: 187px; /*must have*/
+}

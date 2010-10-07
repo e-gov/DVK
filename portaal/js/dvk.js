@@ -44,13 +44,28 @@ var toggleSubrowToggle = {
 		return false;
 	}
 };
+var toggleMoreinfo = {
+	init : function(){
+		$("div.toggle-moreinfo").find("a").click(this.clickIt);
+	},
+	clickIt : function(){
+		var div = $(this).next("div");
+		if(div.hasClass("open")) {
+			div.removeClass("open");
+		}
+		else {
+			div.addClass("open");
+		}
+		return false;
+	}
+};
 
 $(function(){
 	toggleSubrow.init();
 	toggleSubrowToggle.init();
+	toggleMoreinfo.init();
 	if($("input.date-range").length){
 		$("input.date-range").datepick({ rangeSelect: true });
 	}
 	$("tr.subrow").css("display","none");
-	$("div.moreinfo").css("display","none");
 });

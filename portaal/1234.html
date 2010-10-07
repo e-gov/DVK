@@ -31,11 +31,6 @@
         </h1>
         <div class="lipikud_kast">
           <ul class="lipikud">
-            <li class="active">
-              <span class="link">
-                <a href="1234.html">Dok. nr 1234</a>
-              </span>
-            </li>
 			<li>
               <span class="link">
                 <a href="index.html">Ülevaade</a>
@@ -58,86 +53,79 @@
             </li>
           </ul>
         </div>
-        <h2>Dokument nr 1234</h2>
-		<div class="filter-outer">
-          <p>
-            <label for="id">ID:</label>
-            <input id="id" class="id" type="text" title="ID" />
-            <label for="sender">Saaja:</label>
-            <input id="sender" class="text" type="text" title="Nimetus" />
-            <label for="date-range">Ajavahemik:</label>
-            <input class="date-range" maxlength="28" type="text"
-            title="(pp.kk.aaaa) - (pp.kk.aaaa)" />
-            <button type="submit" class="sp1">
-              <span>
-                <strong>Otsi</strong>
-              </span>
-            </button>
-          </p>
-        </div>
+        <h2>Dokument DVK ID 1234</h2>
 		<p class="help">
               <a href="#">Abiinfo</a>
-            </p>
-		//Comment: Vastavalt sellele, mis dokument avati, kas saadetud või vastuvõetud, näidatakse otsingu tulemusi.
+    	</p>
 		<table class="form"> 
 	<tr> 
-		<td class="col1">ID:</td> 
+		<td class="col1"><strong>DVK ID:</strong></td>
 		<td>1234</td> 
 	</tr> 
 	<tr> 
-		<td class="col1">Staatus:</td> 
-		<td><img src="gfx/read.gif" alt="Loetud" title="Loetud" class="letter2"/>102: Saadetud</td> 
-	</tr> 
+		<td class="col1"><strong>Üldine staatus:</strong></td>
+		<td><img src="gfx/read.gif" alt="Vastuvõetud" title="Vastuvõetud" class="letter2"/> Vastuvõetud</td>
+	</tr>
+	<tr>
+		<td class="col1"><strong>Saadetud:</strong></td>
+		<td>01.01.2008 13:33</td>
+	</tr>
 	<tr> 
-		<td class="col1">Saatja:</td> 
+		<td class="col1"><strong>Saatja:</strong></td>
 		<td>Eesti Energia AS</td> 
 	</tr> 
 	<tr> 
-		<td class="col1">Saaja(d):</td> 
-		<td>Riigi Infosüsteemide Arenduskeskus (<a class="toggle-moreinfo">vastuvõtmata<img src="gfx/unread.gif" alt="Lugemata" title="Lugemata" class="letter2" /></a>)
-		<div class="moreinfo">
-			<table class="form">
-				<tr>
-					<td class="col1">Allüksus:</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td class="col1">Ametikoht:</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td class="col1">Saadud:</td>
-					<td>01.01.2008 13:33</td>
-				</tr>
-				<tr>
-					<td class="col1">:</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td class="col1">:</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td class="col1">:</td>
-					<td></td>
-				</tr>
-	        </table>
+		<td class="col1"><strong>Saaja(d):</strong></td>
+		<td><div class="toggle-moreinfo"><img src="gfx/read.gif" alt="Vastuvõetud" title="Vastuvõetud" class="letter2" /> Riigi Infosüsteemide Arenduskeskus (<a href="#">saadud 01.01.2008 13:33</a>)
+			<div class="moreinfo">
+				<table class="form">
+					<tr>
+						<td class="col1">Vastuvõtja staatus:</td>
+						<td>0</td>
+					</tr>
+					<tr>
+						<td class="col1">Metaxml:</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td class="col1">Viga:</td>
+						<td>Kood: 123<br />Tegija: Consumer<br />Teade: Error in processing<br />Detailid: XML error on line 123.<br /></td>
+					</tr>
+		        </table>
+			</div>
 		</div>
-		<br />Rahandusministeerium (<a class="toggle-moreinfo">vastuvõtmata<img src="gfx/unread.gif" alt="Lugemata" title="Lugemata" class="letter2" /></a>)</td>
-	</tr> 
+		<div class="toggle-moreinfo"><img src="gfx/unread.gif" alt="Lugemata" title="Lugemata" class="letter2" /> Rahandusministeerium (<a href="#">vastuvõtmata</a>)
+			<div class="moreinfo">
+				<table class="form">
+					<tr>
+						<td class="col1">Vastuvõtja staatus:</td>
+						<td>0</td>
+					</tr>
+					<tr>
+						<td class="col1">Metaxml:</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td class="col1">Viga:</td>
+						<td>Kood: 123<br />Tegija: Consumer<br />Teade: Error in processing<br />Detailid: XML error on line 123.<br /></td>
+					</tr>
+		        </table>
+			</div>
+		</div></td>
+	</tr>
+	<tr>
+		<td class="col1"><strong>Kaust:</strong></td>
+		<td>/</td>
+	</tr>
 	<tr> 
-		<td class="col1">Saadetud:</td> 
-		<td>01.01.2008 13:33</td> 
-	</tr> 
-	<tr> 
-		<td class="col1">Säilitustähtaeg:</td> 
+		<td class="col1"><strong>Säilitustähtaeg:</strong></td>
 		<td>01.01.2018 13:33</td> 
 	</tr>
 	<tr> 
-		<td class="col1">XML:</td> 
+		<td class="col1"><strong>XML:</strong></td>
 		<td><a onclick="alert('Avaneb xmli salvestus/avamise dialoogiaken');" href="#">Ava XML (43 Kb)</a></td>
 	</tr> 
-</table> 
+</table>
     </div>
   </body>
 </html>

@@ -32,6 +32,12 @@ public class Settings {
     public static String Client_DefaultOrganizationCode;
     public static String Client_DefaultPersonCode;
     public static String Client_SpecificationVersion = "1.5";
+    public static String Client_KeyStoreFile = "";
+    public static String Client_KeyStorePassword = "";
+    public static String Client_KeyStoreType = "";
+    public static String Client_TrustStoreFile = "";
+    public static String Client_TrustStorePassword = "";
+    public static String Client_TrustStoreType = "";
     
     // Serveri seaded
     public static String Server_DatabaseEnvironmentVariable = "jdbc/dhloracle";
@@ -199,6 +205,28 @@ public class Settings {
             if (currentProperties.getProperty("client_specification_version") != null) {
                 Client_SpecificationVersion = currentProperties.getProperty("client_specification_version").replaceAll(",",".");
             }
+			
+			// SSL keystore andmed
+			if (currentProperties.getProperty("client_keystore_file") != null) {
+                Client_KeyStoreFile = currentProperties.getProperty("client_keystore_file");
+            }
+			if (currentProperties.getProperty("client_keystore_password") != null) {
+                Client_KeyStorePassword = currentProperties.getProperty("client_keystore_password");
+            }
+			if (currentProperties.getProperty("client_keystore_type") != null) {
+                Client_KeyStoreType = currentProperties.getProperty("client_keystore_type");
+            }
+			if (currentProperties.getProperty("client_truststore_file") != null) {
+                Client_TrustStoreFile = currentProperties.getProperty("client_truststore_file");
+            }
+			if (currentProperties.getProperty("client_truststore_password") != null) {
+                Client_TrustStorePassword = currentProperties.getProperty("client_truststore_password");
+            }
+			if (currentProperties.getProperty("client_truststore_type") != null) {
+                Client_TrustStoreType = currentProperties.getProperty("client_truststore_type");
+            }
+			
+			
             
             // Serveri seaded
             if (currentProperties.getProperty("server_producer_name") != null) {

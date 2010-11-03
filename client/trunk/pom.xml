@@ -8,7 +8,7 @@
   
   <!-- Properties -->
   <properties>
-  	<dvkCoreDir>C:\Projektid\dvk\dvk_core</dvkCoreDir>
+  	<dvkCoreDir>C:\Projektid\ria\dvk\workspace\dvk_core</dvkCoreDir>
   </properties>
   
   <!-- Dependencies -->
@@ -40,6 +40,13 @@
 	  	<version>1.0</version>
 	  	<scope>system</scope>
 	  	<systemPath>${basedir}/lib/jaxrpc.jar</systemPath>
+	</dependency>
+	<dependency>
+	  	<groupId>java</groupId>
+	  	<artifactId>jsse</artifactId>
+	  	<version>1.0</version>
+	  	<scope>system</scope>
+	  	<systemPath>${basedir}/lib/jsse.jar</systemPath>
 	</dependency>
 	<dependency>
 	  	<groupId>apache</groupId>

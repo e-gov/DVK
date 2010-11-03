@@ -47,6 +47,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.URL;
+import java.security.Security;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -59,6 +60,7 @@ import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPException;
 
 import org.apache.axis.AxisFault;
+import org.apache.axis.AxisProperties;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
 import org.apache.axis.attachments.AttachmentPart;
@@ -116,6 +118,22 @@ public class ClientAPI {
     public void initClient(String serverURL, String producer) throws Exception {
     	logger.debug("Initializing SOAP client for URL \"" + serverURL + "\" and x-road producer \""+ producer +"\"");
     	
+        // Kui klient on seadistatud töötama HTTPS ühendusega,
+        // siis teeme konfiguratsioonis vajalikud muudatused
+    	URL url = new URL(serverURL);
+        if (url.getProtocol().equalsIgnoreCase("https"))
+        {
+        	System.setProperty("java.protocol.handler.pkgs", "com.sun.net.ssl.internal.www.protocol");
+        	Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
+        	
+        	System.setProperty("javax.net.ssl.keyStore", Settings.Client_KeyStoreFile);
+        	System.setProperty("javax.net.ssl.trustStore", Settings.Client_TrustStoreFile);
+        	System.setProperty("javax.net.ssl.keyStorePassword", Settings.Client_KeyStorePassword);
+        	System.setProperty("javax.net.ssl.trustStorePassword", Settings.Client_TrustStorePassword);
+        	System.setProperty("javax.net.ssl.keyStoreType", Settings.Client_KeyStoreType);
+        	System.setProperty("javax.net.ssl.trustStoreType", Settings.Client_TrustStoreType);
+        }
+    	
     	this.tempFiles = new ArrayList<String>();
         this.service = new Service();
         this.producerName = producer;
@@ -130,6 +148,8 @@ public class ClientAPI {
             this.call.setUseSOAPAction(true);
         }
         this.call.setProperty(MessageContext.HTTP_TRANSPORT_VERSION, HTTPConstants.HEADER_PROTOCOL_V11);
+        
+        
     }
     
     
@@ -430,7 +450,18 @@ public class ClientAPI {
     }
     
     private int runSendDocumentsRequest(String messageData, String attachmentFile, String attachmentName) throws Exception {
-        try {
+        if ((attachmentFile == null) || (attachmentFile.length() < 1)) {
+			throw new Exception("Unable to send message because message file is unspecified!");
+		} else {
+			File f = new File(attachmentFile);
+			if (!f.exists()) {
+				throw new Exception("Unable to send message because message file \""+ attachmentFile +"\" does not exist!");
+			} else if (f.length() < 1) {
+				throw new Exception("Unable to send message because message file \""+ attachmentFile +"\" is empty!");
+			}
+		}
+		
+		try {
 	    	Message msg = new Message(messageData);
 	        call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "sendDocuments"));
 	        

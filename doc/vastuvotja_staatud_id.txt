@@ -1,0 +1,11 @@
+1	Dokumente on puudu (Pooleli)
+2	Järjekorras
+3	Ootel
+4	Lõpetatud
+5	Tagasi lükatud
+6	Teha
+7	Töötlemisel
+8	Aktsepteeritud (Võetud töösse)
+9	Salvestatud
+10 Arhiveeritud
+11 Saadetud

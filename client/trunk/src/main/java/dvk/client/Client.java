@@ -142,12 +142,26 @@ public class Client {
 	
 	        // RECEIVE
 	        if (ExecType == ClientExecType.Receive || ExecType == ClientExecType.SendReceive) {
-	        	
 	        	logger.info("Client executionMode: " + ExecType);
 	        	
-	            // Kui klient vahetab andmeid DVK versiooniga, mis on varasem, kui 1.5, siis ei saa
+	        	// Tuvastame andmebaasiseadetest, milline on suurim lubatud
+	        	// getSendingOptions päringu versioon vaikimisi seadistatud
+	        	// turvaserveri jaoks.
+	        	int getSendingOptionsMaxVersion = 1;
+	        	for (OrgSettings db : currentClientDatabases) {
+                    String secureServer = db.getDvkSettings().getServiceUrl();
+	        		if ((db != null) && (db.getDvkSettings() != null)
+	        			&& ((secureServer == null) || (secureServer.length() < 1) || (Settings.Client_ServiceUrl.equalsIgnoreCase(secureServer)))
+	        			&& (db.getDvkSettings().getGetSendingOptionsRequestVersion() > getSendingOptionsMaxVersion)) {
+	        			getSendingOptionsMaxVersion = db.getDvkSettings().getGetSendingOptionsRequestVersion();
+	        		}
+	        	}
+	        	
+	            // Kui klient vahetab andmeid DVK versiooniga, mis on varasem, kui 1.6, siis ei saa
 	            // serverist küsida, millistel asutustel on allalaadimata dokumente.
-	            if (CommonMethods.compareVersions(Settings.Client_SpecificationVersion,"1.5") < 0) {
+	        	// Samuti kui on keelatud getSendingOptions päringu v3 (või uuema) versiooni kasutamine,
+	        	// siis ei saa serverist küsida, millistel asutustel on allalaadimata dokumente.
+	            if ((getSendingOptionsMaxVersion < 3) || (CommonMethods.compareVersions(Settings.Client_SpecificationVersion,"1.6") < 0)) {
 	                for (OrgSettings db : currentClientDatabases) {
 	                	// Kontrollime kindlasti, et antud andmebaaiühendus ei oleks
 	                	// mõeldud ainult andmebaaide omavahelise andmevahetuse jaoks.
@@ -159,7 +173,7 @@ public class Client {
 	                            String secureServer = db.getDvkSettings().getServiceUrl();
 	                            if ((secureServer == null) || secureServer.equalsIgnoreCase("")) {
 	                                secureServer = Settings.Client_ServiceUrl;
-	                            }                    
+	                            }
 	                            System.out.println("\nAsutus: " + credentials[i].getInstitutionName());
 	                            System.out.println("Asutuse turvaserver: " + secureServer);
 	                            dvkClient.setServiceURL(secureServer);

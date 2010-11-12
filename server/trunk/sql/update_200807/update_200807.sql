@@ -138,7 +138,7 @@ table   vahendaja
     PRIMARY KEY (vahendaja_id),
     CONSTRAINT fk_vahendaja_1 FOREIGN KEY (transport_id)
         REFERENCES transport (transport_id) ON DELETE CASCADE,
-    CONSTRAINT fk_vahendaja_2 FOREIGN KEY (vahendaja_id)
+    CONSTRAINT fk_vahendaja_2 FOREIGN KEY (asutus_id)
         REFERENCES asutus (asutus_id),
     CONSTRAINT fk_vahendaja_3 FOREIGN KEY (ametikoht_id)
         REFERENCES ametikoht (ametikoht_id)

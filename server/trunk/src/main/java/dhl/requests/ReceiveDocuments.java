@@ -97,8 +97,8 @@ public class ReceiveDocuments {
                         {
                             dhl.Document tmpDoc = documents.get(i);
                             
-                            if (!processedDocuments.contains(tmpDoc.getId()) && (tmpDoc.getFilePath() != null)) {
-                                if (tmpDoc != null) {
+                            if (tmpDoc != null) {
+                            	if (!processedDocuments.contains(tmpDoc.getId()) && (tmpDoc.getFilePath() != null)) {
                                     // Laeme konkreetse dokumendi saatmist puudutavad andmed
                                     Sending tmpSending = new Sending();
                                     tmpSending.loadByDocumentID( tmpDoc.getId(), conn );
@@ -115,7 +115,7 @@ public class ReceiveDocuments {
                                         }
                                     }
                                     
-                                    if (tmpRecipient != null) {
+                                    if ((tmpRecipient != null) && (tmpSending.getSender() != null)) {
                                         Asutus senderOrg = new Asutus( tmpSending.getSender().getOrganizationID(), conn );
                                         Asutus recipientOrg = new Asutus( tmpRecipient.getOrganizationID(), conn );
                                         
@@ -134,7 +134,6 @@ public class ReceiveDocuments {
                                 			conversion.convert();
                                 			
                                 			tmpDoc.setFilePath(tmpDoc.getFilePath() + ".tmp");
-                                			
                                         }
                                         
                                         // Viskame XML failist võlja suure mahuga SignedDoc elemendid
@@ -163,7 +162,7 @@ public class ReceiveDocuments {
                     }
                 }
                 catch (Exception ex) {
-                    CommonMethods.logError( ex, "dhl.requests.SendDocuments", "V1" );
+                    CommonMethods.logError( ex, "dhl.requests.ReceiveDocuments", "V1" );
                     throw new AxisFault( "Error composing response message: " +" ("+ ex.getClass().getName() +": "+ ex.getMessage() +")" );
                 }
                 finally {
@@ -264,8 +263,8 @@ public class ReceiveDocuments {
                             {
                                 dhl.Document tmpDoc = documents.get(i);
                                 
-                                if (!processedDocuments.contains(tmpDoc.getId()) && (tmpDoc.getFilePath() != null)) {
-                                    if (tmpDoc != null) {
+                                if (tmpDoc != null) {
+                                	if (!processedDocuments.contains(tmpDoc.getId()) && (tmpDoc.getFilePath() != null)) {
                                         // Laeme konkreetse dokumendi saatmist puudutavad andmed
                                         Sending tmpSending = new Sending();
                                         tmpSending.loadByDocumentID( tmpDoc.getId(), conn );
@@ -282,7 +281,7 @@ public class ReceiveDocuments {
                                             }
                                         }
                                         
-                                        if( tmpRecipient != null )
+                                        if ((tmpRecipient != null) && (tmpSending.getSender() != null))
                                         {
                                             Asutus senderOrg = new Asutus( tmpSending.getSender().getOrganizationID(), conn );
                                             Asutus recipientOrg = new Asutus( tmpRecipient.getOrganizationID(), conn );
@@ -331,7 +330,7 @@ public class ReceiveDocuments {
                         }
                     }
                     catch (Exception ex) {
-                        CommonMethods.logError( ex, "dhl.requests.SendDocuments", "V2" );
+                        CommonMethods.logError( ex, "dhl.requests.ReceiveDocuments", "V2" );
                         throw new AxisFault( "Error composing response message: " +" ("+ ex.getClass().getName() +": "+ ex.getMessage() +")" );
                     }
                     finally {
@@ -467,9 +466,8 @@ public class ReceiveDocuments {
                             {
                                 dhl.Document tmpDoc = documents.get(i);
                                 
-                                
-                                if (!processedDocuments.contains(tmpDoc.getId()) && (tmpDoc.getFilePath() != null)) {
-                                    if (tmpDoc != null) {
+                                if (tmpDoc != null) {
+                                	if (!processedDocuments.contains(tmpDoc.getId()) && (tmpDoc.getFilePath() != null)) {
                                         // Laeme konkreetse dokumendi saatmist puudutavad andmed
                                         Sending tmpSending = new Sending();
                                         tmpSending.loadByDocumentID( tmpDoc.getId(), conn );
@@ -486,7 +484,7 @@ public class ReceiveDocuments {
                                             }
                                         }
                                         
-                                        if( tmpRecipient != null )
+                                        if ((tmpRecipient != null) && (tmpSending.getSender() != null))
                                         {
                                             Asutus senderOrg = new Asutus( tmpSending.getSender().getOrganizationID(), conn );
                                             Asutus recipientOrg = new Asutus( tmpRecipient.getOrganizationID(), conn );
@@ -548,7 +546,7 @@ public class ReceiveDocuments {
                         }
                     }
                     catch (Exception ex) {
-                        CommonMethods.logError( ex, "dhl.requests.SendDocuments", "V3" );
+                        CommonMethods.logError( ex, "dhl.requests.ReceiveDocuments", "V3" );
                         throw new AxisFault( "Error composing response message: " +" ("+ ex.getClass().getName() +": "+ ex.getMessage() +")" );
                     }
                     finally {
@@ -685,8 +683,8 @@ public class ReceiveDocuments {
                             {
                                 dhl.Document tmpDoc = documents.get(i);
                                 
-                                if (!processedDocuments.contains(tmpDoc.getId()) && (tmpDoc.getFilePath() != null)) {
-                                    if (tmpDoc != null) {
+                                if (tmpDoc != null) {
+                                	if (!processedDocuments.contains(tmpDoc.getId()) && (tmpDoc.getFilePath() != null)) {
                                         // Laeme konkreetse dokumendi saatmist puudutavad andmed
                                         Sending tmpSending = new Sending();
                                         tmpSending.loadByDocumentID( tmpDoc.getId(), conn );
@@ -736,7 +734,7 @@ public class ReceiveDocuments {
                     }
                     catch (Exception ex) {
                     	logger.error("Exception: " , ex);
-                        CommonMethods.logError( ex, "dhl.requests.SendDocuments", "V4" );
+                        CommonMethods.logError( ex, "dhl.requests.ReceiveDocuments", "V4" );
                         throw new AxisFault( "Error composing response message: " +" ("+ ex.getClass().getName() +": "+ ex.getMessage() +")" );
                     }
                     finally {
@@ -864,7 +862,7 @@ public class ReceiveDocuments {
             try {
             	currentXmlContent.getDocumentElement().insertBefore(metainfoNode, currentXmlContent.getDocumentElement().getFirstChild());
             } catch (Exception ex) {
-            	logger.warn("Failed to add \"metainfo\" element as first element in container. Adding as last.");
+            	logger.warn("Failed to add \"metainfo\" element as first element in container. Adding as last.", ex);
             	currentXmlContent.getDocumentElement().appendChild(metainfoNode);
             }
         }

@@ -795,4 +795,26 @@ public class Recipient {
             throw new AxisFault("Exception parsing DVK message recipient section: " + ex.getMessage());
         }
     }
+    
+    /**
+     * Copies DVK-specific and recipient-specific information
+     * from another recipient instance to this recipient instance. 
+     * 
+     * @param anotherRecipient
+     * 		Recipient to copy sending status data from
+     */
+    public void copyStatusInformationFromAnotherInstance(Recipient anotherRecipient) {
+    	if (anotherRecipient != null) {
+	    	// DVK status ID and sending end date
+	    	this.setSendStatusID(anotherRecipient.getSendStatusID());
+	    	this.setSendingEndDate(anotherRecipient.getSendingEndDate());
+	    	
+	    	// Recipient-specific status information 
+	    	this.setRecipientStatusId(anotherRecipient.getRecipientStatusId());
+	    	this.setMetaXML(anotherRecipient.getMetaXML());
+	    	this.setFault(anotherRecipient.getFault());
+    	} else {
+    		logger.warn("Unable to copy recipient status from another recipient instance because the other instance is NULL!");
+    	}
+    }
 }

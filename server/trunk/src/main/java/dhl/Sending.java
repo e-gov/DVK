@@ -1,6 +1,7 @@
 package dhl;
 
 import dhl.iostructures.XHeader;
+import dhl.users.UserProfile;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import java.util.ArrayList;
@@ -388,5 +389,41 @@ public class Sending
 
 	public void setDocumentGUID(String mDocumentGUID) {
 		m_documentGUID = mDocumentGUID;
+	}
+	
+	/**
+	 * Checks (and defines) the rules, when a user can see documents status information.
+	 * 
+	 * @param user
+	 * 		User who executed current request
+	 * @return
+	 * 		True, if current user can access documents status information
+	 */
+	public boolean isStatusAccessibleToUser(UserProfile user) {
+		// By default user cannot access a documents status data
+		// This is to avoid giving out any information about documents
+		// not belonging to users organization.
+		boolean result = false;
+		
+		if (user != null) {
+			// User can access documents status data if
+			// - user sent the document
+			// - document was sent by someone else filling the same role in organization
+			// - user is marked as organization admin in DVK (for the org. that sent the document)
+			result = CommonMethods.stringsEqualIgnoreNull(m_sender.getPersonalIdCode(), user.getPersonCode()) ||
+				user.getPositions().contains(m_sender.getPositionID()) ||
+				((m_sender.getOrganizationID() == user.getOrganizationID()) && user.getRoles().contains(CommonStructures.ROLL_ASUTUSE_ADMIN));
+		    
+			// User can also access documents status data if
+			// - user forwarded the document
+			// - document was forwarded by someone else filling the same role in organization
+			// - user is marked as organization admin in DVK (for the org. that forwarded the document)
+			result = result || ((m_proxy != null) &&
+		        (CommonMethods.stringsEqualIgnoreNull(m_proxy.getPersonalIdCode(), user.getPersonCode()) ||
+		        user.getPositions().contains(m_proxy.getPositionID()) ||
+		        ((m_proxy.getOrganizationID() == user.getOrganizationID()) && user.getRoles().contains(CommonStructures.ROLL_ASUTUSE_ADMIN))));
+		}
+		
+		return result;
 	}
 }

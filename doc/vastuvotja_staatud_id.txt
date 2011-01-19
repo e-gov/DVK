@@ -1,3 +1,13 @@
+﻿Antud tabelis on toodud vastuvõtja lisastaatuse väärtused ja neile vastav selgitus. Neid kasutatakse päringutes:
+ - DVK (www.ria.ee/dokumendivahetus):
+   - markDocumentReceived (alates versioonist 2) sisendparameetrites
+   - getSendStatus väljundparameetrites
+ - ADIT (www.ria.ee/ametlikud-dokumendid):
+   - ModifyStatus sisendparameetrites
+   - GetDocument väljundparameetrites
+   - GetDocumentList väljundparameetrites
+Esimeses tulbas on staatuse identifikaator (väärtus) vastuvotja_staatud_id (DVK puhul) või document_status_id (ADITi puhul), teises tulbas staatuse kirjeldus:
+------------------------------------
 1	Dokumente on puudu (Pooleli)
 2	Järjekorras
 3	Ootel
@@ -7,5 +17,5 @@
 7	Töötlemisel
 8	Aktsepteeritud (Võetud töösse)
 9	Salvestatud
-10 Arhiveeritud
-11 Saadetud
+10	Arhiveeritud
+11	Saadetud

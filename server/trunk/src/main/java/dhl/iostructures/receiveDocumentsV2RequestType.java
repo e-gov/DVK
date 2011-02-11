@@ -3,6 +3,8 @@ package dhl.iostructures;
 import dvk.core.CommonMethods;
 import dvk.core.Settings;
 import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.soap.SOAPBody;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -10,7 +12,7 @@ import org.w3c.dom.NodeList;
 
 public class receiveDocumentsV2RequestType {
     public int arv;
-    public ArrayList<String> kaust;
+    public List<String> kaust;
     public String edastusID;
     public int fragmentNr;
     public long fragmentSizeBytes;

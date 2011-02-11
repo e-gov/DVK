@@ -1,10 +1,11 @@
 package dvk.client.iostructures;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ReceiveDocumentsBody implements SOAPBodyOverride {
     public int arv;
-    public ArrayList<String> kaust;
+    public List<String> kaust;
 
     public ReceiveDocumentsBody() {
         arv = 0;

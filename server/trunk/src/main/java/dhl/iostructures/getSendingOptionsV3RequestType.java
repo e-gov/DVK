@@ -2,6 +2,7 @@ package dhl.iostructures;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import dvk.core.CommonMethods;
 import dvk.core.ShortName;
@@ -16,8 +17,8 @@ public class getSendingOptionsV3RequestType {
 	static Logger logger = Logger.getLogger(getSendingOptionsV3RequestType.class.getName());
 	public String kehaHref;
     public String[] asutused;
-    public ArrayList<ShortName> allyksused;
-    public ArrayList<ShortName> ametikohad;
+    public List<ShortName> allyksused;
+    public List<ShortName> ametikohad;
     public String vahetatudDokumenteVahemaltStr;
     public String vahetatudDokumenteKuniStr;
     public String vastuvotmataDokumenteOotelStr;
@@ -61,10 +62,10 @@ public class getSendingOptionsV3RequestType {
                 }
                 return result;
             } else {
-            	throw new Exception("Vigane päringu getSendingOptions.V3 keha - puudub element \"keha\".");
+            	throw new Exception("Vigane pÃ¤ringu getSendingOptions.V3 keha - puudub element \"keha\".");
             }
         } else {
-        	throw new Exception("Vigane päringu getSendingOptions.V3 keha - puudub element \"getSendingOptions\".");
+        	throw new Exception("Vigane pÃ¤ringu getSendingOptions.V3 keha - puudub element \"getSendingOptions\".");
         }
     }
     
@@ -75,7 +76,7 @@ public class getSendingOptionsV3RequestType {
             if (nodes.getLength() > 0) {
                 Element el = (Element)nodes.item(0);
                 
-                // Asutuste nimekiri
+                // List of organizations
                 nodes = el.getElementsByTagName("asutused");
                 if (nodes.getLength() > 0) {
                     Element el1 = (Element)nodes.item(0);
@@ -88,7 +89,7 @@ public class getSendingOptionsV3RequestType {
                     }
                 }
                 
-                // Allüksuste nimekiri
+                // List of subdivisions
                 nodes = el.getElementsByTagName("allyksused");
                 if (nodes.getLength() > 0) {
                     Element el1 = (Element)nodes.item(0);
@@ -112,7 +113,7 @@ public class getSendingOptionsV3RequestType {
                     }
                 }
                 
-                // Ametikohtade nimekiri
+                // List of occupations
                 nodes = el.getElementsByTagName("ametikohad");
                 if (nodes.getLength() > 0) {
                     Element el1 = (Element)nodes.item(0);
@@ -136,7 +137,7 @@ public class getSendingOptionsV3RequestType {
                     }
                 }
                 
-                // Ainult vastuvõtmist ootavate dokumentidega asutused
+                // Only organizations that have incoming documents waiting for download
                 nodes = el.getElementsByTagName("vastuvotmata_dokumente_ootel");
                 if (nodes.getLength() > 0) {
                 	Element el1 = (Element)nodes.item(0);
@@ -146,7 +147,7 @@ public class getSendingOptionsV3RequestType {
                     }
                 }
 
-                // Ainult asutused, kes on vahetanud vähemalt N dokumenti
+                // Only organizations that have exchanged at least N documents
                 nodes = el.getElementsByTagName("vahetatud_dokumente_vahemalt");
                 if (nodes.getLength() > 0) {
                 	Element el1 = (Element)nodes.item(0);
@@ -154,7 +155,7 @@ public class getSendingOptionsV3RequestType {
                     this.vahetatudDokumenteVahemalt = Integer.parseInt(this.vahetatudDokumenteVahemaltStr);
                 }
 
-                // Ainult asutused, kes on vahetanud kuni N dokumenti
+                // Only organizations that have exchanged up to N documents
                 nodes = el.getElementsByTagName("vahetatud_dokumente_kuni");
                 if (nodes.getLength() > 0) {
                 	Element el1 = (Element)nodes.item(0);

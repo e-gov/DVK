@@ -42,6 +42,7 @@ import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import dvk.core.Settings;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -70,34 +71,40 @@ public class CoreServices implements Dhl {
 
     public CoreServices() throws AxisFault {
         try {
-            // Laeme serveri seadetest konfifaili asukoha
+            // Get configuration file location from servlet settings
             HttpServlet httpServlet = (HttpServlet)MessageContext.getCurrentContext().getProperty(HTTPConstants.MC_HTTP_SERVLET);
             String configFileName = httpServlet.getInitParameter("configFile");
 
-            // Laeme konfifailist konfiguratsiooni
+            // Make sure the configuration file actually exists
+            if (CommonMethods.isNullOrEmpty(configFileName)) {
+            	throw new FileNotFoundException("DVK configuration error. Path to configuration file is not set!");
+            } else if (!(new File(configFileName)).exists()) {
+            	configFileName = httpServlet.getServletContext().getRealPath(configFileName);
+            }
+            if (!(new File(configFileName)).exists()) {
+            	throw new FileNotFoundException("DVK configuration error. Specified configuration file dows not exist!");
+            }
+            
+            // Load configuration
             File configFile = new File(configFileName);
             Settings.loadProperties(configFile.getAbsolutePath());
 
-            // Loome klassi, mis eraldi threadis kustutab ära vanad ajutised failid.
-            // Vanu ajutisi faile ei kustutata ära kohe peale nende kasutamist, kuna
-            // üksikjuhtudel ei suudeta neid enne kustutamist veel täies mahus kliendile
-            // ära saata ja poole saatmise pealt kustutamine põhjustab vigu.
+            // Start a cleaner object that cleans up temporary files in a separate thread.
+            // Temporary files should not be deleted immediately after use because some of them
+            // are needed for SOAP response. Deleting such files would cause an error while
+            // sending response to client. 
             TempCleaner cleaner = new TempCleaner();
             cleaner.init();
 
-            // Teostame vajadusel eraldi threadis õiguste andmekoguga sünkroniseerimise
+            // Get organization, subdivision and occupation data from central database
             if (Settings.Server_UseCentralRightsDatabase) {
                 Connection conn = getConnection();
                 AarSyncronizer aarSync = new AarSyncronizer();
                 aarSync.init(conn, Settings.Server_CentralRightsDatabaseSyncPeriod);
-                // Andmebaasiühenduse paneb kinni käivitatud thread, kui
-                // ta on oma tööga lõpuni jõudnud
+                // Opened database connection will be closed by AarSyncronizer thread when it finishes 
             }
-
-            //System.runFinalization();
-            //System.gc();
         } catch (Exception ex) {
-            CommonMethods.logError(ex, this.getClass().getName(), "CoreServices");
+            logger.fatal(ex);
             throw new AxisFault(ex.getMessage());
         }
     }
@@ -185,17 +192,17 @@ public class CoreServices implements Dhl {
         try {
             // Kontrollime, kas konfiguratsioonifail on edukalt sisse loetud
             if ((Settings.currentProperties == null) || (Settings.currentProperties.size() < 1)) {
-                throw new AxisFault("DVK tarkvaraline viga: rakenduse seadistuse laadimine ebaõnnestus!");
+                throw new AxisFault("DVK tarkvaraline viga: rakenduse seadistuse laadimine ebaÃ¤nnestus!");
             }
 
-            // Proovime avada andmebaasiühendust
+            // Proovime avada andmebaasiÃ¤hendust
             try {
                 conn = getConnection();
             } catch (Exception ex) {
-                throw new AxisFault("DVK tarkvaraline viga: Andmebaasiühenduse loomine ebaonnestus!");
+                throw new AxisFault("DVK tarkvaraline viga: AndmebaasiÃ¤henduse loomine ebaonnestus!");
             }
 
-            // Proovime andmebaasiühenduse peal päringut käivitada
+            // Proovime andmebaasiÃ¤henduse peal pÃ¤ringut kÃ¤ivitada
             Statement stmt = conn.createStatement();
             try {
                 boolean stmtResult = stmt.execute("SELECT COUNT(*) FROM klassifikaatori_tyyp");
@@ -219,7 +226,7 @@ public class CoreServices implements Dhl {
                 (new File(tmpFile)).delete();
             }
             
-            // Proovime, kas õiguste kesksüsteemi liides toimib
+            // Proovime, kas Ã¤iguste kesksÃ¤steemi liides toimib
             if (Settings.Server_UseCentralRightsDatabase) {
                 try {
                     AarClient aarClient = new AarClient(Settings.Server_CentralRightsDatabaseURL, Settings.Server_CentralRightsDatabaseOrgCode, Settings.Server_CentralRightsDatabasePersonCode);
@@ -228,7 +235,7 @@ public class CoreServices implements Dhl {
                     aarClient.asutusedRequest(orgs, null);
                 } catch (Exception ex) {
                     CommonMethods.logError(ex, this.getClass().getName(), "runSystemCheck");
-                    throw new AxisFault("DVK tarkvaraline viga: keskse õiguste andmekoguga ühenamine ebaõnnestus!");
+                    throw new AxisFault("DVK tarkvaraline viga: keskse Ã¤iguste andmekoguga Ã¤henamine ebaÃ¤nnestus!");
                 }
             }
 
@@ -274,7 +281,7 @@ public class CoreServices implements Dhl {
      */
     public void deleteOldDocuments(Object keha) throws AxisFault {
         // Antud meetod on kasutatav ainult juhul, kui DVK server ei ole seadistatud
-        // töötama kliendi andmebaasi peal.
+        // tÃ¤Ã¤tama kliendi andmebaasi peal.
         if (!Settings.Server_RunOnClientDatabase) {
             Connection conn = null;
             try {
@@ -326,14 +333,14 @@ public class CoreServices implements Dhl {
                 if (context != null) {
                     conn = getConnection();
     
-                    // Laeme sõnumi X-Tee päised endale sobivasse andmestruktuuri
+                    // Laeme sÃ¤numi X-Tee pÃ¤ised endale sobivasse andmestruktuuri
                     XHeader xTeePais = XHeader.getFromSOAPHeaderAxis(context);
     
-                    // Laeme päises asunud andmete järgi süsteemi tööks vajalikud andmed
+                    // Laeme pÃ¤ises asunud andmete jÃ¤rgi sÃ¤steemi tÃ¤Ã¤ks vajalikud andmed
                     // autenditud kasutaja kohta.
                     UserProfile user = UserProfile.getFromHeaders(xTeePais, conn);
     
-                    // Käivitame päringu keha
+                    // KÃ¤ivitame pÃ¤ringu keha
                     ChangeOrganizationData.V1(context, conn, user);
                     
                     // Koostame vastuse
@@ -380,18 +387,18 @@ public class CoreServices implements Dhl {
         try {
             org.apache.axis.MessageContext context = org.apache.axis.MessageContext.getCurrentContext();
             if (context != null) {
-                // Hangime andmebaasiühenduse
+                // Hangime andmebaasiÃ¤henduse
                 OrgSettings hostOrgSettings = null;
                 if (Settings.Server_RunOnClientDatabase) {
                     // Kui server on seadistatud toimima kliendi andmetabelite peal, siis
                     // loeme kliendi konfiguratsioonifailist kasutatava andmebaasi andmed
-                    // (andmebaasiplatvorm ja ühendusparameetrid)
+                    // (andmebaasiplatvorm ja Ã¤hendusparameetrid)
                     ArrayList<OrgSettings> databases = OrgSettings.getSettings(Settings.Client_ConfigFile);
                     if (databases.size() != 1) {
                         throw new AxisFault("Viga DVK seadistuses!");
                     }
                     hostOrgSettings = databases.get(0);
-                    UnitCredential[] credentials = UnitCredential.getCredentials(hostOrgSettings);
+                    UnitCredential[] credentials = UnitCredential.getCredentials(hostOrgSettings, conn);
                     if (credentials.length < 1) {
                         throw new AxisFault("Viga DVK seadistuses!");
                     }
@@ -400,18 +407,18 @@ public class CoreServices implements Dhl {
                     conn = getConnection();
                 }
 
-                // Laeme sõnumi X-Tee päised endale sobivasse andmestruktuuri
+                // Laeme sÃ¤numi X-Tee pÃ¤ised endale sobivasse andmestruktuuri
                 XHeader xTeePais = XHeader.getFromSOAPHeaderAxis(context);
 
-                // Tuvastame, millist päringu versiooni välja kutsuti
+                // Tuvastame, millist pÃ¤ringu versiooni vÃ¤lja kutsuti
                 String ver = CommonMethods.getXRoadRequestVersion(xTeePais.nimi);
                 
-                // Laeme päises asunud andmete järgi süsteemi tööks vajalikud andmed
+                // Laeme pÃ¤ises asunud andmete jÃ¤rgi sÃ¤steemi tÃ¤Ã¤ks vajalikud andmed
                 // autenditud kasutaja kohta.
                 UserProfile user = null;
                 if (Settings.Server_RunOnClientDatabase) {
                     // Kui server on seadistatud toimima kliendi andmetabelite peal, siis
-                    // ei ole meil mingit infot süsteemi kasutajate kohta.
+                    // ei ole meil mingit infot sÃ¤steemi kasutajate kohta.
                     user = new UserProfile();
                     user.setOrganizationCode(xTeePais.asutus);
                     if ((xTeePais.isikukood != null) && (xTeePais.isikukood.length() > 2)) {
@@ -423,7 +430,7 @@ public class CoreServices implements Dhl {
                     user = UserProfile.getFromHeaders(xTeePais, conn);
                 }
 
-                // Käivitame päringust vajaliku versiooni
+                // KÃ¤ivitame pÃ¤ringust vajaliku versiooni
                 SOAPOutputBodyRepresentation result = null;
                 if (ver.equalsIgnoreCase("v1")) {
                     result = GetSendingOptions.V1(context, conn, hostOrgSettings);
@@ -436,7 +443,7 @@ public class CoreServices implements Dhl {
                     throw new AxisFault(CommonStructures.VIGA_PARINGU_VERSIOONIS);
                 }
 
-                // Koostame väljundsõnumi keha
+                // Koostame vÃ¤ljundsÃ¤numi keha
                  org.apache.axis.Message response = context.getResponseMessage();
                  String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage());
                  if ((xroadNamespacePrefix != null) && (xroadNamespacePrefix.length() > 0)) {
@@ -464,7 +471,7 @@ public class CoreServices implements Dhl {
                  result.addToSOAPBody(response);
                  response.saveChanges();
             } else {
-                throw new AxisFault("Süsteemi sisemine viga! Päringu konteksti laadimine ebaõnnestus!");
+                throw new AxisFault("SÃ¤steemi sisemine viga! PÃ¤ringu konteksti laadimine ebaÃ¤nnestus!");
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
@@ -511,13 +518,13 @@ public class CoreServices implements Dhl {
                 if (Settings.Server_RunOnClientDatabase) {
                     // Kui server on seadistatud toimima kliendi andmetabelite peal, siis
                     // loeme kliendi konfiguratsioonifailist kasutatava andmebaasi andmed
-                    // (andmebaasiplatvorm ja ühendusparameetrid)
+                    // (andmebaasiplatvorm ja Ã¤hendusparameetrid)
                     ArrayList<OrgSettings> databases = OrgSettings.getSettings(Settings.Client_ConfigFile);
                     if (databases.size() != 1) {
                         throw new AxisFault("Viga DVK seadistuses!");
                     }
                     hostOrgSettings = databases.get(0);
-                    UnitCredential[] credentials = UnitCredential.getCredentials(hostOrgSettings);
+                    UnitCredential[] credentials = UnitCredential.getCredentials(hostOrgSettings, conn);
                     if (credentials.length < 1) {
                         throw new AxisFault("Viga DVK seadistuses!");
                     }
@@ -527,23 +534,23 @@ public class CoreServices implements Dhl {
                 }
                 t.markElapsed("Getting DB connection");
 
-                // Laeme sõnumi X-Tee päised endale sobivasse andmestruktuuri
+                // Laeme sÃ¤numi X-Tee pÃ¤ised endale sobivasse andmestruktuuri
                 t.reset();
                 XHeader xTeePais = XHeader.getFromSOAPHeaderAxis(context);
                 t.markElapsed("Getting XRoad header");
 
-                // Tuvastame, millist päringu versiooni välja kutsuti
+                // Tuvastame, millist pÃ¤ringu versiooni vÃ¤lja kutsuti
                 t.reset();
                 String ver = CommonMethods.getXRoadRequestVersion(xTeePais.nimi);
                 t.markElapsed("Getting request version");
 
-                // Laeme päises asunud andmete järgi süsteemi tööks vajalikud andmed
+                // Laeme pÃ¤ises asunud andmete jÃ¤rgi sÃ¤steemi tÃ¤Ã¤ks vajalikud andmed
                 // autenditud kasutaja kohta.
                 t.reset();
                 UserProfile user = null;
                 if (Settings.Server_RunOnClientDatabase) {
                     // Kui server on seadistatud toimima kliendi andmetabelite peal, siis
-                    // ei ole meil mingit infot süsteemi kasutajate kohta.
+                    // ei ole meil mingit infot sÃ¤steemi kasutajate kohta.
                     user = new UserProfile();
                     user.setOrganizationCode(xTeePais.asutus);
                     if ((xTeePais.isikukood != null) && (xTeePais.isikukood.length() > 2)) {
@@ -556,21 +563,18 @@ public class CoreServices implements Dhl {
                 }
                 t.markElapsed("Getting User profile");
 
-                // Käivitame päringu äriloogika
+                // Execute request business logic
                 t.reset();
                 RequestInternalResult result = new RequestInternalResult();
                 if (ver.equalsIgnoreCase("v1")) {
-                    // Käivitame päringu V1 versiooni
                     result = SendDocuments.V1(context, conn, user, hostOrgSettings, xTeePais);
                 } else if (ver.equalsIgnoreCase("v2")) {
-                    // Käivitame päringu V2 versiooni
                     result = SendDocuments.V2(context, conn, user, hostOrgSettings, xTeePais);
                 } else if (ver.equalsIgnoreCase("v3")) {
-                    // Käivitame päringu V3 versiooni
                     result = SendDocuments.V3(context, conn, user, hostOrgSettings, xTeePais);
                 } else {
-                    // Vale versioon
-                    throw new IncorrectRequestVersionException("Vigane päringu versioon \""+ ver +"\"! Lubatud versioonid on \"v1\", \"v2\" ja \"v3\".");
+                    // Unknown request version
+                    throw new IncorrectRequestVersionException("Vigane pÃ¤ringu versioon \""+ ver +"\"! Lubatud versioonid on \"v1\", \"v2\" ja \"v3\".");
                 }
                 tmpFile = result.responseFile;
                 t.markElapsed("Executing Query body");
@@ -611,7 +615,7 @@ public class CoreServices implements Dhl {
                     throw new ResponseProcessingException(CommonStructures.VIGA_VASTUSSONUMI_KOOSTAMISEL, ex);
                 }
             } else {
-                throw new AxisFault("Süsteemi sisemine viga! päringu konteksti laadimine ebaõnnestus!");
+                throw new AxisFault("SÃ¤steemi sisemine viga! pÃ¤ringu konteksti laadimine ebaÃ¤nnestus!");
             }
         } catch (AxisFault fault) {
             CommonMethods.logError(fault, this.getClass().getName(), "sendDocuments");
@@ -645,42 +649,38 @@ public class CoreServices implements Dhl {
                 org.apache.axis.MessageContext context = org.apache.axis.MessageContext.getCurrentContext();
                 t.markElapsed("Getting message context");
                 if (context != null) {
-                    // Hangime andmebaasiühenduse
+                    // Hangime andmebaasiÃ¤henduse
                     t.reset();
                     conn = getConnection();
                     t.markElapsed("Getting DB connection");
     
-                    // Loeme SOAP sõnumi detailandmetest välja X-Tee päise andmed ja
-                    // sõnumiga MIME lisadena kaasa pandud andmed.
+                    // Loeme SOAP sÃ¤numi detailandmetest vÃ¤lja X-Tee pÃ¤ise andmed ja
+                    // sÃ¤numiga MIME lisadena kaasa pandud andmed.
                     t.reset();
                     XHeader xTeePais = XHeader.getFromSOAPHeaderAxis(context);
                     t.markElapsed("Getting XRoad header");
     
-                    // Tuvastame, millist päringu versiooni välja kutsuti
+                    // Tuvastame, millist pÃ¤ringu versiooni vÃ¤lja kutsuti
                     t.reset();
                     String ver = CommonMethods.getXRoadRequestVersion(xTeePais.nimi);
                     t.markElapsed("Getting request version");
     
-                    // Laeme päises asunud andmete järgi süsteemi tööks vajalikud andmed
+                    // Laeme pÃ¤ises asunud andmete jÃ¤rgi sÃ¤steemi tÃ¤Ã¤ks vajalikud andmed
                     // autenditud kasutaja kohta.
                     t.reset();
                     UserProfile user = UserProfile.getFromHeaders(xTeePais, conn);
                     t.markElapsed("Getting User profile");
     
-                    // Käivitame päringu äriloogika
+                    // KÃ¤ivitame pÃ¤ringu Ã¤riloogika
                     t.reset();
                     RequestInternalResult result = new RequestInternalResult();
                     if (ver.equalsIgnoreCase("v1")) {
-                        // Käivitame päringu V1 versiooni
                         result = ReceiveDocuments.V1(context, conn, user);
                     } else if (ver.equalsIgnoreCase("v2")) {
-                        // Käivitame päringu V2 versiooni
                         result = ReceiveDocuments.V2(context, conn, user);
                     } else if (ver.equalsIgnoreCase("v3")) {
-                        // Käivitame päringu V3 versiooni
                         result = ReceiveDocuments.V3(context, conn, user);
                     } else if (ver.equalsIgnoreCase("v4")) {
-                        // Käivitame päringu V4 versiooni
                         result = ReceiveDocuments.V4(context, conn, user);
                     } else {
                         // Vale versioon
@@ -756,7 +756,7 @@ public class CoreServices implements Dhl {
                         throw new AxisFault(CommonStructures.VIGA_VASTUSSONUMI_KOOSTAMISEL);
                     }
                 } else {
-                    throw new AxisFault("Süsteemi sisemine viga! Päringu konteksti laadimine ebaõnnestus!");
+                    throw new AxisFault("SÃ¼steemi sisemine viga! PÃ¤ringu konteksti laadimine ebaÃµnnestus!");
                 }
             } catch (AxisFault fault) {
                 CommonMethods.logError(fault, this.getClass().getName(), "receiveDocuments");
@@ -791,37 +791,34 @@ public class CoreServices implements Dhl {
             try {
                 org.apache.axis.MessageContext context = org.apache.axis.MessageContext.getCurrentContext();
                 if (context != null) {
-                    // Hangime andmebaasiühenduse
+                    // Hangime andmebaasiÃ¤henduse
                     conn = getConnection();
     
-                    // Loeme SOAP sõnumi detailandmetest välja X-Tee päise andmed ja
-                    // sõnumiga MIME lisadena kaasa pandud andmed.
+                    // Loeme SOAP sÃ¤numi detailandmetest vÃ¤lja X-Tee pÃ¤ise andmed ja
+                    // sÃ¤numiga MIME lisadena kaasa pandud andmed.
                     XHeader xTeePais = XHeader.getFromSOAPHeaderAxis(context);
     
-                    // Tuvastame, millist päringu versiooni välja kutsuti
+                    // Tuvastame, millist pÃ¤ringu versiooni vÃ¤lja kutsuti
                     String ver = CommonMethods.getXRoadRequestVersion(xTeePais.nimi);
     
-                    // Laeme päises asunud andmete järgi süsteemi tööks vajalikud andmed
+                    // Laeme pÃ¤ises asunud andmete jÃ¤rgi sÃ¤steemi tÃ¤Ã¤ks vajalikud andmed
                     // autenditud kasutaja kohta.
                     UserProfile user = UserProfile.getFromHeaders(xTeePais, conn);
     
-                    // Käivitame päringust vajaliku versiooni
+                    // KÃ¤ivitame pÃ¤ringust vajaliku versiooni
                     RequestInternalResult result = new RequestInternalResult();
                     if (ver.equalsIgnoreCase("v1")) {
-                        // Käivitame päringu V1 versiooni
                         result = MarkDocumentsReceived.V1(context, conn, user);
                     } else if (ver.equalsIgnoreCase("v2")) {
-                        // Käivitame päringu V2 versiooni
                         result = MarkDocumentsReceived.V2(context, conn, user);
                     } else if (ver.equalsIgnoreCase("v3")) {
-                        // Käivitame päringu V3 versiooni
                         result = MarkDocumentsReceived.V3(context, conn, user);
                     } else {
                         // Vale versioon
                         throw new AxisFault(CommonStructures.VIGA_PARINGU_VERSIOONIS);
                     }
     
-                    // Koostame vastussõnumi keha
+                    // Koostame vastussÃ¤numi keha
                     try {
                         org.apache.axis.Message response = context.getResponseMessage();
                         String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage());
@@ -855,7 +852,7 @@ public class CoreServices implements Dhl {
                         throw new AxisFault(CommonStructures.VIGA_VASTUSSONUMI_KOOSTAMISEL);
                     }
                 } else {
-                    throw new AxisFault("Süsteemi sisemine viga! Päringu konteksti laadimine ebaõnnestus!");
+                    throw new AxisFault("SÃ¼steemi sisemine viga! PÃ¤ringu konteksti laadimine ebaÃµnnestus!");
                 }
             } catch (AxisFault fault) {
                 CommonMethods.logError(fault, this.getClass().getName(), "markDocumentsReceived");
@@ -888,18 +885,18 @@ public class CoreServices implements Dhl {
         try {
             org.apache.axis.MessageContext context = org.apache.axis.MessageContext.getCurrentContext();
             if (context != null) {
-                // Hangime andmebaasiühenduse
+                // Hangime andmebaasiÃ¤henduse
                 OrgSettings hostOrgSettings = null;
                 if (Settings.Server_RunOnClientDatabase) {
                     // Kui server on seadistatud toimima kliendi andmetabelite peal, siis
                     // loeme kliendi konfiguratsioonifailist kasutatava andmebaasi andmed
-                    // (andmebaasiplatvorm ja ühendusparameetrid)
+                    // (andmebaasiplatvorm ja Ã¤hendusparameetrid)
                     ArrayList<OrgSettings> databases = OrgSettings.getSettings(Settings.Client_ConfigFile);
                     if (databases.size() != 1) {
                         throw new AxisFault("Viga DVK seadistuses!");
                     }
                     hostOrgSettings = databases.get(0);
-                    UnitCredential[] credentials = UnitCredential.getCredentials(hostOrgSettings);
+                    UnitCredential[] credentials = UnitCredential.getCredentials(hostOrgSettings, conn);
                     if (credentials.length < 1) {
                         throw new AxisFault("Viga DVK seadistuses!");
                     }
@@ -908,19 +905,19 @@ public class CoreServices implements Dhl {
                     conn = getConnection();
                 }
 
-                // Loeme SOAP sõnumi detailandmetest välja X-Tee päise andmed ja
-                // sõnumiga MIME lisadena kaasa pandud andmed.
+                // Loeme SOAP sÃ¤numi detailandmetest vÃ¤lja X-Tee pÃ¤ise andmed ja
+                // sÃµnumiga MIME lisadena kaasa pandud andmed.
                 XHeader xTeePais = XHeader.getFromSOAPHeaderAxis(context);
                 
-                // Tuvastame, millist päringu versiooni välja kutsuti
+                // Tuvastame, millist pÃ¤ringu versiooni vÃ¤lja kutsuti
                 String ver = CommonMethods.getXRoadRequestVersion(xTeePais.nimi);
 
-                // Laeme päises asunud andmete järgi süsteemi tööks vajalikud andmed
+                // Laeme pÃ¤ises asunud andmete jÃ¤rgi sÃ¼steemi tÃ¶Ã¶ks vajalikud andmed
                 // autenditud kasutaja kohta.
                 UserProfile user = null;
                 if (Settings.Server_RunOnClientDatabase) {
                     // Kui server on seadistatud toimima kliendi andmetabelite peal, siis
-                    // ei ole meil mingit infot süsteemi kasutajate kohta.
+                    // ei ole meil mingit infot sÃ¤steemi kasutajate kohta.
                     user = new UserProfile();
                     user.setOrganizationCode(xTeePais.asutus);
                     if ((xTeePais.isikukood != null) && (xTeePais.isikukood.length() > 2)) {
@@ -985,7 +982,7 @@ public class CoreServices implements Dhl {
                     throw new AxisFault(CommonStructures.VIGA_VASTUSSONUMI_KOOSTAMISEL);
                 }
             } else {
-                throw new AxisFault("Süsteemi sisemine viga! päringu konteksti laadimine ebaõnnestus!");
+                throw new AxisFault("SÃ¤steemi sisemine viga! pÃ¤ringu konteksti laadimine ebaÃ¤nnestus!");
             }
         } catch (AxisFault fault) {
             CommonMethods.logError(fault, this.getClass().getName(), "getSendStatus");
@@ -1018,19 +1015,19 @@ public class CoreServices implements Dhl {
             try {
                 org.apache.axis.MessageContext context = org.apache.axis.MessageContext.getCurrentContext();
                 if (context != null) {
-                    // Hangime andmebaasiühenduse
+                    // Hangime andmebaasiÃ¤henduse
                     conn = getConnection();
     
-                    // Laeme sõnumi X-Tee päised endale sobivasse andmestruktuuri
+                    // Laeme sÃ¤numi X-Tee pÃ¤ised endale sobivasse andmestruktuuri
                     XHeader xTeePais = XHeader.getFromSOAPHeaderAxis(context);
                     
-                    // Tuvastame, millist päringu versiooni välja kutsuti
+                    // Tuvastame, millist pÃ¤ringu versiooni vÃ¤lja kutsuti
                     String ver = CommonMethods.getXRoadRequestVersion(xTeePais.nimi);
                     
                     // Tuvastame kasutaja
                     UserProfile user = UserProfile.getFromHeaders(xTeePais, conn);
                     
-                    // Käivitame päringust vajaliku versiooni
+                    // KÃ¤ivitame pÃ¤ringust vajaliku versiooni
                     SOAPOutputBodyRepresentation result = null; 
                     if (ver.equalsIgnoreCase("v1")) {
                     	result = GetOccupationList.V1(context, conn);
@@ -1041,7 +1038,7 @@ public class CoreServices implements Dhl {
                         throw new AxisFault(CommonStructures.VIGA_PARINGU_VERSIOONIS);
                     }
                     
-                    // Koostame väljundsõnumi keha
+                    // Koostame vÃ¤ljundsÃ¤numi keha
                     org.apache.axis.Message response = context.getResponseMessage();
                     String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage());
                     if ((xroadNamespacePrefix != null) && (xroadNamespacePrefix.length() > 0)) {
@@ -1069,7 +1066,7 @@ public class CoreServices implements Dhl {
                     result.addToSOAPBody(response);
                     response.saveChanges();
                 } else {
-                    throw new AxisFault("Süsteemi sisemine viga! päringu konteksti laadimine ebaõnnestus!");
+                    throw new AxisFault("SÃ¼steemi sisemine viga! pÃ¤ringu konteksti laadimine ebaÃµnnestus!");
                 }
             } catch (Exception ex) {
                 CommonMethods.logError(ex, this.getClass().getName(), "getOccupationList");
@@ -1093,19 +1090,19 @@ public class CoreServices implements Dhl {
             try {
                 org.apache.axis.MessageContext context = org.apache.axis.MessageContext.getCurrentContext();
                 if (context != null) {
-                    // Hangime andmebaasiühenduse
+                    // Hangime andmebaasiÃ¤henduse
                     conn = getConnection();
 
-                    // Laeme sõnumi X-Tee päised endale sobivasse andmestruktuuri
+                    // Laeme sÃ¤numi X-Tee pÃ¤ised endale sobivasse andmestruktuuri
                     XHeader xTeePais = XHeader.getFromSOAPHeaderAxis(context);
                     
-                    // Tuvastame, millist päringu versiooni välja kutsuti
+                    // Tuvastame, millist pÃ¤ringu versiooni vÃ¤lja kutsuti
                     String ver = CommonMethods.getXRoadRequestVersion(xTeePais.nimi);
                     
                     // Tuvastame kasutaja
                     UserProfile user = UserProfile.getFromHeaders(xTeePais, conn);
                     
-                    // Käivitame päringust vajaliku versiooni
+                    // KÃ¤ivitame pÃ¤ringust vajaliku versiooni
                     SOAPOutputBodyRepresentation result = null; 
                     if (ver.equalsIgnoreCase("v1")) {
                     	result = GetSubdivisionList.V1(context, conn);
@@ -1116,7 +1113,7 @@ public class CoreServices implements Dhl {
                         throw new AxisFault(CommonStructures.VIGA_PARINGU_VERSIOONIS);
                     }
                     
-                    // Koostame väljundsõnumi keha
+                    // Koostame vÃ¤ljundsÃ¤numi keha
                     org.apache.axis.Message response = context.getResponseMessage();
                     String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage());
                     if ((xroadNamespacePrefix != null) && (xroadNamespacePrefix.length() > 0)) {
@@ -1145,7 +1142,7 @@ public class CoreServices implements Dhl {
                     result.addToSOAPBody(response);
                     response.saveChanges();
                 } else {
-                    throw new AxisFault("Süsteemi sisemine viga! päringu konteksti laadimine ebaõnnestus!");
+                    throw new AxisFault("SÃ¼steemi sisemine viga! pÃ¤ringu konteksti laadimine ebaÃµnnestus!");
                 }
             } catch (Exception ex) {
                 CommonMethods.logError(ex, this.getClass().getName(), "getSubdivisionList");

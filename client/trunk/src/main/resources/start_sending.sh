@@ -1,6 +1,6 @@
-#!/bin/sh
+﻿#!/bin/sh
 
-DVK_CLIENT_DIR=/home/kasutajad/jaak/dvk_client
+DVK_CLIENT_DIR=.
 
 DVK_CLASSPATH=$DVK_CLIENT_DIR
 for f in $DVK_CLIENT_DIR/lib/*.jar

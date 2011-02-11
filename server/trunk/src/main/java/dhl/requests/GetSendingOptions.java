@@ -40,7 +40,7 @@ public class GetSendingOptions {
         if (Settings.Server_RunOnClientDatabase) {
         	UnitCredential[] credentials = new UnitCredential[]{};
         	try {
-        		credentials = UnitCredential.getCredentials(hostOrgSettings);
+        		credentials = UnitCredential.getCredentials(hostOrgSettings, conn);
         	} catch (Exception ex) {
         		logger.error(ex);
         	}
@@ -110,7 +110,7 @@ public class GetSendingOptions {
             // siis ei ole kunagi ühtegi dokumenti vastuvõtmise ootel, kuna
             // dokumentide allalaadimise päring pole kasutatav.
             if (!bodyData.vastuvotmataDokumenteOotel) {
-                UnitCredential[] credentials = UnitCredential.getCredentials(hostOrgSettings);
+                UnitCredential[] credentials = UnitCredential.getCredentials(hostOrgSettings, conn);
                 for (int i = 0; i < credentials.length; ++i) {
                     UnitCredential cred = credentials[i];
                     if (bodyData != null) {
@@ -166,7 +166,7 @@ public class GetSendingOptions {
             while (i < org.size()) {
                 if (Settings.Server_RunOnClientDatabase) {
                     stat = new AsutuseStatistika();
-                    stat.setVahetatudDokumente(UnitCredential.getExchangedDocumentsCount(org.get(i).getId(), hostOrgSettings));
+                    stat.setVahetatudDokumente(UnitCredential.getExchangedDocumentsCount(org.get(i).getId(), hostOrgSettings, conn));
                     stat.setVastuvotmataDokumente(0);
                 } else {
                     stat = AsutuseStatistika.getByOrgID(org.get(i).getId(), conn);
@@ -227,7 +227,7 @@ public class GetSendingOptions {
 	            // siis ei ole kunagi ühtegi dokumenti vastuvõtmise ootel, kuna
 	            // dokumentide allalaadimise päring pole kasutatav.
 	            if (!bodyData.vastuvotmataDokumenteOotel) {
-	                UnitCredential[] credentials = UnitCredential.getCredentials(hostOrgSettings);
+	                UnitCredential[] credentials = UnitCredential.getCredentials(hostOrgSettings, conn);
 	                for (int i = 0; i < credentials.length; ++i) {
 	                    UnitCredential cred = credentials[i];
 	                    if ((bodyData.asutused != null) && (bodyData.asutused.length > 0)) {
@@ -439,7 +439,7 @@ public class GetSendingOptions {
 	            while (i < organizationList.size()) {
 	                if (Settings.Server_RunOnClientDatabase) {
 	                    stat = new AsutuseStatistika();
-	                    stat.setVahetatudDokumente(UnitCredential.getExchangedDocumentsCount(organizationList.get(i).getId(), hostOrgSettings));
+	                    stat.setVahetatudDokumente(UnitCredential.getExchangedDocumentsCount(organizationList.get(i).getId(), hostOrgSettings, conn));
 	                    stat.setVastuvotmataDokumente(0);
 	                } else {
 	                	logger.debug("Getting insititution statistics.");
@@ -479,7 +479,7 @@ public class GetSendingOptions {
 	            while (i < subdivisionList.size()) {
 	                if (Settings.Server_RunOnClientDatabase) {
 	                    stat = new AsutuseStatistika();
-	                    stat.setVahetatudDokumente(UnitCredential.getExchangedDocumentsCount(organizationList.get(i).getId(), hostOrgSettings));
+	                    stat.setVahetatudDokumente(UnitCredential.getExchangedDocumentsCount(organizationList.get(i).getId(), hostOrgSettings, conn));
 	                    stat.setVastuvotmataDokumente(0);
 	                } else {
 	                	logger.debug("Serveri andmebaasist.");
@@ -513,7 +513,7 @@ public class GetSendingOptions {
 	            while (i < occupationList.size()) {
 	                if (Settings.Server_RunOnClientDatabase) {
 	                    stat = new AsutuseStatistika();
-	                    stat.setVahetatudDokumente(UnitCredential.getExchangedDocumentsCount(organizationList.get(i).getId(), hostOrgSettings));
+	                    stat.setVahetatudDokumente(UnitCredential.getExchangedDocumentsCount(organizationList.get(i).getId(), hostOrgSettings, conn));
 	                    stat.setVastuvotmataDokumente(0);
 	                } else {
 	                    stat = AsutuseStatistika.getByOccupationId(occupationList.get(i).getAsutusID(), occupationList.get(i).getID(), conn);

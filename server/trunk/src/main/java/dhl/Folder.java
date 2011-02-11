@@ -250,7 +250,7 @@ public class Folder {
      * @param initialName   Kliendi poolt etteantud kausta nimetus
      * @return              DVK jaoks sobilikule kujule viidud kausta nimetus
      */
-    private String correctFolderName(String initialName) {
+    public String correctFolderName(String initialName) {
         if ((initialName == null) || (initialName.length() < 1)) {
             return initialName;
         }

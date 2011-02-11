@@ -1223,3 +1223,27 @@ as
     from    dhl_message
     where   dhl_guid = @guid
 GO
+
+create procedure [dbo].[Delete_OldDhlMessages]
+	@deleted_doc_count int out,
+	@doc_lifetime_days int
+as
+	set @deleted_doc_count = 0;
+	
+	if (@doc_lifetime_days is not null) and (@doc_lifetime_days > 0)
+	begin
+		-- Delete old received documents
+		delete
+		from	[dhl_message]
+		where	[is_incoming] = 1
+				and datediff(day, [received_date], getdate()) >= @doc_lifetime_days;
+		set @deleted_doc_count = @deleted_doc_count + isnull(@@rowcount, 0);
+				
+		-- Delete old sent documents
+		delete
+		from	[dhl_message]
+		where	[is_incoming] = 0
+				and datediff(day, [sending_date], getdate()) >= @doc_lifetime_days;
+		set @deleted_doc_count = @deleted_doc_count + isnull(@@rowcount, 0);
+	end
+GO

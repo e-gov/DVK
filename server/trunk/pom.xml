@@ -4,12 +4,13 @@
 	<groupId>dvk</groupId>
 	<artifactId>server</artifactId>
 	<packaging>war</packaging>
-	<version>1.6.0</version>
+	<version>1.6.1</version>
 
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<packageName>dhl</packageName>
-		<dvkCoreDir>C:\development\ws\dvkclean\core</dvkCoreDir>
-		<dvkClientDir>C:\development\ws\dvkclean\client</dvkClientDir>
+		<dvkCoreDir>C:\Projektid\ria\dvk\workspace\dvk_core</dvkCoreDir>
+		<dvkClientDir>C:\Projektid\ria\dvk\workspace\dvk_client</dvkClientDir>
 	</properties>
 
   <dependencies>

@@ -86,12 +86,12 @@ public class GetSendStatus {
                         isSending = false;
                         
                         if (Settings.Server_RunOnClientDatabase) {
-                            ArrayList<DhlMessage> msgList = DhlMessage.getByDhlID(docID, true, true, hostOrgSettings);
+                            ArrayList<DhlMessage> msgList = DhlMessage.getByDhlID(docID, true, true, hostOrgSettings, conn);
                             if ((msgList != null) && !msgList.isEmpty()) {
                                 boolean senderOK = false;
                                 for (int j = 0; j < msgList.size(); ++j) {
                                     DhlMessage msg = msgList.get(j);
-                                    senderOK = (user.getOrganizationCode().equalsIgnoreCase(msg.getSenderOrgCode()) || user.getOrganizationCode().equalsIgnoreCase(msg.getProxyOrgCode()));
+                                    senderOK = ((!Settings.Server_DocumentSenderMustMatchXroadHeader) || user.getOrganizationCode().equalsIgnoreCase(msg.getSenderOrgCode()) || user.getOrganizationCode().equalsIgnoreCase(msg.getProxyOrgCode()));
                                     isCanceled = isCanceled || (msg.getSendingStatusID() == Settings.Client_StatusCanceled);
                                     
                                     Recipient r = new Recipient();
@@ -274,17 +274,17 @@ public class GetSendStatus {
                     	ArrayList<DhlMessage> msgList = null;
                     	if(docID != 0) {
                     		logger.debug("Fetching messagelist. dhl_id: " + docID);
-                    		msgList = DhlMessage.getByDhlID(docID, true, true, hostOrgSettings);
+                    		msgList = DhlMessage.getByDhlID(docID, true, true, hostOrgSettings, conn);
                     	} else {
                     		logger.debug("Fetching messagelist. GUID: " + doc.getGuid());
-                    		msgList = DhlMessage.getByGUID(doc.getGuid(), true, true, hostOrgSettings);
+                    		msgList = DhlMessage.getByGUID(doc.getGuid(), true, true, hostOrgSettings, conn);
                     	}
                         
                         if ((msgList != null) && !msgList.isEmpty()) {
                             boolean senderOK = false;
                             for (int j = 0; j < msgList.size(); ++j) {
                                 DhlMessage msg = msgList.get(j);
-                                senderOK = (user.getOrganizationCode().equalsIgnoreCase(msg.getSenderOrgCode()) || user.getOrganizationCode().equalsIgnoreCase(msg.getProxyOrgCode()));
+                                senderOK = ((!Settings.Server_DocumentSenderMustMatchXroadHeader) || user.getOrganizationCode().equalsIgnoreCase(msg.getSenderOrgCode()) || user.getOrganizationCode().equalsIgnoreCase(msg.getProxyOrgCode()));
                                 isCanceled = isCanceled || (msg.getSendingStatusID() == Settings.Client_StatusCanceled);
                                 
                                 Recipient r = new Recipient();

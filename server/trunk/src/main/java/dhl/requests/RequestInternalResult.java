@@ -2,7 +2,7 @@ package dhl.requests;
 
 import dhl.users.Asutus;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.w3c.dom.Element;
 
@@ -10,8 +10,8 @@ public class RequestInternalResult {
     public String dataMd5Hash;
     public String responseFile;
     public String folder;
-    public ArrayList<String> folders;
-    public ArrayList<Asutus> orgs;
+    public List<String> folders;
+    public List<Asutus> orgs;
     public int count;
     public int fragmentNr;
     public long fragmentSizeBytes;

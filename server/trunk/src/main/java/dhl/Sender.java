@@ -6,17 +6,23 @@ import dhl.users.Ametikoht;
 import dhl.users.Asutus;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
+import dvk.core.Settings;
+
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Date;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import org.apache.axis.AxisFault;
+import org.apache.log4j.Logger;
 
-public class Sender 
-{
-    private int m_id;
+public class Sender {
+	static Logger logger = Logger.getLogger(Sender.class.getName());
+	
+	private int m_id;
     private int m_sendingID;
     private int m_organizationID;
     private int m_positionID;
@@ -168,6 +174,9 @@ public class Sender
         return m_departmentName;
     }
     
+    /**
+     * Initializes all fields.
+     */
     public void clear() {
         m_id = 0;
         m_sendingID = 0;
@@ -184,7 +193,16 @@ public class Sender
         m_departmentName = "";
     }
 
-    public void LoadBySendingID(int sendingID, Connection conn) throws Exception {
+    /**
+     * Gets from database sender data belonging to given sending record.
+     * 
+     * @param sendingID
+     * 		ID of sending record
+     * @param conn
+     * 		Database connection
+     * @throws Exception
+     */
+    public void getBySendingID(int sendingID, Connection conn) throws Exception {
         if (conn != null) {
             CallableStatement cs = conn.prepareCall("{call GET_SENDERBYSENDINGID(?,?,?,?,?,?,?,?,?,?,?,?,?)}");
             cs.setInt("sending_id", sendingID);
@@ -254,40 +272,38 @@ public class Sender
         }
     }
 
-    public static Sender fromXML(XMLStreamReader xmlReader, Connection conn, XHeader xTeePais) throws AxisFault
-    {
+    public static Sender fromXML(XMLStreamReader xmlReader, Connection conn, XHeader xTeePais) throws AxisFault {
         try {
             Sender result = new Sender();
             
-            // Jõtame jõrgnevas võõrtustamata jõrgmised andmevõljad:
-            //   ID - sest see saab võõruse andmebaasi salvestamisel
-            //   SendingID - sest see saab võõrtuse alles siis, kuin saatmisinfo on
-            //       andmebaasi salvatstaud
+            // Fields ID and SendingID are intentionally ignored here because
+            // they will get their values when data is saved to database
             int orgID = 0;
             int positionID = 0;
             int divisionID = 0;
             String orgCode = "";
             String occupationShortName = "";
+            String occupationName = "";
             String subdivisionShortName = "";
+            String subdivisionName = "";
             
             while (xmlReader.hasNext()) {
                 xmlReader.next();
                 
                 if (xmlReader.hasName()) {
                     if (xmlReader.getLocalName().equalsIgnoreCase("saatja") && xmlReader.isEndElement()) {
-                        // Kui oleme jõudnud saatja elemendi lõppu, siis katkestame tsõkli
+                        // Break the loop once we reach the end of sender root element
                         break;
                     }
                     else if (xmlReader.getLocalName().equalsIgnoreCase("regnr") && xmlReader.isStartElement()) {
                         xmlReader.next();
                         if (xmlReader.isCharacters()) {
-                            // Tuvastame adressaadi asutuse
-                            orgCode = xmlReader.getText().trim();
+                            // Attempt to find sender organization from database
+                        	orgCode = xmlReader.getText().trim();
                             orgID = Asutus.getIDByRegNr(orgCode, false, conn);
                             
-                            // Proovime asutust tuvastada teiste teadaolevate DVK serverite abiga
-                            // See on vajalik juhul, kui antud serverisse on dokument edastatud ja
-                            // serveri enda asutuste registris pole algse saatja kohta mingeid andmeid.
+                            // Attempt to find sender organization from other known servers.
+                            // This may be necessary when document has been forwarded to current server.
                             if (orgID == 0) {
                                 try {
                                     Asutus.getOrgsFromAllKnownServers(orgCode, conn, xTeePais);
@@ -299,23 +315,23 @@ public class Sender
                                 }
                             }
                             
-                            result.setOrganizationID( orgID );
+                            result.setOrganizationID(orgID);
                         }
                     }
                     else if (xmlReader.getLocalName().equalsIgnoreCase("ametikoha_kood") && xmlReader.isStartElement()) {
                         xmlReader.next();
                         if (xmlReader.isCharacters()) {
-                            // Tuvastame adressaadi ametikoha
-                             String positionIDText = xmlReader.getText().trim();
-                             if((positionIDText != null) && (positionIDText.length() > 0)) {
-                                 try {
-                                     positionID = Integer.parseInt( positionIDText );
-                                     result.setPositionID( positionID );
-                                 }
-                                 catch (Exception ex) {
-                                     CommonMethods.logError( ex, "dhl.Sender", "fromXML" );
-                                 }
-                             }
+                            // Attempt to find sender occupation ID
+                            String positionIDText = xmlReader.getText().trim();
+                            if(!CommonMethods.isNullOrEmpty(positionIDText)) {
+                                try {
+                                    positionID = Integer.parseInt(positionIDText);
+                                    result.setPositionID(positionID);
+                                }
+                                catch (Exception ex) {
+                                    logger.warn(ex);
+                                }
+                            }
                         }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("ametikoha_lyhinimetus") && xmlReader.isStartElement()) {
                         xmlReader.next();
@@ -323,26 +339,36 @@ public class Sender
                              occupationShortName = xmlReader.getText().trim();
                              result.setPositionShortName(occupationShortName);
                         }
+                    } else if (xmlReader.getLocalName().equalsIgnoreCase("ametikoha_nimetus") && xmlReader.isStartElement()) {
+                        xmlReader.next();
+                        if (xmlReader.isCharacters()) {
+                             occupationName = xmlReader.getText().trim();
+                        }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("allyksuse_kood") && xmlReader.isStartElement()) {
                         xmlReader.next();
                         if (xmlReader.isCharacters()) {
-                            // Tuvastame adressaadi allõksuse
-                             String divisionIDText = xmlReader.getText().trim();
-                             if((divisionIDText != null) && (divisionIDText.length() > 0)) {
-                                 try {
-                                     divisionID = Integer.parseInt( divisionIDText );
-                                     result.setDivisionID( divisionID );
-                                 }
-                                 catch (Exception ex) {
-                                     CommonMethods.logError( ex, "dhl.Sender", "fromXML" );
-                                 }
-                             }
+                            // Attempt to find sender subdivision ID
+                            String divisionIDText = xmlReader.getText().trim();
+                            if(!CommonMethods.isNullOrEmpty(divisionIDText)) {
+                                try {
+                                    divisionID = Integer.parseInt(divisionIDText);
+                                    result.setDivisionID(divisionID);
+                                }
+                                catch (Exception ex) {
+                                	logger.warn(ex);
+                                }
+                            }
                         }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("allyksuse_lyhinimetus") && xmlReader.isStartElement()) {
                         xmlReader.next();
                         if (xmlReader.isCharacters()) {
                              subdivisionShortName = xmlReader.getText().trim();
                              result.setDivisionShortName(subdivisionShortName);
+                        }
+                    } else if (xmlReader.getLocalName().equalsIgnoreCase("allyksuse_nimetus") && xmlReader.isStartElement()) {
+                        xmlReader.next();
+                        if (xmlReader.isCharacters()) {
+                             subdivisionName = xmlReader.getText().trim();
                         }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("epost") && xmlReader.isStartElement()) {
                         xmlReader.next();
@@ -378,27 +404,90 @@ public class Sender
                 }
             }
             
-            // Kui saatjaks mõrgitud asutus ei kuulu DVK kasutajate hulka,
-            // siis teavitame sellest kasutajat.
-            if (orgID < 1) {
-                throw new AxisFault( CommonStructures.VIGA_TUNDMATU_SAATJA_ASUTUS.replaceFirst("#1",orgCode) );
+            // Automatically register unknown sender organization
+            if ((orgID <= 0) && Settings.Server_AutoRegisterUnknownSenders && !CommonMethods.isNullOrEmpty(orgCode)) {
+            	Asutus newOrg = new Asutus();
+            	newOrg.setDvkSaatmine(true);
+            	newOrg.setRegistrikood(orgCode);
+            	
+            	// Determine organization name
+            	if (!CommonMethods.isNullOrEmpty(result.getOrganizationName())) {
+            		newOrg.setNimetus(result.getOrganizationName());
+            	} else if (!CommonMethods.isNullOrEmpty(result.getName()) && CommonMethods.isNullOrEmpty(result.getPersonalIdCode())) {
+            		// It may happen that organization name is placed into sender name field.
+            		newOrg.setNimetus(result.getName());
+            	}
+
+            	newOrg.addToDB(conn, xTeePais);
+            	orgID = newOrg.getId();
+            	result.setOrganizationID(orgID);
+            	
+        		if (orgID > 0) {
+        			logger.info("Organization \""+ orgCode +"\" was automatically added (based on document sender data)");
+        		} else {
+        			logger.warn("Failed adding organization \""+ orgCode +"\" (based on document sender data)");
+        		}
             }
             
-            // Tuvastame ametikoha lõhinime jõrgi ametikoha ID
-            // Seda ei saa enne teha, kui kogu XML on lõbi kõidud, kuna ametikoha
-            // leidmiseks peab lisaks lõhinimele tedma ka asutuse ID-d.
-            if ((occupationShortName != null) && (occupationShortName.length() > 0)) {
+            // If sender is unknown to DEC server (and automatic registration of senders is not enabled)
+            // then return an error message to document sender.
+            if (orgID <= 0) {
+                throw new AxisFault(CommonStructures.VIGA_TUNDMATU_SAATJA_ASUTUS.replaceFirst("#1",orgCode));
+            }
+            
+            // Find occupation ID using occupation short name.
+            // This cannot be done before all XML processing is completed.
+            // Otherwise we would not know organization ID, which is required
+            // to find the correct occupation ID.
+            if (!CommonMethods.isNullOrEmpty(occupationShortName)) {
             	int occupationId = Ametikoht.getIdByShortName(orgID, occupationShortName, conn);
+            	
+            	// If an unknown occupation is found, attempt to register it automatically
+            	if ((occupationId <= 0) && Settings.Server_AutoRegisterUnknownSenders) {
+            		Ametikoht newOccupation = new Ametikoht();
+            		newOccupation.setAsutusID(orgID);
+            		newOccupation.setAsutusKood(orgCode);
+            		newOccupation.setLyhinimetus(occupationShortName);
+            		newOccupation.setNimetus(occupationName);
+            		newOccupation.setCreated(new Date());
+            		newOccupation.addToDB(conn);
+            		occupationId = newOccupation.getID();
+            		if (occupationId > 0) {
+            			logger.info("Occupation \""+ occupationShortName +"\" was automatically added to organization " + orgCode +" (based on document sender data)");
+            		} else {
+            			logger.warn("Failed adding occupation \""+ occupationShortName +"\" to organization " + orgCode +" (based on document sender data)");
+            		}
+            	}
+            	
             	if (occupationId > 0) {
             		result.setPositionID(occupationId);
             	}
             }
             
-            // Tuvastame allõksuse lõhinime jõrgi allõksuse ID
-            // Seda ei saa enne teha, kui kogu XML on lõbi kõidud, kuna allõksuse
-            // leidmiseks peab lisaks lõhinimele tedma ka asutuse ID-d.
-            if ((subdivisionShortName != null) && (subdivisionShortName.length() > 0)) {
+            // Find subdivision ID using occupation short name.
+            // This cannot be done before all XML processing is completed.
+            // Otherwise we would not know organization ID, which is required
+            // to find the correct subdivision ID.
+            if (!CommonMethods.isNullOrEmpty(subdivisionShortName)) {
             	int subdivisionId = Allyksus.getIdByShortName(orgID, subdivisionShortName, conn);
+            	
+            	// If an unknown subdivision is found, attempt to register it automatically
+            	if ((subdivisionId <= 0) && Settings.Server_AutoRegisterUnknownSenders) {
+            		Allyksus newSubdivision = new Allyksus();
+            		newSubdivision.setAsutusID(orgID);
+            		newSubdivision.setAsutusKood(orgCode);
+            		newSubdivision.setLyhinimetus(subdivisionShortName);
+            		newSubdivision.setNimetus(subdivisionName);
+            		newSubdivision.setLoodud(new Date());
+            		newSubdivision.addToDB(conn);
+            		subdivisionId = newSubdivision.getID();
+            		if (subdivisionId > 0) {
+            			logger.info("Subdivision \""+ subdivisionShortName +"\" was automatically added to organization " + orgCode +" (based on document sender data)");
+            		} else {
+            			logger.warn("Failed adding subdivision \""+ subdivisionShortName +"\" to organization " + orgCode +" (based on document sender data)");
+            		}
+            	}
+            	
             	if (subdivisionId > 0) {
             		result.setDivisionID(subdivisionId);
             	}
@@ -407,7 +496,7 @@ public class Sender
             return result;
         }
         catch (XMLStreamException ex) {
-            CommonMethods.logError( ex, "dhl.Sender", "fromXML" );
+        	logger.error(ex);
             throw new AxisFault("Exception parsing DVK message sender section: " + ex.getMessage(), ex);
         }
     }

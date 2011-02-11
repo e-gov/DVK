@@ -1277,6 +1277,38 @@ begin
 end; $$
 language plpgsql;
 
+create or replace
+function "Delete_OldDhlMessages"(p_doc_lifetime_days integer)
+returns integer
+as $$
+declare
+    result integer := 0;
+    tmp_rc integer := 0;
+begin
+    if (p_doc_lifetime_days is not null) and (p_doc_lifetime_days > 0) then
+		-- Delete old received documents
+		delete
+		from	dhl_message
+		where	is_incoming = 1
+				and (current_date - received_date) >= p_doc_lifetime_days;
+		GET DIAGNOSTICS tmp_rc = ROW_COUNT;
+		result := result + tmp_rc;
+				
+		-- Delete old sent documents
+		delete
+		from	dhl_message
+		where	is_incoming = 0
+				and (current_date - sending_date) >= p_doc_lifetime_days;
+		GET DIAGNOSTICS tmp_rc = ROW_COUNT;
+		result := result + tmp_rc;
+	end if;
+    
+    return  result;
+end; $$
+language plpgsql;
+
+
+
 
 CREATE TABLE dhl_message (
     dhl_message_id integer DEFAULT nextval('sq_dhl_message_id'::regclass) NOT NULL,

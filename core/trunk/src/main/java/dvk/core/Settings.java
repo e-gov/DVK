@@ -6,8 +6,12 @@ import java.io.InputStream;
 
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
 public class Settings {
-    private static final long Client_DefaultFragmentSizeBytes = 1024 * 1024 * 10;
+	static Logger logger = Logger.getLogger(Settings.class.getName());
+	
+	private static final long Client_DefaultFragmentSizeBytes = 1024 * 1024 * 10;
     private static final int Server_DefaultDocumentDefaultLifetime = 30;
     private static final int Server_DefaultExpiredDocumentGracePeriod = 1;
     private static final String Client_DefaultProducerName = "dhl";
@@ -39,7 +43,7 @@ public class Settings {
     public static String Client_TrustStorePassword = "";
     public static String Client_TrustStoreType = "";
     
-    // Serveri seaded
+    // Server settings
     public static String Server_DatabaseEnvironmentVariable = "jdbc/dhloracle";
     public static String Server_ProducerName = Server_DefaultProducerName;
     public static int Server_DocumentDefaultLifetime = Server_DefaultDocumentDefaultLifetime;
@@ -55,13 +59,15 @@ public class Settings {
     public static boolean Server_IgnoreInvalidContainers = false;
     public static boolean Server_ValidateXmlFiles = false;
     public static boolean Server_ValidateSignatures = false;
+    public static boolean Server_DocumentSenderMustMatchXroadHeader = false;
+    public static boolean Server_AutoRegisterUnknownSenders = false;
     
-    // Üldkasutatavad seaded
+    // General settings (both client and server)
     public static boolean LogErrors = false;
     public static String ErrorLogFile = "error_log.txt";
     public static String PerformanceLogFile = "";
     
-    // Testkliendi seaded
+    // Test client settings 
     public static String Test_LogFile = "";
     
 
@@ -75,7 +81,7 @@ public class Settings {
                 return defValue;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dvk.core.Settings",  "getBinaryBufferSize");
+        	logger.error(ex);
             return defValue;
         }
     }
@@ -90,7 +96,7 @@ public class Settings {
                 return defValue;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dvk.core.Settings",  "getDBBufferSize");
+        	logger.error(ex);
             return defValue;
         }
     }
@@ -105,7 +111,7 @@ public class Settings {
                 return defValue;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dvk.core.Settings",  "getClientStatusWaitingID");
+        	logger.error(ex);
             return defValue;
         }
     }
@@ -119,7 +125,7 @@ public class Settings {
             currentProperties.load(propertyFile);
             extractSettings();
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dvk.core.Settings", "loadProperties");
+        	logger.error(ex);
             return false;
         } finally {
             CommonMethods.safeCloseStream(propertyFile);
@@ -287,6 +293,22 @@ public class Settings {
                 Server_ValidateSignatures = true;
             }
             
+            // Kas dokumendi saatjaks märgitud asutus peab olema sama, mis x-tee päistes sõnumi saatjaks märgitud asutus?
+            if ((currentProperties.getProperty("server_document_sender_must_match_xroad_header") != null) &&
+                (currentProperties.getProperty("server_document_sender_must_match_xroad_header").equalsIgnoreCase("yes") ||
+                currentProperties.getProperty("server_document_sender_must_match_xroad_header").equalsIgnoreCase("true") ||
+                currentProperties.getProperty("server_document_sender_must_match_xroad_header").equalsIgnoreCase("1"))) {
+                Server_DocumentSenderMustMatchXroadHeader = true;
+            }
+            
+            // Should the server automatically register senders that are not found in organization database?
+            if ((currentProperties.getProperty("server_auto_register_unknown_senders") != null) &&
+                (currentProperties.getProperty("server_auto_register_unknown_senders").equalsIgnoreCase("yes") ||
+                currentProperties.getProperty("server_auto_register_unknown_senders").equalsIgnoreCase("true") ||
+                currentProperties.getProperty("server_auto_register_unknown_senders").equalsIgnoreCase("1"))) {
+                Server_AutoRegisterUnknownSenders = true;
+            }
+            
             
             // Õiguste haldamise kesksüsteemi kasutamine
             if ((currentProperties.getProperty("server_use_central_rights_database") != null) &&
@@ -341,7 +363,7 @@ public class Settings {
                 Test_LogFile = currentProperties.getProperty("test_log_file");
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dvk.core.Settings", "extractSettings");
+        	logger.error(ex);
         }
     }
 }

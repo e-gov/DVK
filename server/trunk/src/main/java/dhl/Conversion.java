@@ -171,29 +171,34 @@ public class Conversion {
 		logger.debug("Version: " + this.getVersion());
 		logger.debug("TargetVersion: " + this.getTargetVersion());		
 		
-		javax.xml.transform.TransformerFactory tFactory = javax.xml.transform.TransformerFactory
-				.newInstance();
-
-		if(this.getXslt() != null) {
-			ByteArrayInputStream bis = new ByteArrayInputStream(this.getXslt()
-					.getBytes("UTF-8"));
-
-			javax.xml.transform.Transformer transformer = tFactory
-					.newTransformer(new javax.xml.transform.stream.StreamSource(bis));
-
-			StreamResult outputTarget = new StreamResult();
-			outputTarget.setOutputStream(new FileOutputStream(new File(this
-					.getOutputFile())));
-
-			transformer.transform(new javax.xml.transform.stream.StreamSource(
-					new File(this.getInputFile())), outputTarget);
-
-			logger.debug("XML Transformed.");
-		} else {
-			logger.error("XSLT not defined (maybe missing from database?).");
-		}
+		if ((new File(this.getInputFile())).exists()) {
+			javax.xml.transform.TransformerFactory tFactory = javax.xml.transform.TransformerFactory.newInstance();
+			if (tFactory != null) {
+				if ((this.getXslt() != null) && (this.getXslt().length() > 0)) {
+					ByteArrayInputStream bis = new ByteArrayInputStream(this.getXslt().getBytes("UTF-8"));
 		
-
+					javax.xml.transform.Transformer transformer = tFactory
+							.newTransformer(new javax.xml.transform.stream.StreamSource(bis));
+					
+					if (transformer != null) {
+						StreamResult outputTarget = new StreamResult();
+						outputTarget.setOutputStream(new FileOutputStream(new File(this.getOutputFile())));
+						transformer.transform(new javax.xml.transform.stream.StreamSource(
+								new File(this.getInputFile())), outputTarget);
+			
+						logger.debug("XML Transformed.");
+					} else {
+						logger.error("Container transformation failed! Failed creating Transformer for XSLT transformation.");
+					}
+				} else {
+					logger.error("XSLT not defined (maybe missing from database?).");
+				}
+			} else {
+				logger.error("Container transformation failed! Failed creating Transformer Factory for XSLT transformation.");
+			}
+		} else {
+			logger.error("Container transformation failed! Input file does not exist.");
+		}
 	}
 
 	private Connection initTestConnection() throws ClassNotFoundException,

@@ -94,7 +94,7 @@ public class CommonMethods {
             file.createNewFile();
             return result;
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "CommonMethods", "createPipelineFile");
+        	logger.error(ex);
             return null;
         }
     }
@@ -126,7 +126,7 @@ public class CommonMethods {
                             files[i].delete();
                         }
                     } catch (Exception ex) {
-                        CommonMethods.logError(ex, "CommonMethods", "deleteOldPipelineFiles");
+                    	logger.error(ex);
                     }
                 }
                 if (giveFeedbackOnConsole) {
@@ -153,7 +153,7 @@ public class CommonMethods {
                 return result;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "CommonMethods", "getUniqueDirectory");
+        	logger.error(ex);
             return null;
         }
     }
@@ -196,7 +196,7 @@ public class CommonMethods {
 
             return true;
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "CommonMethods", "gzipUnpackXML");
+        	logger.error(ex);
             return false;
         } finally {
             safeCloseStream(in);
@@ -251,7 +251,7 @@ public class CommonMethods {
     
     public static String base64EncodeFile(String filePath, String orgCode, String requestName) {
         if (!(new File(filePath)).exists()) {
-            CommonMethods.logError(new Exception("Data file does not exist!"), "CommonMethods", "gzipPackXML");
+        	logger.error("Data file does not exist!");
             return null;
         }
 
@@ -272,7 +272,7 @@ public class CommonMethods {
 
             return base64OutFileName;
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "CommonMethods", "gzipPackXML");
+        	logger.error(ex);
             return null;
         }
     }
@@ -281,7 +281,7 @@ public class CommonMethods {
         try {
             return xmlElementToString(xmlElement).getBytes("UTF-8");
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "CommonMethods", "xmlElementToBinary");
+        	logger.error(ex);
             return null;
         }
     }
@@ -303,7 +303,7 @@ public class CommonMethods {
             trans = null;
             source = null;
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "CommonMethods", "xmlDocumentToFile");
+        	logger.error(ex);
             result = false;
         } finally {
             safeCloseWriter(ow);
@@ -325,7 +325,7 @@ public class CommonMethods {
             trans.transform(source, new StreamResult(sw));
             return sw.toString();
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "CommonMethods", "xmlElementToString");
+        	logger.error(ex);
             return "";
         }
     }
@@ -338,7 +338,7 @@ public class CommonMethods {
             DocumentBuilder builder = factory.newDocumentBuilder();
             return builder.parse(resultStream);
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "CommonMethods", "xmlDocumentFromBinary");
+        	logger.error(ex);
             return null;
         }
     }
@@ -385,7 +385,7 @@ public class CommonMethods {
             result = result.substring(0, result.length() - 2) + ":" + result.substring(result.length() - 2);
             return result;
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "CommonMethods", "getDateISO8601");
+        	logger.error(ex);
             return "";
         }
     }
@@ -493,7 +493,7 @@ public class CommonMethods {
             }
             return byteStream.toByteArray();
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "CommonMethods", "getDataFromDataHandler");
+        	logger.error(ex);
             return null;
         }
     }
@@ -537,7 +537,7 @@ public class CommonMethods {
 
             return byteArrayToHex(digest);
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "CommonMethods", "getDataFromDataSource");
+        	logger.error(ex);
             return null;
         }
     }
@@ -612,42 +612,6 @@ public class CommonMethods {
 
     public static void logError(Exception ex, String className, String methodName) {
         logger.error(className + "." + methodName + "()", ex);
-    	/*
-    	boolean logErrors = false;
-        String logLocation = null;
-        
-        if (Settings.currentProperties != null) {
-            logErrors = Settings.LogErrors;
-            logLocation = Settings.ErrorLogFile;
-        } else {
-            logErrors = true;
-            String tmpDir = System.getProperty("java.io.tmpdir", "");
-            logLocation = tmpDir + File.separator + "dvk_error_log.txt";
-        }
-        
-        if (logErrors && (logLocation != null) && (logLocation.length() > 0)) {
-            StringBuffer data = new StringBuffer();
-            data.append("ERROR: [").append(className).append('|').append(methodName).append("] [").append((new Date()).toString()).append("]\r\n");
-            data.append("    ").append(ex.getClass().getName()).append(": ").append(ex.getMessage()).append("\r\n");
-            writeToFile(logLocation, (data.toString() + "\r\n").getBytes());
-
-            FileOutputStream fs = null;
-            PrintStream ps = null;
-            try {
-                fs = new FileOutputStream(logLocation, true);
-                ps = new PrintStream(fs, true);
-                ex.printStackTrace(ps);
-            } catch (Exception e) {
-            } finally {
-                safeCloseStream(ps);
-                safeCloseStream(fs);
-                ps = null;
-                fs = null;
-            }
-
-            writeToFile(logLocation, ("\r\n").getBytes());
-            sendEmail(data.toString());
-        }*/
     }
 
     public static String getNodeText(Node node) {
@@ -690,7 +654,7 @@ public class CommonMethods {
                 conn.close();
             }
         } catch (Exception e) {
-            CommonMethods.logError(e, "dvk.core.CommonMethods", "closeConnectionSafely");
+        	logger.error(e);
         }
     }
 
@@ -763,7 +727,18 @@ public class CommonMethods {
                 s = null;
             }
         }
-    }    
+    }
+    
+    public static void safeCloseDatabaseConnection(Connection dbConnection) {
+    	try {
+	    	if ((dbConnection != null) && !dbConnection.isClosed()) {
+	    		dbConnection.close();
+	    	}
+    	}
+		catch (Exception ex) {
+			logger.warn("Failed closing database connection!", ex);
+		}
+    }
     
     public static FileSplitResult splitOutTags(String xmlFileName, String tagLocalName, boolean noMainFile, boolean noSubFiles, boolean replaceMain) {
         FileSplitResult result = new FileSplitResult();
@@ -952,7 +927,7 @@ public class CommonMethods {
                 }
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dhl.CommonMethods", "splitOutTags");
+        	logger.error(ex);
         } finally {
             // Streamid kinni
             safeCloseReader(mainReader);
@@ -1059,8 +1034,7 @@ public class CommonMethods {
             // Kustutame ajutise faili 
             (new File(xmlFileName)).delete();
         } catch (Exception ex) {
-        	logger.error("Exception: ", ex);
-            CommonMethods.logError(ex, "dhl.CommonMethods", "joinSplitXML");
+        	logger.error(ex);
         } finally {
             safeCloseReader(mainReader);
             safeCloseReader(mainInReader);
@@ -1392,7 +1366,7 @@ public class CommonMethods {
             }
         } catch (Exception ex) {
             result = -1;
-            logError(ex, "dvk.core.CommonMethods", "getCharacterCountInFile");
+            logger.error(ex);
         } finally {
             safeCloseReader(reader);
             safeCloseReader(inReader);
@@ -1570,5 +1544,18 @@ public class CommonMethods {
             result = null;
         }
         return result;
+    }
+    
+    /**
+     * Determines if given String is null or empty (zero length).
+     * Whitespace is not treated as empty string.
+     * 
+     * @param stringToEvaluate
+     * 		String that will be checked for having NULL or empty value
+     * @return
+     * 		true, if input String is NULL or has zero length 
+     */
+    public static boolean isNullOrEmpty(String stringToEvaluate) {
+    	return ((stringToEvaluate == null) || stringToEvaluate.isEmpty());
     }
 }

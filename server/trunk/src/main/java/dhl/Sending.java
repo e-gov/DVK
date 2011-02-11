@@ -4,6 +4,8 @@ import dhl.iostructures.XHeader;
 import dhl.users.UserProfile;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
+import dvk.core.Settings;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.sql.CallableStatement;
@@ -167,7 +169,7 @@ public class Sending
                 m_documentID = documentID;
 
                 if (m_id > 0) {
-                    m_sender.LoadBySendingID(m_id, conn);
+                    m_sender.getBySendingID(m_id, conn);
                     m_proxy.LoadBySendingID(m_id, conn);
                     m_recipients = Recipient.getList(m_id, conn);
                 }
@@ -204,7 +206,7 @@ public class Sending
                 m_documentGUID = document_guid;
                 
                 if (m_id > 0) {
-                    m_sender.LoadBySendingID(m_id, conn);
+                    m_sender.getBySendingID(m_id, conn);
                     m_proxy.LoadBySendingID(m_id, conn);
                     m_recipients = Recipient.getList(m_id, conn);
                 }
@@ -405,7 +407,12 @@ public class Sending
 		// not belonging to users organization.
 		boolean result = false;
 		
-		if (user != null) {
+		// If server is configured so that x-road request sender must not match
+		// document sender, then access to status information must also not be
+		// restricted by x-road credentials.
+		if (!Settings.Server_DocumentSenderMustMatchXroadHeader) {
+			result = true;
+		} else if (user != null) {
 			// User can access documents status data if
 			// - user sent the document
 			// - document was sent by someone else filling the same role in organization

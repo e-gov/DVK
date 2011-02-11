@@ -848,28 +848,34 @@ public class Asutus {
                     Settings.Client_DefaultPersonCode,
                     "",
                     (CommonMethods.personalIDCodeHasCountryCode(Settings.Client_DefaultPersonCode) ? Settings.Client_DefaultPersonCode : "EE"+Settings.Client_DefaultPersonCode));
-                    
-                GetSendingOptionsV3ResponseType result = dvkClient.getSendingOptions(header, null, null, null, false, -1, -1, 1);
-                if ((result != null) && (result.asutused != null)) {
-                    for (int j = 0; j < result.asutused.size(); ++j) {
-                    	DhlCapability item = result.asutused.get(j);
-                        int testID = getIDByRegNr(item.getOrgCode(), false, conn);
-                        if (testID <= 0) {
-                            Asutus newOrg = new Asutus();
-                            newOrg.setRegistrikood(item.getOrgCode());
-                            newOrg.setNimetus(item.getOrgName());
-                            newOrg.setDvkSaatmine(item.getIsDhlCapable());
-                            newOrg.setDvkOtseSaatmine(item.getIsDhlDirectCapable());
-                            newOrg.setServerID(server.getID());
-                            newOrg.addToDB(conn, xTeePais);
-                            if ((orgCodeToFind != null) && !orgCodeToFind.equalsIgnoreCase("") && (orgCodeToFind == item.getOrgCode())) {
-                                foundMissingOrg = true;
-                            }
-                        }
-                        if (foundMissingOrg) {
-                            return;
-                        }
-                    }
+                
+                try {
+	                GetSendingOptionsV3ResponseType result = dvkClient.getSendingOptions(header, null, null, null, false, -1, -1, 1);
+	                if ((result != null) && (result.asutused != null)) {
+	                    for (int j = 0; j < result.asutused.size(); ++j) {
+	                    	DhlCapability item = result.asutused.get(j);
+	                        int testID = getIDByRegNr(item.getOrgCode(), false, conn);
+	                        if (testID <= 0) {
+	                            Asutus newOrg = new Asutus();
+	                            newOrg.setRegistrikood(item.getOrgCode());
+	                            newOrg.setNimetus(item.getOrgName());
+	                            newOrg.setDvkSaatmine(item.getIsDhlCapable());
+	                            newOrg.setDvkOtseSaatmine(item.getIsDhlDirectCapable());
+	                            newOrg.setServerID(server.getID());
+	                            newOrg.addToDB(conn, xTeePais);
+	                            if ((orgCodeToFind != null) && !orgCodeToFind.equalsIgnoreCase("") && (orgCodeToFind == item.getOrgCode())) {
+	                                foundMissingOrg = true;
+	                            }
+	                        }
+	                    }
+	                }
+                } catch (Exception ex) {
+                	CommonMethods.logError(ex, "dhl.users.Asutus", "getOrgsFromAllKnownServers");
+                }
+                
+                // If we found the necessary organization then let's not bother another server 
+                if (foundMissingOrg) {
+                    return;
                 }
             }
         }

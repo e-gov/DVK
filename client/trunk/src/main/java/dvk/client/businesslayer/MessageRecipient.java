@@ -286,51 +286,54 @@ public class MessageRecipient {
         m_serviceURL = "";
     }
 
-    public static ArrayList<MessageRecipient> getList(int messageID, OrgSettings db) {
+    public static ArrayList<MessageRecipient> getList(int messageID, OrgSettings db, Connection dbConnection) {
         try {
-            Connection conn = DBConnection.getConnection(db);
-            if (conn != null) {
-                conn.setAutoCommit(false);
-                Calendar cal = Calendar.getInstance();
-                int parNr = 1;
-                if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    parNr++;
-                }
-                CallableStatement cs = DBConnection.getStatementForResultSet("Get_DhlMessageRecipients", 1, db, conn);
-                cs.setInt(parNr++, messageID);
-                ResultSet rs = DBConnection.getResultSet(cs, db, 1);
+            if (dbConnection != null) {
                 ArrayList<MessageRecipient> result = new ArrayList<MessageRecipient>();
-                while (rs.next()) {
-                    MessageRecipient item = new MessageRecipient();
-                    item.setId(rs.getInt("dhl_message_recipient_id"));
-                    item.setMessageID(rs.getInt("dhl_message_id"));
-                    item.setRecipientOrgCode(rs.getString("recipient_org_code"));
-                    item.setRecipientOrgName(rs.getString("recipient_org_name"));
-                    item.setRecipientPersonCode(rs.getString("recipient_person_code"));
-                    item.setRecipientName(rs.getString("recipient_name"));
-                    item.setSendingDate(rs.getTimestamp("sending_date", cal));
-                    item.setReceivedDate(rs.getTimestamp("received_date", cal));
-                    item.setSendingStatusID(rs.getInt("sending_status_id"));
-                    item.setRecipientStatusID(rs.getInt("recipient_status_id"));
-                    item.setFaultCode(rs.getString("fault_code"));
-                    item.setFaultActor(rs.getString("fault_actor"));
-                    item.setFaultString(rs.getString("fault_string"));
-                    item.setFaultDetail(rs.getString("fault_detail"));
-                    item.setMetaXML(rs.getString("metaxml"));
-                    item.setDhlId(rs.getInt("dhl_id"));
-                    item.setProducerName(rs.getString("producer_name"));
-                    item.setServiceURL(rs.getString("service_url"));
-                    item.setRecipientDivisionID(rs.getInt("recipient_division_id"));
-                    item.setRecipientDivisionName(rs.getString("recipient_division_name"));
-                    item.setRecipientPositionID(rs.getInt("recipient_position_id"));
-                    item.setRecipientPositionName(rs.getString("recipient_position_name"));
-                    item.setRecipientDivisionCode(rs.getString("recipient_division_code"));
-                    item.setRecipientPositionCode(rs.getString("recipient_position_code"));
-                    result.add(item);
-                }
-                rs.close();
-                cs.close();
-                conn.close();
+            	boolean defaultAutoCommit = dbConnection.getAutoCommit();
+        		try {
+	            	dbConnection.setAutoCommit(false);
+	                Calendar cal = Calendar.getInstance();
+	                int parNr = 1;
+	                if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
+	                    parNr++;
+	                }
+	                CallableStatement cs = DBConnection.getStatementForResultSet("Get_DhlMessageRecipients", 1, db, dbConnection);
+	                cs.setInt(parNr++, messageID);
+	                ResultSet rs = DBConnection.getResultSet(cs, db, 1);
+	                while (rs.next()) {
+	                    MessageRecipient item = new MessageRecipient();
+	                    item.setId(rs.getInt("dhl_message_recipient_id"));
+	                    item.setMessageID(rs.getInt("dhl_message_id"));
+	                    item.setRecipientOrgCode(rs.getString("recipient_org_code"));
+	                    item.setRecipientOrgName(rs.getString("recipient_org_name"));
+	                    item.setRecipientPersonCode(rs.getString("recipient_person_code"));
+	                    item.setRecipientName(rs.getString("recipient_name"));
+	                    item.setSendingDate(rs.getTimestamp("sending_date", cal));
+	                    item.setReceivedDate(rs.getTimestamp("received_date", cal));
+	                    item.setSendingStatusID(rs.getInt("sending_status_id"));
+	                    item.setRecipientStatusID(rs.getInt("recipient_status_id"));
+	                    item.setFaultCode(rs.getString("fault_code"));
+	                    item.setFaultActor(rs.getString("fault_actor"));
+	                    item.setFaultString(rs.getString("fault_string"));
+	                    item.setFaultDetail(rs.getString("fault_detail"));
+	                    item.setMetaXML(rs.getString("metaxml"));
+	                    item.setDhlId(rs.getInt("dhl_id"));
+	                    item.setProducerName(rs.getString("producer_name"));
+	                    item.setServiceURL(rs.getString("service_url"));
+	                    item.setRecipientDivisionID(rs.getInt("recipient_division_id"));
+	                    item.setRecipientDivisionName(rs.getString("recipient_division_name"));
+	                    item.setRecipientPositionID(rs.getInt("recipient_position_id"));
+	                    item.setRecipientPositionName(rs.getString("recipient_position_name"));
+	                    item.setRecipientDivisionCode(rs.getString("recipient_division_code"));
+	                    item.setRecipientPositionCode(rs.getString("recipient_position_code"));
+	                    result.add(item);
+	                }
+	                rs.close();
+	                cs.close();
+        		} finally {
+        			dbConnection.setAutoCommit(defaultAutoCommit);
+        		}
                 return result;
             } else {
                 return null;
@@ -341,7 +344,7 @@ public class MessageRecipient {
         }
     }
 
-    public boolean saveToDB(OrgSettings db) {
+    public boolean saveToDB(OrgSettings db, Connection dbConnection) {
     	logger.debug("m_messageID: " + m_messageID);
     	logger.debug("m_recipientOrgCode: " + m_recipientOrgCode);
     	logger.debug("m_recipientOrgName: " + m_recipientOrgName);
@@ -365,22 +368,18 @@ public class MessageRecipient {
     	logger.debug("m_recipientDivisionCode: " + m_recipientDivisionCode);
     	logger.debug("m_recipientPositionCode: " + m_recipientPositionCode);
     	
-        Connection conn = null;
         try {
-            conn = DBConnection.getConnection(db);
-            if (conn != null) {
+            if (dbConnection != null) {
                 Calendar cal = Calendar.getInstance();
 
                 int parNr = 1;
-                CallableStatement cs = conn.prepareCall("{call Save_DhlMessageRecipient(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                CallableStatement cs = dbConnection.prepareCall("{call Save_DhlMessageRecipient(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    cs = conn.prepareCall("{? = call \"Save_DhlMessageRecipient\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                    cs = dbConnection.prepareCall("{? = call \"Save_DhlMessageRecipient\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 }
                 
-                // Mingil põhjusel toimib SQL Anywhere JDBC klient
-                // korrektselt ainult juhul, kui väljundparameetrid asuvad kõige lõpus.
-                // Vastasel juhul liigutatakse kõik väljundparameetrile
-                // järgnevad sisendparameetrid ühe koha võrra edasi.
+                // SQL Anywhere JDBC client requires that output parameters are supplied as last parameter(s).
+                // Otherwise all input parameters will be incorrectly moved down by one position in parameter list.
                 if (!CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
                 	parNr++;
                 }
@@ -429,17 +428,15 @@ public class MessageRecipient {
                 }
                 logger.debug("m_id: " + m_id);
                 cs.close();
-                conn.commit();
-                conn.close();
+                dbConnection.commit();
                 return true;
             } else {
                 return false;
             }
         } catch (Exception ex) {
-            if (conn != null) {
+            if (dbConnection != null) {
                 try {
-                    conn.rollback();
-                    conn.close();
+                	dbConnection.rollback();
                 } catch(SQLException ex1) {
                     CommonMethods.logError(ex, this.getClass().getName(), "saveToDB");
                 }
@@ -449,51 +446,39 @@ public class MessageRecipient {
         }
     }
     
-    public static int getId(int messageId, String orgCode, String personCode, String subdivisionShortName, String occupationShortName, OrgSettings db) throws Exception {
+    public static int getId(int messageId, String orgCode, String personCode, String subdivisionShortName, String occupationShortName, OrgSettings db, Connection dbConnection) throws Exception {
         int result = 0;
-    	Connection conn = null;
-        try {
-            conn = DBConnection.getConnection(db);
-            if (conn != null) {
-                int parNr = 1;
-                CallableStatement cs = conn.prepareCall("{call Get_DhlMessageRecipientId(?,?,?,?,?,?)}");
-                if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    cs = conn.prepareCall("{? = call \"Get_DhlMessageRecipientId\"(?,?,?,?,?)}");
-                }
-
-                // Mingil põhjusel toimib SQL Anywhere JDBC klient
-                // korrektselt ainult juhul, kui väljundparameetrid asuvad kõige lõpus.
-                // Vastasel juhul liigutatakse kõik väljundparameetrile
-                // järgnevad sisendparameetrid ühe koha võrra edasi.
-                if (!CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
-                	parNr++;
-                }
-
-                cs.setInt(parNr++, messageId);
-                cs.setString(parNr++, orgCode);
-                cs.setString(parNr++, personCode);
-                cs.setString(parNr++, subdivisionShortName);
-                cs.setString(parNr++, occupationShortName);
-                if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
-                	cs.registerOutParameter(parNr, Types.INTEGER);
-                } else {
-                	cs.registerOutParameter(1, Types.INTEGER);
-                }
-                cs.execute();
-                if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
-                	result = cs.getInt(parNr);
-                } else {
-                	result = cs.getInt(1);
-                }
-                cs.close();
-                conn.commit();
-                conn.close();
+        if (dbConnection != null) {
+            int parNr = 1;
+            CallableStatement cs = dbConnection.prepareCall("{call Get_DhlMessageRecipientId(?,?,?,?,?,?)}");
+            if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
+                cs = dbConnection.prepareCall("{? = call \"Get_DhlMessageRecipientId\"(?,?,?,?,?)}");
             }
-        } finally {
-        	if (conn != null) {
-        		try { conn.close(); }
-        		catch (Exception ex) {}
-        	}
+
+            // SQL Anywhere JDBC client requires that output parameters are supplied as last parameter(s).
+            // Otherwise all input parameters will be incorrectly moved down by one position in parameter list.
+            if (!CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+            	parNr++;
+            }
+
+            cs.setInt(parNr++, messageId);
+            cs.setString(parNr++, orgCode);
+            cs.setString(parNr++, personCode);
+            cs.setString(parNr++, subdivisionShortName);
+            cs.setString(parNr++, occupationShortName);
+            if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+            	cs.registerOutParameter(parNr, Types.INTEGER);
+            } else {
+            	cs.registerOutParameter(1, Types.INTEGER);
+            }
+            cs.execute();
+            if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+            	result = cs.getInt(parNr);
+            } else {
+            	result = cs.getInt(1);
+            }
+            cs.close();
+            dbConnection.commit();
         }
         return result;
     }

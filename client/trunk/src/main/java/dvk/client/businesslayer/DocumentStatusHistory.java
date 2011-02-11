@@ -12,7 +12,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import dvk.client.conf.OrgSettings;
-import dvk.client.db.DBConnection;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import dvk.core.Fault;
@@ -28,7 +27,7 @@ public class DocumentStatusHistory {
     private int m_recipientStatusId;
     private String m_metaXML;
     
-    // Abimuutujad, mida andmebaasi ei salvestata
+    // Helper variables that will not be saved to database
     private String m_orgCode;
     private String m_personCode;
     private String m_subdivisionShortName;
@@ -147,63 +146,53 @@ public class DocumentStatusHistory {
     	this.m_occupationShortName = "";
     }
     
-    public int saveToDB(OrgSettings db) throws Exception {
+    public int saveToDB(OrgSettings db, Connection dbConnection) throws Exception {
         int result = 0;
-    	Connection conn = DBConnection.getConnection(db);
-        if (conn != null) {
-            try {
-            	Calendar cal = Calendar.getInstance();
+        if (dbConnection != null) {
+        	Calendar cal = Calendar.getInstance();
 
-                int parNr = 1;
-                CallableStatement cs = conn.prepareCall("{call Save_DhlStatusHistory(?,?,?,?,?,?,?,?,?,?,?)}");
-                if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    cs = conn.prepareCall("{? = call \"Save_DhlStatusHistory\"(?,?,?,?,?,?,?,?,?,?)}");
-                }
-                
-                // Mingil põhjusel toimib SQL Anywhere JDBC klient
-                // korrektselt ainult juhul, kui väljundparameetrid asuvad kõige lõpus.
-                // Vastasel juhul liigutatakse kõik väljundparameetrile
-                // järgnevad sisendparameetrid ühe koha võrra edasi.
-                if (!CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
-                	parNr++;
-                }
-
-                cs.setInt(parNr++, m_recipientId);
-                cs.setInt(parNr++, m_serverSideId);
-                cs.setInt(parNr++, m_sendingStatusId);
-                cs.setTimestamp(parNr++, CommonMethods.sqlDateFromDate(m_statusDate), cal);
-                if (m_fault != null) {
-	                cs.setString(parNr++, m_fault.getFaultCode());
-	                cs.setString(parNr++, m_fault.getFaultActor());
-	                cs.setString(parNr++, m_fault.getFaultString());
-	                cs.setString(parNr++, m_fault.getFaultDetail());
-                } else {
-	                cs.setNull(parNr++, Types.VARCHAR);
-	                cs.setNull(parNr++, Types.VARCHAR);
-	                cs.setNull(parNr++, Types.VARCHAR);
-	                cs.setNull(parNr++, Types.VARCHAR);
-                }
-                cs = CommonMethods.setNullableIntParam(cs, parNr++, m_recipientStatusId);
-                cs.setString(parNr++, m_metaXML);
-                if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
-                	cs.registerOutParameter(parNr, Types.INTEGER);
-                } else {
-                	cs.registerOutParameter(1, Types.INTEGER);
-                }
-                cs.execute();
-                if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
-                	m_id = cs.getInt(parNr);
-                } else {
-                	m_id = cs.getInt(1);
-                }
-                cs.close();
-                conn.commit();
-            } finally {
-            	if (conn != null) {
-            		try { conn.close(); }
-            		catch (Exception ex) {}
-            	}
+            int parNr = 1;
+            CallableStatement cs = dbConnection.prepareCall("{call Save_DhlStatusHistory(?,?,?,?,?,?,?,?,?,?,?)}");
+            if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
+                cs = dbConnection.prepareCall("{? = call \"Save_DhlStatusHistory\"(?,?,?,?,?,?,?,?,?,?)}");
             }
+            
+            // SQL Anywhere JDBC client requires that output parameters are supplied as last parameter(s).
+            // Otherwise all input parameters will be incorrectly moved down by one position in parameter list.
+            if (!CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+            	parNr++;
+            }
+
+            cs.setInt(parNr++, m_recipientId);
+            cs.setInt(parNr++, m_serverSideId);
+            cs.setInt(parNr++, m_sendingStatusId);
+            cs.setTimestamp(parNr++, CommonMethods.sqlDateFromDate(m_statusDate), cal);
+            if (m_fault != null) {
+                cs.setString(parNr++, m_fault.getFaultCode());
+                cs.setString(parNr++, m_fault.getFaultActor());
+                cs.setString(parNr++, m_fault.getFaultString());
+                cs.setString(parNr++, m_fault.getFaultDetail());
+            } else {
+                cs.setNull(parNr++, Types.VARCHAR);
+                cs.setNull(parNr++, Types.VARCHAR);
+                cs.setNull(parNr++, Types.VARCHAR);
+                cs.setNull(parNr++, Types.VARCHAR);
+            }
+            cs = CommonMethods.setNullableIntParam(cs, parNr++, m_recipientStatusId);
+            cs.setString(parNr++, m_metaXML);
+            if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+            	cs.registerOutParameter(parNr, Types.INTEGER);
+            } else {
+            	cs.registerOutParameter(1, Types.INTEGER);
+            }
+            cs.execute();
+            if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+            	m_id = cs.getInt(parNr);
+            } else {
+            	m_id = cs.getInt(1);
+            }
+            cs.close();
+            dbConnection.commit();
         } else {
             throw new SQLException("Database connection is NULL!");
         }

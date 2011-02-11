@@ -36,7 +36,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.OutputStreamWriter;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -136,10 +135,10 @@ public class SendDocuments {
                         // Võtame võlja antud andmebaasis seadistatud asutuste nimekirja, et
                         // saaksime XML parsimisel võtta võlja eraldi kirjed, kui smaa sõnumit
                         // on saadetud mitmele asutusele
-                        UnitCredential[] credentials = UnitCredential.getCredentials(hostOrgSettings);
+                        UnitCredential[] credentials = UnitCredential.getCredentials(hostOrgSettings, conn);
                         
                         // Leiame dokumendile DHL_ID
-                        int dhlID = Counter.getNextDhlID(hostOrgSettings);
+                        int dhlID = Counter.getNextDhlID(hostOrgSettings, conn);
                         
                         ArrayList<DhlMessage> msgList = DhlMessage.getFromXML(docFiles.subFiles.get(i), credentials);
                         for (int j = 0; j < msgList.size(); ++j) {
@@ -149,7 +148,8 @@ public class SendDocuments {
                             // Kontrollime, et dokumendi saatjaks või vahendajaks mõrgitud asutus
                             // ja dokumendi reaalselt saatnud asutus oleksid samad.
                             if ((msg.getSenderOrgCode() != user.getOrganizationCode()) &&
-                               (msg.getProxyOrgCode() !=  user.getOrganizationCode())) {
+                               (msg.getProxyOrgCode() !=  user.getOrganizationCode()) &&
+                               Settings.Server_DocumentSenderMustMatchXroadHeader) {
                                 throw new AxisFault( CommonStructures.VIGA_SAATJA_ASUTUSED_ERINEVAD );
                             }
                             
@@ -184,7 +184,7 @@ public class SendDocuments {
                         
                         // Kontrollime, et dokumendi saatjaks või vahendajaks mõrgitud asutus
                         // ja dokumendi reaalselt saatnud asutus oleksid samad.
-                        if (doc.getSendingList() != null) {
+                        if ((doc.getSendingList() != null) && Settings.Server_DocumentSenderMustMatchXroadHeader) {
                             Sending tmpSending;
                             for (int j = 0; j < doc.getSendingList().size(); ++j) {
                                 tmpSending = doc.getSendingList().get(j);
@@ -195,7 +195,7 @@ public class SendDocuments {
                                     logger.info("Sender org ID: " + String.valueOf(tmpSending.getSender().getOrganizationID()));
                                     logger.info("Proxy org ID: " + String.valueOf(tmpSending.getProxy().getOrganizationID()));
                                 	
-                                	throw new AxisFault( CommonStructures.VIGA_SAATJA_ASUTUSED_ERINEVAD );
+                                	throw new AxisFault(CommonStructures.VIGA_SAATJA_ASUTUSED_ERINEVAD);
                                 }
                                 if (validationFault != null) {
                                     for (int k = 0; k < tmpSending.getRecipients().size(); ++k) {
@@ -253,7 +253,7 @@ public class SendDocuments {
                         tmpMsg.setDhlFolderName(bodyData.kaust);
                         
                         // Salvestame dokumendi andmebaasi
-                        tmpMsg.addToDB(hostOrgSettings);
+                        tmpMsg.addToDB(hostOrgSettings, conn);
                         
                         // Tagastame siin kirje ID asemel DHL_ID võõrtuse, kuna
                         // kliendi poolel peaks DVK unikaalne identifikaator
@@ -488,10 +488,10 @@ public class SendDocuments {
                             // Võtame võlja antud andmebaasis seadistatud asutuste nimekirja, et
                             // saaksime XML parsimisel võtta võlja eraldi kirjed, kui smaa sõnumit
                             // on saadetud mitmele asutusele
-                            UnitCredential[] credentials = UnitCredential.getCredentials(hostOrgSettings);
+                            UnitCredential[] credentials = UnitCredential.getCredentials(hostOrgSettings, conn);
 
                             // Leiame dokumendile DHL_ID
-                            int dhlID = Counter.getNextDhlID(hostOrgSettings);
+                            int dhlID = Counter.getNextDhlID(hostOrgSettings, conn);
                             
                             ArrayList<DhlMessage> msgList = DhlMessage.getFromXML(docFiles.subFiles.get(i), credentials);
                             for (int j = 0; j < msgList.size(); ++j) {
@@ -501,7 +501,8 @@ public class SendDocuments {
                                 // Kontrollime, et dokumendi saatjaks või vahendajaks mõrgitud asutus
                                 // ja dokumendi reaalselt saatnud asutus oleksid samad.
                                 if (!msg.getSenderOrgCode().equalsIgnoreCase(user.getOrganizationCode()) &&
-                                   !msg.getProxyOrgCode().equalsIgnoreCase(user.getOrganizationCode())) {
+                                   !msg.getProxyOrgCode().equalsIgnoreCase(user.getOrganizationCode()) &&
+                                   Settings.Server_DocumentSenderMustMatchXroadHeader) {
                                     throw new ContainerValidationException(CommonStructures.VIGA_SAATJA_ASUTUSED_ERINEVAD + " X-Tee: " + user.getOrganizationCode() + ", Sender: " + msg.getSenderOrgCode());
                                 }
                                 
@@ -542,7 +543,7 @@ public class SendDocuments {
                             
                             // Kontrollime, et dokumendi saatjaks või vahendajaks mõrgitud asutus
                             // ja dokumendi reaalselt saatnud asutus oleksid samad.
-                            if (doc.getSendingList() != null) {
+                            if ((doc.getSendingList() != null) && Settings.Server_DocumentSenderMustMatchXroadHeader) {
                                 Sending tmpSending;
                                 for (int j = 0; j < doc.getSendingList().size(); ++j) {
                                     tmpSending = doc.getSendingList().get(j);
@@ -609,7 +610,7 @@ public class SendDocuments {
                             tmpMsg.setDhlFolderName(bodyData.kaust);
                             
                             // Salvestame dokumendi andmebaasi
-                            tmpMsg.addToDB(hostOrgSettings);
+                            tmpMsg.addToDB(hostOrgSettings, conn);
                             
                             // Tagastame siin kirje ID asemel DHL_ID võõrtuse, kuna
                             // kliendi poolel peaks DVK unikaalne identifikaator
@@ -865,10 +866,10 @@ public class SendDocuments {
                             // Võtame võlja antud andmebaasis seadistatud asutuste nimekirja, et
                             // saaksime XML parsimisel võtta võlja eraldi kirjed, kui smaa sõnumit
                             // on saadetud mitmele asutusele
-                            UnitCredential[] credentials = UnitCredential.getCredentials(hostOrgSettings);
+                            UnitCredential[] credentials = UnitCredential.getCredentials(hostOrgSettings, conn);
 
                             // Leiame dokumendile DHL_ID
-                            int dhlID = Counter.getNextDhlID(hostOrgSettings);
+                            int dhlID = Counter.getNextDhlID(hostOrgSettings, conn);
                             
                             ArrayList<DhlMessage> msgList = DhlMessage.getFromXML(docFiles.subFiles.get(i), credentials);
                             for (int j = 0; j < msgList.size(); ++j) {
@@ -878,7 +879,8 @@ public class SendDocuments {
                                 // Kontrollime, et dokumendi saatjaks või vahendajaks mõrgitud asutus
                                 // ja dokumendi reaalselt saatnud asutus oleksid samad.
                                 if (!msg.getSenderOrgCode().equalsIgnoreCase(user.getOrganizationCode()) &&
-                                   !msg.getProxyOrgCode().equalsIgnoreCase(user.getOrganizationCode())) {
+                                   !msg.getProxyOrgCode().equalsIgnoreCase(user.getOrganizationCode()) &&
+                                   Settings.Server_DocumentSenderMustMatchXroadHeader) {
                                     throw new ContainerValidationException(CommonStructures.VIGA_SAATJA_ASUTUSED_ERINEVAD + " X-Tee: " + user.getOrganizationCode() + ", Sender: " + msg.getSenderOrgCode());
                                 }
                                 
@@ -919,7 +921,7 @@ public class SendDocuments {
                             
                             // Kontrollime, et dokumendi saatjaks või vahendajaks mõrgitud asutus
                             // ja dokumendi reaalselt saatnud asutus oleksid samad.
-                            if (doc.getSendingList() != null) {
+                            if ((doc.getSendingList() != null) && Settings.Server_DocumentSenderMustMatchXroadHeader) {
                                 Sending tmpSending;
                                 for (int j = 0; j < doc.getSendingList().size(); ++j) {
                                     tmpSending = doc.getSendingList().get(j);
@@ -986,7 +988,7 @@ public class SendDocuments {
                             tmpMsg.setDhlFolderName(bodyData.kaust);
                             
                             // Salvestame dokumendi andmebaasi
-                            tmpMsg.addToDB(hostOrgSettings);
+                            tmpMsg.addToDB(hostOrgSettings, conn);
                             
                             // Tagastame siin kirje ID asemel DHL_ID võõrtuse, kuna
                             // kliendi poolel peaks DVK unikaalne identifikaator

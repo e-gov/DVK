@@ -10,8 +10,11 @@ import dvk.core.HeaderVariables;
 import dvk.core.Settings;
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
+
 public class CommunicationTestClient {
-    private static ArrayList<Integer> pendingDocuments = new ArrayList<Integer>();
+	private static Logger logger = Logger.getLogger(CommunicationTestClient.class.getName());
+	private static ArrayList<Integer> pendingDocuments = new ArrayList<Integer>();
     
     public static void main (String[] args) {
         try {
@@ -128,9 +131,8 @@ public class CommunicationTestClient {
                 ex.printStackTrace();
             }
         }
-        catch( Exception ex )
-        {
-            CommonMethods.logError( ex, "clnt.DhlTestClient", "main" );
+        catch (Exception ex) {
+            logger.error(ex);
             CommonMethods.writeLog( ex.toString(), true );
             CommonMethods.writeLog( ex.getMessage(), true );
         }

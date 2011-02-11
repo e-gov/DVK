@@ -4,5 +4,6 @@ public enum ClientExecType {
     Send,
     Receive,
     SendReceive,
-    UpdateStatus
+    UpdateStatus,
+    DeleteOldDocuments
 }

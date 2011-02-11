@@ -2,11 +2,14 @@ package dvk.core;
 
 import java.io.OutputStreamWriter;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public class Fault {
-    private String m_faultCode;
+	static Logger logger = Logger.getLogger(Fault.class.getName());
+	
+	private String m_faultCode;
     private String m_faultActor;
     private String m_faultString;
     private String m_faultDetail;
@@ -101,7 +104,7 @@ public class Fault {
             xmlWriter.write("</fault>");
             return true;
         } catch (Exception ex) {
-            CommonMethods.logError(ex, this.getClass().getName(), "appendObjectXML");
+        	logger.error(ex);
             return false;
         }
     }

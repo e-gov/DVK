@@ -1,6 +1,7 @@
 package dvk.client.iostructures;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -11,7 +12,7 @@ public class ReceiveDocumentsV4Body implements SOAPBodyOverride {
     public int arv;
     public String allyksuseLyhinimetus;
     public String ametikohaLyhinimetus;
-    public ArrayList<String> kaust;
+    public List<String> kaust;
     public String edastusID;
     public int fragmentNr;
     public long fragmendiSuurusBaitides;

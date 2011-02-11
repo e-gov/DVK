@@ -8,6 +8,8 @@
   
   <!-- Properties -->
   <properties>
+  	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  	
   	<dvkCoreDir>C:\Projektid\ria\dvk\workspace\dvk_core</dvkCoreDir>
   </properties>
   
@@ -198,18 +200,17 @@
 				</includes>		
 			</resource>
 			<resource>
-				<directory>${basedir}</directory>
+				<directory>${basedir}/src/main/resources</directory>
 				<includes>
-					<include>*.cmd</include>
-					<include>*.sh</include>
+					<include>*.*</include>
 				</includes>
 			</resource>
 			<resource>
-				<directory>${basedir}/src/main/resources</directory>
-				<includes>
-					<include>client_config.xml</include>
-					<include>dvk_client.properties</include>
-				</includes>
+				<directory>sql/</directory>
+				<targetPath>sql/</targetPath>
+				<excludes>
+					<exclude>**/testdata/*.*</exclude>
+				</excludes>
 			</resource>
 		</resources>
 		<plugins>

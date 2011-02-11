@@ -1,12 +1,13 @@
 package dvk.client.iostructures;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ReceiveDocumentsV3Body implements SOAPBodyOverride {
     public int arv;
     public int allyksus;
     public int ametikoht;
-    public ArrayList<String> kaust;
+    public List<String> kaust;
     public String edastusID;
     public int fragmentNr;
     public long fragmendiSuurusBaitides;

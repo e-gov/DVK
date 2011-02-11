@@ -20,7 +20,7 @@ public class DhlCapability {
     private boolean m_isDhlCapable;
     private boolean m_isDhlDirectCapable;
     private String m_dhlDirectProducerName;
-    private String m_dhlDirectServiceUrl; // otsesuhtluse korral ilma X-teed kasutamata adapterserveri aadress
+    private String m_dhlDirectServiceUrl;
     private String m_parentOrgCode;
 
     public void setOrgCode(String orgCode) {
@@ -94,7 +94,7 @@ public class DhlCapability {
     }
 
     /**
-     * T�hjendab v�i initsialiseerib klassi andmev�ljad
+     * Initializes all fields
      */
     public void clear() {
         m_orgCode = "";
@@ -107,18 +107,22 @@ public class DhlCapability {
     }
 
     /**
-     * Salvestab asutuse DVK-v�imekust puudutavad andmed andmebaasi
+     * Save data about organization DEC capability to database
      * 
-     * @param conn      Andmebaasi�hendus
-     * @return          Kas salvestamine �nnestus
+     * @param dbConnection
+     * 		Active database connection
+     * @param db
+     * 		Database settings
+     * @return
+     * 		{@code true} if saving succeeded
      */
-    public boolean saveToDB(Connection conn, OrgSettings db) {
+    public boolean saveToDB(Connection dbConnection, OrgSettings db) {
         try {
-            if (conn != null) {
+            if (dbConnection != null) {
                 int parNr = 1;
-                CallableStatement cs = conn.prepareCall("{call Save_DhlOrganization(?,?,?,?,?,?,?)}");
+                CallableStatement cs = dbConnection.prepareCall("{call Save_DhlOrganization(?,?,?,?,?,?,?)}");
                 if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    cs = conn.prepareCall("{? = call \"Save_DhlOrganization\"(?,?,?,?,?,?,?)}");
+                    cs = dbConnection.prepareCall("{? = call \"Save_DhlOrganization\"(?,?,?,?,?,?,?)}");
                     cs.registerOutParameter(parNr++, Types.BOOLEAN);
                 }
 
@@ -139,71 +143,81 @@ public class DhlCapability {
                 cs.setString(parNr++, m_parentOrgCode);
                 cs.execute();
                 cs.close();
-                conn.commit();
+                dbConnection.commit();
                 return true;
             } else {
                 return false;
             }
         } catch (Exception ex) {
-            try { conn.rollback(); }
+            try { dbConnection.rollback(); }
             catch(SQLException ex1) { CommonMethods.logError(ex, this.getClass().getName(), "saveToDB"); }
             CommonMethods.logError(ex, this.getClass().getName(), "saveToDB");
             return false;
         }
     }
     
-    public void loadFromDB(Connection conn, String orgCode, OrgSettings db) {
+    public void loadFromDB(Connection dbConnection, String orgCode, OrgSettings db) {
         clear();
         try {
-            if (conn != null) {
-                conn.setAutoCommit(false);
-                int parNr = 1;
-                if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    parNr++;
-                }
-                CallableStatement cs = DBConnection.getStatementForResultSet("Get_DhlCapability", 1, db, conn);
-                cs.setString(parNr++, orgCode);
-                ResultSet rs = DBConnection.getResultSet(cs, db, 1);
-                if (rs.next()) {
-                    m_orgCode = rs.getString("org_code");
-                    m_orgName = rs.getString("org_name");
-                    m_isDhlCapable = (rs.getInt("dhl_capable") ==  1);
-                    m_isDhlDirectCapable = (rs.getInt("dhl_direct_capable") == 1);
-                    m_dhlDirectProducerName = rs.getString("dhl_direct_producer_name");
-                    m_dhlDirectServiceUrl = rs.getString("dhl_direct_service_url");
-                    m_parentOrgCode = rs.getString("parent_org_code");
-                }
-                rs.close();
-                cs.close();
+            if (dbConnection != null) {
+            	boolean defaultAutoCommit = dbConnection.getAutoCommit();
+        		try {
+	            	dbConnection.setAutoCommit(false);
+	                int parNr = 1;
+	                if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
+	                    parNr++;
+	                }
+	                CallableStatement cs = DBConnection.getStatementForResultSet("Get_DhlCapability", 1, db, dbConnection);
+	                cs.setString(parNr++, orgCode);
+	                ResultSet rs = DBConnection.getResultSet(cs, db, 1);
+	                if (rs.next()) {
+	                    m_orgCode = rs.getString("org_code");
+	                    m_orgName = rs.getString("org_name");
+	                    m_isDhlCapable = (rs.getInt("dhl_capable") ==  1);
+	                    m_isDhlDirectCapable = (rs.getInt("dhl_direct_capable") == 1);
+	                    m_dhlDirectProducerName = rs.getString("dhl_direct_producer_name");
+	                    m_dhlDirectServiceUrl = rs.getString("dhl_direct_service_url");
+	                    m_parentOrgCode = rs.getString("parent_org_code");
+	                }
+	                rs.close();
+	                cs.close();
+        		} finally {
+        			dbConnection.setAutoCommit(defaultAutoCommit);
+        		}
             }
         } catch (Exception ex) {
             CommonMethods.logError(ex, "clnt.businesslayer.DhlCapability", "loadFromDB");
         }
     }
 
-    // V�ljastab k�ikide erinevate DVK serverite seadete kollektsiooni 
-    public static ArrayList<DhlCapability> getList(OrgSettings db) {
+    /**
+     * Returns list of all known organizations
+     */
+    public static ArrayList<DhlCapability> getList(OrgSettings db, Connection dbConnection) {
         try {
-            Connection conn = DBConnection.getConnection(db);
-            if (conn != null) {
-                conn.setAutoCommit(false);
-                CallableStatement cs = DBConnection.getStatementForResultSet("Get_DhlCapabilityList", 0, db, conn);
-                ResultSet rs = DBConnection.getResultSet(cs, db, 0);
-                ArrayList<DhlCapability> result = new ArrayList<DhlCapability>();
-                while (rs.next()) {
-                    DhlCapability item = new DhlCapability();
-                    item.setOrgCode(rs.getString("org_code"));
-                    item.setOrgName(rs.getString("org_name"));
-                    item.setIsDhlCapable(rs.getInt("dhl_capable") == 1);
-                    item.setIsDhlDirectCapable(rs.getInt("dhl_direct_capable") == 1);
-                    item.setDhlDirectProducerName(rs.getString("dhl_direct_producer_name"));
-                    item.setDhlDirectServiceUrl(rs.getString("dhl_direct_service_url")); 
-                    item.setParentOrgCode(rs.getString("parent_org_code"));
-                    result.add(item);
-                }
-                rs.close();
-                cs.close();
-                conn.close();
+            if (dbConnection != null) {
+            	ArrayList<DhlCapability> result = new ArrayList<DhlCapability>();
+            	boolean defaultAutoCommit = dbConnection.getAutoCommit();
+        		try {
+	            	dbConnection.setAutoCommit(false);
+	                CallableStatement cs = DBConnection.getStatementForResultSet("Get_DhlCapabilityList", 0, db, dbConnection);
+	                ResultSet rs = DBConnection.getResultSet(cs, db, 0);
+	                while (rs.next()) {
+	                    DhlCapability item = new DhlCapability();
+	                    item.setOrgCode(rs.getString("org_code"));
+	                    item.setOrgName(rs.getString("org_name"));
+	                    item.setIsDhlCapable(rs.getInt("dhl_capable") == 1);
+	                    item.setIsDhlDirectCapable(rs.getInt("dhl_direct_capable") == 1);
+	                    item.setDhlDirectProducerName(rs.getString("dhl_direct_producer_name"));
+	                    item.setDhlDirectServiceUrl(rs.getString("dhl_direct_service_url")); 
+	                    item.setParentOrgCode(rs.getString("parent_org_code"));
+	                    result.add(item);
+	                }
+	                rs.close();
+	                cs.close();
+        		} finally {
+        			dbConnection.setAutoCommit(defaultAutoCommit);
+        		}
                 return result;
             } else {
                 return null;
@@ -214,34 +228,38 @@ public class DhlCapability {
         }
     }
     
-    // V�ljastab etteantud s�numi saajate erinevate DVK serverite seadete kollektsiooni
-    public static ArrayList<DhlCapability> getListByMessageID(int messageID, OrgSettings db) {
+    /**
+     * Returns list of all organizations related to given DEC message
+     */
+    public static ArrayList<DhlCapability> getListByMessageID(int messageID, OrgSettings db, Connection dbConnection) {
         try {
-            Connection conn = DBConnection.getConnection(db);
-            if (conn != null) {
-                conn.setAutoCommit(false);
-                int parNr = 1;
-                if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    parNr++;
-                }
-                CallableStatement cs = DBConnection.getStatementForResultSet("Get_DhlCapabilityByMessageID", 1, db, conn);
-                cs.setInt(parNr++, messageID);
-                ResultSet rs = DBConnection.getResultSet(cs, db, 1);
-                ArrayList<DhlCapability> result = new ArrayList<DhlCapability>();
-                
-                // Siin on oluline, et ei loetaks muid andmeid peale
-                // erinevate DVK-v�imekuse kombinatsioonide.
-                while (rs.next()) {
-                    DhlCapability item = new DhlCapability();
-                    item.setIsDhlCapable((rs.getInt("dhl_capable") == 1));
-                    item.setIsDhlDirectCapable((rs.getInt("dhl_direct_capable") == 1));
-                    item.setDhlDirectProducerName(rs.getString("dhl_direct_producer_name"));
-                    item.setDhlDirectServiceUrl(rs.getString("dhl_direct_service_url"));
-                    result.add(item);
-                }
-                rs.close();
-                cs.close();
-                conn.close();
+            if (dbConnection != null) {
+            	ArrayList<DhlCapability> result = new ArrayList<DhlCapability>();
+            	boolean defaultAutoCommit = dbConnection.getAutoCommit();
+        		try {
+	            	dbConnection.setAutoCommit(false);
+	                int parNr = 1;
+	                if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
+	                    parNr++;
+	                }
+	                CallableStatement cs = DBConnection.getStatementForResultSet("Get_DhlCapabilityByMessageID", 1, db, dbConnection);
+	                cs.setInt(parNr++, messageID);
+	                ResultSet rs = DBConnection.getResultSet(cs, db, 1);
+	                
+	                // It is necessary to read here only all different combinations of DEC capability
+	                while (rs.next()) {
+	                    DhlCapability item = new DhlCapability();
+	                    item.setIsDhlCapable((rs.getInt("dhl_capable") == 1));
+	                    item.setIsDhlDirectCapable((rs.getInt("dhl_direct_capable") == 1));
+	                    item.setDhlDirectProducerName(rs.getString("dhl_direct_producer_name"));
+	                    item.setDhlDirectServiceUrl(rs.getString("dhl_direct_service_url"));
+	                    result.add(item);
+	                }
+	                rs.close();
+	                cs.close();
+        		} finally {
+        			dbConnection.setAutoCommit(defaultAutoCommit);
+        		}
                 return result;
             } else {
                 return null;
@@ -252,31 +270,37 @@ public class DhlCapability {
         }
     }
     
-    // V�ljastab organisatsioonide koodide kollektsiooni, kes on sama serveri k�ljes
-    public static ArrayList<String> getOrgsByCapability(DhlCapability dcap, OrgSettings db) {
+    /**
+     * Returns list of all organizations that are using the same DEC server
+     */
+    public static ArrayList<String> getOrgsByCapability(DhlCapability dcap, OrgSettings db, Connection dbConnection) {
         try {
-            Connection conn = DBConnection.getConnection(db);
-            if (conn != null) {
-                conn.setAutoCommit(false);
-                int parNr = 1;
-                if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    parNr++;
-                }
-                CallableStatement cs = DBConnection.getStatementForResultSet("Get_DhlOrgsByCapability", 4, db, conn);
-                
-                cs.setInt(parNr++, (dcap.getIsDhlCapable() ? 1 : 0));
-                cs.setInt(parNr++, (dcap.getIsDhlDirectCapable() ? 1 : 0));
-                cs.setString(parNr++, dcap.getDhlDirectProducerName());
-                cs.setString(parNr++, dcap.getDhlDirectServiceUrl());
-                
-                ResultSet rs = DBConnection.getResultSet(cs, db, 4);
-                ArrayList<String> result = new ArrayList<String>();
-                while (rs.next()) {
-                    result.add(rs.getString("org_code"));
-                }
-                rs.close();
-                cs.close();
-                conn.close();
+            if (dbConnection != null) {
+            	ArrayList<String> result = new ArrayList<String>();
+            	boolean defaultAutoCommit = dbConnection.getAutoCommit();
+        		try {
+	            	dbConnection.setAutoCommit(false);
+	                int parNr = 1;
+	                if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
+	                    parNr++;
+	                }
+	                CallableStatement cs = DBConnection.getStatementForResultSet("Get_DhlOrgsByCapability", 4, db, dbConnection);
+	                
+	                cs.setInt(parNr++, (dcap.getIsDhlCapable() ? 1 : 0));
+	                cs.setInt(parNr++, (dcap.getIsDhlDirectCapable() ? 1 : 0));
+	                cs.setString(parNr++, dcap.getDhlDirectProducerName());
+	                cs.setString(parNr++, dcap.getDhlDirectServiceUrl());
+	                
+	                ResultSet rs = DBConnection.getResultSet(cs, db, 4);
+	                
+	                while (rs.next()) {
+	                    result.add(rs.getString("org_code"));
+	                }
+	                rs.close();
+	                cs.close();
+        		} finally {
+        			dbConnection.setAutoCommit(defaultAutoCommit);
+        		}
                 return result;
             } else {
                 return null;
@@ -287,17 +311,18 @@ public class DhlCapability {
         }
     }
     
-    // Uuendada iga saaja (asutuste l�ikes) puhul DHL_ID v��rtust
-    public boolean updateDhlID(DhlMessage msg, OrgSettings db, int dhlID) {        
+    /**
+     * Updates DEC document ID value in every recipient record
+     */
+    public boolean updateDhlID(DhlMessage msg, OrgSettings db, int dhlID, Connection dbConnection) {        
         try {
-            //m_dhlID = dhlID;
-           // logger.info("Update_DhlMessageRecipientDhlID "+ msg.getDhlID());
-            Connection conn = DBConnection.getConnection(db);
-            if (conn != null) {
-                CallableStatement cs = conn.prepareCall("{call Update_DhlMessageRecipDhlID(?,?,?,?,?,?)}");
+            // m_dhlID = dhlID;
+            // logger.info("Update_DhlMessageRecipientDhlID "+ msg.getDhlID());
+            if (dbConnection != null) {
+                CallableStatement cs = dbConnection.prepareCall("{call Update_DhlMessageRecipDhlID(?,?,?,?,?,?)}");
                 int parNr = 1;
                 if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    cs = conn.prepareCall("{? = call \"Update_DhlMessageRecipDhlID\"(?,?,?,?,?,?)}");
+                    cs = dbConnection.prepareCall("{? = call \"Update_DhlMessageRecipDhlID\"(?,?,?,?,?,?)}");
                     cs.registerOutParameter(parNr++, Types.BOOLEAN);
                 }
 
@@ -309,7 +334,6 @@ public class DhlCapability {
                 cs.setString(parNr++, msg.getQueryID());
                 cs.execute();
                 cs.close();
-                conn.close();
                 return true;
             } 
         } catch (Exception ex) {

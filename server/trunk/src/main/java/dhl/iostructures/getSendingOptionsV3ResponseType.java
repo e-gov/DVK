@@ -11,6 +11,8 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPBodyElement;
 import javax.xml.soap.SOAPElement;
@@ -45,7 +47,7 @@ public class getSendingOptionsV3ResponseType implements SOAPOutputBodyRepresenta
             SOAPElement elParing = element.addChildElement(se.createName("paring"));
             elParing.addTextNode(this.dataMd5Hash);
             
-            // Sõnumi keha osa
+            // X-road "keha" part in SOAP message
             SOAPElement elKeha = element.addChildElement(se.createName("keha"));
             elKeha.addAttribute(se.createName("href"), "cid:" + kehaHref);
         } catch (Exception ex) {
@@ -54,9 +56,9 @@ public class getSendingOptionsV3ResponseType implements SOAPOutputBodyRepresenta
     }
     
     public void createResponseFile(
-    	ArrayList<Asutus> organizationList,
-    	ArrayList<Allyksus> subdivisionList,
-    	ArrayList<Ametikoht> occupationList,
+    	List<Asutus> organizationList,
+    	List<Allyksus> subdivisionList,
+    	List<Ametikoht> occupationList,
     	String orgCode) throws Exception {
     
     	String xmlFile = CommonMethods.createPipelineFile(0);

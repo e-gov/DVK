@@ -6,7 +6,9 @@
   <name>dvk-core</name>
   <version>1.6.1</version>
   
-  
+  <properties>
+  	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
   
   <dependencies>
 	  <dependency>

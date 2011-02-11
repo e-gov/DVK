@@ -22,14 +22,14 @@ public class CommonStructures {
     public static final String DhlNamespaceV2 = "http://www.riik.ee/schemas/dhl/2010/2"; 
     
     // Veateadete tekstid
-    public static final String VIGA_XTEE_PAISED_PUUDU = "Esitatud sõnumil puuduvad vajalikud X-Tee p�ised!";
+    public static final String VIGA_XTEE_PAISED_PUUDU = "Esitatud sõnumil puuduvad vajalikud X-Tee päised!";
     public static final String VIGA_XTEE_ASUTUSE_PAIS_PUUDU = "Esitatud sõnumi X-Tee päised ei sisalda informatsiooni sõnumi saatnud asutuse kohta!";
     public static final String VIGA_XTEE_ISIKU_PAIS_PUUDU = "Esitatud sõnumi X-Tee päised ei sisalda informatsiooni sõnumi saatnud isiku kohta!";
     public static final String VIGA_TUNDMATU_ASUTUS = "Esitatud sõnumi saatjaks märgitud asutus (#1) ei kuulu DVK-d kasutavate asutuste hulka!";
     public static final String VIGA_TUNDMATU_ISIK = "Esitatud sõnumi saatjaks märgitud isik ei kuulu DVK-s registreeritud isikute hulka!";
     public static final String VIGA_PUUDUV_MIME_LISA = "Viga MIME lisade töötlemisel! Sõnumi kehas märgitud ID-le vastavat MIME lisa ei õnnestunud leida!";
     public static final String VIGA_VIGANE_MIME_LISA = "Sonumi lisas edastatud andmed on vigase XML struktuuriga!";
-    public static final String VIGA_VIGANE_KEHA = "Viga s�numi keha töötlemisel!";
+    public static final String VIGA_VIGANE_KEHA = "Viga sõnumi keha töötlemisel!";
     public static final String VIGA_SAADETUD_DOKUMENDI_SALVESTAMISEL = "DVK serveri tarkvaraline viga! Saadetud dokumenti ei õnnestunud salvestada!";
     public static final String VIGA_SAADETUD_DOKUMENDI_TOOTLEMISEL = "Viga saadetud dokumendi andmete töötlemisel! Palume kontrollida, et saadetud dokument vastaks kokkulepitud struktuurile!";
     public static final String VIGA_PUUDUV_TAG = "Puuduv kohustuslik XML-tag: #1";
@@ -38,7 +38,7 @@ public class CommonStructures {
     public static final String VIGA_AADRESSANDMED_PUUDU = "Viga saadetud sõnumi andmetes! Dokumendi saatja ja saajate andmed on puudu!";
     public static final String VIGA_VALE_ARV_SAATJAID = "Viga saadetud sõnumi andmetes! Kui transpordi plokk on täidetud, siis peab dokumendi olema täpselt üks saatja!";
     public static final String VIGA_VALE_ARV_VASTUVOTJAID = "Viga saadetud sõnumi andmetes! Kui transpordi plokk on täidetud, siis peab dokumendi olema vähemalt üks saaja!";
-    public static final String VIGA_AMETIKOHATA_ISIK = "Esitatud s�numi saatjaks märgitud isik ei täida oma asutuses ühtegi ametikohta!";
+    public static final String VIGA_AMETIKOHATA_ISIK = "Esitatud sõnumi saatjaks märgitud isik ei täida oma asutuses ühtegi ametikohta!";
     public static final String VIGA_TUNDMATU_SAATJA_ASUTUS = "Dokumendi saatjaks märgitud asutus (#1) ei kuulu DVK-d kasutavate asutuste hulka!";
     public static final String VIGA_TUNDMATU_VAHENDAJA_ASUTUS = "Dokumendi vahendajaks märgitud asutus (#1) ei kuulu DVK-d kasutavate asutuste hulka!";
     public static final String VIGA_SAATJA_ASUTUSED_ERINEVAD = "X-Tee kaudu dokumendi saatnud asutus erineb dokumendi sisus saatjaks m�rgitud asutusest!";

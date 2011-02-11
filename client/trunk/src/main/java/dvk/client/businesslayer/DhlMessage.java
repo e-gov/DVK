@@ -73,7 +73,7 @@ public class DhlMessage implements Cloneable {
     private boolean m_statusUpdateNeeded;
     private String m_metaXML;    
     private String m_queryID; // X-tee põringu põise ID
-    private ArrayList<MessageRecipient> m_recipients; // s�numi saajad
+    private ArrayList<MessageRecipient> m_recipients; // sõnumi saajad
     private String m_recipientDepartmentNr;
     private String m_recipientDepartmentName;
     private String m_recipientEmail;
@@ -461,13 +461,49 @@ public class DhlMessage implements Cloneable {
         this.m_deliveryChannel = value;
     }
     
+    public static String generateGUID() {
+    	return java.util.UUID.randomUUID().toString();
+    }
+
+	public String getRecipientPositionShortName() {
+		return m_recipientPositionShortName;
+	}
+
+	public void setRecipientPositionShortName(String positionShortName) {
+		m_recipientPositionShortName = positionShortName;
+	}
+
+	public String getRecipientDivisionShortName() {
+		return m_recipientDivisionShortName;
+	}
+
+	public void setRecipientDivisionShortName(String divisionShortName) {
+		m_recipientDivisionShortName = divisionShortName;
+	}
+
+	public boolean isFyi() {
+		return m_fyi;
+	}
+
+	public void setFyi(boolean fyi) {
+		this.m_fyi = fyi;
+	}
+
+	public int getContainerVersion() {
+		return m_containerVersion;
+	}
+
+	public void setContainerVersion(int version) {
+		m_containerVersion = version;
+	}
+    
     public DhlMessage() {
         clear();
     }
     
-    public DhlMessage(int id, boolean metadataOnly, OrgSettings db) throws Exception {
+    public DhlMessage(int id, boolean metadataOnly, OrgSettings db, Connection dbConnection) throws Exception {
         clear();
-        this.getByID(id, metadataOnly, db);
+        this.getByID(id, metadataOnly, db, dbConnection);
     }
 
     public DhlMessage(String dataFilePath, UnitCredential unit) throws Exception {
@@ -522,108 +558,111 @@ public class DhlMessage implements Cloneable {
         m_deliveryChannel = new DeliveryChannel();
     }
 
-    public void getByID(int id, boolean metadataOnly, OrgSettings db) throws Exception {
+    public void getByID(int id, boolean metadataOnly, OrgSettings db, Connection dbConnection) throws Exception {
         try {
-            Connection conn = DBConnection.getConnection(db);
-            if (conn != null) {
-                conn.setAutoCommit(false);
-                Calendar cal = Calendar.getInstance();
-                int parNr = 1;
-                if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    parNr++;
-                }
-                CallableStatement cs = DBConnection.getStatementForResultSet("Get_DhlMessageByID", 3, db, conn);
-                cs.setInt(parNr++, id);
-                cs.setInt(parNr++, (metadataOnly ? 1 : 0));
-                
-                ResultSet rs = DBConnection.getResultSet(cs, db, 2);
-                while (rs.next()) {
-                    this.setId(rs.getInt("dhl_message_id"));
-                    this.setIsIncoming(rs.getBoolean("is_incoming"));                    
-                    
-                    if (!metadataOnly) {
-                    	String itemDataFile = CommonMethods.createPipelineFile(0);
-                    	this.setFilePath(itemDataFile);
-                    	
-                    	if (CommonStructures.PROVIDER_TYPE_POSTGRE.equalsIgnoreCase(db.getDbProvider())
-                        	|| CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
-                    		byte[] containerData = rs.getString("data").getBytes("UTF-8");
-                    		logger.debug("Container data was read from database. Container size: " + containerData.length + " bytes.");
-                    		CommonMethods.writeToFile(itemDataFile, containerData);
-                    	} else {
-	                        Clob tmpBlob = rs.getClob("data");
-	                        Reader r = tmpBlob.getCharacterStream();
-	                        FileOutputStream fos = new FileOutputStream(itemDataFile);
-	                        OutputStreamWriter out = new OutputStreamWriter(fos, "UTF-8");
-	                        try {
-		                        long totalSize = 0;
-		                        int actualReadLength = 0;
-	                            char[] charbuf = new char[Settings.getDBBufferSize()];
-	                            while ((actualReadLength = r.read(charbuf)) > 0) {
-	                                out.write(charbuf, 0, actualReadLength);
-	                                totalSize += actualReadLength;
-	                            }
-	                            logger.debug("Container data was read from database. Container size: " + totalSize + " characters.");
-	                        } catch (Exception e) {
-	                            CommonMethods.logError(e, "dhl.Document", "getDocumentsSentTo");
-	                            throw e;
-	                        } finally {
-	                            out.flush();
-	                            out.close();
-	                        }
-                    	}
-                    }
-                    
-                    this.setTitle(rs.getString("title"));
-                    this.setSenderOrgCode(rs.getString("sender_org_code"));
-                    this.setSenderOrgName(rs.getString("sender_org_name"));
-                    this.setSenderPersonCode(rs.getString("sender_person_code"));
-                    this.setSenderName(rs.getString("sender_name"));
-                    this.setProxyOrgCode(rs.getString("proxy_org_code"));
-                    this.setProxyOrgName(rs.getString("proxy_org_name"));
-                    this.setProxyPersonCode(rs.getString("proxy_person_code"));
-                    this.setProxyName(rs.getString("proxy_name"));
-                    this.setRecipientOrgCode(rs.getString("recipient_org_code"));
-                    this.setRecipientOrgName(rs.getString("recipient_org_name"));
-                    this.setRecipientPersonCode(rs.getString("recipient_person_code"));
-                    this.setRecipientName(rs.getString("recipient_name"));
-                    this.setCaseName(rs.getString("case_name"));
-                    this.setDhlFolderName(rs.getString("dhl_folder_name"));
-                    this.setSendingStatusID(rs.getInt("sending_status_id"));
-                    this.setUnitID(rs.getInt("unit_id"));
-                    this.setDhlID(rs.getInt("dhl_id"));
-                    this.setSendingDate(rs.getDate("sending_date", cal));
-                    this.setReceivedDate(rs.getDate("received_date", cal));
-                    this.setLocalItemID(rs.getInt("local_item_id"));
-                    this.setRecipientStatusID(rs.getInt("recipient_status_id"));
-                    this.setFaultCode(rs.getString("fault_code"));
-                    this.setFaultActor(rs.getString("fault_actor"));
-                    this.setFaultString(rs.getString("fault_string"));
-                    this.setFaultDetail(rs.getString("fault_detail"));
-                    this.setStatusUpdateNeeded(rs.getBoolean("status_update_needed"));
-                    this.setMetaXML(rs.getString("metaxml"));
-                    this.setQueryID(rs.getString("query_id"));
-                    this.setRecipientDepartmentNr(rs.getString("recipient_department_nr"));
-                    this.setRecipientDepartmentName(rs.getString("recipient_department_name"));
-                    this.setRecipientEmail(rs.getString("recipient_email"));
-                    this.setRecipientDivisionID(rs.getInt("recipient_division_id"));
-                    this.setRecipientDivisionName(rs.getString("recipient_division_name"));
-                    this.setRecipientPositionID(rs.getInt("recipient_position_id"));
-                    this.setRecipientPositionName(rs.getString("recipient_position_name"));
-                    this.setRecipientDivisionCode(rs.getString("recipient_division_code"));
-                    this.setRecipientPositionCode(rs.getString("recipient_position_code"));
-                    this.setDhlGuid(rs.getString("dhl_guid"));
-                }
-                rs.close();
-                cs.close();
-                conn.close();
+            if (dbConnection != null) {
+            	boolean defaultAutoCommit = dbConnection.getAutoCommit();
+        		try {
+	            	dbConnection.setAutoCommit(false);
+	                Calendar cal = Calendar.getInstance();
+	                int parNr = 1;
+	                if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
+	                    parNr++;
+	                }
+	                CallableStatement cs = DBConnection.getStatementForResultSet("Get_DhlMessageByID", 3, db, dbConnection);
+	                cs.setInt(parNr++, id);
+	                cs.setInt(parNr++, (metadataOnly ? 1 : 0));
+	                
+	                ResultSet rs = DBConnection.getResultSet(cs, db, 2);
+	                while (rs.next()) {
+	                    this.setId(rs.getInt("dhl_message_id"));
+	                    this.setIsIncoming(rs.getBoolean("is_incoming"));                    
+	                    
+	                    if (!metadataOnly) {
+	                    	String itemDataFile = CommonMethods.createPipelineFile(0);
+	                    	this.setFilePath(itemDataFile);
+	                    	
+	                    	if (CommonStructures.PROVIDER_TYPE_POSTGRE.equalsIgnoreCase(db.getDbProvider())
+	                        	|| CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+	                    		byte[] containerData = rs.getString("data").getBytes("UTF-8");
+	                    		logger.debug("Container data was read from database. Container size: " + containerData.length + " bytes.");
+	                    		CommonMethods.writeToFile(itemDataFile, containerData);
+	                    	} else {
+		                        Clob tmpBlob = rs.getClob("data");
+		                        Reader r = tmpBlob.getCharacterStream();
+		                        FileOutputStream fos = new FileOutputStream(itemDataFile);
+		                        OutputStreamWriter out = new OutputStreamWriter(fos, "UTF-8");
+		                        try {
+			                        long totalSize = 0;
+			                        int actualReadLength = 0;
+		                            char[] charbuf = new char[Settings.getDBBufferSize()];
+		                            while ((actualReadLength = r.read(charbuf)) > 0) {
+		                                out.write(charbuf, 0, actualReadLength);
+		                                totalSize += actualReadLength;
+		                            }
+		                            logger.debug("Container data was read from database. Container size: " + totalSize + " characters.");
+		                        } catch (Exception e) {
+		                            CommonMethods.logError(e, "dhl.Document", "getDocumentsSentTo");
+		                            throw e;
+		                        } finally {
+		                            out.flush();
+		                            out.close();
+		                        }
+	                    	}
+	                    }
+	                    
+	                    this.setTitle(rs.getString("title"));
+	                    this.setSenderOrgCode(rs.getString("sender_org_code"));
+	                    this.setSenderOrgName(rs.getString("sender_org_name"));
+	                    this.setSenderPersonCode(rs.getString("sender_person_code"));
+	                    this.setSenderName(rs.getString("sender_name"));
+	                    this.setProxyOrgCode(rs.getString("proxy_org_code"));
+	                    this.setProxyOrgName(rs.getString("proxy_org_name"));
+	                    this.setProxyPersonCode(rs.getString("proxy_person_code"));
+	                    this.setProxyName(rs.getString("proxy_name"));
+	                    this.setRecipientOrgCode(rs.getString("recipient_org_code"));
+	                    this.setRecipientOrgName(rs.getString("recipient_org_name"));
+	                    this.setRecipientPersonCode(rs.getString("recipient_person_code"));
+	                    this.setRecipientName(rs.getString("recipient_name"));
+	                    this.setCaseName(rs.getString("case_name"));
+	                    this.setDhlFolderName(rs.getString("dhl_folder_name"));
+	                    this.setSendingStatusID(rs.getInt("sending_status_id"));
+	                    this.setUnitID(rs.getInt("unit_id"));
+	                    this.setDhlID(rs.getInt("dhl_id"));
+	                    this.setSendingDate(rs.getDate("sending_date", cal));
+	                    this.setReceivedDate(rs.getDate("received_date", cal));
+	                    this.setLocalItemID(rs.getInt("local_item_id"));
+	                    this.setRecipientStatusID(rs.getInt("recipient_status_id"));
+	                    this.setFaultCode(rs.getString("fault_code"));
+	                    this.setFaultActor(rs.getString("fault_actor"));
+	                    this.setFaultString(rs.getString("fault_string"));
+	                    this.setFaultDetail(rs.getString("fault_detail"));
+	                    this.setStatusUpdateNeeded(rs.getBoolean("status_update_needed"));
+	                    this.setMetaXML(rs.getString("metaxml"));
+	                    this.setQueryID(rs.getString("query_id"));
+	                    this.setRecipientDepartmentNr(rs.getString("recipient_department_nr"));
+	                    this.setRecipientDepartmentName(rs.getString("recipient_department_name"));
+	                    this.setRecipientEmail(rs.getString("recipient_email"));
+	                    this.setRecipientDivisionID(rs.getInt("recipient_division_id"));
+	                    this.setRecipientDivisionName(rs.getString("recipient_division_name"));
+	                    this.setRecipientPositionID(rs.getInt("recipient_position_id"));
+	                    this.setRecipientPositionName(rs.getString("recipient_position_name"));
+	                    this.setRecipientDivisionCode(rs.getString("recipient_division_code"));
+	                    this.setRecipientPositionCode(rs.getString("recipient_position_code"));
+	                    this.setDhlGuid(rs.getString("dhl_guid"));
+	                }
+	                rs.close();
+	                cs.close();
+        		} finally {
+        			dbConnection.setAutoCommit(defaultAutoCommit);
+        		}
             }
         } catch (Exception ex) {
             CommonMethods.logError(ex, this.getClass().getName(), "getByID");
         }
     }
     
-    public static ArrayList<DhlMessage> getList(boolean incoming, int statusID, int unitID, boolean statusUpdateNeeded, boolean metadataOnly, OrgSettings db) {
+    public static ArrayList<DhlMessage> getList(boolean incoming, int statusID, int unitID, boolean statusUpdateNeeded, boolean metadataOnly, OrgSettings db, Connection dbConnection) {
         
     	logger.debug("Getting messageList...");
     	logger.debug("incoming: " + incoming);
@@ -633,110 +672,113 @@ public class DhlMessage implements Cloneable {
     	logger.debug("metadataOnly: " + metadataOnly);
 		
 		try {
-            Connection conn = DBConnection.getConnection(db);
-            if (conn != null) {
-                conn.setAutoCommit(false);
-                Calendar cal = Calendar.getInstance();
-                int parNr = 1;
-                if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    parNr++;
-                }
-                CallableStatement cs = DBConnection.getStatementForResultSet("Get_DhlMessages", 5, db, conn);
-                cs.setInt(parNr++, (incoming ? 1 : 0));
-                if (statusID == 0) {
-                    cs.setNull(parNr++, Types.INTEGER);
-                } else {
-                    cs.setInt(parNr++, statusID);
-                }
-                cs.setInt(parNr++, unitID);
-                cs.setInt(parNr++, (statusUpdateNeeded ? 1 : 0));
-                cs.setInt(parNr++, (metadataOnly ? 1 : 0));
-                ResultSet rs = DBConnection.getResultSet(cs, db, 5);
-                ArrayList<DhlMessage> result = new ArrayList<DhlMessage>();
-                int docCounter = 0;
-                while (rs.next()) {
-                    ++docCounter;
-                    DhlMessage item = new DhlMessage();
-                    
-                    if (!metadataOnly){
-                        String itemDataFile = CommonMethods.createPipelineFile(docCounter);
-                        item.setFilePath(itemDataFile);
-                    	
-                    	if (CommonStructures.PROVIDER_TYPE_POSTGRE.equalsIgnoreCase(db.getDbProvider())
-                    		|| CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
-                    		byte[] containerData = rs.getString("data").getBytes("UTF-8");
-                    		logger.debug("Container data was read from database. Container size: " + containerData.length + " bytes.");
-                    		CommonMethods.writeToFile(itemDataFile, containerData);
-                    	} else {
-	                        Clob tmpBlob = rs.getClob("data");
-	                        Reader r = tmpBlob.getCharacterStream();
-	                        FileOutputStream fos = new FileOutputStream(itemDataFile);
-	                        OutputStreamWriter out = new OutputStreamWriter(fos, "UTF-8");
-	                        try {
-		                        long totalSize = 0;
-		                        int actualReadLength = 0;
-	                            char[] charbuf = new char[Settings.getDBBufferSize()];
-	                            while ((actualReadLength = r.read(charbuf)) > 0) {
-	                                out.write(charbuf, 0, actualReadLength);
-	                                totalSize += actualReadLength;
-	                            }
-	                            logger.debug("Container data was read from database. Container size: " + totalSize + " characters.");
-	                        } catch (Exception e) {
-	                            CommonMethods.logError(e, "dvk.client.businesslayer.DhlMessage", "getList");
-	                            throw e;
-	                        } finally {
-	                            out.flush();
-	                            out.close();
-	                        }
-                    	}
-                    }
-                    
-                    item.setId(rs.getInt("dhl_message_id"));
-                    item.setDhlID(rs.getInt("dhl_id"));
-                    item.setIsIncoming(rs.getBoolean("is_incoming"));                        
-                    item.setTitle(rs.getString("title"));
-                    item.setSenderOrgCode(rs.getString("sender_org_code"));
-                    item.setSenderOrgName(rs.getString("sender_org_name"));
-                    item.setSenderPersonCode(rs.getString("sender_person_code"));
-                    item.setSenderName(rs.getString("sender_name"));
-                    item.setProxyOrgCode(rs.getString("proxy_org_code"));
-                    item.setProxyOrgName(rs.getString("proxy_org_name"));
-                    item.setProxyPersonCode(rs.getString("proxy_person_code"));
-                    item.setProxyName(rs.getString("proxy_name"));
-                    item.setRecipientOrgCode(rs.getString("recipient_org_code"));
-                    item.setRecipientOrgName(rs.getString("recipient_org_name"));
-                    item.setRecipientPersonCode(rs.getString("recipient_person_code"));
-                    item.setRecipientName(rs.getString("recipient_name"));
-                    item.setCaseName(rs.getString("case_name"));
-                    item.setDhlFolderName(rs.getString("dhl_folder_name"));
-                    item.setSendingStatusID(rs.getInt("sending_status_id"));
-                    item.setUnitID(rs.getInt("unit_id"));
-                    item.setSendingDate(rs.getDate("sending_date", cal));
-                    item.setReceivedDate(rs.getDate("received_date", cal));
-                    item.setLocalItemID(rs.getInt("local_item_id"));
-                    item.setRecipientStatusID(rs.getInt("recipient_status_id"));
-                    item.setFaultCode(rs.getString("fault_code"));
-                    item.setFaultActor(rs.getString("fault_actor"));
-                    item.setFaultString(rs.getString("fault_string"));
-                    item.setFaultDetail(rs.getString("fault_detail"));
-                    item.setStatusUpdateNeeded(rs.getBoolean("status_update_needed"));
-                    item.setMetaXML(rs.getString("metaxml"));
-                    item.setQueryID(rs.getString("query_id"));
-                    item.setRecipientDepartmentNr(rs.getString("recipient_department_nr"));
-                    item.setRecipientDepartmentName(rs.getString("recipient_department_name"));
-                    item.setRecipientEmail(rs.getString("recipient_email"));
-                    item.setRecipientDivisionID(rs.getInt("recipient_division_id"));
-                    item.setRecipientDivisionName(rs.getString("recipient_division_name"));
-                    item.setRecipientPositionID(rs.getInt("recipient_position_id"));
-                    item.setRecipientPositionName(rs.getString("recipient_position_name"));
-                    item.setRecipientDivisionCode(rs.getString("recipient_division_code"));
-                    item.setRecipientPositionCode(rs.getString("recipient_position_code"));
-                    item.setDhlGuid(rs.getString("dhl_guid"));
-                    result.add(item);
-                }
-                rs.close();
-                cs.close();
-                conn.close();
+            if (dbConnection != null) {
+            	ArrayList<DhlMessage> result = new ArrayList<DhlMessage>();
+            	boolean defaultAutoCommit = dbConnection.getAutoCommit();
+        		try {
+	            	dbConnection.setAutoCommit(false);
+	                Calendar cal = Calendar.getInstance();
+	                int parNr = 1;
+	                if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
+	                    parNr++;
+	                }
+	                CallableStatement cs = DBConnection.getStatementForResultSet("Get_DhlMessages", 5, db, dbConnection);
+	                cs.setInt(parNr++, (incoming ? 1 : 0));
+	                if (statusID == 0) {
+	                    cs.setNull(parNr++, Types.INTEGER);
+	                } else {
+	                    cs.setInt(parNr++, statusID);
+	                }
+	                cs.setInt(parNr++, unitID);
+	                cs.setInt(parNr++, (statusUpdateNeeded ? 1 : 0));
+	                cs.setInt(parNr++, (metadataOnly ? 1 : 0));
+	                ResultSet rs = DBConnection.getResultSet(cs, db, 5);
+	                int docCounter = 0;
+	                while (rs.next()) {
+	                    ++docCounter;
+	                    DhlMessage item = new DhlMessage();
+	                    
+	                    if (!metadataOnly){
+	                        String itemDataFile = CommonMethods.createPipelineFile(docCounter);
+	                        item.setFilePath(itemDataFile);
+	                    	
+	                    	if (CommonStructures.PROVIDER_TYPE_POSTGRE.equalsIgnoreCase(db.getDbProvider())
+	                    		|| CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+	                    		byte[] containerData = rs.getString("data").getBytes("UTF-8");
+	                    		logger.debug("Container data was read from database. Container size: " + containerData.length + " bytes.");
+	                    		CommonMethods.writeToFile(itemDataFile, containerData);
+	                    	} else {
+		                        Clob tmpBlob = rs.getClob("data");
+		                        Reader r = tmpBlob.getCharacterStream();
+		                        FileOutputStream fos = new FileOutputStream(itemDataFile);
+		                        OutputStreamWriter out = new OutputStreamWriter(fos, "UTF-8");
+		                        try {
+			                        long totalSize = 0;
+			                        int actualReadLength = 0;
+		                            char[] charbuf = new char[Settings.getDBBufferSize()];
+		                            while ((actualReadLength = r.read(charbuf)) > 0) {
+		                                out.write(charbuf, 0, actualReadLength);
+		                                totalSize += actualReadLength;
+		                            }
+		                            logger.debug("Container data was read from database. Container size: " + totalSize + " characters.");
+		                        } catch (Exception e) {
+		                            CommonMethods.logError(e, "dvk.client.businesslayer.DhlMessage", "getList");
+		                            throw e;
+		                        } finally {
+		                            out.flush();
+		                            out.close();
+		                        }
+	                    	}
+	                    }
+	                    
+	                    item.setId(rs.getInt("dhl_message_id"));
+	                    item.setDhlID(rs.getInt("dhl_id"));
+	                    item.setIsIncoming(rs.getBoolean("is_incoming"));                        
+	                    item.setTitle(rs.getString("title"));
+	                    item.setSenderOrgCode(rs.getString("sender_org_code"));
+	                    item.setSenderOrgName(rs.getString("sender_org_name"));
+	                    item.setSenderPersonCode(rs.getString("sender_person_code"));
+	                    item.setSenderName(rs.getString("sender_name"));
+	                    item.setProxyOrgCode(rs.getString("proxy_org_code"));
+	                    item.setProxyOrgName(rs.getString("proxy_org_name"));
+	                    item.setProxyPersonCode(rs.getString("proxy_person_code"));
+	                    item.setProxyName(rs.getString("proxy_name"));
+	                    item.setRecipientOrgCode(rs.getString("recipient_org_code"));
+	                    item.setRecipientOrgName(rs.getString("recipient_org_name"));
+	                    item.setRecipientPersonCode(rs.getString("recipient_person_code"));
+	                    item.setRecipientName(rs.getString("recipient_name"));
+	                    item.setCaseName(rs.getString("case_name"));
+	                    item.setDhlFolderName(rs.getString("dhl_folder_name"));
+	                    item.setSendingStatusID(rs.getInt("sending_status_id"));
+	                    item.setUnitID(rs.getInt("unit_id"));
+	                    item.setSendingDate(rs.getDate("sending_date", cal));
+	                    item.setReceivedDate(rs.getDate("received_date", cal));
+	                    item.setLocalItemID(rs.getInt("local_item_id"));
+	                    item.setRecipientStatusID(rs.getInt("recipient_status_id"));
+	                    item.setFaultCode(rs.getString("fault_code"));
+	                    item.setFaultActor(rs.getString("fault_actor"));
+	                    item.setFaultString(rs.getString("fault_string"));
+	                    item.setFaultDetail(rs.getString("fault_detail"));
+	                    item.setStatusUpdateNeeded(rs.getBoolean("status_update_needed"));
+	                    item.setMetaXML(rs.getString("metaxml"));
+	                    item.setQueryID(rs.getString("query_id"));
+	                    item.setRecipientDepartmentNr(rs.getString("recipient_department_nr"));
+	                    item.setRecipientDepartmentName(rs.getString("recipient_department_name"));
+	                    item.setRecipientEmail(rs.getString("recipient_email"));
+	                    item.setRecipientDivisionID(rs.getInt("recipient_division_id"));
+	                    item.setRecipientDivisionName(rs.getString("recipient_division_name"));
+	                    item.setRecipientPositionID(rs.getInt("recipient_position_id"));
+	                    item.setRecipientPositionName(rs.getString("recipient_position_name"));
+	                    item.setRecipientDivisionCode(rs.getString("recipient_division_code"));
+	                    item.setRecipientPositionCode(rs.getString("recipient_position_code"));
+	                    item.setDhlGuid(rs.getString("dhl_guid"));
+	                    result.add(item);
+	                }
+	                rs.close();
+	                cs.close();
+        		} finally {
+        			dbConnection.setAutoCommit(defaultAutoCommit);
+        		}
                 return result;
             } else {
                 return null;
@@ -747,7 +789,7 @@ public class DhlMessage implements Cloneable {
         }
     }
     
-    public int addToDB(OrgSettings db) throws Exception {
+    public int addToDB(OrgSettings db, Connection dbConnection) throws Exception {
         FileInputStream inStream = null;
         InputStreamReader inReader = null;
         BufferedReader reader = null;
@@ -761,20 +803,17 @@ public class DhlMessage implements Cloneable {
             inReader = new InputStreamReader(inStream, "UTF-8");
             reader = new BufferedReader(inReader);
             
-            Connection conn = DBConnection.getConnection(db);
-            if (conn != null) {
+            if (dbConnection != null) {
                 Calendar cal = Calendar.getInstance();
                 
                 int parNr = 1;
-                CallableStatement cs = conn.prepareCall("{call Add_DhlMessage(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                CallableStatement cs = dbConnection.prepareCall("{call Add_DhlMessage(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    cs = conn.prepareCall("{? = call \"Add_DhlMessage\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                    cs = dbConnection.prepareCall("{? = call \"Add_DhlMessage\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 }
                 
-                // Mingil põhjusel toimib SQL Anywhere JDBC klient
-                // korrektselt ainult juhul, kui väljundparameetrid asuvad kõige lõpus.
-                // Vastasel juhul liigutatakse kõik väljundparameetrile
-                // järgnevad sisendparameetrid ühe koha võrra edasi.
+                // SQL Anywhere JDBC client requires that output parameters are supplied as last parameter(s).
+                // Otherwise all input parameters will be incorrectly moved down by one position in parameter list.
                 if (!CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
                 	parNr++;
                 }
@@ -832,7 +871,6 @@ public class DhlMessage implements Cloneable {
                 	m_id = cs.getInt(1);
                 }
                 cs.close();
-                conn.close();
 
                 return m_id;
             } else {
@@ -849,7 +887,7 @@ public class DhlMessage implements Cloneable {
         }
     }
 
-    public boolean updateInDB(OrgSettings db) {
+    public boolean updateInDB(OrgSettings db, Connection dbConnection) {
         FileInputStream inStream = null;
         InputStreamReader inReader = null;
         BufferedReader reader = null;
@@ -863,14 +901,13 @@ public class DhlMessage implements Cloneable {
             inReader = new InputStreamReader(inStream, "UTF-8");
             reader = new BufferedReader(inReader);
             
-            Connection conn = DBConnection.getConnection(db);
-            if (conn != null) {
+            if (dbConnection != null) {
                 Calendar cal = Calendar.getInstance();
 
                 int parNr = 1;
-                CallableStatement cs = conn.prepareCall("{call Update_DhlMessage(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                CallableStatement cs = dbConnection.prepareCall("{call Update_DhlMessage(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    cs = conn.prepareCall("{? = call \"Update_DhlMessage\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                    cs = dbConnection.prepareCall("{? = call \"Update_DhlMessage\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                     cs.registerOutParameter(parNr++, Types.BOOLEAN);
                 }
 
@@ -918,7 +955,6 @@ public class DhlMessage implements Cloneable {
                 cs.setString(parNr++, m_dhlGuid);
                 cs.execute();
                 cs.close();
-                conn.close();
 
                 return true;
             } else {
@@ -937,25 +973,22 @@ public class DhlMessage implements Cloneable {
         }
     }
 
-    public static int getMessageID(int dhlID, String producerName, String serviceURL, boolean isIncoming, OrgSettings db) {
+    public static int getMessageID(int dhlID, String producerName, String serviceURL, boolean isIncoming, OrgSettings db, Connection dbConnection) {
     	logger.debug("Getting message ID from database. Parameters: ");
     	logger.debug("dhlID: " + dhlID);
     	logger.debug("isIncoming: " + isIncoming);
     	logger.debug("producerName: " + producerName);
     	logger.debug("serviceURL: " + serviceURL);
         try {
-            Connection conn = DBConnection.getConnection(db);
-            if (conn != null) {
+            if (dbConnection != null) {
             	int parNr = 1;
-            	CallableStatement cs = conn.prepareCall("{call Get_DhlMessageID(?,?,?,?,?)}");
+            	CallableStatement cs = dbConnection.prepareCall("{call Get_DhlMessageID(?,?,?,?,?)}");
                 if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    cs = conn.prepareCall("{? = call \"Get_DhlMessageID\"(?,?,?,?)}");
+                    cs = dbConnection.prepareCall("{? = call \"Get_DhlMessageID\"(?,?,?,?)}");
                 }
                 
-                // Mingil põhjusel toimib SQL Anywhere JDBC klient
-                // korrektselt ainult juhul, kui väljundparameetrid asuvad kõige lõpus.
-                // Vastasel juhul liigutatakse kõik väljundparameetrile
-                // järgnevad sisendparameetrid ühe koha võrra edasi.
+                // SQL Anywhere JDBC client requires that output parameters are supplied as last parameter(s).
+                // Otherwise all input parameters will be incorrectly moved down by one position in parameter list.
                 if (!CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
                 	parNr++;
                 }
@@ -977,7 +1010,6 @@ public class DhlMessage implements Cloneable {
                 	result = cs.getInt(1);
                 }
                 cs.close();
-                conn.close();
 
                 return result;
             } else {
@@ -989,20 +1021,17 @@ public class DhlMessage implements Cloneable {
         }
     }
     
-    public static int getMessageID(String dhlGuid, String producerName, String serviceURL, boolean isIncoming, OrgSettings db) {
+    public static int getMessageID(String dhlGuid, String producerName, String serviceURL, boolean isIncoming, OrgSettings db, Connection dbConnection) {
         try {
-        	Connection conn = DBConnection.getConnection(db);
-            if (conn != null) {
+            if (dbConnection != null) {
             	int parNr = 1;
-                CallableStatement cs = conn.prepareCall("{call Get_DhlMessageIDByGuid(?,?,?,?,?)}");
+                CallableStatement cs = dbConnection.prepareCall("{call Get_DhlMessageIDByGuid(?,?,?,?,?)}");
                 if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    cs = conn.prepareCall("{? = call \"Get_DhlMessageIDByGuid\"(?,?,?,?)}");
+                    cs = dbConnection.prepareCall("{? = call \"Get_DhlMessageIDByGuid\"(?,?,?,?)}");
                 }
                 
-                // Mingil põhjusel toimib SQL Anywhere JDBC klient
-                // korrektselt ainult juhul, kui väljundparameetrid asuvad kõige lõpus.
-                // Vastasel juhul liigutatakse kõik väljundparameetrile
-                // järgnevad sisendparameetrid ühe koha võrra edasi.
+                // SQL Anywhere JDBC client requires that output parameters are supplied as last parameter(s).
+                // Otherwise all input parameters will be incorrectly moved down by one position in parameter list.
                 if (!CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
                 	parNr++;
                 }
@@ -1024,7 +1053,6 @@ public class DhlMessage implements Cloneable {
                 	result = cs.getInt(1);
                 }
                 cs.close();
-                conn.close();
 
                 return result;
             } else {
@@ -1036,15 +1064,14 @@ public class DhlMessage implements Cloneable {
         }
     }
 
-    public static boolean updateStatus(int messageID, int statusID, Date sendingDate, boolean statusUpdateNeeded, OrgSettings db) {
+    public static boolean updateStatus(int messageID, int statusID, Date sendingDate, boolean statusUpdateNeeded, OrgSettings db, Connection dbConnection) {
         try {
             Calendar cal = Calendar.getInstance();
-            Connection conn = DBConnection.getConnection(db);
-            if (conn != null) {
-                CallableStatement cs = conn.prepareCall("{call Update_DhlMessageStatus(?,?,?,?,?)}");
+            if (dbConnection != null) {
+                CallableStatement cs = dbConnection.prepareCall("{call Update_DhlMessageStatus(?,?,?,?,?)}");
                 int parNr = 1;
                 if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    cs = conn.prepareCall("{? = call \"Update_DhlMessageStatus\"(?,?,?,?,?)}");
+                    cs = dbConnection.prepareCall("{? = call \"Update_DhlMessageStatus\"(?,?,?,?,?)}");
                     cs.registerOutParameter(parNr++, Types.BOOLEAN);
                 }
 
@@ -1064,7 +1091,6 @@ public class DhlMessage implements Cloneable {
                 }
                 cs.execute();
                 cs.close();
-                conn.close();
 
                 return true;
             } else {
@@ -1077,10 +1103,10 @@ public class DhlMessage implements Cloneable {
         }
     }
 
-    public static boolean updateStatus(int messageID, GetSendStatusResponseItem item, OrgSettings db) {
+    public static boolean updateStatus(int messageID, GetSendStatusResponseItem item, OrgSettings db, Connection dbConnection) {
     	logger.debug("Updating message status. Message ID: " + messageID);
         try {
-            ArrayList<MessageRecipient> recipients = MessageRecipient.getList(messageID, db);
+            ArrayList<MessageRecipient> recipients = MessageRecipient.getList(messageID, db, dbConnection);
             Date dateAllReceived = new Date(0L);
             Date dateSent = new Date(0L);
             for (int i = 0; i < item.getRecipients().size(); ++i) {
@@ -1107,11 +1133,11 @@ public class DhlMessage implements Cloneable {
                     originalRecipient.setFaultString(r.getFaultString());
                     originalRecipient.setFaultDetail(r.getFaultDetail());
                     originalRecipient.setDhlId(r.getDhlID());
-                    originalRecipient.saveToDB(db);
+                    originalRecipient.saveToDB(db, dbConnection);
                 } else {
                 	logger.debug("Original recipient is undefined. Saving messageRecipient to database.");
                     r.setMessageID(messageID);
-                    r.saveToDB(db);
+                    r.saveToDB(db, dbConnection);
                 }
             }
             
@@ -1120,11 +1146,11 @@ public class DhlMessage implements Cloneable {
             	for (int i = 0; i < item.getHistory().size(); i++) {
             		DocumentStatusHistory historyItem = item.getHistory().get(i); 
 
-            		// õritame nõõd adressaadi andmete m��ramata adressaadi ID ka tuvastada
-	                int recipientId = MessageRecipient.getId(messageID, historyItem.getOrgCode(), historyItem.getPersonCode(), historyItem.getSubdivisionShortName(), historyItem.getOccupationShortName(), db);
+            		// õritame nõõd adressaadi andmete mõõramata adressaadi ID ka tuvastada
+	                int recipientId = MessageRecipient.getId(messageID, historyItem.getOrgCode(), historyItem.getPersonCode(), historyItem.getSubdivisionShortName(), historyItem.getOccupationShortName(), db, dbConnection);
 	                if (recipientId > 0) {
 	                	historyItem.setRecipientId(recipientId);
-	                	historyItem.saveToDB(db);
+	                	historyItem.saveToDB(db, dbConnection);
 	                } else {
 	                	logger.info("Cannot save history event "+ String.valueOf(historyItem.getServerSideId()) +" to DB because matching recipient was not found!");
 	                }
@@ -1136,12 +1162,11 @@ public class DhlMessage implements Cloneable {
             cal.add(Calendar.DAY_OF_YEAR, Settings.Client_SentMessageStatusFollowupDays);
             boolean statusUpdateNeeded = (cal.getTime().compareTo(new Date()) > 0);
 
-            Connection conn = DBConnection.getConnection(db);
-            if (conn != null) {
-                CallableStatement cs = conn.prepareCall("{call Update_DhlMessageStatus(?,?,?,?,?)}");
+            if (dbConnection != null) {
+                CallableStatement cs = dbConnection.prepareCall("{call Update_DhlMessageStatus(?,?,?,?,?)}");
                 int parNr = 1;
                 if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    cs = conn.prepareCall("{? = call \"Update_DhlMessageStatus\"(?,?,?,?,?)}");
+                    cs = dbConnection.prepareCall("{? = call \"Update_DhlMessageStatus\"(?,?,?,?,?)}");
                     cs.registerOutParameter(parNr++, Types.BOOLEAN);
                 }
 
@@ -1156,7 +1181,6 @@ public class DhlMessage implements Cloneable {
                 cs.setNull(parNr++, Types.TIMESTAMP);
                 cs.execute();
                 cs.close();
-                conn.close();
 
                 return true;
             } else {
@@ -1168,15 +1192,14 @@ public class DhlMessage implements Cloneable {
         }
     }
 
-    public boolean updateDhlID(OrgSettings db) {
+    public boolean updateDhlID(OrgSettings db, Connection dbConnection) {
     	logger.debug("Updating DhlId...");
         try {
-            Connection conn = DBConnection.getConnection(db);
-            if (conn != null) {
-                CallableStatement cs = conn.prepareCall("{call Update_DhlMessageDhlID(?,?,?,?)}");
+            if (dbConnection != null) {
+                CallableStatement cs = dbConnection.prepareCall("{call Update_DhlMessageDhlID(?,?,?,?)}");
                 int parNr = 1;
                 if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    cs = conn.prepareCall("{? = call \"Update_DhlMessageDhlID\"(?,?,?,?)}");
+                    cs = dbConnection.prepareCall("{? = call \"Update_DhlMessageDhlID\"(?,?,?,?)}");
                     cs.registerOutParameter(parNr++, Types.BOOLEAN);
                 }
 
@@ -1186,7 +1209,6 @@ public class DhlMessage implements Cloneable {
                 cs.setString(parNr++, m_dhlGuid);
                 cs.execute();
                 cs.close();
-                conn.close();
                 return true;
             } else {
             	logger.warn("Database connection is null.");
@@ -1198,14 +1220,13 @@ public class DhlMessage implements Cloneable {
         }
     }
 
-    public boolean updateStatusUpdateNeed(OrgSettings db) {
+    public boolean updateStatusUpdateNeed(OrgSettings db, Connection dbConnection) {
         try {
-            Connection conn = DBConnection.getConnection(db);
-            if (conn != null) {
-                CallableStatement cs = conn.prepareCall("{call Update_DhlMsgStatusUpdateNeed(?,?)}");
+            if (dbConnection != null) {
+                CallableStatement cs = dbConnection.prepareCall("{call Update_DhlMsgStatusUpdateNeed(?,?)}");
                 int parNr = 1;
                 if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    cs = conn.prepareCall("{? = call \"Update_DhlMsgStatusUpdateNeed\"(?,?)}");
+                    cs = dbConnection.prepareCall("{? = call \"Update_DhlMsgStatusUpdateNeed\"(?,?)}");
                     cs.registerOutParameter(parNr++, Types.BOOLEAN);
                 }
 
@@ -1217,7 +1238,6 @@ public class DhlMessage implements Cloneable {
                 }
                 cs.execute();
                 cs.close();
-                conn.close();
                 return true;
             } else {
                 return false;
@@ -1228,106 +1248,109 @@ public class DhlMessage implements Cloneable {
         }
     }
     
-    public static ArrayList<DhlMessage> getByDhlID(int dhlID, boolean incoming, boolean metadataOnly, OrgSettings db) {
+    public static ArrayList<DhlMessage> getByDhlID(int dhlID, boolean incoming, boolean metadataOnly, OrgSettings db, Connection dbConnection) {
         try {
-            Connection conn = DBConnection.getConnection(db);
-            if (conn != null) {
-                conn.setAutoCommit(false);
-                Calendar cal = Calendar.getInstance();
-                int parNr = 1;
-                if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    parNr++;
-                }
-                CallableStatement cs = DBConnection.getStatementForResultSet("Get_DhlMessagesByDhlID", 3, db, conn);
-                cs.setInt(parNr++, dhlID);
-                cs.setInt(parNr++, (incoming ? 1 : 0));
-                cs.setInt(parNr++, (metadataOnly ? 1 : 0));
-                ResultSet rs = DBConnection.getResultSet(cs, db, 3);
-                ArrayList<DhlMessage> result = new ArrayList<DhlMessage>();
-                int docCounter = 0;
-                while (rs.next()) {
-                    ++docCounter;
-                    DhlMessage item = new DhlMessage();
-                    item.setId(rs.getInt("dhl_message_id"));
-                    item.setIsIncoming(rs.getBoolean("is_incoming"));                    
-                    
-                    if (!metadataOnly) {
-                        String itemDataFile = CommonMethods.createPipelineFile(docCounter);
-                        item.setFilePath(itemDataFile);
-                    	
-                    	if (CommonStructures.PROVIDER_TYPE_POSTGRE.equalsIgnoreCase(db.getDbProvider())
-                            || CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
-                    		byte[] containerData = rs.getString("data").getBytes("UTF-8");
-                    		logger.debug("Container data was read from database. Container size: " + containerData.length + " bytes.");
-                    		CommonMethods.writeToFile(itemDataFile, containerData);
-                    	} else {
-	                        Clob tmpBlob = rs.getClob("data");
-	                        Reader r = tmpBlob.getCharacterStream();
-	                        FileOutputStream fos = new FileOutputStream(itemDataFile);
-	                        OutputStreamWriter out = new OutputStreamWriter(fos, "UTF-8");
-	                        try {
-		                        long totalSize = 0;
-		                        int actualReadLength = 0;
-	                            char[] charbuf = new char[Settings.getDBBufferSize()];
-	                            while ((actualReadLength = r.read(charbuf)) > 0) {
-	                                out.write(charbuf, 0, actualReadLength);
-	                                totalSize += actualReadLength;
-	                            }
-	                            logger.debug("Container data was read from database. Container size: " + totalSize + " characters.");
-	                        } catch (Exception e) {
-	                            CommonMethods.logError(e, "dhl.Document", "getDocumentsSentTo");
-	                            throw e;
-	                        } finally {
-	                            out.flush();
-	                            out.close();
-	                        }
-                    	}
-                    }
-                    
-                    item.setTitle(rs.getString("title"));
-                    item.setSenderOrgCode(rs.getString("sender_org_code"));
-                    item.setSenderOrgName(rs.getString("sender_org_name"));
-                    item.setSenderPersonCode(rs.getString("sender_person_code"));
-                    item.setSenderName(rs.getString("sender_name"));
-                    item.setProxyOrgCode(rs.getString("proxy_org_code"));
-                    item.setProxyOrgName(rs.getString("proxy_org_name"));
-                    item.setProxyPersonCode(rs.getString("proxy_person_code"));
-                    item.setProxyName(rs.getString("proxy_name"));
-                    item.setRecipientOrgCode(rs.getString("recipient_org_code"));
-                    item.setRecipientOrgName(rs.getString("recipient_org_name"));
-                    item.setRecipientPersonCode(rs.getString("recipient_person_code"));
-                    item.setRecipientName(rs.getString("recipient_name"));
-                    item.setCaseName(rs.getString("case_name"));
-                    item.setDhlFolderName(rs.getString("dhl_folder_name"));
-                    item.setSendingStatusID(rs.getInt("sending_status_id"));
-                    item.setUnitID(rs.getInt("unit_id"));
-                    item.setDhlID(rs.getInt("dhl_id"));
-                    item.setSendingDate(rs.getDate("sending_date", cal));
-                    item.setReceivedDate(rs.getDate("received_date", cal));
-                    item.setLocalItemID(rs.getInt("local_item_id"));
-                    item.setRecipientStatusID(rs.getInt("recipient_status_id"));
-                    item.setFaultCode(rs.getString("fault_code"));
-                    item.setFaultActor(rs.getString("fault_actor"));
-                    item.setFaultString(rs.getString("fault_string"));
-                    item.setFaultDetail(rs.getString("fault_detail"));
-                    item.setStatusUpdateNeeded(rs.getBoolean("status_update_needed"));
-                    item.setMetaXML(rs.getString("metaxml"));
-                    item.setQueryID(rs.getString("query_id"));
-                    item.setRecipientDepartmentNr(rs.getString("recipient_department_nr"));
-                    item.setRecipientDepartmentName(rs.getString("recipient_department_name"));
-                    item.setRecipientEmail(rs.getString("recipient_email"));
-                    item.setRecipientDivisionID(rs.getInt("recipient_division_id"));
-                    item.setRecipientDivisionName(rs.getString("recipient_division_name"));
-                    item.setRecipientPositionID(rs.getInt("recipient_position_id"));
-                    item.setRecipientPositionName(rs.getString("recipient_position_name"));
-                    item.setRecipientDivisionCode(rs.getString("recipient_division_code"));
-                    item.setRecipientPositionCode(rs.getString("recipient_position_code"));
-                    item.setDhlGuid(rs.getString("dhl_guid"));
-                    result.add(item);
-                }
-                rs.close();
-                cs.close();
-                conn.close();
+            if (dbConnection != null) {
+            	ArrayList<DhlMessage> result = new ArrayList<DhlMessage>();
+            	boolean defaultAutoCommit = dbConnection.getAutoCommit();
+        		try {
+	            	dbConnection.setAutoCommit(false);
+	                Calendar cal = Calendar.getInstance();
+	                int parNr = 1;
+	                if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
+	                    parNr++;
+	                }
+	                CallableStatement cs = DBConnection.getStatementForResultSet("Get_DhlMessagesByDhlID", 3, db, dbConnection);
+	                cs.setInt(parNr++, dhlID);
+	                cs.setInt(parNr++, (incoming ? 1 : 0));
+	                cs.setInt(parNr++, (metadataOnly ? 1 : 0));
+	                ResultSet rs = DBConnection.getResultSet(cs, db, 3);
+	                int docCounter = 0;
+	                while (rs.next()) {
+	                    ++docCounter;
+	                    DhlMessage item = new DhlMessage();
+	                    item.setId(rs.getInt("dhl_message_id"));
+	                    item.setIsIncoming(rs.getBoolean("is_incoming"));                    
+	                    
+	                    if (!metadataOnly) {
+	                        String itemDataFile = CommonMethods.createPipelineFile(docCounter);
+	                        item.setFilePath(itemDataFile);
+	                    	
+	                    	if (CommonStructures.PROVIDER_TYPE_POSTGRE.equalsIgnoreCase(db.getDbProvider())
+	                            || CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+	                    		byte[] containerData = rs.getString("data").getBytes("UTF-8");
+	                    		logger.debug("Container data was read from database. Container size: " + containerData.length + " bytes.");
+	                    		CommonMethods.writeToFile(itemDataFile, containerData);
+	                    	} else {
+		                        Clob tmpBlob = rs.getClob("data");
+		                        Reader r = tmpBlob.getCharacterStream();
+		                        FileOutputStream fos = new FileOutputStream(itemDataFile);
+		                        OutputStreamWriter out = new OutputStreamWriter(fos, "UTF-8");
+		                        try {
+			                        long totalSize = 0;
+			                        int actualReadLength = 0;
+		                            char[] charbuf = new char[Settings.getDBBufferSize()];
+		                            while ((actualReadLength = r.read(charbuf)) > 0) {
+		                                out.write(charbuf, 0, actualReadLength);
+		                                totalSize += actualReadLength;
+		                            }
+		                            logger.debug("Container data was read from database. Container size: " + totalSize + " characters.");
+		                        } catch (Exception e) {
+		                            CommonMethods.logError(e, "dhl.Document", "getDocumentsSentTo");
+		                            throw e;
+		                        } finally {
+		                            out.flush();
+		                            out.close();
+		                        }
+	                    	}
+	                    }
+	                    
+	                    item.setTitle(rs.getString("title"));
+	                    item.setSenderOrgCode(rs.getString("sender_org_code"));
+	                    item.setSenderOrgName(rs.getString("sender_org_name"));
+	                    item.setSenderPersonCode(rs.getString("sender_person_code"));
+	                    item.setSenderName(rs.getString("sender_name"));
+	                    item.setProxyOrgCode(rs.getString("proxy_org_code"));
+	                    item.setProxyOrgName(rs.getString("proxy_org_name"));
+	                    item.setProxyPersonCode(rs.getString("proxy_person_code"));
+	                    item.setProxyName(rs.getString("proxy_name"));
+	                    item.setRecipientOrgCode(rs.getString("recipient_org_code"));
+	                    item.setRecipientOrgName(rs.getString("recipient_org_name"));
+	                    item.setRecipientPersonCode(rs.getString("recipient_person_code"));
+	                    item.setRecipientName(rs.getString("recipient_name"));
+	                    item.setCaseName(rs.getString("case_name"));
+	                    item.setDhlFolderName(rs.getString("dhl_folder_name"));
+	                    item.setSendingStatusID(rs.getInt("sending_status_id"));
+	                    item.setUnitID(rs.getInt("unit_id"));
+	                    item.setDhlID(rs.getInt("dhl_id"));
+	                    item.setSendingDate(rs.getDate("sending_date", cal));
+	                    item.setReceivedDate(rs.getDate("received_date", cal));
+	                    item.setLocalItemID(rs.getInt("local_item_id"));
+	                    item.setRecipientStatusID(rs.getInt("recipient_status_id"));
+	                    item.setFaultCode(rs.getString("fault_code"));
+	                    item.setFaultActor(rs.getString("fault_actor"));
+	                    item.setFaultString(rs.getString("fault_string"));
+	                    item.setFaultDetail(rs.getString("fault_detail"));
+	                    item.setStatusUpdateNeeded(rs.getBoolean("status_update_needed"));
+	                    item.setMetaXML(rs.getString("metaxml"));
+	                    item.setQueryID(rs.getString("query_id"));
+	                    item.setRecipientDepartmentNr(rs.getString("recipient_department_nr"));
+	                    item.setRecipientDepartmentName(rs.getString("recipient_department_name"));
+	                    item.setRecipientEmail(rs.getString("recipient_email"));
+	                    item.setRecipientDivisionID(rs.getInt("recipient_division_id"));
+	                    item.setRecipientDivisionName(rs.getString("recipient_division_name"));
+	                    item.setRecipientPositionID(rs.getInt("recipient_position_id"));
+	                    item.setRecipientPositionName(rs.getString("recipient_position_name"));
+	                    item.setRecipientDivisionCode(rs.getString("recipient_division_code"));
+	                    item.setRecipientPositionCode(rs.getString("recipient_position_code"));
+	                    item.setDhlGuid(rs.getString("dhl_guid"));
+	                    result.add(item);
+	                }
+	                rs.close();
+	                cs.close();
+        		} finally {
+        			dbConnection.setAutoCommit(defaultAutoCommit);
+        		}
                 return result;
             } else {
                 return null;
@@ -1338,106 +1361,109 @@ public class DhlMessage implements Cloneable {
         }
     }
 
-    public static ArrayList<DhlMessage> getByGUID(String guid, boolean incoming, boolean metadataOnly, OrgSettings db) {
+    public static ArrayList<DhlMessage> getByGUID(String guid, boolean incoming, boolean metadataOnly, OrgSettings db, Connection dbConnection) {
         try {
-            Connection conn = DBConnection.getConnection(db);
-            if (conn != null) {
-                conn.setAutoCommit(false);
-                Calendar cal = Calendar.getInstance();
-                int parNr = 1;
-                if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    parNr++;
-                }
-                CallableStatement cs = DBConnection.getStatementForResultSet("Get_DhlMessageByGUID", 3, db, conn);
-                cs.setString(parNr++, guid);
-                cs.setInt(parNr++, (incoming ? 1 : 0));
-                cs.setInt(parNr++, (metadataOnly ? 1 : 0));
-                ResultSet rs = DBConnection.getResultSet(cs, db, 3);
-                ArrayList<DhlMessage> result = new ArrayList<DhlMessage>();
-                int docCounter = 0;
-                while (rs.next()) {
-                    ++docCounter;
-                    DhlMessage item = new DhlMessage();
-                    item.setId(rs.getInt("dhl_message_id"));
-                    item.setIsIncoming(rs.getBoolean("is_incoming"));                    
-                    
-                    if (!metadataOnly) {
-                        String itemDataFile = CommonMethods.createPipelineFile(docCounter);
-                        item.setFilePath(itemDataFile);
-                    	
-                    	if (CommonStructures.PROVIDER_TYPE_POSTGRE.equalsIgnoreCase(db.getDbProvider())
-                            || CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
-                    		byte[] containerData = rs.getString("data").getBytes("UTF-8");
-                    		logger.debug("Container data was read from database. Container size: " + containerData.length + " bytes.");
-                    		CommonMethods.writeToFile(itemDataFile, containerData);
-                    	} else {
-	                        Clob tmpBlob = rs.getClob("data");
-	                        Reader r = tmpBlob.getCharacterStream();
-	                        FileOutputStream fos = new FileOutputStream(itemDataFile);
-	                        OutputStreamWriter out = new OutputStreamWriter(fos, "UTF-8");
-	                        try {
-		                        long totalSize = 0;
-		                        int actualReadLength = 0;
-	                        	char[] charbuf = new char[Settings.getDBBufferSize()];
-	                            while ((actualReadLength = r.read(charbuf)) > 0) {
-	                                out.write(charbuf, 0, actualReadLength);
-	                                totalSize += actualReadLength;
-	                            }
-	                            logger.debug("Container data was read from database. Container size: " + totalSize + " characters.");
-	                        } catch (Exception e) {
-	                            CommonMethods.logError(e, "dhl.Document", "getDocumentsSentTo");
-	                            throw e;
-	                        } finally {
-	                            out.flush();
-	                            out.close();
-	                        }
-                    	}
-                    }
-                    
-                    item.setTitle(rs.getString("title"));
-                    item.setSenderOrgCode(rs.getString("sender_org_code"));
-                    item.setSenderOrgName(rs.getString("sender_org_name"));
-                    item.setSenderPersonCode(rs.getString("sender_person_code"));
-                    item.setSenderName(rs.getString("sender_name"));
-                    item.setProxyOrgCode(rs.getString("proxy_org_code"));
-                    item.setProxyOrgName(rs.getString("proxy_org_name"));
-                    item.setProxyPersonCode(rs.getString("proxy_person_code"));
-                    item.setProxyName(rs.getString("proxy_name"));
-                    item.setRecipientOrgCode(rs.getString("recipient_org_code"));
-                    item.setRecipientOrgName(rs.getString("recipient_org_name"));
-                    item.setRecipientPersonCode(rs.getString("recipient_person_code"));
-                    item.setRecipientName(rs.getString("recipient_name"));
-                    item.setCaseName(rs.getString("case_name"));
-                    item.setDhlFolderName(rs.getString("dhl_folder_name"));
-                    item.setSendingStatusID(rs.getInt("sending_status_id"));
-                    item.setUnitID(rs.getInt("unit_id"));
-                    item.setDhlID(rs.getInt("dhl_id"));
-                    item.setSendingDate(rs.getDate("sending_date", cal));
-                    item.setReceivedDate(rs.getDate("received_date", cal));
-                    item.setLocalItemID(rs.getInt("local_item_id"));
-                    item.setRecipientStatusID(rs.getInt("recipient_status_id"));
-                    item.setFaultCode(rs.getString("fault_code"));
-                    item.setFaultActor(rs.getString("fault_actor"));
-                    item.setFaultString(rs.getString("fault_string"));
-                    item.setFaultDetail(rs.getString("fault_detail"));
-                    item.setStatusUpdateNeeded(rs.getBoolean("status_update_needed"));
-                    item.setMetaXML(rs.getString("metaxml"));
-                    item.setQueryID(rs.getString("query_id"));
-                    item.setRecipientDepartmentNr(rs.getString("recipient_department_nr"));
-                    item.setRecipientDepartmentName(rs.getString("recipient_department_name"));
-                    item.setRecipientEmail(rs.getString("recipient_email"));
-                    item.setRecipientDivisionID(rs.getInt("recipient_division_id"));
-                    item.setRecipientDivisionName(rs.getString("recipient_division_name"));
-                    item.setRecipientPositionID(rs.getInt("recipient_position_id"));
-                    item.setRecipientPositionName(rs.getString("recipient_position_name"));
-                    item.setRecipientDivisionCode(rs.getString("recipient_division_code"));
-                    item.setRecipientPositionCode(rs.getString("recipient_position_code"));
-                    item.setDhlGuid(rs.getString("dhl_guid"));
-                    result.add(item);
-                }
-                rs.close();
-                cs.close();
-                conn.close();
+            if (dbConnection != null) {
+            	ArrayList<DhlMessage> result = new ArrayList<DhlMessage>();
+            	boolean defaultAutoCommit = dbConnection.getAutoCommit();
+        		try {
+	            	dbConnection.setAutoCommit(false);
+	                Calendar cal = Calendar.getInstance();
+	                int parNr = 1;
+	                if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
+	                    parNr++;
+	                }
+	                CallableStatement cs = DBConnection.getStatementForResultSet("Get_DhlMessageByGUID", 3, db, dbConnection);
+	                cs.setString(parNr++, guid);
+	                cs.setInt(parNr++, (incoming ? 1 : 0));
+	                cs.setInt(parNr++, (metadataOnly ? 1 : 0));
+	                ResultSet rs = DBConnection.getResultSet(cs, db, 3);
+	                int docCounter = 0;
+	                while (rs.next()) {
+	                    ++docCounter;
+	                    DhlMessage item = new DhlMessage();
+	                    item.setId(rs.getInt("dhl_message_id"));
+	                    item.setIsIncoming(rs.getBoolean("is_incoming"));                    
+	                    
+	                    if (!metadataOnly) {
+	                        String itemDataFile = CommonMethods.createPipelineFile(docCounter);
+	                        item.setFilePath(itemDataFile);
+	                    	
+	                    	if (CommonStructures.PROVIDER_TYPE_POSTGRE.equalsIgnoreCase(db.getDbProvider())
+	                            || CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+	                    		byte[] containerData = rs.getString("data").getBytes("UTF-8");
+	                    		logger.debug("Container data was read from database. Container size: " + containerData.length + " bytes.");
+	                    		CommonMethods.writeToFile(itemDataFile, containerData);
+	                    	} else {
+		                        Clob tmpBlob = rs.getClob("data");
+		                        Reader r = tmpBlob.getCharacterStream();
+		                        FileOutputStream fos = new FileOutputStream(itemDataFile);
+		                        OutputStreamWriter out = new OutputStreamWriter(fos, "UTF-8");
+		                        try {
+			                        long totalSize = 0;
+			                        int actualReadLength = 0;
+		                        	char[] charbuf = new char[Settings.getDBBufferSize()];
+		                            while ((actualReadLength = r.read(charbuf)) > 0) {
+		                                out.write(charbuf, 0, actualReadLength);
+		                                totalSize += actualReadLength;
+		                            }
+		                            logger.debug("Container data was read from database. Container size: " + totalSize + " characters.");
+		                        } catch (Exception e) {
+		                            CommonMethods.logError(e, "dhl.Document", "getDocumentsSentTo");
+		                            throw e;
+		                        } finally {
+		                            out.flush();
+		                            out.close();
+		                        }
+	                    	}
+	                    }
+	                    
+	                    item.setTitle(rs.getString("title"));
+	                    item.setSenderOrgCode(rs.getString("sender_org_code"));
+	                    item.setSenderOrgName(rs.getString("sender_org_name"));
+	                    item.setSenderPersonCode(rs.getString("sender_person_code"));
+	                    item.setSenderName(rs.getString("sender_name"));
+	                    item.setProxyOrgCode(rs.getString("proxy_org_code"));
+	                    item.setProxyOrgName(rs.getString("proxy_org_name"));
+	                    item.setProxyPersonCode(rs.getString("proxy_person_code"));
+	                    item.setProxyName(rs.getString("proxy_name"));
+	                    item.setRecipientOrgCode(rs.getString("recipient_org_code"));
+	                    item.setRecipientOrgName(rs.getString("recipient_org_name"));
+	                    item.setRecipientPersonCode(rs.getString("recipient_person_code"));
+	                    item.setRecipientName(rs.getString("recipient_name"));
+	                    item.setCaseName(rs.getString("case_name"));
+	                    item.setDhlFolderName(rs.getString("dhl_folder_name"));
+	                    item.setSendingStatusID(rs.getInt("sending_status_id"));
+	                    item.setUnitID(rs.getInt("unit_id"));
+	                    item.setDhlID(rs.getInt("dhl_id"));
+	                    item.setSendingDate(rs.getDate("sending_date", cal));
+	                    item.setReceivedDate(rs.getDate("received_date", cal));
+	                    item.setLocalItemID(rs.getInt("local_item_id"));
+	                    item.setRecipientStatusID(rs.getInt("recipient_status_id"));
+	                    item.setFaultCode(rs.getString("fault_code"));
+	                    item.setFaultActor(rs.getString("fault_actor"));
+	                    item.setFaultString(rs.getString("fault_string"));
+	                    item.setFaultDetail(rs.getString("fault_detail"));
+	                    item.setStatusUpdateNeeded(rs.getBoolean("status_update_needed"));
+	                    item.setMetaXML(rs.getString("metaxml"));
+	                    item.setQueryID(rs.getString("query_id"));
+	                    item.setRecipientDepartmentNr(rs.getString("recipient_department_nr"));
+	                    item.setRecipientDepartmentName(rs.getString("recipient_department_name"));
+	                    item.setRecipientEmail(rs.getString("recipient_email"));
+	                    item.setRecipientDivisionID(rs.getInt("recipient_division_id"));
+	                    item.setRecipientDivisionName(rs.getString("recipient_division_name"));
+	                    item.setRecipientPositionID(rs.getInt("recipient_position_id"));
+	                    item.setRecipientPositionName(rs.getString("recipient_position_name"));
+	                    item.setRecipientDivisionCode(rs.getString("recipient_division_code"));
+	                    item.setRecipientPositionCode(rs.getString("recipient_position_code"));
+	                    item.setDhlGuid(rs.getString("dhl_guid"));
+	                    result.add(item);
+	                }
+	                rs.close();
+	                cs.close();
+        		} finally {
+        			dbConnection.setAutoCommit(defaultAutoCommit);
+        		}
                 return result;
             } else {
                 return null;
@@ -1482,11 +1508,11 @@ public class DhlMessage implements Cloneable {
         units = null;
     }
     
-    // Lisab s�numi XMLi transpordi saajate osasse etteantud saajad (eemaldab �leliigsed)
-    // v�ljastab uue faili PATHi, eisalgne faile j��b ka alles
+    // Lisab sõnumi XMLi transpordi saajate osasse etteantud saajad (eemaldab õleliigsed)
+    // võljastab uue faili PATHi, eisalgne faile jõõb ka alles
     public String CreateNewFile(ArrayList<String> allowedOrgs, int containerVersion)throws Exception{
         String newFile = "";
-        // Kopeerime dokumendi faili uueks t��failiks
+        // Kopeerime dokumendi faili uueks tõõfailiks
         String simplifiedFile = CommonMethods.createPipelineFile(0);
         if (CommonMethods.copyFile(getFilePath(), simplifiedFile)) {
             newFile = CommonMethods.createPipelineFile(1);
@@ -1520,7 +1546,7 @@ public class DhlMessage implements Cloneable {
     public String createNewFile(ArrayList<MessageRecipient> allowedRecipients, int containerVersion) throws Exception{
         String newFile = "";
         
-        // Kopeerime dokumendi faili uueks t��failiks
+        // Kopeerime dokumendi faili uueks tõõfailiks
         String simplifiedFile = CommonMethods.createPipelineFile(0);
         if (CommonMethods.copyFile(this.m_filePath, simplifiedFile)) {
             newFile = CommonMethods.createPipelineFile(1);
@@ -1697,7 +1723,7 @@ public class DhlMessage implements Cloneable {
                                     addr.add(a);
                                     
                                     // Kui tegemist on esimese leitud kohaliku adressaadiga, siis kirjutame
-                                    // selle andmed kohe ka s�numi kõlge.
+                                    // selle andmed kohe ka sõnumi kõlge.
                                     if (addr.size() == 1) {
                                         templateMessage.m_recipientOrgCode = recipientOrgCode;
                                         templateMessage.m_recipientOrgName = recipientOrgName;
@@ -1896,10 +1922,10 @@ public class DhlMessage implements Cloneable {
             reader.close();
         }
 
-        // Kui dokumendi pealkiri ei ole esitatud v�ljal mm:koostaja_dokumendinimi, siis
-        // v��rtustame selle Riigikantselei XML-is oleva pealkirja v�i dokumendiliigi
-        // m��ramata (dokumendiliigi m��ramata v��rtustamine on kasulik ennek�ike Kodanikuportaali)
-        // andmete puhul, kuna seal on reeglina pealkiri v��rtustamata.
+        // Kui dokumendi pealkiri ei ole esitatud võljal mm:koostaja_dokumendinimi, siis
+        // võõrtustame selle Riigikantselei XML-is oleva pealkirja või dokumendiliigi
+        // mõõramata (dokumendiliigi mõõramata võõrtustamine on kasulik ennekõike Kodanikuportaali)
+        // andmete puhul, kuna seal on reeglina pealkiri võõrtustamata.
         if (templateMessage != null) {
             if ((templateMessage.m_title == null) || (templateMessage.m_title.length() < 1)) {
                 if ((rkTitle != null) && (rkTitle.length() > 0)) {
@@ -1970,19 +1996,19 @@ public class DhlMessage implements Cloneable {
         }
     }
     
-    public static void prepareUnsentMessages(int unitID, OrgSettings db) {
-        ArrayList<DhlMessage> messages = DhlMessage.getList(false, Settings.Client_StatusWaiting, unitID, false, false, db);
+    public static void prepareUnsentMessages(int unitID, OrgSettings db, Connection dbConnection) {
+        ArrayList<DhlMessage> messages = DhlMessage.getList(false, Settings.Client_StatusWaiting, unitID, false, false, db, dbConnection);
         for (int i = 0; i < messages.size(); ++i) {
             DhlMessage msg = messages.get(i);
             
-            // Kui saadetava s�numi GUID on m��ramata, siis anname s�numile GUID-i
+            // Kui saadetava sõnumi GUID on mõõramata, siis anname sõnumile GUID-i
             // ja salvestame selle kohe ka andmebaasi.
             if ((msg.getDhlGuid() == null) || (msg.getDhlGuid().length() < 1)) {
             	msg.setDhlGuid(generateGUID());
-            	msg.updateDhlID(db);
+            	msg.updateDhlID(db, dbConnection);
             }
             
-            ArrayList<MessageRecipient> msgRec = MessageRecipient.getList(msg.getId(), db);
+            ArrayList<MessageRecipient> msgRec = MessageRecipient.getList(msg.getId(), db, dbConnection);
             ArrayList<SimpleAddressData> recipients = null;
             try {
                 recipients = extractRecipientData(msg.getFilePath());
@@ -2025,7 +2051,7 @@ public class DhlMessage implements Cloneable {
                         newRecipient.setRecipientPositionCode(xmlRec.getPositionCode());
                         newRecipient.setRecipientPositionName(xmlRec.getPositionName());
                         newRecipient.setSendingStatusID(msg.getSendingStatusID());
-                        newRecipient.saveToDB(db);
+                        newRecipient.saveToDB(db, dbConnection);
                         logger.info("Extracted reipient "+ newRecipient.getRecipientOrgCode() +" from XML and added to database.");
                     }
                 }
@@ -2156,7 +2182,7 @@ public class DhlMessage implements Cloneable {
     	org.w3c.dom.Document currentXmlContent = CommonMethods.xmlDocumentFromFile(filePath, true);
         Element transportNode = null;
 
-        // Tuvastame katse-eksituse meetodil �ige nimeruumi.
+        // Tuvastame katse-eksituse meetodil õige nimeruumi.
         String namespaceUri = CommonStructures.DhlNamespace;
         NodeList foundNodes = currentXmlContent.getDocumentElement().getElementsByTagNameNS(namespaceUri, "transport");
         if (foundNodes.getLength() < 1) {
@@ -2196,7 +2222,7 @@ public class DhlMessage implements Cloneable {
                 	personalIdCode = CommonMethods.getNodeText(personalIdNodes.item(0));
                 }
                 
-                // Adressaadi all�ksuse kood XML konteineris
+                // Adressaadi allõksuse kood XML konteineris
             	NodeList subdivisionNodes = recipientRoot.getElementsByTagNameNS(namespaceUri, "allyksuse_kood");
                 if (subdivisionNodes.getLength() > 0) {
                 	try {
@@ -2218,13 +2244,13 @@ public class DhlMessage implements Cloneable {
                 	}
                 }
                 
-                // Adressaadi all�ksuse l�hinimetus XML konteineris
+                // Adressaadi allõksuse lõhinimetus XML konteineris
             	NodeList subdivisionSnNodes = recipientRoot.getElementsByTagNameNS(namespaceUri, "allyksuse_lyhinimetus");
                 if (subdivisionSnNodes.getLength() > 0) {
                 	subdivisionShortName = CommonMethods.getNodeText(subdivisionSnNodes.item(0));
                 }
                 
-                // Adressaadi ametikoha l�hinimetus XML konteineris
+                // Adressaadi ametikoha lõhinimetus XML konteineris
             	NodeList occupationSnNodes = recipientRoot.getElementsByTagNameNS(namespaceUri, "ametikoha_lyhinimetus");
                 if (occupationSnNodes.getLength() > 0) {
                 	occupationShortName = CommonMethods.getNodeText(occupationSnNodes.item(0));
@@ -2245,23 +2271,23 @@ public class DhlMessage implements Cloneable {
                 if (!recipientFound) {
                     transportNode.removeChild(recipientRoot);
                     logger.info("");
-                	logger.info("Failist v�lja visatud asutus");
+                	logger.info("Failist võlja visatud asutus");
                 	logger.info("Reg nr: " + regNr);
                 	logger.info("Isikukood: " + personalIdCode);
-                	logger.info("all�ksuse ID: " + String.valueOf(subdivisionId));
+                	logger.info("allõksuse ID: " + String.valueOf(subdivisionId));
                 	logger.info("Ametikoha ID: " + String.valueOf(occupationId));
-                	logger.info("all�ksuse l�hinimetus: " + subdivisionShortName);
-                	logger.info("Ametikoha l�hinimetus: " + occupationShortName);
+                	logger.info("allõksuse lõhinimetus: " + subdivisionShortName);
+                	logger.info("Ametikoha lõhinimetus: " + occupationShortName);
                 } else {
                 	recipientIndex++;
                 	logger.info("");
                 	logger.info("Uude faili lubatud asutus.");
                 	logger.info("Reg nr: " + regNr);
                 	logger.info("Isikukood: " + personalIdCode);
-                	logger.info("all�ksuse ID: " + String.valueOf(subdivisionId));
+                	logger.info("allõksuse ID: " + String.valueOf(subdivisionId));
                 	logger.info("Ametikoha ID: " + String.valueOf(occupationId));
-                	logger.info("all�ksuse l�hinimetus: " + subdivisionShortName);
-                	logger.info("Ametikoha l�hinimetus: " + occupationShortName);
+                	logger.info("allõksuse lõhinimetus: " + subdivisionShortName);
+                	logger.info("Ametikoha lõhinimetus: " + occupationShortName);
                 }
             }
             
@@ -2276,7 +2302,7 @@ public class DhlMessage implements Cloneable {
                 }
             }
             
-            // M�rgime antud DVK serveri s�numi vahendajaks
+            // Mõrgime antud DVK serveri sõnumi vahendajaks
             if (addProxy){
                 Element elProxy = currentXmlContent.createElementNS(namespaceUri, defaultPrefix + ":vahendaja");
                 elProxy = CommonMethods.appendTextNode(currentXmlContent, elProxy, "regnr", Settings.Client_DefaultOrganizationCode, defaultPrefix, namespaceUri);
@@ -2290,23 +2316,23 @@ public class DhlMessage implements Cloneable {
     }
     
     /**
-     * Jaotab s�numi iga erineva edastuskanali jaoks omaette alams�numiteks.
-     * Alams�numid erinevad �ksteisest DVK konteineri <transport> elemendis
+     * Jaotab sõnumi iga erineva edastuskanali jaoks omaette alamsõnumiteks.
+     * Alamsõnumid erinevad õksteisest DVK konteineri <transport> elemendis
      * asuvate adressaatide poolest.
      * 
-     * @return		Alams�numite nimekiri
+     * @return		Alamsõnumite nimekiri
      */
-    public ArrayList<DhlMessage> splitMessageByDeliveryChannel(OrgSettings myDatabase, ArrayList<OrgSettings> allKnownDatabases, int containerVersion) throws Exception {
+    public ArrayList<DhlMessage> splitMessageByDeliveryChannel(OrgSettings myDatabase, ArrayList<OrgSettings> allKnownDatabases, int containerVersion, Connection dbConnection) throws Exception {
     	
 		logger.debug("Splitting messages by delivery channel.");
 		
 		ArrayList<DhlMessage> result = new ArrayList<DhlMessage>();
     	
     	if ((this.m_recipients == null) || (this.m_recipients.size() < 1)) {
-    		this.m_recipients = MessageRecipient.getList(this.m_id, myDatabase);
+    		this.m_recipients = MessageRecipient.getList(this.m_id, myDatabase, dbConnection);
     	}
     	
-		// Kontrollime, kas m�nedele adressaatidele saaks otse andmebaasist
+		// Kontrollime, kas mõnedele adressaatidele saaks otse andmebaasist
     	// andmebaasi saata.
     	// 
     	// Esmalt eraldame adressaatide hulgast need adressaadid, kes
@@ -2326,17 +2352,17 @@ public class DhlMessage implements Cloneable {
     	}
     	logger.info("Minuga samas asutuses on " + String.valueOf(myOrgRecipients.size()) + " adressaati.");
     	
-    	// Kui m�ni adressaat on saatjaga samas asutuses, siis tuvastame,
-    	// kas meil on teada andmebaasi�hendus dokumendi otse saatmiseks.
+    	// Kui mõni adressaat on saatjaga samas asutuses, siis tuvastame,
+    	// kas meil on teada andmebaasiõhendus dokumendi otse saatmiseks.
     	//
-		// Isegi juhul, kui sama dokument l�heb samas andmebaasis mitmele
+		// Isegi juhul, kui sama dokument lõheb samas andmebaasis mitmele
 		// adressaadile, saadame ta sinna mitmes eksemplaris. Vastasel juhul
-		// ei saa adressaadip�hiselt j�lgida, milline adressaat on dokumendi
-		// k�tte saanud ja milline mitte.
+		// ei saa adressaadipõhiselt jõlgida, milline adressaat on dokumendi
+		// kõtte saanud ja milline mitte.
 		for (OrgSettings db : allKnownDatabases) {
 			// Teise andmebaasi dhl_settings andmebaasis on kirjas, millise
-			// asutuse, all�ksuse ja ametikohaga on tegemist.
-			UnitCredential[] orgsInDB = UnitCredential.getCredentials(db);
+			// asutuse, allõksuse ja ametikohaga on tegemist.
+			UnitCredential[] orgsInDB = UnitCredential.getCredentials(db, dbConnection);
 			for (int j = 0; j < orgsInDB.length; j++) {
 				UnitCredential cred = orgsInDB[j];
 				if (cred.getInstitutionCode().equalsIgnoreCase(senderOrgCode)) {
@@ -2376,14 +2402,14 @@ public class DhlMessage implements Cloneable {
     		centralServerMessage.loadRecipientsFromXML();
     		
         	// Leiame nimekirja erinevatest serveritest, kuhu antud dokument tuleks saata.
-        	// S.t. kui dokument peab j�udma erinevatele adressaatidele erinevate serverite kaudu
-        	ArrayList<DhlCapability> destinationServers = DhlCapability.getListByMessageID(centralServerMessage.getId(), myDatabase);
+        	// S.t. kui dokument peab jõudma erinevatele adressaatidele erinevate serverite kaudu
+        	ArrayList<DhlCapability> destinationServers = DhlCapability.getListByMessageID(centralServerMessage.getId(), myDatabase, dbConnection);
             
-        	// V�tame filtreerimiseks v�lja k�igi teadaolevate asutuste nimekirja
-        	ArrayList<DhlCapability> allKnownOrgs = DhlCapability.getList(myDatabase);
+        	// Võtame filtreerimiseks võlja kõigi teadaolevate asutuste nimekirja
+        	ArrayList<DhlCapability> allKnownOrgs = DhlCapability.getList(myDatabase, dbConnection);
         	
-        	// Kui serverite massiiv on t�hi, siis lisame sinna
-            // �he t�hja v��rtuse DVK keskserveri jaoks
+        	// Kui serverite massiiv on tõhi, siis lisame sinna
+            // õhe tõhja võõrtuse DVK keskserveri jaoks
             if (destinationServers == null) {
             	destinationServers = new ArrayList<DhlCapability>();
             }
@@ -2396,9 +2422,9 @@ public class DhlMessage implements Cloneable {
                 destinationServers.add(defaultServer);
             }
             
-            // Komplekteerime erinevate serverite jaoks omaette alams�numid
+            // Komplekteerime erinevate serverite jaoks omaette alamsõnumid
             for (int i = 0; i < destinationServers.size(); i++){
-                // Paneme kokku konkreetsesse serverisse saadetavate saajate s�numi,
+                // Paneme kokku konkreetsesse serverisse saadetavate saajate sõnumi,
             	// ehk siis  eemaldame saajate hulgast need, kes selles sihtserveris ei paikne
                 String currentProducer = destinationServers.get(i).getDhlDirectProducerName();
                 String currentServiceUrl = destinationServers.get(i).getDhlDirectServiceUrl();
@@ -2409,8 +2435,8 @@ public class DhlMessage implements Cloneable {
                     currentProducer = Settings.Client_ProducerName;
                 }
                 
-                // Filtreerime v�lja asutused, kes saavad s�numit aktiivse (indexiga i) DVK serveri kaudu
-                ArrayList<String> orgs = DhlCapability.getOrgsByCapability(destinationServers.get(i), myDatabase); // nimekiri asutuse koodidest
+                // Filtreerime võlja asutused, kes saavad sõnumit aktiivse (indexiga i) DVK serveri kaudu
+                ArrayList<String> orgs = DhlCapability.getOrgsByCapability(destinationServers.get(i), myDatabase, dbConnection); // nimekiri asutuse koodidest
                 if ((orgs != null) && (orgs.size() > 0)) {
                 	DhlMessage newMessage = (DhlMessage)centralServerMessage.clone();
                 	
@@ -2419,8 +2445,8 @@ public class DhlMessage implements Cloneable {
                     	if (orgs.contains(mr.getRecipientOrgCode())){
                             allowedOrgs.add(mr.getRecipientOrgCode());
                         } else {
-                        	// Kontrollime, kas me sellist asutust �ldse tunneme.
-                        	// Kui ei tunne, siis �rme teda igaks juhuks v�lja viska.
+                        	// Kontrollime, kas me sellist asutust õldse tunneme.
+                        	// Kui ei tunne, siis õrme teda igaks juhuks võlja viska.
                         	boolean orgFound = false;
                         	for (int j = 0; j < allKnownOrgs.size(); j++) {
                         		if (CommonMethods.stringsEqualIgnoreNull(allKnownOrgs.get(i).getOrgCode(), mr.getRecipientOrgCode())) {
@@ -2434,14 +2460,14 @@ public class DhlMessage implements Cloneable {
                         }
                     }
                     
-                    String newFilePath = newMessage.CreateNewFile(allowedOrgs, containerVersion); // eemldada s�numi XMList need saajad, kes aktiivse serveri kaudu kirja ei saa
+                    String newFilePath = newMessage.CreateNewFile(allowedOrgs, containerVersion); // eemldada sõnumi XMList need saajad, kes aktiivse serveri kaudu kirja ei saa
                     newMessage.setFilePath(newFilePath);
                     
                     newMessage.getDeliveryChannel().setServiceUrl(currentServiceUrl);
                     newMessage.getDeliveryChannel().setProducerName(currentProducer);
                     
-                    // Paneme keskserveri kaudu saadetavad s�numid ettepoole,
-                    // et saatmisel saaks keskserveri ID v�imalikult kiiresti k�tte.
+                    // Paneme keskserveri kaudu saadetavad sõnumid ettepoole,
+                    // et saatmisel saaks keskserveri ID võimalikult kiiresti kõtte.
                     result.add(0, newMessage);
                     logger.info("Added message clone for central server delivery");
                 }
@@ -2453,14 +2479,14 @@ public class DhlMessage implements Cloneable {
 
     
     /**
-     * Arvutab adressaadip�histe staatuse koodide alusel v�lja kogu s�numi
+     * Arvutab adressaadipõhiste staatuse koodide alusel võlja kogu sõnumi
      * staatuse ja uuendab seda andmebaasis.
      * 
-     * @param messageId		s�numi kohalik ID
-     * @param db			Andmebaasi�henduse seaded
+     * @param messageId		sõnumi kohalik ID
+     * @param db			Andmebaasiühenduse seaded
      */
-    public static void calculateAndUpdateMessageStatus(int messageId, OrgSettings db) {
-    	ArrayList<MessageRecipient> recipients = MessageRecipient.getList(messageId, db);
+    public static void calculateAndUpdateMessageStatus(int messageId, OrgSettings db, Connection dbConnection) {
+    	ArrayList<MessageRecipient> recipients = MessageRecipient.getList(messageId, db, dbConnection);
     	
     	int totalStatusId = Settings.Client_StatusSent;
     	Calendar cal = Calendar.getInstance();
@@ -2484,42 +2510,45 @@ public class DhlMessage implements Cloneable {
     			}
     		}
     	}
-    	updateStatus(messageId, totalStatusId, dateSent, false, db);
+    	updateStatus(messageId, totalStatusId, dateSent, false, db, dbConnection);
     }
     
-    public static String generateGUID() {
-    	return java.util.UUID.randomUUID().toString();
+    public static int deleteOldDocuments(int documentLifetimeInDays, OrgSettings db, Connection dbConnection) throws Exception {
+        int result = 0;
+    	try {
+            if (dbConnection != null) {
+                CallableStatement cs = dbConnection.prepareCall("{call Delete_OldDhlMessages(?,?)}");
+                int parNr = 1;
+                if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
+                    cs = dbConnection.prepareCall("{? = call \"Delete_OldDhlMessages\"(?)}");
+                }
+
+                if (!CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                	parNr++;
+                }
+                
+                cs.setInt(parNr++, documentLifetimeInDays);
+                
+                if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                	cs.registerOutParameter(parNr, Types.INTEGER);
+                } else {
+                	cs.registerOutParameter(1, Types.INTEGER);
+                }
+                cs.execute();
+                if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
+                	result = cs.getInt(parNr);
+                } else {
+                	result = cs.getInt(1);
+                }
+                
+                cs.execute();
+                cs.close();
+            } else {
+            	logger.warn("Database connection is NULL.");
+            }
+        } catch (Exception ex) {
+            logger.error(ex);
+        }
+        return result;
     }
-
-	public String getRecipientPositionShortName() {
-		return m_recipientPositionShortName;
-	}
-
-	public void setRecipientPositionShortName(String positionShortName) {
-		m_recipientPositionShortName = positionShortName;
-	}
-
-	public String getRecipientDivisionShortName() {
-		return m_recipientDivisionShortName;
-	}
-
-	public void setRecipientDivisionShortName(String divisionShortName) {
-		m_recipientDivisionShortName = divisionShortName;
-	}
-
-	public boolean isFyi() {
-		return m_fyi;
-	}
-
-	public void setFyi(boolean fyi) {
-		this.m_fyi = fyi;
-	}
-
-	public int getContainerVersion() {
-		return m_containerVersion;
-	}
-
-	public void setContainerVersion(int version) {
-		m_containerVersion = version;
-	}
 }

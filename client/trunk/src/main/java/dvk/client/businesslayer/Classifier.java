@@ -42,9 +42,9 @@ public class Classifier {
     	this.m_id = id;
     }
     
-    public Classifier(String code, OrgSettings db) {
+    public Classifier(String code, OrgSettings db, Connection dbConnection) {
     	clear();
-    	loadFromDB(code, db);
+    	loadFromDB(code, db, dbConnection);
     }
     
     public void clear() {
@@ -52,100 +52,100 @@ public class Classifier {
     	this.m_id = 0;
     }
     
-    public void loadFromDB(String classifierCode, OrgSettings db) {
+    public void loadFromDB(String classifierCode, OrgSettings db, Connection dbConnection) {
         clear();
         try {
-        	Connection conn = DBConnection.getConnection(db);
-        	if (conn != null) {
-                conn.setAutoCommit(false);
-                int parNr = 1;
-                if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    parNr++;
-                }
-                CallableStatement cs = DBConnection.getStatementForResultSet("Get_DhlClassifier", 1, db, conn);
-                cs.setString(parNr++, classifierCode);
-                ResultSet rs = DBConnection.getResultSet(cs, db, 1);
-                if (rs.next()) {
-                    m_code = rs.getString("dhl_classifier_code");
-                    m_id = rs.getInt("dhl_classifier_id");
-                }
-                rs.close();
-                cs.close();
-                try { conn.close(); }
-                catch (Exception ex) { CommonMethods.logError(ex, this.getClass().getName(), "loadFromDB"); }
+        	if (dbConnection != null) {
+        		boolean defaultAutoCommit = dbConnection.getAutoCommit();
+        		try {
+	        		dbConnection.setAutoCommit(false);
+	                int parNr = 1;
+	                if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
+	                    parNr++;
+	                }
+	                CallableStatement cs = DBConnection.getStatementForResultSet("Get_DhlClassifier", 1, db, dbConnection);
+	                cs.setString(parNr++, classifierCode);
+	                ResultSet rs = DBConnection.getResultSet(cs, db, 1);
+	                if (rs.next()) {
+	                    m_code = rs.getString("dhl_classifier_code");
+	                    m_id = rs.getInt("dhl_classifier_id");
+	                }
+	                rs.close();
+	                cs.close();
+        		} finally {
+        			dbConnection.setAutoCommit(defaultAutoCommit);
+        		}
             }
         } catch (Exception ex) {
             CommonMethods.logError(ex, this.getClass().getName(), "loadFromDB");
         }
     }
     
-    public boolean saveToDB(OrgSettings db) throws Exception {
+    public boolean saveToDB(OrgSettings db, Connection dbConnection) throws Exception {
     	boolean result = false;
-    	Connection conn = DBConnection.getConnection(db);
     	try {
-        	if (conn != null) {
+    		if (dbConnection != null) {
                 int parNr = 1;
-                CallableStatement cs = conn.prepareCall("{call Save_DhlClassifier(?,?)}");
-                if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    cs = conn.prepareCall("{? = call \"Save_DhlClassifier\"(?,?)}");
+                CallableStatement cs = dbConnection.prepareCall("{call Save_DhlClassifier(?,?)}");
+                if (CommonStructures.PROVIDER_TYPE_POSTGRE.equalsIgnoreCase(db.getDbProvider())) {
+                    cs = dbConnection.prepareCall("{? = call \"Save_DhlClassifier\"(?,?)}");
                     cs.registerOutParameter(parNr++, Types.BOOLEAN);
                 }
                 cs.setString(parNr++, m_code);
                 cs.setInt(parNr++, m_id);
                 cs.execute();
                 cs.close();
-                conn.commit();
+                dbConnection.commit();
                 result = true;
             } else {
             	result = false;
             }
         } catch (Exception ex) {
-            try { conn.rollback(); }
+            try { dbConnection.rollback(); }
             catch(SQLException ex1) { CommonMethods.logError(ex1, this.getClass().getName(), "saveToDB"); }
             CommonMethods.logError(ex, this.getClass().getName(), "saveToDB");
             result = false;
         }
-        try { conn.close(); }
-        catch (Exception ex) { CommonMethods.logError(ex, this.getClass().getName(), "saveToDB"); }
         return result;
     }
     
-    public static ArrayList<Classifier> getList(OrgSettings db) {
+    public static ArrayList<Classifier> getList(OrgSettings db, Connection dbConnection) {
     	ArrayList<Classifier> result = new ArrayList<Classifier>();
     	try {
-            Connection conn = DBConnection.getConnection(db);
-            if (conn != null) {
-                conn.setAutoCommit(false);
-                CallableStatement cs = DBConnection.getStatementForResultSet("Get_DhlClassifierList", 0, db, conn);
-                ResultSet rs = DBConnection.getResultSet(cs, db, 0);
-                while (rs.next()) {
-                	Classifier item = new Classifier();
-                    item.setCode(rs.getString("dhl_classifier_code"));
-                    item.setId(rs.getInt("dhl_classifier_id"));
-                    result.add(item);
-                }
-                rs.close();
-                cs.close();
-                conn.close();
+            if (dbConnection != null) {
+        		boolean defaultAutoCommit = dbConnection.getAutoCommit();
+        		try {
+	            	dbConnection.setAutoCommit(false);
+	                CallableStatement cs = DBConnection.getStatementForResultSet("Get_DhlClassifierList", 0, db, dbConnection);
+	                ResultSet rs = DBConnection.getResultSet(cs, db, 0);
+	                while (rs.next()) {
+	                	Classifier item = new Classifier();
+	                    item.setCode(rs.getString("dhl_classifier_code"));
+	                    item.setId(rs.getInt("dhl_classifier_id"));
+	                    result.add(item);
+	                }
+	                rs.close();
+	                cs.close();
+        		} finally {
+        			dbConnection.setAutoCommit(defaultAutoCommit);
+        		}
             }
-            try { conn.close(); }
-            catch (Exception ex) { CommonMethods.logError(ex, "clnt.businesslayer.Classifier", "getList"); }
         } catch (Exception ex) {
             CommonMethods.logError(ex, "clnt.businesslayer.Classifier", "getList");
         }
         return result;
     }
     
-    public static void duplicateSettingsToDB(OrgSettings db) throws Exception {
+    public static void duplicateSettingsToDB(OrgSettings db, Connection dbConnection) throws Exception {
         Classifier classif = new Classifier("STATUS_CANCELED", Settings.Client_StatusCanceled);
-        classif.saveToDB(db);
+        classif.saveToDB(db, dbConnection);
         classif = new Classifier("STATUS_RECEIVED", Settings.Client_StatusReceived);
-        classif.saveToDB(db);
+        classif.saveToDB(db, dbConnection);
         classif = new Classifier("STATUS_SENDING", Settings.Client_StatusSending);
-        classif.saveToDB(db);
+        classif.saveToDB(db, dbConnection);
         classif = new Classifier("STATUS_SENT", Settings.Client_StatusSent);
-        classif.saveToDB(db);
+        classif.saveToDB(db, dbConnection);
         classif = new Classifier("STATUS_WAITING", Settings.Client_StatusWaiting);
-        classif.saveToDB(db);
+        classif.saveToDB(db, dbConnection);
     }
 }

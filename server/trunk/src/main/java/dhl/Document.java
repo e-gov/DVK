@@ -38,12 +38,12 @@ public class Document {
     private ArrayList<Sending> m_sendingList;
     private Date m_conservationDeadline;
     
-    // DVK konteineri versioon
+    // DEC container version
     private int m_dvkContainerVersion;
     private String m_guid;
     
-    // Abimuutujad, mida kasutatakse andmetöötlusel,
-    // aga mida andmebaasi ei salvestata.
+    // Helper variables that are used in data processing
+    // but won't be saved to database
     private org.w3c.dom.Document m_simplifiedXmlDoc;
     private ArrayList<DocumentFile> m_files;
 
@@ -186,7 +186,7 @@ public class Document {
                 return 0;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dhl.Document", "getNextID");
+        	logger.error(ex);
             return 0;
         }
     }
@@ -323,7 +323,7 @@ public class Document {
                 return false;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dhl.Document",  "deleteFromDB");
+        	logger.error(ex);
             return false;
         }
     }
@@ -343,24 +343,24 @@ public class Document {
                 return false;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dhl.Document",  "updateExpirationDate");
+        	logger.error(ex);
             return false;
         }
     }
 
     /**
      * Tagastab nimekirja etteantud dokumentidest, mille allalaadimiseks
-     * on etteantud isikul õigus.
+     * on etteantud isikul Ãµigus.
      * 
      * @param organizationID			asutuse ID
      * @param folderID					kausta ID
      * @param userID					isiku ID
-     * @param divisionID				allüksuse ID
-     * @param divisionShortName			allüksuse lühinimetus
+     * @param divisionID				allï¿½ksuse ID
+     * @param divisionShortName			allï¿½ksuse lÃ¼hinimetus
      * @param occupationID				ametikoha ID
-     * @param occupationShortName		ametikoha lühinimetus
+     * @param occupationShortName		ametikoha lÃ¼hinimetus
      * @param resultLimit				maksimaalne lubatud tulemuste arv
-     * @param conn						andmebaasiühenduse objekt
+     * @param conn						andmebaasiÃ¼henduse objekt
      * @return							nimekiri allalaadimist ootavatest dokumentidest
      */
     public static ArrayList<Document> getDocumentsSentTo(
@@ -438,9 +438,6 @@ public class Document {
                             out.write(charbuf, 0, actualReadLength);
                             totalReadLength += actualReadLength;
                         }
-                    } catch (Exception e) {
-                        CommonMethods.logError(e, "dhl.Document", "getDocumentsSentTo");
-                        throw e;
                     } finally {
                         out.flush();
                         out.close();
@@ -465,17 +462,17 @@ public class Document {
                 return null;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dhl.Document", "getDocumentsSentTo");
+        	logger.error(ex);
             return null;
         }
     }
 
     /**
-     * Loob XML-i põhjal <code>Document</code> objekti.
+     * Loob XML-i pÃµhjal <code>Document</code> objekti.
      * 
      * @param dataFile XML fail
      * @param organizationID organisatsiooni ID
-     * @param conn andmebaasiühendus
+     * @param conn andmebaasiÃ¼hendus
      * @return dokument
      * @throws AxisFault
      */
@@ -548,9 +545,9 @@ public class Document {
                     }
                 }
                 
-                // Kontrollime veelkord andmed üle
+                // Kontrollime veelkord andmed Ã¼le
                 // Kui "transport" plokk saatja ega saajate kohta infot ei sisalda,
-                // siis järelikult ei saadetud dokumenti edastamiseks.
+                // siis jÃ¤relikult ei saadetud dokumenti edastamiseks.
                 if ((result.getSendingList() == null) || (result.getSendingList().size() < 1)) {
                     throw new AxisFault(CommonStructures.VIGA_AADRESSANDMED_PUUDU);
                 }
@@ -560,13 +557,13 @@ public class Document {
                 	throw new AxisFault(CommonStructures.VIGA_AADRESSANDMED_PUUDU);
                 }
 
-                // Kuna saatjaid saab olla täpselt üks, siis anname veateate niipea,
-                // kui saatjaid pole või on üle ühe.
+                // Kuna saatjaid saab olla tÃ¤pselt Ã¼ks, siis anname veateate niipea,
+                // kui saatjaid pole vÃµi on Ã¼le Ã¼he.
                 if ((tmpSending.getSender() == null) || (tmpSending.getSender().getOrganizationID() < 1)) {
                     throw new AxisFault(CommonStructures.VIGA_VALE_ARV_SAATJAID);
                 }
 
-                // Kui ühtegi saajat pole esitatud, siis tagastame veateate
+                // Kui Ã¼htegi saajat pole esitatud, siis tagastame veateate
                 if ((tmpSending.getRecipients() == null) || (tmpSending.getRecipients().size() < 1)) {
                     throw new AxisFault(CommonStructures.VIGA_VALE_ARV_VASTUVOTJAID);
                 }
@@ -642,7 +639,7 @@ public class Document {
         	return result;
             
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dhl.Document", "sendingStatusFromXML");
+        	logger.error(ex);
             return null;
         }
     }
@@ -676,7 +673,7 @@ public class Document {
                 return null;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dhl.Document", "getExpiredDocuments");
+        	logger.error(ex);
             return null;
         }
     }

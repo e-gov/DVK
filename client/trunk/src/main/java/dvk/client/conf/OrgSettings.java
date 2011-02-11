@@ -23,6 +23,7 @@ public class OrgSettings implements Cloneable {
     private String m_processName;
     private String m_schemaName;
     private boolean m_dbToDbCommunicationOnly;
+    private int m_deleteOldDocumentsAfterDays;
     private OrgDvkSettings m_dvkSettings;
 
     public void setDbProvider(String dbProvider) {
@@ -105,6 +106,14 @@ public class OrgSettings implements Cloneable {
 		m_dbToDbCommunicationOnly = dbToDbCommunicationOnly;
 	}
 
+	public int getDeleteOldDocumentsAfterDays() {
+		return m_deleteOldDocumentsAfterDays;
+	}
+
+	public void setDeleteOldDocumentsAfterDays(int deleteOldDocumentsAfterDays) {
+		this.m_deleteOldDocumentsAfterDays = deleteOldDocumentsAfterDays;
+	}
+
 	public void setDvkSettings(OrgDvkSettings dvkSettings) {
         this.m_dvkSettings = dvkSettings;
     }
@@ -128,6 +137,7 @@ public class OrgSettings implements Cloneable {
         m_processName = "";
         m_schemaName = "";
         m_dbToDbCommunicationOnly = false;
+        m_deleteOldDocumentsAfterDays = -1;
         m_dvkSettings = new OrgDvkSettings();
     }
     
@@ -147,12 +157,19 @@ public class OrgSettings implements Cloneable {
             }
             return result;
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "clnt.conf.OrgSettings", "getSettings");
-            logger.error("Error configuring client database: ", ex);
+            logger.error(ex);
             return new ArrayList<OrgSettings>();
         }
     }
 
+    /**
+     * Reads configuration parameters from XML document
+     * 
+     * @param rootNode
+     * 		Root element of XML configuration file (XML document)
+     * @return
+     * 		{@link OrgSettings} object with filled-in values from configuration file
+     */
     private static OrgSettings getFromXML(Node rootNode) {
         Node n;
         NodeList nl = rootNode.getChildNodes();
@@ -182,6 +199,8 @@ public class OrgSettings implements Cloneable {
                     result.setSchemaName(CommonMethods.getNodeText(n));
                 } else if (n.getLocalName().equalsIgnoreCase("db_to_db_communication_only")) {
                     result.setDbToDbCommunicationOnly(CommonMethods.booleanFromXML(CommonMethods.getNodeText(n)));
+                } else if (n.getLocalName().equalsIgnoreCase("delete_old_documents_after_days")) {
+                    result.setDeleteOldDocumentsAfterDays(CommonMethods.toIntSafe(CommonMethods.getNodeText(n), -1));
                 }
             }
         }

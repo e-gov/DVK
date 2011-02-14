@@ -400,14 +400,16 @@ public class Client {
 		            	Connection dbConnection = null;
 			            	try {
 				            	dbConnection = DBConnection.getConnection(db);
-				            	System.out.println("\nDeleting all documents older than "+ currentDbDocLifetimeInDays +" days from database \""+ db.getDatabaseName() +"\"");
+				            	System.out.println("\nKustutan andmebaasist \""+ db.getDatabaseName() +"\" kõik "+ currentDbDocLifetimeInDays +" päevast vanemad dokumendid");
 				            	int deletedDocumentCount = DhlMessage.deleteOldDocuments(currentDbDocLifetimeInDays, db, dbConnection);
-				            	System.out.println(deletedDocumentCount + " old documents deleted.");
+				            	System.out.println("Kustutatud kokku " + deletedDocumentCount + " dokumenti.");
+				            	
+				            	logger.info("Deleted "+ deletedDocumentCount +" old documents from database \""+ db.getDatabaseName() +"\". Application was configured to delete all documents older than "+ currentDbDocLifetimeInDays + " days.");
 			            	} finally {
 			            		CommonMethods.safeCloseDatabaseConnection(dbConnection);
 			            	}
 	            		} else {
-	            			System.out.println("Will not delete any documents from database \""+ db.getDatabaseName() +"\".");
+	            			System.out.println("Andmebaasist \""+ db.getDatabaseName() +"\" ei kustutata ühtegi dokumenti.");
 	            		}
 	            	}
 	            }

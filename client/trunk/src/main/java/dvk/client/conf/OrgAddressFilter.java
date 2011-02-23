@@ -71,7 +71,7 @@ public class OrgAddressFilter {
     
     public ArrayList<MessageRecipient> getMatchingRecipients(ArrayList<MessageRecipient> fullList) {
     	ArrayList<MessageRecipient> result = new ArrayList<MessageRecipient>();
-    	if ((this.isValidFilter() == true)) {
+    	if (this.isValidFilter() == true) {
     		for (MessageRecipient recipient : fullList) {
     			// Aadressandmetes on sõltuvalt konteineri versioonist antud
     			// kas allüksuse/ametikoha ID (ver 1) või lühinimetus (ver 2).

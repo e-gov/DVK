@@ -10,7 +10,7 @@
   <properties>
   	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   	
-  	<dvkCoreDir>C:\Projektid\ria\dvk\workspace\dvk_core</dvkCoreDir>
+  	<dvkCoreDir>P:\ria\dvk\workspace\dvk_core</dvkCoreDir>
   </properties>
   
   <!-- Dependencies -->
@@ -81,7 +81,7 @@
 	<dependency>
 	  	<groupId>ria</groupId>
 	  	<artifactId>dvk-core</artifactId>
-	  	<version>1.0</version>
+	  	<version>1.6.1</version>
 	  	<scope>system</scope>
 	  	<systemPath>${dvkCoreDir}/target/dvk-core.jar</systemPath>
 	</dependency>
@@ -171,6 +171,15 @@
 	  	<scope>system</scope>
 	  	<systemPath>${dvkCoreDir}/lib/wstx-lgpl-3.9.2.jar</systemPath>
 	  </dependency>
+	  
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.0</version>
+      <type>jar</type>
+      <scope>test</scope>
+      <optional>true</optional>
+    </dependency>
   </dependencies>
   
   <!-- Build -->

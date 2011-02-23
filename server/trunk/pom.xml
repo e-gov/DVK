@@ -9,22 +9,22 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<packageName>dhl</packageName>
-		<dvkCoreDir>C:\Projektid\ria\dvk\workspace\dvk_core</dvkCoreDir>
-		<dvkClientDir>C:\Projektid\ria\dvk\workspace\dvk_client</dvkClientDir>
+		<dvkCoreDir>P:\ria\dvk\workspace\dvk_core</dvkCoreDir>
+		<dvkClientDir>P:\ria\dvk\workspace\dvk_client</dvkClientDir>
 	</properties>
 
   <dependencies>
   	<dependency>
       <groupId>ria</groupId>
       <artifactId>dvk-core</artifactId>
-      <version>1.0</version>
+      <version>1.6.1</version>
       <scope>system</scope>
       <systemPath>${dvkCoreDir}\target\dvk-core.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>ria</groupId>
       <artifactId>dvk-client</artifactId>
-      <version>1.0</version>
+      <version>1.6.1</version>
       <scope>system</scope>
       <systemPath>${dvkClientDir}\target\dvk-client.jar</systemPath>
     </dependency>

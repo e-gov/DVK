@@ -14,6 +14,7 @@ import dvk.core.CommonStructures;
 import dvk.core.FileSplitResult;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
@@ -1547,34 +1548,37 @@ public class DhlMessage implements Cloneable {
         String newFile = "";
         
         // Kopeerime dokumendi faili uueks tõõfailiks
-        String simplifiedFile = CommonMethods.createPipelineFile(0);
-        if (CommonMethods.copyFile(this.m_filePath, simplifiedFile)) {
-            newFile = CommonMethods.createPipelineFile(1);
-            
-            FileSplitResult splitResult = null;
-            if(containerVersion == 1) {
-            	splitResult = CommonMethods.splitOutTags(simplifiedFile, "SignedDoc", false, false, false);
-            } else {
-            	splitResult = CommonMethods.splitOutTags(simplifiedFile, "failid", false, false, false);
-            }
-           
-            FileOutputStream out = null;
-            OutputStreamWriter ow = null;
-            BufferedWriter bw = null;
-            try {
-            	createNewXmlFileForSpecifiedRecipients(splitResult.mainFile, allowedRecipients, false);
-                out = new FileOutputStream(newFile, false);
-                ow = new OutputStreamWriter(out, "UTF-8");
-                bw = new BufferedWriter(ow);
-                CommonMethods.joinSplitXML(splitResult.mainFile, bw);
-            } finally {
-                CommonMethods.safeCloseWriter(bw);
-                CommonMethods.safeCloseWriter(ow);
-                CommonMethods.safeCloseStream(out);
-            }            
-        } else {
-            throw new Exception("Dokumendi faili kopeerimine edastamiseks ebaõnnestus!");
+        if (!CommonMethods.isNullOrEmpty(this.m_filePath) && (new File(this.m_filePath)).exists()) {
+	        String simplifiedFile = CommonMethods.createPipelineFile(0);
+	        if (CommonMethods.copyFile(this.m_filePath, simplifiedFile)) {
+	            newFile = CommonMethods.createPipelineFile(1);
+	            
+	            FileSplitResult splitResult = null;
+	            if(containerVersion == 1) {
+	            	splitResult = CommonMethods.splitOutTags(simplifiedFile, "SignedDoc", false, false, false);
+	            } else {
+	            	splitResult = CommonMethods.splitOutTags(simplifiedFile, "failid", false, false, false);
+	            }
+	           
+	            FileOutputStream out = null;
+	            OutputStreamWriter ow = null;
+	            BufferedWriter bw = null;
+	            try {
+	            	createNewXmlFileForSpecifiedRecipients(splitResult.mainFile, allowedRecipients, false);
+	                out = new FileOutputStream(newFile, false);
+	                ow = new OutputStreamWriter(out, "UTF-8");
+	                bw = new BufferedWriter(ow);
+	                CommonMethods.joinSplitXML(splitResult.mainFile, bw);
+	            } finally {
+	                CommonMethods.safeCloseWriter(bw);
+	                CommonMethods.safeCloseWriter(ow);
+	                CommonMethods.safeCloseStream(out);
+	            }            
+	        } else {
+	            throw new Exception("Dokumendi faili kopeerimine edastamiseks ebaõnnestus!");
+	        }
         }
+        
         return newFile;
     }
     

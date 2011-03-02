@@ -407,7 +407,7 @@ public class Sender {
             // Automatically register unknown sender organization
             if ((orgID <= 0) && Settings.Server_AutoRegisterUnknownSenders && !CommonMethods.isNullOrEmpty(orgCode)) {
             	Asutus newOrg = new Asutus();
-            	newOrg.setDvkSaatmine(true);
+            	newOrg.setDvkSaatmine(false);
             	newOrg.setRegistrikood(orgCode);
             	
             	// Determine organization name

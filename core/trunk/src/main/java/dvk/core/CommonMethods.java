@@ -159,16 +159,34 @@ public class CommonMethods {
     }
 
     public static boolean gzipUnpackXML(String sourceFile, boolean appendDocumentHeader) {
+        if (isNullOrEmpty(sourceFile)) {
+        	logger.error("Extracting gzipped XML file failed because file name was not supplied!");
+        	return false;
+        }
+        
+        File sourceFileAsObject = new File(sourceFile); 
+        if (!sourceFileAsObject.exists()) {
+        	logger.error("Extracting gzipped XML file failed because file "+ sourceFile +" does not exist!");
+        	return false;
+        }
+        if (sourceFileAsObject.length() < 1) {
+        	logger.error("Extracting gzipped XML file failed because file "+ sourceFile +" is empty!");
+        	return false;
+        }
+    	
+    	long totalBytesExtracted = 0;
         byte[] buf = new byte[Settings.getBinaryBufferSize()];
         int len;
         FileInputStream sourceStream = null;
+        BufferedInputStream sourceBuffered = null;
         GZIPInputStream in = null;
         FileOutputStream out = null;
 
         try {
             // Init streams needed for uncompressing data
             sourceStream = new FileInputStream(sourceFile);
-            in = new GZIPInputStream(sourceStream);
+            sourceBuffered = new BufferedInputStream(sourceStream);
+            in = new GZIPInputStream(sourceBuffered);
             String targetFile = sourceFile + ".out";
             out = new FileOutputStream(targetFile, false);
             if (appendDocumentHeader) {
@@ -178,6 +196,7 @@ public class CommonMethods {
             // Uncompress data in input stream
             while ((len = in.read(buf)) > 0) {
                 out.write(buf, 0, len);
+                totalBytesExtracted += len;
             }
             if (appendDocumentHeader) {
                 out.write("</root>".getBytes("UTF-8"));
@@ -186,6 +205,7 @@ public class CommonMethods {
             // Paneme failid kinni, et saaks ülearuse faili maha kustutada ja
             // vajaliku ümber nimetada.
             safeCloseStream(in);
+            safeCloseStream(sourceBuffered);
             safeCloseStream(sourceStream);
             safeCloseStream(out);
 
@@ -197,9 +217,11 @@ public class CommonMethods {
             return true;
         } catch (Exception ex) {
         	logger.error(ex);
+        	logger.error("Initial file length: "+ sourceFileAsObject.length() +", total bytes extracted before error: "+ totalBytesExtracted);
             return false;
         } finally {
             safeCloseStream(in);
+            safeCloseStream(sourceBuffered);
             safeCloseStream(sourceStream);
             safeCloseStream(out);
 
@@ -505,6 +527,7 @@ public class CommonMethods {
             MessageDigest md = MessageDigest.getInstance("MD5");
             InputStream dataStream = source.getInputStream();
             FileOutputStream outStream = new FileOutputStream(targetFile, append);
+            InputStream base64DecoderStream = null;
 
             // Puhvri pikkus peab jaguma 4-ga, kuna meil on potentsiaalselt tegemist
             // Base64 kodeeringus andmetega, mille me tahame kohe ka dekodeerida
@@ -517,17 +540,21 @@ public class CommonMethods {
                         outStream.write(buf, 0, len);
                     }
                 } else {
-                    String base64String = "";
-                    while ((len = dataStream.read(buf, 0, buf.length)) > 0) {
+                	base64DecoderStream = new dvk.core.Base64.InputStream(dataStream);
+                	//String base64String = "";
+                    while ((len = base64DecoderStream.read(buf, 0, buf.length)) > 0) {
                         md.update(buf, 0, len);
-                        base64String = new String(buf, 0, len);
-                        outStream.write(Base64.decode(base64String));
+                        //base64String = new String(buf, 0, len);
+                        //outStream.write(Base64.decode(base64String));
+                        outStream.write(buf, 0, len);
                     }
                 }
             } finally {
                 buf = null;
+                safeCloseStream(base64DecoderStream);
                 safeCloseStream(dataStream);
                 safeCloseStream(outStream);
+                base64DecoderStream = null;
                 dataStream = null;
                 outStream = null;
             }

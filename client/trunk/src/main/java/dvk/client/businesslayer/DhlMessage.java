@@ -959,10 +959,11 @@ public class DhlMessage implements Cloneable {
 
                 return true;
             } else {
+            	logger.error("Database connection is NULL!");
                 return false;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, this.getClass().getName(), "updateInDB");
+        	logger.error(ex);
             return false;
         } finally {
             CommonMethods.safeCloseReader(reader);
@@ -971,6 +972,73 @@ public class DhlMessage implements Cloneable {
             inStream = null;
             inReader = null;
             reader = null;
+        }
+    }
+    
+    public boolean updateMetaDataInDB(OrgSettings db, Connection dbConnection) {
+        try {
+            if (dbConnection != null) {
+                Calendar cal = Calendar.getInstance();
+
+                int parNr = 1;
+                CallableStatement cs = dbConnection.prepareCall("{call Update_DhlMessageMetaData(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
+                    cs = dbConnection.prepareCall("{? = call \"Update_DhlMessageMetaData\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                    cs.registerOutParameter(parNr++, Types.BOOLEAN);
+                }
+
+                cs.setInt(parNr++, m_id);
+                cs.setInt(parNr++, (m_isIncoming ? 1 : 0));
+                cs.setInt(parNr++, m_dhlID);
+                cs.setString(parNr++, m_title);
+                cs.setString(parNr++, m_senderOrgCode);
+                cs.setString(parNr++, m_senderOrgName);
+                cs.setString(parNr++, m_senderPersonCode);
+                cs.setString(parNr++, m_senderName);
+                cs.setString(parNr++, m_recipientOrgCode);
+                cs.setString(parNr++, m_recipientOrgName);
+                cs.setString(parNr++, m_recipientPersonCode);
+                cs.setString(parNr++, m_recipientName);
+                cs.setString(parNr++, m_caseName);
+                cs.setString(parNr++, m_dhlFolderName);
+                cs.setInt(parNr++, m_sendingStatusID);
+                cs.setInt(parNr++, m_unitID);
+                cs.setTimestamp(parNr++, CommonMethods.sqlDateFromDate(m_sendingDate), cal);
+                cs.setTimestamp(parNr++, CommonMethods.sqlDateFromDate(m_receivedDate), cal);
+                cs.setInt(parNr++, m_localItemID);
+                cs.setInt(parNr++, m_recipientStatusID);
+                cs.setString(parNr++, m_faultCode);
+                cs.setString(parNr++, m_faultActor);
+                cs.setString(parNr++, m_faultString);
+                cs.setString(parNr++, m_faultDetail);
+                cs.setInt(parNr++, (m_statusUpdateNeeded ? 1 : 0));
+                cs.setString(parNr++, m_metaXML);
+                cs.setString(parNr++, m_queryID);
+                cs.setString(parNr++, m_proxyOrgCode);
+                cs.setString(parNr++, m_proxyOrgName);
+                cs.setString(parNr++, m_proxyPersonCode);
+                cs.setString(parNr++, m_proxyName);
+                cs.setString(parNr++, m_recipientDepartmentNr);
+                cs.setString(parNr++, m_recipientDepartmentName);
+                cs.setString(parNr++, m_recipientEmail);
+                cs.setInt(parNr++, m_recipientDivisionID);
+                cs.setString(parNr++, m_recipientDivisionName);
+                cs.setInt(parNr++, m_recipientPositionID);
+                cs.setString(parNr++, m_recipientPositionName);
+                cs.setString(parNr++, m_recipientDivisionCode);
+                cs.setString(parNr++, m_recipientPositionCode);
+                cs.setString(parNr++, m_dhlGuid);
+                cs.execute();
+                cs.close();
+
+                return true;
+            } else {
+            	logger.error("Database connection is NULL!");
+                return false;
+            }
+        } catch (Exception ex) {
+        	logger.error(ex);
+            return false;
         }
     }
 
@@ -2012,52 +2080,72 @@ public class DhlMessage implements Cloneable {
             	msg.updateDhlID(db, dbConnection);
             }
             
-            ArrayList<MessageRecipient> msgRec = MessageRecipient.getList(msg.getId(), db, dbConnection);
-            ArrayList<SimpleAddressData> recipients = null;
-            try {
-                recipients = extractRecipientData(msg.getFilePath());
-            } catch(Exception ex) {
-                CommonMethods.logError(ex, "dvk.client.businesslayer.DhlMessage", "prepareUnsentMessages");
-                recipients = null;
-            }
-            
-            if ((recipients != null) && !recipients.isEmpty()) {
-                for (int k = 0; k < recipients.size(); ++k) {
-                    SimpleAddressData xmlRec = recipients.get(k);
-                    boolean exists = false;
-                    for (int m = 0; m < msgRec.size(); ++m) {
-                        MessageRecipient rec = msgRec.get(m);
-                        if (rec.getRecipientOrgCode().equalsIgnoreCase(xmlRec.getOrgCode()) &&
-                            rec.getRecipientPersonCode().equalsIgnoreCase(xmlRec.getPersonCode()) &&
-                            (rec.getRecipientDivisionID() == xmlRec.getDivisionID()) &&
-                            (rec.getRecipientDivisionCode() == xmlRec.getDivisionCode()) &&
-                            (rec.getRecipientDivisionCode().equalsIgnoreCase(xmlRec.getDivisionCode())) &&
-                            (rec.getRecipientPositionID() == xmlRec.getPositionID()) &&
-                            (rec.getRecipientPositionCode() == xmlRec.getPositionCode()) &&
-                            (rec.getRecipientPositionCode().equalsIgnoreCase(xmlRec.getPositionCode()))) {
-                            exists = true;
-                            rec = null;
-                            break;
-                        }
+            extractAndSaveMessageRecipients(msg, db, dbConnection);
+        }
+    }
+    
+    /**
+     * Extracts message recipient list from DEC container and writes recipient
+     * list to database (table DHL_MESSAGE_RECIPIENT).
+     * 
+     * @param message
+     *     DEC message
+     * @param db
+     *     Database settings
+     * @param dbConnection
+     *     Active database connection
+     */
+    public static void extractAndSaveMessageRecipients(DhlMessage message,
+    	OrgSettings db, Connection dbConnection) {
+    	
+        ArrayList<MessageRecipient> msgRec = MessageRecipient.getList(message.getId(), db, dbConnection);
+        ArrayList<SimpleAddressData> recipients = null;
+        try {
+            recipients = extractRecipientData(message.getFilePath());
+        } catch(Exception ex) {
+        	logger.error(ex);
+            recipients = null;
+        }
+        
+        if ((recipients != null) && !recipients.isEmpty()) {
+            for (int k = 0; k < recipients.size(); ++k) {
+                SimpleAddressData xmlRec = recipients.get(k);
+                boolean exists = false;
+                for (int m = 0; m < msgRec.size(); ++m) {
+                    MessageRecipient rec = msgRec.get(m);
+                    if (rec.getRecipientOrgCode().equalsIgnoreCase(xmlRec.getOrgCode()) &&
+                        rec.getRecipientPersonCode().equalsIgnoreCase(xmlRec.getPersonCode()) &&
+                        (rec.getRecipientDivisionID() == xmlRec.getDivisionID()) &&
+                        (rec.getRecipientDivisionCode() == xmlRec.getDivisionCode()) &&
+                        (rec.getRecipientDivisionCode().equalsIgnoreCase(xmlRec.getDivisionCode())) &&
+                        (rec.getRecipientPositionID() == xmlRec.getPositionID()) &&
+                        (rec.getRecipientPositionCode() == xmlRec.getPositionCode()) &&
+                        (rec.getRecipientPositionCode().equalsIgnoreCase(xmlRec.getPositionCode()))) {
+                        exists = true;
                         rec = null;
+                        break;
                     }
-                    if (!exists) {
-                        MessageRecipient newRecipient = new MessageRecipient();
-                        newRecipient.setMessageID(msg.getId());
-                        newRecipient.setRecipientName(xmlRec.getPersonName());
-                        newRecipient.setRecipientOrgCode(xmlRec.getOrgCode());
-                        newRecipient.setRecipientOrgName(xmlRec.getOrgName());
-                        newRecipient.setRecipientPersonCode(xmlRec.getPersonCode());
-                        newRecipient.setRecipientDivisionID(xmlRec.getDivisionID());
-                        newRecipient.setRecipientDivisionCode(xmlRec.getDivisionCode());
-                        newRecipient.setRecipientDivisionName(xmlRec.getDivisionName());
-                        newRecipient.setRecipientPositionID(xmlRec.getPositionID());
-                        newRecipient.setRecipientPositionCode(xmlRec.getPositionCode());
-                        newRecipient.setRecipientPositionName(xmlRec.getPositionName());
-                        newRecipient.setSendingStatusID(msg.getSendingStatusID());
-                        newRecipient.saveToDB(db, dbConnection);
-                        logger.info("Extracted reipient "+ newRecipient.getRecipientOrgCode() +" from XML and added to database.");
-                    }
+                    rec = null;
+                }
+                if (!exists) {
+                    MessageRecipient newRecipient = new MessageRecipient();
+                    newRecipient.setMessageID(message.getId());
+                    newRecipient.setRecipientName(xmlRec.getPersonName());
+                    newRecipient.setRecipientOrgCode(xmlRec.getOrgCode());
+                    newRecipient.setRecipientOrgName(xmlRec.getOrgName());
+                    newRecipient.setRecipientPersonCode(xmlRec.getPersonCode());
+                    newRecipient.setRecipientDivisionID(xmlRec.getDivisionID());
+                    newRecipient.setRecipientDivisionCode(xmlRec.getDivisionCode());
+                    newRecipient.setRecipientDivisionName(xmlRec.getDivisionName());
+                    newRecipient.setRecipientPositionID(xmlRec.getPositionID());
+                    newRecipient.setRecipientPositionCode(xmlRec.getPositionCode());
+                    newRecipient.setRecipientPositionName(xmlRec.getPositionName());
+                    newRecipient.setSendingStatusID(message.getSendingStatusID());
+                    newRecipient.setSendingDate(message.getSendingDate());
+                    newRecipient.setReceivedDate(message.getReceivedDate());
+                    newRecipient.setDhlId(message.getDhlID());
+                    newRecipient.saveToDB(db, dbConnection);
+                    logger.info("Extracted reipient "+ newRecipient.getRecipientOrgCode() +" from XML and added to database.");
                 }
             }
         }

@@ -4,7 +4,7 @@
   <artifactId>client</artifactId>
   <packaging>jar</packaging>
   <name>dvk-client</name>
-  <version>1.6.1</version>  
+  <version>1.6.2</version>  
   
   <!-- Properties -->
   <properties>

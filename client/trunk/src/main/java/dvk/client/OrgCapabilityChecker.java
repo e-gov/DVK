@@ -218,28 +218,54 @@ public class OrgCapabilityChecker {
 			                }
 			                
 			                // Allüksuste andmete kirjutamine andmebaasi
-			                for (int b = 0; b < result.allyksused.size(); ++b) {
-			                    Subdivision sub = result.allyksused.get(b);
-			                    sub.saveToDB(dbConnection, db);
-			                    
-			                    // Kui Amphora integratsioon on lubatud, siis lisame uue
-			                    // allüksuse otse Amphora asutuste registrisse.
-			                    if (Settings.Client_IntegratedAmphoraFunctions) {
-			                         if((sub != null) && (sub.getID() > 0) && (sub.getName() != null) && !sub.getName().equalsIgnoreCase("") && (sub.getOrgCode() != null) && !sub.getOrgCode().equalsIgnoreCase("")) {
-			                             Department.addDepartment(dbConnection, db, credentials[a], sub.getID(), sub.getName(), sub.getOrgCode());
-			                         }
-			                    }
+			                if ((result.allyksused != null) && (result.allyksused.size() > 0)) {
+			                	List<Subdivision> existingSubdivisions = Subdivision.getList(db, dbConnection);
+			                	if (existingSubdivisions != null) {
+				                	for (int b = 0; b < existingSubdivisions.size(); b++) {
+				                		Subdivision existingItem = existingSubdivisions.get(b);
+				                		if (Subdivision.FindFromList(result.allyksused, existingItem.getOrgCode(), existingItem.getShortName()) == null) {
+				                			existingItem.deleteFromDb(db, dbConnection);
+				                		}
+				                	}
+			                	}
+			                	
+				                for (int b = 0; b < result.allyksused.size(); ++b) {
+				                    Subdivision sub = result.allyksused.get(b);
+				                    sub.saveToDB(dbConnection, db);
+				                    
+				                    // Kui Amphora integratsioon on lubatud, siis lisame uue
+				                    // allüksuse otse Amphora asutuste registrisse.
+				                    // TODO: Remove Amphora integration after year 2011
+				                    if (Settings.Client_IntegratedAmphoraFunctions) {
+				                         if((sub != null) && (sub.getID() > 0) && !CommonMethods.isNullOrEmpty(sub.getName()) && !CommonMethods.isNullOrEmpty(sub.getOrgCode())) {
+				                             Department.addDepartment(dbConnection, db, credentials[a], sub.getID(), sub.getName(), sub.getOrgCode());
+				                         }
+				                    }
+				                }
 			                }
 			                
 			                // Ametikohtade andmete kirjutamine andmebaasi
-			                for (int b = 0; b < result.ametikohad.size(); ++b) {
-			                    Occupation occ = result.ametikohad.get(b);
-			                    occ.saveToDB(dbConnection, db);
-			                } 
+			                if ((result.ametikohad != null) && (result.ametikohad.size() > 0)) {
+			                	List<Occupation> existingOccupations = Occupation.getList(db, dbConnection);
+			                	if (existingOccupations != null) {
+				                	for (int b = 0; b < existingOccupations.size(); b++) {
+				                		Occupation existingItem = existingOccupations.get(b);
+				                		if (Occupation.FindFromList(result.ametikohad, existingItem.getOrgCode(), existingItem.getShortName()) == null) {
+				                			existingItem.deleteFromDb(db, dbConnection);
+				                		}
+				                	}
+			                	}
+			                
+				                for (int b = 0; b < result.ametikohad.size(); ++b) {
+				                    Occupation occ = result.ametikohad.get(b);
+				                    occ.saveToDB(dbConnection, db);
+				                }
+			                }
 			                
 			                // Kui Amphora integratsioon on lubatud, siis kontrollime, et
 			                // Amphora asutuste tabelis olev info oleks sünkroonis DVK-st
 			                // saadud infoga.
+			                // TODO: Remove Amphora integration after year 2011
 			                if (Settings.Client_IntegratedAmphoraFunctions) {
 			                    Organization.syncOrgDhlCapability(dbConnection);
 			                }
@@ -253,7 +279,7 @@ public class OrgCapabilityChecker {
 	        }
 	        System.out.println("    Processing response data completed successfully!");
         } catch (Exception ex) {
-        	System.out.println("    Exception occured! " + ex.getMessage());
+        	System.out.println("    Exception occurred! " + ex.getMessage());
         	logger.error(ex);
         }
         

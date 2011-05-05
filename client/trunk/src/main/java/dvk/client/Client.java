@@ -548,7 +548,7 @@ public class Client {
                         addressTable.put(currentKey, dhlIDs);
                     }
                 }
-                
+
                 for (int i = 0; i < keys.size(); ++i) {
                     String currentKey = keys.get(i);
                     ArrayList<DhlMessage> dhlIDs = addressTable.get(currentKey);
@@ -639,12 +639,13 @@ public class Client {
         return resultCounter;
     }
 
-    private static int SendUnsentMessages(UnitCredential masterCredential, OrgSettings db, Connection dbConnection)
-    {
+    private static int SendUnsentMessages(UnitCredential masterCredential,
+    	OrgSettings db, Connection dbConnection) {
         int resultCounter = 0;
         try {
-            // Töötleme andmebaasis olevad saatmist ootavad sõnumid üle, et XML konteineris
-            // olev adressaatide nimekiri oleks kindlasti ka adressaatide tabelisse dubleeritud.
+            // Töötleme andmebaasis olevad saatmist ootavad sõnumid üle, et
+        	// XML konteineris olev adressaatide nimekiri oleks kindlasti ka
+        	// adressaatide tabelisse dubleeritud.
             DhlMessage.prepareUnsentMessages(masterCredential.getUnitID(), db, dbConnection);
             
             ArrayList<DhlMessage> messages = DhlMessage.getList(false, Settings.Client_StatusWaiting, masterCredential.getUnitID(), false, false, db, dbConnection);
@@ -675,6 +676,11 @@ public class Client {
                 try {
 	                ArrayList<DhlMessage> messageClones = msg.splitMessageByDeliveryChannel(db, allKnownDatabases, masterCredential.getContainerVersion(), dbConnection);
 	                logger.info("Document " + String.valueOf(msg.getId()) + " (GUID:"+ msg.getDhlGuid() +") will be sent through " + String.valueOf(messageClones.size()) + " channels.");
+	                
+	                int messageDecId = 0;
+	                String messageQueryId = "";
+	                String messageGuid = "";
+	                
 	                int centralServerId = 0;
 	                for (int k = 0; k < messageClones.size(); k++) {
 	                	DhlMessage currentClone = messageClones.get(k);
@@ -696,10 +702,12 @@ public class Client {
 	                		dvkClient.initClient(serviceUrl, producerName);
 	                		
 	                        result = dvkClient.sendDocuments(header, currentClone);
+	                        currentClone.setDhlID(result);
+	                        currentClone.setQueryID(dvkClient.getQueryId());
+
 	                        if ((centralServerId == 0) && producerName.equalsIgnoreCase(Settings.Client_ProducerName)) {
 	                        	centralServerId = result;
 	                        }
-	                        currentClone.setQueryID(dvkClient.getQueryId()); // paneme päringu ID sõnumile külge
 	                        
 	                        for (int a = 0; a < currentClone.getRecipients().size(); a++) {
 	                        	MessageRecipient rec = currentClone.getRecipients().get(a);
@@ -715,14 +723,26 @@ public class Client {
 	                	
                         // Ainult esimese serveri puhul uuendame DHL_ID väärtus sõnumi põhitabelis
                         if (k == 0){
-                            UpdateDhlID(currentClone, db, result, dbConnection);
+                        	messageDecId = currentClone.getDhlID();
+                        	messageQueryId = currentClone.getQueryID();
+                        	messageGuid = currentClone.getDhlGuid();
                         }
 	                }
 	                
+	                // Remove data abuout previous sending errors
+                	msg.setDhlID(messageDecId);
+                	msg.setQueryID(messageQueryId);
+                	msg.setDhlGuid(messageGuid);
+                	msg.setStatusUpdateNeeded(Settings.Client_SentMessageStatusFollowupDays > 0);
+                	msg.setSendingStatusID(Settings.Client_StatusSending);
+                	msg.setFaultActor("");
+                	msg.setFaultCode("");
+                	msg.setFaultDetail("");
+                	msg.setFaultString("");
+                	msg.updateMetaDataInDB(db, dbConnection);
+	                
 	                // Märgime saatja andmebaasis, et sõnum on saatmisel
 	                DhlMessage.calculateAndUpdateMessageStatus(msg.getId(), db, dbConnection);
-	                //DhlMessage.updateStatus(msg.getId(), Settings.Client_StatusSending, false, db);
-	                
                 } catch (Exception ex1) {
                     CommonMethods.logError(ex1, "dvk.client.Client", "SendUnsentMessages");
                     System.out.println("    Sõnumite saatmisel tekkis viga: " + ex1.getMessage());
@@ -732,7 +752,7 @@ public class Client {
                             msg.setFaultActor("local");
                             msg.setFaultString(ex1.getMessage());
                             msg.setQueryID(dvkClient.getQueryId());  // paneme sõnumile külge päringu ID
-                            msg.updateInDB(db, dbConnection);
+                            msg.updateMetaDataInDB(db, dbConnection);
                         } catch (Exception ex2) {
                             CommonMethods.logError(ex2, "dvk.client.Client", "SendUnsentMessages");
                             System.out.println("    Sõnumite saatmisel tekkis viga: " + ex2.getMessage());
@@ -749,19 +769,8 @@ public class Client {
         return resultCounter;
     }
     
-    // Harutab lahti sendDocuments päringu vastuseks saadud XML-i ja uuendab
-    // vastavalt XML-i sisule andmebaasis olevate dokumentide andmeid.
-    private static void UpdateDhlID(DhlMessage message, OrgSettings db, int dhlID, Connection dbConnection) throws Exception {
-    	logger.debug("Updating DHL ID.");
-        if (dhlID > 0) {
-            message.setDhlID(dhlID);
-            message.updateDhlID(db, dbConnection);
-            boolean statusUpdateNeeded = (Settings.Client_SentMessageStatusFollowupDays > 0);
-            DhlMessage.updateStatus(message.getId(), Settings.Client_StatusSending, null, statusUpdateNeeded, db, dbConnection);
-        }
-    }
-    
-    private static void ReceiveNewMessages(UnitCredential masterCredential, OrgSettings db, Connection dbConnection) {
+    private static void ReceiveNewMessages(UnitCredential masterCredential,
+    	OrgSettings db, Connection dbConnection) {
     	logger.info("Receiving new messages.");
     	
         try {
@@ -788,6 +797,7 @@ public class Client {
                 
                 try {
 	                if (message.addToDB(db, dbConnection) > 0) {
+	                	DhlMessage.extractAndSaveMessageRecipients(message, db, dbConnection);
 	                    receivedDocs.add(message);
 	                } else {
 	                    failedDocs.add(message);

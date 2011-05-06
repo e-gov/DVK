@@ -603,15 +603,15 @@ public class CommonMethods {
         if (onScreen) {
             System.out.println(data);
         }
-        
+
         String logLocation = null;
         if (Settings.currentProperties != null) {
             logLocation = Settings.Test_LogFile;
         } else {
             String tmpDir = System.getProperty("java.io.tmpdir", "");
-            logLocation = tmpDir + File.separator + "dvk_test_log.txt";            
+            logLocation = tmpDir + File.separator + "dvk_test_log.txt";
         }
-        
+
         if ((logLocation != null) && (logLocation.length() > 0)) {
             writeToFile(logLocation, (data + "\r\n").getBytes());
         }
@@ -620,7 +620,7 @@ public class CommonMethods {
     public static void debugWrite(String data) {
         boolean logErrors = false;
         String logLocation = null;
-        
+
         if (Settings.currentProperties != null) {
             logErrors = Settings.LogErrors;
             logLocation = Settings.ErrorLogFile;
@@ -629,7 +629,7 @@ public class CommonMethods {
             String tmpDir = System.getProperty("java.io.tmpdir", "");
             logLocation = tmpDir + File.separator + "dvk_error_log.txt";
         }
-        
+
         if (logErrors && (logLocation != null) && (logLocation.length() > 0)) {
             writeToFile(logLocation, (data + "\r\n").getBytes());
         }
@@ -673,16 +673,6 @@ public class CommonMethods {
         }
     }
 
-    public static void closeConnectionSafely(Connection conn) {
-        try {
-            if ((conn != null) && (!conn.isClosed())) {
-                conn.close();
-            }
-        } catch (Exception e) {
-        	logger.error(e);
-        }
-    }
-
     public static CallableStatement setNullableIntParam(CallableStatement cs, int index, int value) throws SQLException {
         if (cs != null) {
             if (value != 0) {
@@ -695,7 +685,7 @@ public class CommonMethods {
             return null;
         }
     }
-    
+
     public static CallableStatement setNullableIntParam(CallableStatement cs, String paramName, int value) throws SQLException {
         if (cs != null) {
             if (value != 0) {
@@ -753,18 +743,17 @@ public class CommonMethods {
             }
         }
     }
-    
+
     public static void safeCloseDatabaseConnection(Connection dbConnection) {
     	try {
 	    	if ((dbConnection != null) && !dbConnection.isClosed()) {
 	    		dbConnection.close();
 	    	}
-    	}
-		catch (Exception ex) {
+    	} catch (Exception ex) {
 			logger.warn("Failed closing database connection!", ex);
 		}
     }
-    
+
     public static FileSplitResult splitOutTags(String xmlFileName, String tagLocalName, boolean noMainFile, boolean noSubFiles, boolean replaceMain) {
         FileSplitResult result = new FileSplitResult();
         result.subFiles = new ArrayList<String>();

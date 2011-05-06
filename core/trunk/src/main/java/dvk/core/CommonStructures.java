@@ -46,6 +46,7 @@ public class CommonStructures {
     public static final String VIGA_ANDMEBAASI_SALVESTAMISEL = "DVK serveri tarkvaraline viga! Viga andmete andmebaasi salvestamisel!";
     public static final String VIGA_ANDMEBAASIYHENDUSE_LOOMISEL = "DVK serveri tarkvaraline viga! Viga andmebaasiühenduse loomisel!";
     public static final String VIGA_PARINGU_VERSIOONIS = "X-Tee päises nimetatud päringu versiooni ei eksisteeri!";
+    public static final String VIGA_ASUTUS_BLOKEERITUD = "DVK päringud on asutusele #1 blokeeritud. Blokeeringu eemaldamiseks pöörduge palun DVK halduri poole.";
     
     // Rollid
     public static final String ROLL_ASUTUSE_ADMIN = "DHL: asutuse administraator";

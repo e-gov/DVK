@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 import java.util.zip.*;
 import javax.activation.DataHandler;
@@ -1581,5 +1582,27 @@ public class CommonMethods {
      */
     public static boolean isNullOrEmpty(String stringToEvaluate) {
     	return ((stringToEvaluate == null) || stringToEvaluate.isEmpty());
+    }
+    
+    /**
+     * Seeks specified value from String list.
+     * Ignores case and treats null and empty values as equal.
+     * 
+     * @param list
+     *     List of strings
+     * @param valueToSeek
+     *     String value to seek from list
+     * @return
+     *     true if specified string is found in list
+     */
+    public static boolean listContainsIgnoreCase(List<String> list, String valueToSeek) {
+    	if (list != null) {
+	    	for (String item : list) {
+	    		if (stringsEqualIgnoreNull(item, valueToSeek)) {
+	    			return true;
+	    		}
+	    	}
+    	}
+    	return false;
     }
 }

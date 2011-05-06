@@ -1,5 +1,6 @@
 package dhl.aar;
 
+import dhl.CoreServices;
 import dhl.sys.ApplicationParams;
 import dhl.users.Asutus;
 import dvk.core.CommonMethods;
@@ -7,8 +8,12 @@ import java.sql.Connection;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.apache.log4j.Logger;
+
 public class AarSyncronizer implements Runnable {
-    Thread t;
+	static Logger logger = Logger.getLogger(AarSyncronizer.class);
+
+	Thread t;
     Connection dbConn;
     int syncDelay = 0;
 
@@ -17,15 +22,17 @@ public class AarSyncronizer implements Runnable {
             this.t = new Thread(this);
             this.dbConn = conn;
             this.syncDelay = syncDelay;
-            
-            // Vigaste seadetega threadi kõima ei tõmba
+
+            // Vigaste seadetega threadi käima ei tõmba
             if ((this.dbConn != null) && (this.syncDelay > 0)) {
                 this.t.start();
             } else {
-                CommonMethods.closeConnectionSafely(this.dbConn);
+                logger.error("Could not start \"aar\" database synchronizer due to incorrect settings!");
+            	CommonMethods.safeCloseDatabaseConnection(this.dbConn);
             }
         } catch (Exception ex) {
-            CommonMethods.closeConnectionSafely(this.dbConn);
+            logger.error(ex);
+        	CommonMethods.safeCloseDatabaseConnection(this.dbConn);
         }
     }
 
@@ -39,31 +46,31 @@ public class AarSyncronizer implements Runnable {
                 calendar.add(Calendar.MINUTE, this.syncDelay);
                 markerDate = (calendar.getTime());
             }
-            
+
             Calendar now = Calendar.getInstance();
             now.setTime(new Date());
             Calendar currentSync = Calendar.getInstance();
             currentSync.setTime(markerDate);
-            
-            // Kui praegune hetk on hilisem planeeritud sõnkroniseerimise ajast,
-            // siis kõivitame sõnkroniseerimise
+
+            // Kui praegune hetk on hilisem planeeritud sünkroniseerimise ajast,
+            // siis käivitame sünkroniseerimise
             if (now.after(currentSync)) {
-                // Mõrgime seadetesse viimase sõnkroniseerimise kuupõevaks
+                // Märgime seadetesse viimase sünkroniseerimise kuupäevaks
                 // praeguse hetke.
-                // Teeme seda igaks juhuks enne realset sõnkroniseerimist, kuna
-                // sedasi on võiksem tõenõosus, et sõnkroniseerimine mitmekordselt
-                // kõivitatakse
+                // Teeme seda igaks juhuks enne realset sünkroniseerimist, kuna
+                // sedasi on väiksem tõenäosus, et sünkroniseerimine
+                // mitmekordselt käivitatakse.
                 params.setLastAarSync(new Date());
                 params.saveToDB(this.dbConn);
 
-                // Sõnkroniseerime kohaliku asutuste ja õiguste andmebaasi andmeid
-                // keskse õiguste andmekoguga
+                // Sünkroniseerime kohaliku asutuste ja õiguste andmebaasi
+                // andmeid keskse õiguste andmekoguga
                 Asutus.runAarSyncronization(dbConn);
-            }            
+            }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, this.getClass().getName(), "run");
+        	logger.error(ex);
         } finally {
-            CommonMethods.closeConnectionSafely(this.dbConn);
+            CommonMethods.safeCloseDatabaseConnection(this.dbConn);
         }
     }
 }

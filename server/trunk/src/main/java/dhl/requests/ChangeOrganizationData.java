@@ -22,9 +22,9 @@ public class ChangeOrganizationData {
             throw new AxisFault(CommonStructures.VIGA_VIGANE_KEHA);
         }
         
-        // Kui põringuga õritatakse muuta teise asutuse andmeid, siis anname veatete
+        // Kui põringuga üritatakse muuta teise asutuse andmeid, siis anname veatete
         if (!bodyData.asutus.getRegistrikood().equalsIgnoreCase(user.getOrganizationCode())) {
-            throw new AxisFault("Antud põringuga saab muuta ainult põringu sooritanud asutuse andmeid!");
+            throw new AxisFault("Antud päringuga saab muuta ainult päringu sooritanud asutuse andmeid!");
         }
 
         // Laeme andmebaasist asutuse andmete olemasoleva seisu.

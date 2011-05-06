@@ -96,11 +96,20 @@ public class UserProfile {
             throw new AxisFault(CommonStructures.VIGA_XTEE_ASUTUSE_PAIS_PUUDU);
         }
 
-        // Laeme asutuste registrist esitatud asutuse koodile vastava asutuse andmed.
+        // Laeme asutuste registrist esitatud asutuse koodile vastava
+        // asutuse andmed.
         result.setOrganizationCode(header.asutus);
         result.setOrganizationID(Asutus.getIDByRegNr(header.asutus, false, conn));
         if (result.getOrganizationID() <= 0) {
-            throw new AxisFault(CommonStructures.VIGA_TUNDMATU_ASUTUS.replaceFirst("#1", header.asutus));
+            throw new AxisFault(CommonStructures.VIGA_TUNDMATU_ASUTUS
+                .replaceFirst("#1", header.asutus));
+        }
+
+        // Make sure that current users organization has not been disabled.
+        Asutus org = new Asutus(result.getOrganizationID(), conn);
+        if ((org == null) || !org.getDvkSaatmine()) {
+            throw new AxisFault(CommonStructures.VIGA_ASUTUS_BLOKEERITUD
+                .replaceFirst("#1", result.getOrganizationCode()));
         }
 
         // Leiame sõnumi saatnud isiku ID oma isikute registrist

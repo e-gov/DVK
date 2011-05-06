@@ -4,7 +4,7 @@
 	<groupId>dvk</groupId>
 	<artifactId>server</artifactId>
 	<packaging>war</packaging>
-	<version>1.6.1</version>
+	<version>1.6.2</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -17,14 +17,14 @@
   	<dependency>
       <groupId>ria</groupId>
       <artifactId>dvk-core</artifactId>
-      <version>1.6.1</version>
+      <version>1.6.2</version>
       <scope>system</scope>
       <systemPath>${dvkCoreDir}\target\dvk-core.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>ria</groupId>
       <artifactId>dvk-client</artifactId>
-      <version>1.6.1</version>
+      <version>1.6.2</version>
       <scope>system</scope>
       <systemPath>${dvkClientDir}\target\dvk-client.jar</systemPath>
     </dependency>

@@ -34,7 +34,7 @@ public class CommonStructures {
     public static final String VIGA_SAADETUD_DOKUMENDI_TOOTLEMISEL = "Viga saadetud dokumendi andmete töötlemisel! Palume kontrollida, et saadetud dokument vastaks kokkulepitud struktuurile!";
     public static final String VIGA_PUUDUV_TAG = "Puuduv kohustuslik XML-tag: #1";
     public static final String VIGA_VASTUSSONUMI_KOOSTAMISEL = "DVK serveri tarkvaraline viga! Viga vastussõnumi koostamisel!";
-    public static final String VIGA_PUUDULIKUD_VASTUVOTJA_KONTAKTID = "Antud dokumenti ei ole võimalik saajale edastada, kuna antud asutus ei ole DVK-ga liitunud või ei suuda DVK kaudu andmeid vahetada!";
+    public static final String VIGA_PUUDULIKUD_VASTUVOTJA_KONTAKTID = "Antud dokumenti ei ole võimalik saajale edastada, kuna asutus #1 ei ole DVK-ga liitunud või ei suuda DVK kaudu andmeid vahetada!";
     public static final String VIGA_AADRESSANDMED_PUUDU = "Viga saadetud sõnumi andmetes! Dokumendi saatja ja saajate andmed on puudu!";
     public static final String VIGA_VALE_ARV_SAATJAID = "Viga saadetud sõnumi andmetes! Kui transpordi plokk on täidetud, siis peab dokumendi olema täpselt üks saatja!";
     public static final String VIGA_VALE_ARV_VASTUVOTJAID = "Viga saadetud sõnumi andmetes! Kui transpordi plokk on täidetud, siis peab dokumendi olema vähemalt üks saaja!";

@@ -435,6 +435,10 @@ public class ClientAPI {
 			    	result = recipientSideMessage.addToDB(targetDb, targetDbConnection);
 			    	
 			    	if (result > 0) {
+			    		if (rec.getDhlID() == 0) {
+			    			rec.setDhlId(result);
+			    		}
+			    		
 			    		// Uuendame adressaadi andmeid lähteandmebaasis
 			    		rec.setSendingDate(now);
 			    		rec.setReceivedDate(now);

@@ -43,8 +43,8 @@ public class OrgAddressFilter {
     }
     
     private boolean getCodesSet() {
-    	return ((this.m_subdivisionCode != null) && (this.m_subdivisionCode.length() > 0)
-    			|| (this.m_occupationCode != null) && (this.m_occupationCode.length() > 0));
+    	return (!CommonMethods.isNullOrEmpty(this.m_subdivisionCode)
+    			|| !CommonMethods.isNullOrEmpty(this.m_occupationCode));
     }
     
     private boolean getIdsSet() {
@@ -80,16 +80,28 @@ public class OrgAddressFilter {
     			// Seega tuvastame aadressandmete järgi, kas filtreerida ID-de
     			// või lühinimetuste järgi.
     			
-    			if (((recipient.getRecipientDivisionCode() != null) && (recipient.getRecipientDivisionCode().length() > 0))
-    				|| ((recipient.getRecipientPositionCode() != null) && (recipient.getRecipientPositionCode().length() > 0))) {
+    			if (CommonMethods.isNullOrEmpty(recipient.getRecipientDivisionCode())
+    				&& CommonMethods.isNullOrEmpty(recipient.getRecipientPositionCode())
+    				&& CommonMethods.isNullOrEmpty(this.getSubdivisionCode())
+    				&& CommonMethods.isNullOrEmpty(this.getOccupationCode())
+    				&& (recipient.getRecipientDivisionID() <= 0)
+    				&& (recipient.getRecipientPositionID() <= 0)
+    				&& (this.getSubdivisionId() <= 0)
+    				&& (this.getOccupationId() <= 0)) {
+    			
+    				result.add(recipient);
+    				
+				} else if (!CommonMethods.isNullOrEmpty(recipient.getRecipientDivisionCode())
+    				|| !CommonMethods.isNullOrEmpty(recipient.getRecipientPositionCode())) {
         			
-    				if (((this.getSubdivisionCode() == null) || (this.getSubdivisionCode().length() < 1)
+    				if ((CommonMethods.isNullOrEmpty(this.getSubdivisionCode())
         	        	|| this.getSubdivisionCode().equalsIgnoreCase("*")
         	        	|| CommonMethods.stringsEqualIgnoreNull(recipient.getRecipientDivisionCode(), this.getSubdivisionCode()))
-        	        	&& ((this.getOccupationCode() == null) || (this.getOccupationCode().length() < 1)
+        	        	&& (CommonMethods.isNullOrEmpty(this.getOccupationCode())
          	        	|| this.getOccupationCode().equalsIgnoreCase("*")
          	        	|| CommonMethods.stringsEqualIgnoreNull(recipient.getRecipientPositionCode(), this.getOccupationCode()))) {
-        	        	result.add(recipient);
+        	        	
+    					result.add(recipient);
         	        }
     			} else {
         			if (((this.getSubdivisionId() <= 0) || (recipient.getRecipientDivisionID() == this.getSubdivisionId()))

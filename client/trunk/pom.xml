@@ -81,7 +81,7 @@
 	<dependency>
 	  	<groupId>ria</groupId>
 	  	<artifactId>dvk-core</artifactId>
-	  	<version>1.6.1</version>
+	  	<version>1.6.2</version>
 	  	<scope>system</scope>
 	  	<systemPath>${dvkCoreDir}/target/dvk-core.jar</systemPath>
 	</dependency>
@@ -186,6 +186,8 @@
 	<build>
 		<finalName>dvk-client</finalName>
 		<sourceDirectory>src/main/java</sourceDirectory>
+		<testSourceDirectory>src/test/java</testSourceDirectory>
+		<testOutputDirectory>target/test-classes</testOutputDirectory>
 		<resources>
 			<resource>
 				<directory>lib/</directory>

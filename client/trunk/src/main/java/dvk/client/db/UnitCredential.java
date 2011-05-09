@@ -1,6 +1,7 @@
 package dvk.client.db;
 
 import dvk.client.conf.OrgSettings;
+import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -254,5 +255,32 @@ public class UnitCredential {
         	logger.error(ex);
             return 0;
         }
+    }
+    
+    /**
+     * Checks if current organization is configured to download messages from
+     * given DEC folder.
+     * 
+     * @param folderName
+     *     Folder name
+     * @return
+     *     true if current organization is configured to download messages from
+     *     given DEC folder
+     */
+    public boolean acceptsMessagesInFolder(String folderName) {
+		boolean result = false;
+		if ((this.getFolders() == null) || (this.getFolders().isEmpty())) {
+			result = true;
+		} else if (CommonMethods.isNullOrEmpty(folderName) && this.getFolders().contains("/")) {
+			result = true;
+		} else if (!CommonMethods.isNullOrEmpty(folderName)) {
+			String normalizedFolderName = folderName.startsWith("/") ? folderName.substring(1) : folderName;
+			List<String> normalizedFolderList = new ArrayList<String>();
+			for (String folder : this.getFolders()) {
+				normalizedFolderList.add(folder.startsWith("/") ? folder.substring(1) : folder);
+			}
+			result = CommonMethods.listContainsIgnoreCase(normalizedFolderList, normalizedFolderName);
+		}
+		return result;
     }
 }

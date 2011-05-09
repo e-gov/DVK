@@ -84,31 +84,30 @@ public class SendDocuments {
             if (attachmentSource == null) {
                 throw new AxisFault( CommonStructures.VIGA_PUUDUV_MIME_LISA );
             }
-            
+
             // Laeme SOAP attachmendis asunud andmed baidimassiivi
             String[] headers = px.getMimeHeader("Content-Transfer-Encoding");
             String encoding;
             if((headers == null) || (headers.length < 1)) {
                 encoding = "base64";
-            }
-            else {
+            } else {
                 encoding = headers[0];
             }
-            
+
             t.reset();
             result.dataMd5Hash = CommonMethods.getDataFromDataSource(attachmentSource, encoding, pipelineDataFile, false);
             t.markElapsed("Extracting data from SOAP attachment");
             if (result.dataMd5Hash == null) {
-                throw new AxisFault( CommonStructures.VIGA_VIGANE_MIME_LISA );
+                throw new AxisFault(CommonStructures.VIGA_VIGANE_MIME_LISA);
             }
-            
+
             // Pakime andmed GZIPiga lahti
             t.reset();
             if (!CommonMethods.gzipUnpackXML(pipelineDataFile, true)) {
-                throw new AxisFault(CommonStructures.VIGA_VIGANE_MIME_LISA );
+                throw new AxisFault(CommonStructures.VIGA_VIGANE_MIME_LISA);
             }
             t.markElapsed("Extracting attachment data");
-            
+
             // Pakime saadetud dokumentide faili lahti ja laeme selle XML struktuuri
             t.reset();
             FileSplitResult docFiles = CommonMethods.splitOutTags(pipelineDataFile, "dokument", true, false, true);
@@ -116,7 +115,7 @@ public class SendDocuments {
             if ((docFiles == null) || (docFiles.subFiles == null) || (docFiles.subFiles.size() < 1)) {
                  throw new AxisFault( CommonStructures.VIGA_VIGANE_MIME_LISA );
             }
-            
+
             t.reset();
             FileOutputStream out = null;
             OutputStreamWriter ow = null;
@@ -127,7 +126,7 @@ public class SendDocuments {
                 try {
                     // Valideerime XML dokumendi
                     Fault validationFault = CommonMethods.validateDVKContainer(docFiles.subFiles.get(i));
-                    
+
                     // Sõltuvalt sellest, kas server tõõtab serveri või kliendi
                     // andmebaasi peal, koostame DVK konteineri XML failidest
                     // vastavad andmeobjektid ja salvestame need andmebaasi
@@ -217,7 +216,7 @@ public class SendDocuments {
                         CommonMethods.safeCloseWriter(bw);
                         CommonMethods.safeCloseWriter(ow);
                         CommonMethods.safeCloseStream(out);
-                        
+
                         // Lisame uue dokumendi laekunud dokumentide listi
                         serverDocuments.add(doc);
                     }
@@ -231,15 +230,15 @@ public class SendDocuments {
                 }
             }
             t.markElapsed("Parsing document XML");
-            
+
             // Salvestame saadud dokumendid andmebaasi ja koostame
             // uute dokumentide ID-de põhjal vastussõnumi.
             try {
                 t.reset();
                 out = new FileOutputStream(pipelineDataFile, false);
-                ow = new OutputStreamWriter(out, "UTF-8"); 
+                ow = new OutputStreamWriter(out, "UTF-8");
                 ow.write("<keha>");
-                
+
                 if (Settings.Server_RunOnClientDatabase) {
                     DhlMessage tmpMsg;
                     for (int i = 0; i < clientDocuments.size(); ++i) {
@@ -251,10 +250,10 @@ public class SendDocuments {
                         tmpMsg.setQueryID(xTeePais.id);
                         tmpMsg.setCaseName(xTeePais.toimik);
                         tmpMsg.setDhlFolderName(bodyData.kaust);
-                        
+
                         // Salvestame dokumendi andmebaasi
                         tmpMsg.addToDB(hostOrgSettings, conn);
-                        
+
                         // Tagastame siin kirje ID asemel DHL_ID võõrtuse, kuna
                         // kliendi poolel peaks DVK unikaalne identifikaator
                         // asuma just sellel andmevõljal.
@@ -268,17 +267,16 @@ public class SendDocuments {
                     dhl.Document tmpDoc;
                     for (int i = 0; i < serverDocuments.size(); ++i) {
                         tmpDoc = serverDocuments.get(i);
-                        
+
                         // Salvestame dokumendi andmebaasi
                         tmpDoc.addToDB(conn, xTeePais);
-                        
+
                         // Edastame dokumendi vajadusel mõnda teise DVK serverisse
                         ForwardDocument(tmpDoc, bodyData.kaust, conn, 1, xTeePais);
-                        
+
                         if (tmpDoc.getId() > 0) {
                             ow.write("<dhl_id>"+ String.valueOf(tmpDoc.getId()) +"</dhl_id>");
-                        }
-                        else {
+                        } else {
                             throw new AxisFault( CommonStructures.VIGA_SAADETUD_DOKUMENDI_SALVESTAMISEL );
                         }
                     }
@@ -290,7 +288,7 @@ public class SendDocuments {
                 CommonMethods.safeCloseStream(out);
                 ow = null;
                 out = null;
-                
+
                 // Kustutame ajutisest kataloogist õra andmebaasi salvestatud failid
                 t.reset();
                 if (Settings.Server_RunOnClientDatabase) {
@@ -304,7 +302,7 @@ public class SendDocuments {
                 }
                 t.markElapsed("Deleting temporary document files");
             }
-            
+
             t.reset();
             result.responseFile = CommonMethods.gzipPackXML(pipelineDataFile, user.getOrganizationCode(), "sendDocuments");
             t.markElapsed("Compressing response XML");
@@ -313,19 +311,19 @@ public class SendDocuments {
         		(new File(pipelineDataFile)).delete();
         	}
         }
-        
+
         return result;
     }
-    
+
     public static RequestInternalResult V2(org.apache.axis.MessageContext context, Connection conn, UserProfile user, OrgSettings hostOrgSettings, XHeader xTeePais) throws Exception, ParserConfigurationException {
-        
+
     	logger.info("SendDocuments.V2 invoked.");
-    	
+
     	Timer t = new Timer();
         RequestInternalResult result = new RequestInternalResult();
         String pipelineDataFile = CommonMethods.createPipelineFile(0);
         String responseDataFile = null;
-        
+
         try {
             // Laeme põringu keha endale sobivasse andmestruktuuri
             sendDocumentsV2RequestType bodyData = sendDocumentsV2RequestType.getFromSOAPBody( context );
@@ -333,7 +331,7 @@ public class SendDocuments {
                 throw new RequestProcessingException(CommonStructures.VIGA_VIGANE_KEHA);
             }
             result.folder = bodyData.kaust;
-            
+
             // Tuvastame, millisesse kausta soovitakse dokumenti salvestada
             // - Kui DVK server on seadistatud tõõtama kliendi tabelite peal,
             //   siis pole meil kaustade tabelit olemas ja seega ei saa kausta
@@ -341,8 +339,8 @@ public class SendDocuments {
             int senderTargetFolder = Folder.GLOBAL_ROOT_FOLDER;
             if (!Settings.Server_RunOnClientDatabase) {
                 senderTargetFolder = Folder.getFolderIdByPath( bodyData.kaust, user.getOrganizationID(), conn, false, true, xTeePais );
-            }            
-            
+            }
+
             // Leiame sõnumi kehas olnud viite alusels MIME lisast vajalikud andmed
             org.apache.axis.attachments.AttachmentPart px = (org.apache.axis.attachments.AttachmentPart) context.getCurrentMessage().getAttachmentsImpl().getAttachmentByReference(bodyData.dokumendid);
             if (px == null) {
@@ -366,20 +364,19 @@ public class SendDocuments {
             // Laeme SOAP attachmendis asunud andmed baidimassiivi
             String[] headers = px.getMimeHeader("Content-Transfer-Encoding");
             String encoding;
-            if((headers == null) || (headers.length < 1)) {
+            if ((headers == null) || (headers.length < 1)) {
                 encoding = "base64";
-            }
-            else {
+            } else {
                 encoding = headers[0];
             }
-            
+
             t.reset();
             result.dataMd5Hash = CommonMethods.getDataFromDataSource(attachmentSource, encoding, pipelineDataFile, false);
             t.markElapsed("Extracting data from SOAP attachment");
             if (result.dataMd5Hash == null) {
                 throw new RequestProcessingException(CommonStructures.VIGA_VIGANE_MIME_LISA);
             }
-            
+
             // Kui tegemist on dokumendi fragmendiga, siis salvestame selle
             // fragmentide tabelisse
             if (bodyData.fragmenteKokku > 0) {
@@ -408,10 +405,10 @@ public class SendDocuments {
                     fragment.addToDBProc(conn, xTeePais);
                     (new File(pipelineDataFile)).delete();
                 }
-            
+
                 // Kui tegemist on viimase saadetud fragmendiga, siis paneme
                 // fragmentidest kokku tervikliku faili.
-                if (bodyData.fragmentNr == (bodyData.fragmenteKokku-1)) {
+                if (bodyData.fragmentNr == (bodyData.fragmenteKokku - 1)) {
                     if (Settings.Server_RunOnClientDatabase) {
                         pipelineDataFile = CommonMethods.createPipelineFile(0);
                         FileOutputStream fos = null;
@@ -739,24 +736,23 @@ public class SendDocuments {
                     throw new FragmentedDataProcessingException("Dokumendi saatmisel fragmentideks jaotatuna tuleks maarata ka elemendi edastus_id vaartus!");
                 }
             }
-            
+
             // Laeme SOAP attachmendis asunud andmed baidimassiivi
             String[] headers = px.getMimeHeader("Content-Transfer-Encoding");
             String encoding;
-            if((headers == null) || (headers.length < 1)) {
+            if ((headers == null) || (headers.length < 1)) {
                 encoding = "base64";
-            }
-            else {
+            } else {
                 encoding = headers[0];
             }
-            
+
             t.reset();
             result.dataMd5Hash = CommonMethods.getDataFromDataSource(attachmentSource, encoding, pipelineDataFile, false);
             t.markElapsed("Extracting data from SOAP attachment");
             if (result.dataMd5Hash == null) {
                 throw new RequestProcessingException(CommonStructures.VIGA_VIGANE_MIME_LISA);
             }
-            
+
             // Kui tegemist on dokumendi fragmendiga, siis salvestame selle
             // fragmentide tabelisse
             if (bodyData.fragmenteKokku > 0) {
@@ -785,10 +781,10 @@ public class SendDocuments {
                     fragment.addToDBProc(conn, xTeePais);
                     (new File(pipelineDataFile)).delete();
                 }
-            
+
                 // Kui tegemist on viimase saadetud fragmendiga, siis paneme
                 // fragmentidest kokku tervikliku faili.
-                if (bodyData.fragmentNr == (bodyData.fragmenteKokku-1)) {
+                if (bodyData.fragmentNr == (bodyData.fragmenteKokku - 1)) {
                     if (Settings.Server_RunOnClientDatabase) {
                         pipelineDataFile = CommonMethods.createPipelineFile(0);
                         FileOutputStream fos = null;
@@ -1175,16 +1171,16 @@ public class SendDocuments {
         }
         return sendingList;
     }
-    
+
     private static void validateXmlFiles(ArrayList<DocumentFile> docFiles) throws AxisFault, Exception {
     	if (Settings.Server_ValidateXmlFiles && (docFiles != null)) {
     		logger.info("Starting XML validation of total " + String.valueOf(docFiles.size()) + " files.");
     		ArrayList<String> allErrors = new ArrayList<String>();
-    		
+
     		for (int i = 0; i < docFiles.size(); i++) {
         		String originalFileName = docFiles.get(i).getFileName();
     			String localFileName = docFiles.get(i).getLocalFileFullName();
-    			
+
     			if (originalFileName.toLowerCase().endsWith("xml")) {
 	    			ArrayList<String> validationErrors = XmlValidator.Validate(localFileName);
 	    			if ((validationErrors != null) && (validationErrors.size() > 0)) {
@@ -1206,7 +1202,7 @@ public class SendDocuments {
     				}
     			}
         	}
-    		
+
     		if ((allErrors != null) && (allErrors.size() > 0)) {
     			StringBuilder sb = new StringBuilder(10000);
     			for (String error : allErrors) {
@@ -1216,15 +1212,15 @@ public class SendDocuments {
     		}
         }
     }
-    
+
     private static void validateSignedFileSignatures(ArrayList<DocumentFile> docFiles) throws ComponentException, IncorrectSignatureException {
     	if (Settings.Server_ValidateSignatures && (docFiles != null)) {
     		logger.info("Starting signature validation of total " + String.valueOf(docFiles.size()) + " files.");
     		ArrayList<String> allErrors = new ArrayList<String>();
-    		
+
     		for (int i = 0; i < docFiles.size(); i++) {
         		String fileName = docFiles.get(i).getFileName();
-    			
+
     			if (fileName.toLowerCase().endsWith("ddoc") || fileName.toLowerCase().endsWith("bdoc")) {
     				ArrayList<String> validationErrors = docFiles.get(i).validateFileSignatures();
     				if ((validationErrors != null) && (validationErrors.size() > 0)) {
@@ -1232,7 +1228,7 @@ public class SendDocuments {
     				}
     			}
         	}
-    		
+
     		if ((allErrors != null) && (allErrors.size() > 0)) {
     			StringBuilder sb = new StringBuilder(10000);
     			for (String error : allErrors) {

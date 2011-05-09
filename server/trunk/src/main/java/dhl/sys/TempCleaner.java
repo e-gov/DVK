@@ -17,7 +17,7 @@ public class TempCleaner implements Runnable {
         File tempPath = new File(System.getProperty("java.io.tmpdir", ""));
         if ((tempPath != null) && tempPath.exists() && tempPath.isDirectory()) {
             FilenameFilter filter = new FilenameFilter() {
-                    public boolean accept(File dir, String name) {
+                    public boolean accept(final File dir, final String name) {
                         return name.startsWith("dhl_");
                     }
                 };

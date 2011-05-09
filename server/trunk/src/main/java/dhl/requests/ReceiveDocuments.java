@@ -23,6 +23,8 @@ import java.io.OutputStreamWriter;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+
 import org.apache.axis.AxisFault;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
@@ -31,25 +33,27 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class ReceiveDocuments {
-	
+
 	private static Logger logger = Logger.getLogger(ReceiveDocuments.class);
-	
-	public static RequestInternalResult V1( org.apache.axis.MessageContext context, Connection conn, UserProfile user ) throws Exception {
-        
+
+	public static RequestInternalResult V1(org.apache.axis.MessageContext context, Connection conn, UserProfile user) throws Exception {
 		logger.info("ReceiveDocuments.V1 invoked.");
-		
+
 		Timer t = new Timer();
         RequestInternalResult result = new RequestInternalResult();
         String pipelineDataFile = CommonMethods.createPipelineFile(0);
-        
+
         try {
             // Laeme SOAP keha endale sobivasse andmestruktuuri
             t.reset();
-            receiveDocumentsRequestType bodyData = receiveDocumentsRequestType.getFromSOAPBody( context );
+            receiveDocumentsRequestType bodyData = receiveDocumentsRequestType.getFromSOAPBody(context);
             result.count = bodyData.arv;
             result.folders = bodyData.kaust;
             t.markElapsed("Parsing SOAP body");
-            
+
+            // Check if all requested folders really exist
+            validateFolders(bodyData.kaust, user, conn);
+
             t.reset();
             ArrayList<dhl.Document> documents = new ArrayList<dhl.Document>();
             if ((bodyData.kaust == null) || (bodyData.kaust.size() == 0)) {
@@ -61,15 +65,15 @@ public class ReceiveDocuments {
                     // Tuvastame, millisesse kausta soovitakse dokumenti salvestada
                 	XHeader xTeePais = new XHeader(user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
                     int requestTargetFolder = Folder.getFolderIdByPath( bodyData.kaust.get(folderNr).trim(), user.getOrganizationID(), conn, true, false, xTeePais );
-                
+
                     // Leiame antud kasutajale saadetud dokumendid
                     ArrayList<dhl.Document> tmpDocs = dhl.Document.getDocumentsSentTo( user.getOrganizationID(), requestTargetFolder, user.getPersonID(), 0, "", 0, "", resultLimit, conn );
                     resultLimit -= tmpDocs.size();
-                    
+
                     // Lisame leitud dokumendid dokumentide tõisnimekirja
-                    documents.addAll( tmpDocs );
+                    documents.addAll(tmpDocs);
                     tmpDocs = null;
-                    
+
                     // Kui maksimaalne lubatud vastuste hulk on kões, siis
                     // rohkem dokumente andmebaasist võlja ei võta
                     if (resultLimit <= 0) {
@@ -78,11 +82,10 @@ public class ReceiveDocuments {
                 }
             }
             t.markElapsed("Reading documents from DB");
-            
+
             // Pistame leitud dokumendid võljundisse
             t.reset();
-            try
-            {
+            try {
                 FileOutputStream out = null;
                 OutputStreamWriter ow = null;
                 BufferedWriter bw = null;
@@ -90,22 +93,21 @@ public class ReceiveDocuments {
                     out = new FileOutputStream(pipelineDataFile, false);
                     ow = new OutputStreamWriter(out, "UTF-8");
                     bw = new BufferedWriter(ow);
-    
+
                     if (documents != null) {
                         ArrayList<Integer> processedDocuments = new ArrayList<Integer>();
-                        for( int i = 0; i < documents.size(); ++i )
-                        {
+                        for (int i = 0; i < documents.size(); ++i) {
                             dhl.Document tmpDoc = documents.get(i);
-                            
+
                             if (tmpDoc != null) {
                             	if (!processedDocuments.contains(tmpDoc.getId()) && (tmpDoc.getFilePath() != null)) {
                                     // Laeme konkreetse dokumendi saatmist puudutavad andmed
                                     Sending tmpSending = new Sending();
                                     tmpSending.loadByDocumentID( tmpDoc.getId(), conn );
-                                    
+
                                     Recipient tmpRecipient = null;
                                     ArrayList<Recipient> tmpRecipients = tmpSending.getRecipients();
-                
+
                                     Recipient recipientBuffer = null;
                                     for (int j = 0; j < tmpRecipients.size(); ++j) {
                                         recipientBuffer = tmpRecipients.get(j);
@@ -114,31 +116,31 @@ public class ReceiveDocuments {
                                             break;
                                         }
                                     }
-                                    
+
                                     if ((tmpRecipient != null) && (tmpSending.getSender() != null)) {
                                         Asutus senderOrg = new Asutus( tmpSending.getSender().getOrganizationID(), conn );
                                         Asutus recipientOrg = new Asutus( tmpRecipient.getOrganizationID(), conn );
-                                        
+
                                         if(tmpDoc.getDvkContainerVersion() == 2) {
-                                        	
+
                                         	// Convert to DVK container version 1
                                         	Conversion conversion = new Conversion();
                                 			conversion.setInputFile(tmpDoc.getFilePath());
                                 			conversion.setOutputFile(tmpDoc.getFilePath() + ".tmp");
                                 			conversion.setVersion(2);
                                 			conversion.setTargetVersion(1);
-                                			
+
                                 			// Get the XSLT from database
                                 			conversion.getConversionFromDB(conn);
-                                			
+
                                 			conversion.convert();
-                                			
+
                                 			tmpDoc.setFilePath(tmpDoc.getFilePath() + ".tmp");
                                         }
-                                        
+
                                         // Viskame XML failist võlja suure mahuga SignedDoc elemendid
                                         CommonMethods.splitOutTags(tmpDoc.getFilePath(), "SignedDoc", false, false, true);
-                                        
+
                                         // Tõidame DHL poolt automaatselt tõidetavad võljad
                                         appendAutomaticMetaData(
                                             tmpDoc.getFilePath(),
@@ -149,23 +151,23 @@ public class ReceiveDocuments {
                                             recipientOrg,
                                             conn,
                                             tmpDoc.getDvkContainerVersion());
-                                                                            
+
                                         // Paigaldame varem eraldatud SignedDoc elemendid uuesti XML
                                         // faili koosseisu tagasi.
                                         CommonMethods.joinSplitXML(tmpDoc.getFilePath(), bw);
-                                        
-                                        processedDocuments.add( tmpDoc.getId() );
+
+                                        processedDocuments.add(tmpDoc.getId());
                                     }
                                 }
                             }
                         }
                     }
-                }
-                catch (Exception ex) {
-                    CommonMethods.logError( ex, "dhl.requests.ReceiveDocuments", "V1" );
-                    throw new AxisFault( "Error composing response message: " +" ("+ ex.getClass().getName() +": "+ ex.getMessage() +")" );
-                }
-                finally {
+                } catch (AxisFault fault) {
+                	throw fault;
+                } catch (Exception ex) {
+                	logger.error(ex.getMessage(), ex);
+                    throw new AxisFault("Error composing response message: " +" ("+ ex.getClass().getName() +": "+ ex.getMessage() +")");
+                } finally {
                     CommonMethods.safeCloseWriter(bw);
                     CommonMethods.safeCloseWriter(ow);
                     CommonMethods.safeCloseStream(out);
@@ -173,43 +175,44 @@ public class ReceiveDocuments {
                     ow = null;
                     out = null;
                 }
-            }
-            catch (Exception ex) {
-                CommonMethods.logError( ex, "dhl.ReceiveDocuments", "V1" );
-                throw new AxisFault( ex.getMessage() );
+            } catch (AxisFault fault) {
+            	throw fault;
+            } catch (Exception ex) {
+            	logger.error(ex.getMessage(), ex);
+                throw new AxisFault(ex.getMessage());
             }
             t.markElapsed("Processing documents and creating answer");
-            
+
             t.reset();
-            result.responseFile = CommonMethods.gzipPackXML(pipelineDataFile, user.getOrganizationCode(), "receiveDocuments" );
-            t.markElapsed("Compressing response data");                
-        }
-        finally {
+            result.responseFile = CommonMethods.gzipPackXML(pipelineDataFile, user.getOrganizationCode(), "receiveDocuments");
+            t.markElapsed("Compressing response data");
+        } finally {
             (new File(pipelineDataFile)).delete();
         }
-        
+
         return result;
     }
-    
-    public static RequestInternalResult V2( org.apache.axis.MessageContext context, Connection conn, UserProfile user ) throws Exception
-    {
-    	
+
+    public static RequestInternalResult V2( org.apache.axis.MessageContext context, Connection conn, UserProfile user ) throws Exception {
     	logger.info("ReceiveDocuments.V2 invoked.");
-    	
+
         Timer t = new Timer();
         RequestInternalResult result = new RequestInternalResult();
         String pipelineDataFile = CommonMethods.createPipelineFile(0);
-        
+
         try {
             // Laeme SOAP keha endale sobivasse andmestruktuuri
             t.reset();
-            receiveDocumentsV2RequestType bodyData = receiveDocumentsV2RequestType.getFromSOAPBody( context );
+            receiveDocumentsV2RequestType bodyData = receiveDocumentsV2RequestType.getFromSOAPBody(context);
             result.count = bodyData.arv;
             result.folders = bodyData.kaust;
             result.deliverySessionID = bodyData.edastusID;
             result.fragmentSizeBytes = bodyData.fragmentSizeBytesOrig;
             t.markElapsed("Parsing SOAP body");
-            
+
+            // Check if all requested folders really exist
+            validateFolders(bodyData.kaust, user, conn);
+
             if ((bodyData.edastusID != null) && !bodyData.edastusID.equalsIgnoreCase("") && (bodyData.fragmentNr > 0)) {
                 DocumentFragment fragment = new DocumentFragment(user.getOrganizationID(), bodyData.edastusID, bodyData.fragmentNr, conn);
                 result.responseFile = fragment.getFileName();
@@ -227,15 +230,15 @@ public class ReceiveDocuments {
                         // Tuvastame, millisesse kausta soovitakse dokumenti salvestada
                     	XHeader xTeePais = new XHeader(user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
                         int requestTargetFolder = Folder.getFolderIdByPath( bodyData.kaust.get(folderNr).trim(), user.getOrganizationID(), conn, true, false, xTeePais );
-                    
+
                         // Leiame antud kasutajale saadetud dokumendid
                         ArrayList<dhl.Document> tmpDocs = dhl.Document.getDocumentsSentTo( user.getOrganizationID(), requestTargetFolder, user.getPersonID(), 0, "", 0, "", resultLimit, conn );
                         resultLimit -= tmpDocs.size();
-                        
+
                         // Lisame leitud dokumendid dokumentide tõisnimekirja
-                        documents.addAll( tmpDocs );
+                        documents.addAll(tmpDocs);
                         tmpDocs = null;
-                        
+
                         // Kui maksimaalne lubatud vastuste hulk on kões, siis
                         // rohkem dokumente andmebaasist võlja ei võta
                         if (resultLimit <= 0) {
@@ -244,11 +247,10 @@ public class ReceiveDocuments {
                     }
                 }
                 t.markElapsed("Reading documents from DB");
-                
+
                 // Pistame leitud dokumendid võljundisse
                 t.reset();
-                try
-                {
+                try {
                     FileOutputStream out = null;
                     OutputStreamWriter ow = null;
                     BufferedWriter bw = null;
@@ -256,22 +258,21 @@ public class ReceiveDocuments {
                         out = new FileOutputStream(pipelineDataFile, false);
                         ow = new OutputStreamWriter(out, "UTF-8");
                         bw = new BufferedWriter(ow);
-        
+
                         if (documents != null) {
                             ArrayList<Integer> processedDocuments = new ArrayList<Integer>();
-                            for( int i = 0; i < documents.size(); ++i )
-                            {
+                            for (int i = 0; i < documents.size(); ++i) {
                                 dhl.Document tmpDoc = documents.get(i);
-                                
+
                                 if (tmpDoc != null) {
                                 	if (!processedDocuments.contains(tmpDoc.getId()) && (tmpDoc.getFilePath() != null)) {
                                         // Laeme konkreetse dokumendi saatmist puudutavad andmed
                                         Sending tmpSending = new Sending();
-                                        tmpSending.loadByDocumentID( tmpDoc.getId(), conn );
-                                        
+                                        tmpSending.loadByDocumentID(tmpDoc.getId(), conn);
+
                                         Recipient tmpRecipient = null;
                                         ArrayList<Recipient> tmpRecipients = tmpSending.getRecipients();
-                    
+
                                         Recipient recipientBuffer = null;
                                         for (int j = 0; j < tmpRecipients.size(); ++j) {
                                             recipientBuffer = tmpRecipients.get(j);
@@ -280,33 +281,33 @@ public class ReceiveDocuments {
                                                 break;
                                             }
                                         }
-                                        
+
                                         if ((tmpRecipient != null) && (tmpSending.getSender() != null))
                                         {
-                                            Asutus senderOrg = new Asutus( tmpSending.getSender().getOrganizationID(), conn );
-                                            Asutus recipientOrg = new Asutus( tmpRecipient.getOrganizationID(), conn );
-                                            
+                                            Asutus senderOrg = new Asutus(tmpSending.getSender().getOrganizationID(), conn);
+                                            Asutus recipientOrg = new Asutus(tmpRecipient.getOrganizationID(), conn);
+
                                             if(tmpDoc.getDvkContainerVersion() == 2) {
-                                            	
+
                                             	// Convert to DVK container version 1
                                             	Conversion conversion = new Conversion();
                                     			conversion.setInputFile(tmpDoc.getFilePath());
                                     			conversion.setOutputFile(tmpDoc.getFilePath() + ".tmp");
                                     			conversion.setVersion(2);
                                     			conversion.setTargetVersion(1);
-                                    			
+
                                     			// Get the XSLT from database
                                     			conversion.getConversionFromDB(conn);
-                                    			
+
                                     			conversion.convert();
-                                    			
+
                                     			tmpDoc.setFilePath(tmpDoc.getFilePath() + ".tmp");
-                                    			
+
                                             }
-                                            
+
                                             // Viskame XML failist võlja suure mahuga SignedDoc elemendid
                                             CommonMethods.splitOutTags(tmpDoc.getFilePath(), "SignedDoc", false, false, true);
-                                            
+
                                             // Tõidame DHL poolt automaatselt tõidetavad võljad
                                             appendAutomaticMetaData(
                                                 tmpDoc.getFilePath(),
@@ -317,23 +318,23 @@ public class ReceiveDocuments {
                                                 recipientOrg,
                                                 conn,
                                                 tmpDoc.getDvkContainerVersion());
-                                                                                
+
                                             // Paigaldame varem eraldatud SignedDoc elemendid uuesti XML
                                             // faili koosseisu tagasi.
                                             CommonMethods.joinSplitXML(tmpDoc.getFilePath(), bw);
-                                            
-                                            processedDocuments.add( tmpDoc.getId() );                                            
+
+                                            processedDocuments.add( tmpDoc.getId() );
                                         }
                                     }
                                 }
                             }
                         }
-                    }
-                    catch (Exception ex) {
-                        CommonMethods.logError( ex, "dhl.requests.ReceiveDocuments", "V2" );
-                        throw new AxisFault( "Error composing response message: " +" ("+ ex.getClass().getName() +": "+ ex.getMessage() +")" );
-                    }
-                    finally {
+                    } catch (AxisFault fault) {
+                    	throw fault;
+                    } catch (Exception ex) {
+                    	logger.error(ex.getMessage(), ex);
+                        throw new AxisFault("Error composing response message: " +" ("+ ex.getClass().getName() +": "+ ex.getMessage() +")");
+                    } finally {
                         CommonMethods.safeCloseWriter(bw);
                         CommonMethods.safeCloseWriter(ow);
                         CommonMethods.safeCloseStream(out);
@@ -341,17 +342,18 @@ public class ReceiveDocuments {
                         ow = null;
                         out = null;
                     }
-                }
-                catch (Exception ex) {
-                    CommonMethods.logError( ex, "dhl.ReceiveDocuments", "V2" );
-                    throw new AxisFault( ex.getMessage() );
+                } catch (AxisFault fault) {
+                	throw fault;
+                } catch (Exception ex) {
+                	logger.error(ex.getMessage(), ex);
+                    throw new AxisFault(ex.getMessage());
                 }
                 t.markElapsed("Processing documents and creating answer");
-                
+
                 t.reset();
                 result.responseFile = CommonMethods.gzipPackXML(pipelineDataFile, user.getOrganizationCode(), "receiveDocuments" );
                 t.markElapsed("Compressing response data");
-                
+
                 // Kui soovitakse vastust fragmenteeritud kujul, siis lammutame faili
                 // tõkkideks ja salvestame tõkid saatmist ootama.
                 if ((bodyData.edastusID != null) && !bodyData.edastusID.equalsIgnoreCase("") && (bodyData.fragmentNr >= 0)) {
@@ -364,22 +366,20 @@ public class ReceiveDocuments {
                     }
                 }
             }
-        }
-        finally {
+        } finally {
             (new File(pipelineDataFile)).delete();
         }
-        
+
         return result;
     }
-    
+
     public static RequestInternalResult V3( org.apache.axis.MessageContext context, Connection conn, UserProfile user ) throws Exception {
-        
     	logger.info("ReceiveDocuments.V3 invoked.");
-    	
+
     	Timer t = new Timer();
         RequestInternalResult result = new RequestInternalResult();
         String pipelineDataFile = CommonMethods.createPipelineFile(0);
-        
+
         try {
             // Laeme SOAP keha endale sobivasse andmestruktuuri
             t.reset();
@@ -389,9 +389,12 @@ public class ReceiveDocuments {
             result.deliverySessionID = bodyData.edastusID;
             result.fragmentSizeBytes = bodyData.fragmentSizeBytesOrig;
             t.markElapsed("Parsing SOAP body");
-            
+
+            // Check if all requested folders really exist
+            validateFolders(bodyData.kaust, user, conn);
+
             logger.debug("Starting receiveDocuments.V3 Request. Org: " + user.getOrganizationCode() + ", Personal ID: " + user.getPersonCode());
-            
+
             if ((bodyData.edastusID != null) && !bodyData.edastusID.equalsIgnoreCase("") && (bodyData.fragmentNr > 0)) {
                 DocumentFragment fragment = new DocumentFragment(user.getOrganizationID(), bodyData.edastusID, bodyData.fragmentNr, conn);
                 result.responseFile = fragment.getFileName();
@@ -419,7 +422,7 @@ public class ReceiveDocuments {
                         // Tuvastame, millisesse kausta soovitakse dokumenti salvestada
                     	XHeader xTeePais = new XHeader(user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
                         int requestTargetFolder = Folder.getFolderIdByPath( bodyData.kaust.get(folderNr).trim(), user.getOrganizationID(), conn, true, false, xTeePais );
-                    
+
                         // Leiame antud kasutajale saadetud dokumendid
                         logger.debug("Searching documents using following parameters: Org ID:  " + String.valueOf(user.getOrganizationID()) + ", Folder:  " + String.valueOf(requestTargetFolder) + ", Person ID: " + String.valueOf(user.getPersonID()) + ", Subdivision ID: " + String.valueOf(bodyData.allyksus) + ", Occupation ID: " + String.valueOf(bodyData.ametikoht) + ", Max documents: " + String.valueOf(resultLimit));
                         ArrayList<dhl.Document> tmpDocs = dhl.Document.getDocumentsSentTo(
@@ -432,12 +435,12 @@ public class ReceiveDocuments {
                             "",
                             resultLimit,
                             conn);
-                        resultLimit -= tmpDocs.size();                        
-                        
+                        resultLimit -= tmpDocs.size();
+
                         // Lisame leitud dokumendid dokumentide tõisnimekirja
-                        documents.addAll( tmpDocs );
+                        documents.addAll(tmpDocs);
                         tmpDocs = null;
-                        
+
                         // Kui maksimaalne lubatud vastuste hulk on kões, siis
                         // rohkem dokumente andmebaasist võlja ei võta
                         if (resultLimit <= 0) {
@@ -447,11 +450,10 @@ public class ReceiveDocuments {
                 }
                 t.markElapsed("Reading documents from DB");
                 logger.info(String.valueOf(documents.size()) + " found.");
-                
+
                 // Pistame leitud dokumendid võljundisse
                 t.reset();
-                try
-                {
+                try {
                     FileOutputStream out = null;
                     OutputStreamWriter ow = null;
                     BufferedWriter bw = null;
@@ -459,22 +461,21 @@ public class ReceiveDocuments {
                         out = new FileOutputStream(pipelineDataFile, false);
                         ow = new OutputStreamWriter(out, "UTF-8");
                         bw = new BufferedWriter(ow);
-        
+
                         if (documents != null) {
                             ArrayList<Integer> processedDocuments = new ArrayList<Integer>();
-                            for( int i = 0; i < documents.size(); ++i )
-                            {
+                            for (int i = 0; i < documents.size(); ++i) {
                                 dhl.Document tmpDoc = documents.get(i);
-                                
+
                                 if (tmpDoc != null) {
                                 	if (!processedDocuments.contains(tmpDoc.getId()) && (tmpDoc.getFilePath() != null)) {
                                         // Laeme konkreetse dokumendi saatmist puudutavad andmed
                                         Sending tmpSending = new Sending();
                                         tmpSending.loadByDocumentID( tmpDoc.getId(), conn );
-                                        
+
                                         Recipient tmpRecipient = null;
                                         ArrayList<Recipient> tmpRecipients = tmpSending.getRecipients();
-                    
+
                                         Recipient recipientBuffer = null;
                                         for (int j = 0; j < tmpRecipients.size(); ++j) {
                                             recipientBuffer = tmpRecipients.get(j);
@@ -483,41 +484,39 @@ public class ReceiveDocuments {
                                                 break;
                                             }
                                         }
-                                        
-                                        if ((tmpRecipient != null) && (tmpSending.getSender() != null))
-                                        {
+
+                                        if ((tmpRecipient != null) && (tmpSending.getSender() != null)) {
                                             Asutus senderOrg = new Asutus( tmpSending.getSender().getOrganizationID(), conn );
                                             Asutus recipientOrg = new Asutus( tmpRecipient.getOrganizationID(), conn );
-                                            
+
                                             if(tmpDoc.getDvkContainerVersion() == 2) {
-                                            	
                                             	logger.debug("Converting DVK container to older version.");
-                                            	
+
                                             	try {
                                             		logger.debug("TmpDoc filePath: " + tmpDoc.getFilePath());
                                             		logger.debug("TmpDoc filePath out: " + tmpDoc.getFilePath() + ".tmp");
-	                                            	
+
                                             		// Convert to DVK container version 1
 	                                            	Conversion conversion = new Conversion();
 	                                    			conversion.setInputFile(tmpDoc.getFilePath());
 	                                    			conversion.setOutputFile(tmpDoc.getFilePath() + ".tmp");
 	                                    			conversion.setVersion(2);
 	                                    			conversion.setTargetVersion(1);
-	                                    			
+
 	                                    			// Get the XSLT from database
 	                                    			conversion.getConversionFromDB(conn);
-	                                    			
+
 	                                    			conversion.convert();
-	                                    			
+
 	                                    			tmpDoc.setFilePath(tmpDoc.getFilePath() + ".tmp");
                                             	} catch (Exception e) {
                                             		logger.error("Error while converting DVK container: ", e);
                                             	}
                                             }
-                                            
+
                                             logger.debug("Splitting out file tag: 'SignedDoc' from file: " + tmpDoc.getFilePath());
                                             CommonMethods.splitOutTags(tmpDoc.getFilePath(), "SignedDoc", false, false, true);
-                                            
+
                                             // Tõidame DHL poolt automaatselt tõidetavad võljad
                                             appendAutomaticMetaData(
                                                 tmpDoc.getFilePath(),
@@ -528,28 +527,26 @@ public class ReceiveDocuments {
                                                 recipientOrg,
                                                 conn,
                                                 tmpDoc.getDvkContainerVersion());
-                                            
+
                                             // Paigaldame varem eraldatud SignedDoc elemendid uuesti XML
                                             // faili koosseisu tagasi.
                                             logger.debug("Joining split XML.");
                                             logger.debug("PipelineDatafile: " + pipelineDataFile);
                                             logger.debug("Temporary XML file: " + tmpDoc.getFilePath());
                                             CommonMethods.joinSplitXML(tmpDoc.getFilePath(), bw);
-                                            
-                                            
-                                            
-                                            processedDocuments.add( tmpDoc.getId() );                                            
+
+                                            processedDocuments.add( tmpDoc.getId() );
                                         }
                                     }
                                 }
                             }
                         }
-                    }
-                    catch (Exception ex) {
-                        CommonMethods.logError( ex, "dhl.requests.ReceiveDocuments", "V3" );
-                        throw new AxisFault( "Error composing response message: " +" ("+ ex.getClass().getName() +": "+ ex.getMessage() +")" );
-                    }
-                    finally {
+                    } catch (AxisFault fault) {
+                    	throw fault;
+                    } catch (Exception ex) {
+                    	logger.error(ex.getMessage(), ex);
+                        throw new AxisFault("Error composing response message: " +" ("+ ex.getClass().getName() +": "+ ex.getMessage() +")");
+                    } finally {
                         CommonMethods.safeCloseWriter(bw);
                         CommonMethods.safeCloseWriter(ow);
                         CommonMethods.safeCloseStream(out);
@@ -557,17 +554,18 @@ public class ReceiveDocuments {
                         ow = null;
                         out = null;
                     }
-                }
-                catch (Exception ex) {
-                    CommonMethods.logError( ex, "dhl.ReceiveDocuments", "V3" );
-                    throw new AxisFault( ex.getMessage() );
+                } catch (AxisFault fault) {
+                	throw fault;
+                } catch (Exception ex) {
+                	logger.error(ex.getMessage(), ex);
+                    throw new AxisFault(ex.getMessage());
                 }
                 t.markElapsed("Processing documents and creating answer");
-                
+
                 t.reset();
                 result.responseFile = CommonMethods.gzipPackXML(pipelineDataFile, user.getOrganizationCode(), "receiveDocuments" );
                 t.markElapsed("Compressing response data");
-                
+
                 // Kui soovitakse vastust fragmenteeritud kujul, siis lammutame faili
                 // tõkkideks ja salvestame tõkid saatmist ootama.
                 if ((bodyData.edastusID != null) && !bodyData.edastusID.equalsIgnoreCase("") && (bodyData.fragmentNr >= 0)) {
@@ -580,23 +578,20 @@ public class ReceiveDocuments {
                     }
                 }
             }
-        }
-        finally {
+        } finally {
             (new File(pipelineDataFile)).delete();
         }
-        
+
         return result;
     }
-    
-    
+
     public static RequestInternalResult V4(org.apache.axis.MessageContext context, Connection conn, UserProfile user) throws Exception {
-        
     	logger.info("ReceiveDocuments.V4 invoked.");
-    	
+
     	Timer t = new Timer();
         RequestInternalResult result = new RequestInternalResult();
         String pipelineDataFile = CommonMethods.createPipelineFile(0);
-        
+
         try {
             // Laeme SOAP keha endale sobivasse andmestruktuuri
             t.reset();
@@ -606,9 +601,12 @@ public class ReceiveDocuments {
             result.deliverySessionID = bodyData.edastusID;
             result.fragmentSizeBytes = bodyData.fragmentSizeBytesOrig;
             t.markElapsed("Parsing SOAP body");
-            
+
+            // Check if all requested folders really exist
+            validateFolders(bodyData.kaust, user, conn);
+
             logger.debug("Starting receiveDocuments.V4 Request. Org: " + user.getOrganizationCode() + ", Personal ID: " + user.getPersonCode());
-            
+
             if ((bodyData.edastusID != null) && !bodyData.edastusID.equalsIgnoreCase("") && (bodyData.fragmentNr > 0)) {
                 DocumentFragment fragment = new DocumentFragment(user.getOrganizationID(), bodyData.edastusID, bodyData.fragmentNr, conn);
                 result.responseFile = fragment.getFileName();
@@ -636,7 +634,7 @@ public class ReceiveDocuments {
                         // Tuvastame, millisesse kausta soovitakse dokumenti salvestada
                     	XHeader xTeePais = new XHeader(user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
                         int requestTargetFolder = Folder.getFolderIdByPath( bodyData.kaust.get(folderNr).trim(), user.getOrganizationID(), conn, true, false, xTeePais );
-                    
+
                         // Leiame antud kasutajale saadetud dokumendid
                         logger.debug("Searching documents using following parameters: Org ID:  " + String.valueOf(user.getOrganizationID()) + ", Folder:  " + String.valueOf(requestTargetFolder) + ", Person ID: " + String.valueOf(user.getPersonID()) + ", Subdivision SN: " + bodyData.allyksuseLyhinimetus + ", Occupation SN: " + bodyData.ametikohaLyhinimetus + ", Max documents: " + String.valueOf(resultLimit));
                         ArrayList<dhl.Document> tmpDocs = dhl.Document.getDocumentsSentTo(
@@ -649,12 +647,12 @@ public class ReceiveDocuments {
                             bodyData.ametikohaLyhinimetus,
                             resultLimit,
                             conn);
-                        resultLimit -= tmpDocs.size();                        
-                        
+                        resultLimit -= tmpDocs.size();
+
                         // Lisame leitud dokumendid dokumentide tõisnimekirja
-                        documents.addAll( tmpDocs );
+                        documents.addAll(tmpDocs);
                         tmpDocs = null;
-                        
+
                         // Kui maksimaalne lubatud vastuste hulk on kões, siis
                         // rohkem dokumente andmebaasist võlja ei võta
                         if (resultLimit <= 0) {
@@ -664,11 +662,10 @@ public class ReceiveDocuments {
                 }
                 t.markElapsed("Reading documents from DB");
                 logger.info(String.valueOf(documents.size()) + " found.");
-                
+
                 // Pistame leitud dokumendid võljundisse
                 t.reset();
-                try
-                {
+                try {
                     FileOutputStream out = null;
                     OutputStreamWriter ow = null;
                     BufferedWriter bw = null;
@@ -676,22 +673,21 @@ public class ReceiveDocuments {
                         out = new FileOutputStream(pipelineDataFile, false);
                         ow = new OutputStreamWriter(out, "UTF-8");
                         bw = new BufferedWriter(ow);
-        
+
                         if (documents != null) {
                             ArrayList<Integer> processedDocuments = new ArrayList<Integer>();
-                            for( int i = 0; i < documents.size(); ++i )
-                            {
+                            for (int i = 0; i < documents.size(); ++i) {
                                 dhl.Document tmpDoc = documents.get(i);
-                                
+
                                 if (tmpDoc != null) {
                                 	if (!processedDocuments.contains(tmpDoc.getId()) && (tmpDoc.getFilePath() != null)) {
                                         // Laeme konkreetse dokumendi saatmist puudutavad andmed
                                         Sending tmpSending = new Sending();
                                         tmpSending.loadByDocumentID( tmpDoc.getId(), conn );
-                                        
+
                                         Recipient tmpRecipient = null;
                                         ArrayList<Recipient> tmpRecipients = tmpSending.getRecipients();
-                    
+
                                         Recipient recipientBuffer = null;
                                         for (int j = 0; j < tmpRecipients.size(); ++j) {
                                             recipientBuffer = tmpRecipients.get(j);
@@ -700,16 +696,15 @@ public class ReceiveDocuments {
                                                 break;
                                             }
                                         }
-                                        
-                                        if( tmpRecipient != null )
-                                        {
+
+                                        if (tmpRecipient != null) {
                                             Asutus senderOrg = new Asutus( tmpSending.getSender().getOrganizationID(), conn );
                                             Asutus recipientOrg = new Asutus( tmpRecipient.getOrganizationID(), conn );
-                                            
+
                                             // Viskame XML failist võlja suure mahuga SignedDoc elemendid
                                             //CommonMethods.splitOutTags(tmpDoc.getFilePath(), "SignedDoc", false, false, true);
                                             CommonMethods.splitOutTags(tmpDoc.getFilePath(), "failid", false, false, true);
-                                            
+
                                             // Tõidame DHL poolt automaatselt tõidetavad võljad
                                             appendAutomaticMetaData(
                                                 tmpDoc.getFilePath(),
@@ -720,24 +715,23 @@ public class ReceiveDocuments {
                                                 recipientOrg,
                                                 conn,
                                                 tmpDoc.getDvkContainerVersion());
-                                                                                
+
                                             // Paigaldame varem eraldatud SignedDoc elemendid uuesti XML
                                             // faili koosseisu tagasi.
                                             CommonMethods.joinSplitXML(tmpDoc.getFilePath(), bw);
-                                            
-                                            processedDocuments.add( tmpDoc.getId() );                                            
+
+                                            processedDocuments.add( tmpDoc.getId() );
                                         }
                                     }
                                 }
                             }
                         }
-                    }
-                    catch (Exception ex) {
-                    	logger.error("Exception: " , ex);
-                        CommonMethods.logError( ex, "dhl.requests.ReceiveDocuments", "V4" );
+                    } catch (AxisFault fault) {
+                    	throw fault;
+                    } catch (Exception ex) {
+                    	logger.error(ex.getMessage(), ex);
                         throw new AxisFault( "Error composing response message: " +" ("+ ex.getClass().getName() +": "+ ex.getMessage() +")" );
-                    }
-                    finally {
+                    } finally {
                         CommonMethods.safeCloseWriter(bw);
                         CommonMethods.safeCloseWriter(ow);
                         CommonMethods.safeCloseStream(out);
@@ -745,19 +739,19 @@ public class ReceiveDocuments {
                         ow = null;
                         out = null;
                     }
-                }
-                catch (Exception ex) {
-                	logger.error("Exception: " , ex);
-                    CommonMethods.logError( ex, "dhl.ReceiveDocuments", "V4" );
-                    throw new AxisFault( ex.getMessage() );
+                } catch (AxisFault fault) {
+                	throw fault;
+                } catch (Exception ex) {
+                	logger.error(ex.getMessage(), ex);
+                    throw new AxisFault(ex.getMessage());
                 }
                 t.markElapsed("Processing documents and creating answer");
-                
+
                 t.reset();
                 result.responseFile = CommonMethods.gzipPackXML(pipelineDataFile, user.getOrganizationCode(), "receiveDocuments" );
                 logger.debug("result.responseFile: " + result.responseFile);
                 t.markElapsed("Compressing response data");
-                
+
                 // Kui soovitakse vastust fragmenteeritud kujul, siis lammutame faili
                 // tõkkideks ja salvestame tõkid saatmist ootama.
                 if ((bodyData.edastusID != null) && !bodyData.edastusID.equalsIgnoreCase("") && (bodyData.fragmentNr >= 0)) {
@@ -765,10 +759,10 @@ public class ReceiveDocuments {
                 	XHeader xTeePais = new XHeader(user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
                     FragmentationResult fragResult = DocumentFragment.getFragments(result.responseFile, bodyData.fragmentSizeBytes, user.getOrganizationID(), bodyData.edastusID, false, conn, xTeePais);
                     if ((fragResult != null) && (fragResult.firstFragmentFile != null) && (new File(fragResult.firstFragmentFile)).exists()) {
-                    	
+
                     	logger.debug("fragResult.totalFragments: " + fragResult.totalFragments);
                     	logger.debug("fragResult.firstFragmentFile: " + fragResult.firstFragmentFile);
-                    	
+
                         result.responseFile = fragResult.firstFragmentFile;
                         result.fragmentNr = 0;
                         result.totalFragments = fragResult.totalFragments;
@@ -777,27 +771,26 @@ public class ReceiveDocuments {
                     }
                 }
             }
-        }
-        finally {
+        } finally {
             (new File(pipelineDataFile)).delete();
         }
-        
+
         logger.debug("Returning result.");
-        if(result != null) {
+        if (result != null) {
         	logger.debug("result.fragmentNr: " + result.fragmentNr);
         	logger.debug("result.totalFragments: " + result.totalFragments);
-        	logger.debug("result.responseFile: " + result.responseFile);        	
+        	logger.debug("result.responseFile: " + result.responseFile);
         }
-        
+
         return result;
     }
-    
-    
-    
+
+
+
     /**
      * Meetod lisab DVK poolt automaatselt lisatavad metaandmed
      * dokumendi XML struktuurile.
-     * 
+     *
      * @param filePath              Tõõdeldava XML faili asukoht
      * @param sendingData           Dokumendi saatmise andmed
      * @param recipientData         Dokumenti hetkel vastuvõtva adressaadi andmed
@@ -814,15 +807,15 @@ public class ReceiveDocuments {
         Asutus senderOrg,
         Asutus recipientOrg,
         Connection conn,
-        int containerVersion) throws Exception
-    {
+        int containerVersion) throws Exception {
+
     	logger.debug("Constructing document from XML. File: " + filePath);
         Document currentXmlContent = CommonMethods.xmlDocumentFromFile(filePath, true);
-        
+
         if (currentXmlContent == null) {
         	throw new Exception("Failed to process XML contents of document " + documentData.getId() + "! Document XML is empty or invalid.");
         }
-        
+
         Element metainfoNode = null;
 
         NodeList foundNodes = null;
@@ -830,19 +823,19 @@ public class ReceiveDocuments {
         	foundNodes = currentXmlContent.getDocumentElement().getElementsByTagNameNS(CommonStructures.DhlNamespace, "metainfo");
         } else {
         	foundNodes = currentXmlContent.getDocumentElement().getElementsByTagNameNS(CommonStructures.DhlNamespaceV2, "metainfo");
-        }        
-        
+        }
+
         if (foundNodes != null && foundNodes.getLength() > 0) {
             metainfoNode = (Element)foundNodes.item(0);
         } else {
             String defaultPrefix = null;
-            
+
             if(containerVersion == 1) {
             	defaultPrefix = currentXmlContent.lookupPrefix(CommonStructures.DhlNamespace);
             } else {
             	defaultPrefix = currentXmlContent.lookupPrefix(CommonStructures.DhlNamespaceV2);
             }
-            
+
             if (defaultPrefix == null) {
                 defaultPrefix = "dhl";
                 int prefixCounter = 0;
@@ -851,13 +844,13 @@ public class ReceiveDocuments {
                     defaultPrefix = "dhl" + String.valueOf(prefixCounter);
                 }
             }
-            
+
             if(containerVersion == 1) {
             	metainfoNode = currentXmlContent.createElementNS(CommonStructures.DhlNamespace, defaultPrefix + ":metainfo");
             } else {
             	metainfoNode = currentXmlContent.createElementNS(CommonStructures.DhlNamespaceV2, defaultPrefix + ":metainfo");
             }
-            
+
             // Lisame metainfo elemendi esimeseks elemendiks
             try {
             	currentXmlContent.getDocumentElement().insertBefore(metainfoNode, currentXmlContent.getDocumentElement().getFirstChild());
@@ -950,5 +943,41 @@ public class ReceiveDocuments {
 
         // Salvestame muudetud XML andmed faili
         CommonMethods.xmlElementToFile(currentXmlContent.getDocumentElement(), filePath);
+    }
+
+    /**
+     * Checks if folders specified in request actually exist. If non-existing
+     * folders are found then throws an {@link AxisFault} containing list
+     * of folders that do not exist.
+     * @param folders
+     *     List of folders from receiveDocuments request
+     * @param user
+     *     Current user
+     * @param conn
+     *     Active database connection
+     * @throws AxisFault
+     *     Error containing list of folders that do not exist
+     */
+    private static void validateFolders(final List<String> folders,
+    	final UserProfile user, final Connection conn) throws AxisFault {
+    	if ((folders != null) && (folders.size() > 0)) {
+	    	List<String> nonExistingFolders = new ArrayList<String>();
+    		XHeader xTeePais = new XHeader(user.getOrganizationCode(), null,
+	    		null, null, null, null, user.getPersonCode());
+
+    		for (String folderName : folders) {
+	    		int folderId = Folder.getFolderIdByPath(folderName,
+	    			user.getOrganizationID(), conn, true, false, xTeePais);
+	    		if (folderId == Folder.NONEXISTING_FOLDER) {
+	    			nonExistingFolders.add(folderName);
+	    		}
+	    	}
+
+	    	if (nonExistingFolders.size() > 0) {
+	    		throw new AxisFault(CommonStructures.
+	    			VIGA_ALLALAADIMINE_TUNDMATUST_KATALOOGIST.replaceFirst("#1",
+	    			CommonMethods.join(nonExistingFolders, ", ")));
+	    	}
+    	}
     }
 }

@@ -1559,17 +1559,17 @@ public class CommonMethods {
         }
         return result;
     }
-    
+
     /**
      * Determines if given String is null or empty (zero length).
      * Whitespace is not treated as empty string.
-     * 
+     *
      * @param stringToEvaluate
      * 		String that will be checked for having NULL or empty value
      * @return
-     * 		true, if input String is NULL or has zero length 
+     * 		true, if input String is NULL or has zero length
      */
-    public static boolean isNullOrEmpty(String stringToEvaluate) {
+    public static boolean isNullOrEmpty(final String stringToEvaluate) {
     	return ((stringToEvaluate == null) || stringToEvaluate.isEmpty());
     }
     
@@ -1593,5 +1593,28 @@ public class CommonMethods {
 	    	}
     	}
     	return false;
+    }
+    
+    /**
+     * Joins list of strings to a single string (separated by specified delimiter).
+     * 
+     * @param s
+     *     List of strings
+     * @param delimiter
+     *     Item delimiter in resulting string
+     * @return
+     *     String consisting of list items
+     */
+    public static String join(List<? extends CharSequence> s, String delimiter) {
+    	StringBuilder buffer = new StringBuilder();
+    	Iterator<? extends CharSequence> iter = s.iterator();
+    	if (iter.hasNext()) {
+    	    buffer.append(iter.next());
+    	    while (iter.hasNext()) {
+	    		buffer.append(delimiter);
+	    		buffer.append(iter.next());
+    	    }
+    	}
+    	return buffer.toString();
     }
 }

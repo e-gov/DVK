@@ -12,11 +12,11 @@ public class CommonStructures {
     public static final String SendStatus_Sending_Name = "saatmisel";
     public static final String SendStatus_Sent_Name = "saadetud";
     public static final String SendStatus_Canceled_Name = "katkestatud";
-    
+
     public static final String AutomaticMetadataNamespace = "http://www.riik.ee/schemas/dhl-meta-automatic";
     public static final String ManualMetadataNamespace = "http://www.riik.ee/schemas/dhl-meta-manual";
     public static final String DhlNamespace = "http://www.riik.ee/schemas/dhl";
-    
+
     public static final String AutomaticMetadataNamespaceV2 = "http://www.riik.ee/schemas/dhl-meta-automatic.v2";
     public static final String ManualMetadataNamespaceV2 = "http://www.riik.ee/schemas/dhl-meta-manual.v2";
     public static final String DhlNamespaceV2 = "http://www.riik.ee/schemas/dhl/2010/2"; 
@@ -47,11 +47,12 @@ public class CommonStructures {
     public static final String VIGA_ANDMEBAASIYHENDUSE_LOOMISEL = "DVK serveri tarkvaraline viga! Viga andmebaasiühenduse loomisel!";
     public static final String VIGA_PARINGU_VERSIOONIS = "X-Tee päises nimetatud päringu versiooni ei eksisteeri!";
     public static final String VIGA_ASUTUS_BLOKEERITUD = "DVK päringud on asutusele #1 blokeeritud. Blokeeringu eemaldamiseks pöörduge palun DVK halduri poole.";
-    
+    public static final String VIGA_ALLALAADIMINE_TUNDMATUST_KATALOOGIST = "Dokumentide allalaadimine ebaõnnestus, kuna päringus esitatud kaustu ei eksisteeri. Tundmatud kaustad: #1";
+
     // Rollid
     public static final String ROLL_ASUTUSE_ADMIN = "DHL: asutuse administraator";
     public static final String ROLL_ALLYKSUSE_ADMIN = "DHL: allyksuse administraator";
-    
+
     // Nimeruumid
     public static final String NS_XTEE_PREFIX = "xtee";
     public static final String NS_XTEE_URI = "http://x-tee.riik.ee/xsd/xtee.xsd";
@@ -63,16 +64,16 @@ public class CommonStructures {
     public static final String NS_DHL_URI = "http://www.riik.ee/schemas/dhl";
     public static final String NS_DVK_MAIN = "http://producers.dhl.xtee.riik.ee/producer/dhl";
     public static final String NS_AAR_MAIN = "http://producers.aar.xtee.riik.ee/producer/aar";
-    
+
     // Saatmisviisid
     public static final String SENDING_DHL = "dhl";
     public static final String SENDING_DHL_DIRECT = "dhl_otse";
-    
+
     // Veakoodid
     public static final String FAULT_ACTOR = "http://producers.dhl.xtee.riik.ee/producer/dhl";
     public static final String FAULT_EXPIRED_CODE = "DVK-ERR-001";
     public static final String FAULT_INVALID_CONTAINER_CODE = "DVK-ERR-002";
-    
+
     // Andmebaasiplatvormid
     public static final String PROVIDER_TYPE_MSSQL = "MSSQL";
     public static final String PROVIDER_TYPE_MSSQL_2005 = "MSSQL2005";

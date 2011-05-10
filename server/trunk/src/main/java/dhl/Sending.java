@@ -18,11 +18,9 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.axis.AxisFault;
 import org.apache.log4j.Logger;
 
-public class Sending 
-{
-	
+public class Sending {
 	private static Logger logger = Logger.getLogger(Sending.class);
-	
+
     private int m_id;
     private int m_documentID;
     private Date m_startDate;
@@ -34,7 +32,7 @@ public class Sending
     private ArrayList<Recipient> m_recipients;
     private boolean m_isNewlyAdded;
     private String m_documentGUID;
-    
+
     public void setId(int id) {
         this.m_id = id;
     }
@@ -82,7 +80,7 @@ public class Sending
     public Sender getSender() {
         return m_sender;
     }
-    
+
     public void setProxy(Proxy proxy) {
         this.m_proxy = proxy;
     }
@@ -118,7 +116,7 @@ public class Sending
     public Sending() {
         clear();
     }
-    
+
     public void clear() {
         m_id = 0;
         m_documentID = 0;
@@ -126,25 +124,22 @@ public class Sending
         m_endDate = null;
         m_sendStatusID = CommonStructures.SendStatus_Sending;
         m_receivedMethodID = CommonStructures.SendingMethod_XTee;
-        
-        if( m_sender == null ) {
+
+        if (m_sender == null) {
             m_sender = new Sender();
-        }
-        else {
+        } else {
             m_sender.clear();
         }
-        
-        if( m_proxy == null ) {
+
+        if (m_proxy == null) {
             m_proxy = new Proxy();
-        }
-        else {
+        } else {
             m_proxy.clear();
         }
-        
-        if( m_recipients == null ) {
+
+        if (m_recipients == null) {
             m_recipients = new ArrayList<Recipient>();
-        }
-        else {
+        } else {
             m_recipients.clear();
         }
         m_isNewlyAdded = false;
@@ -180,11 +175,11 @@ public class Sending
                 return false;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, this.getClass().getName(), "loadByDocumentID");
+        	logger.error(ex.getMessage(), ex);
             return false;
         }
     }
-    
+
     public boolean loadByDocumentGUID(String document_guid, Connection conn) {
         clear();
         try {
@@ -204,7 +199,7 @@ public class Sending
                 m_sendStatusID = cs.getInt("send_status_id");
                 m_documentID = cs.getInt("document_id");
                 m_documentGUID = document_guid;
-                
+
                 if (m_id > 0) {
                     m_sender.getBySendingID(m_id, conn);
                     m_proxy.LoadBySendingID(m_id, conn);
@@ -217,20 +212,20 @@ public class Sending
                 return false;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, this.getClass().getName(), "loadByDocumentID");
+        	logger.error(ex.getMessage(), ex);
             return false;
         }
     }
 
     public int addToDB(Connection conn, XHeader xTeePais) throws IllegalArgumentException, SQLException {
         if (conn != null) {
-        	
+
         	logger.debug("Adding transport info to database: ");
         	logger.debug("m_documentID: " + m_documentID);
         	logger.debug("m_startDate: " + m_startDate);
         	logger.debug("m_endDate: " + m_endDate);
         	logger.debug("m_sendStatusID: " + m_sendStatusID);
-        	
+
             Calendar cal = Calendar.getInstance();
             CallableStatement cs = conn.prepareCall("{call ADD_SENDING(?,?,?,?,?,?,?)}");
             cs.registerOutParameter("sending_id", Types.INTEGER);
@@ -238,15 +233,15 @@ public class Sending
             cs.setTimestamp("sending_start_date", CommonMethods.sqlDateFromDate(m_startDate), cal);
             cs.setTimestamp("sending_end_date", CommonMethods.sqlDateFromDate(m_endDate), cal);
             cs.setInt("send_status_id", m_sendStatusID);
-            
-            if(xTeePais != null) {
+
+            if (xTeePais != null) {
             	cs.setString("xtee_isikukood", xTeePais.isikukood);
                 cs.setString("xtee_asutus", xTeePais.asutus);
     		} else {
     			cs.setString("xtee_isikukood", null);
                 cs.setString("xtee_asutus", null);
-    		}            
-            
+    		}
+
             cs.executeUpdate();
             m_id = cs.getInt("sending_id");
             cs.close();
@@ -254,13 +249,13 @@ public class Sending
             if (m_id > 0) {
                 m_sender.setSendingID(m_id);
                 m_sender.addToDB(conn, xTeePais);
-                
+
                 if ((m_proxy != null) && (m_proxy.getOrganizationID() > 0)) {
                     m_proxy.setSendingID(m_id);
                     m_proxy.addToDB(conn, xTeePais);
                 }
 
-                for (Recipient tmpRecipient: m_recipients) {
+                for (Recipient tmpRecipient : m_recipients) {
                     tmpRecipient.setSendingID(m_id);
                     tmpRecipient.addToDB(conn, xTeePais);
                 }
@@ -279,7 +274,7 @@ public class Sending
     	logger.debug("sending_start_date: " + m_startDate);
     	logger.debug("sending_end_date: " + m_endDate);
     	logger.debug("send_status_id: " + m_sendStatusID);
-    	
+
         try {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
@@ -292,8 +287,8 @@ public class Sending
                 cs.executeUpdate();
                 cs.close();
 
-                if (updateChildObjects == true) {
-                    for (Recipient tmpRecipient: m_recipients) {
+                if (updateChildObjects) {
+                    for (Recipient tmpRecipient : m_recipients) {
                         tmpRecipient.update(conn, xTeePais);
                     }
                 }
@@ -303,7 +298,7 @@ public class Sending
                 return false;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, this.getClass().getName(), "update");
+        	logger.error(ex.getMessage(), ex);
             return false;
         }
     }
@@ -392,10 +387,10 @@ public class Sending
 	public void setDocumentGUID(String mDocumentGUID) {
 		m_documentGUID = mDocumentGUID;
 	}
-	
+
 	/**
 	 * Checks (and defines) the rules, when a user can see documents status information.
-	 * 
+	 *
 	 * @param user
 	 * 		User who executed current request
 	 * @return
@@ -406,7 +401,7 @@ public class Sending
 		// This is to avoid giving out any information about documents
 		// not belonging to users organization.
 		boolean result = false;
-		
+
 		// If server is configured so that x-road request sender must not match
 		// document sender, then access to status information must also not be
 		// restricted by x-road credentials.
@@ -417,20 +412,34 @@ public class Sending
 			// - user sent the document
 			// - document was sent by someone else filling the same role in organization
 			// - user is marked as organization admin in DVK (for the org. that sent the document)
-			result = CommonMethods.stringsEqualIgnoreNull(m_sender.getPersonalIdCode(), user.getPersonCode()) ||
-				user.getPositions().contains(m_sender.getPositionID()) ||
-				((m_sender.getOrganizationID() == user.getOrganizationID()) && user.getRoles().contains(CommonStructures.ROLL_ASUTUSE_ADMIN));
-		    
+			result = CommonMethods.stringsEqualIgnoreNull(m_sender.getPersonalIdCode(), user.getPersonCode())
+				|| user.getPositions().contains(m_sender.getPositionID())
+				|| ((m_sender.getOrganizationID() == user.getOrganizationID()) && user.getRoles().contains(CommonStructures.ROLL_ASUTUSE_ADMIN));
+
 			// User can also access documents status data if
 			// - user forwarded the document
 			// - document was forwarded by someone else filling the same role in organization
 			// - user is marked as organization admin in DVK (for the org. that forwarded the document)
-			result = result || ((m_proxy != null) &&
-		        (CommonMethods.stringsEqualIgnoreNull(m_proxy.getPersonalIdCode(), user.getPersonCode()) ||
-		        user.getPositions().contains(m_proxy.getPositionID()) ||
-		        ((m_proxy.getOrganizationID() == user.getOrganizationID()) && user.getRoles().contains(CommonStructures.ROLL_ASUTUSE_ADMIN))));
+			if (!result) {
+				result = result || ((m_proxy != null)
+					&& (CommonMethods.stringsEqualIgnoreNull(m_proxy.getPersonalIdCode(), user.getPersonCode())
+			        || user.getPositions().contains(m_proxy.getPositionID())
+			        || ((m_proxy.getOrganizationID() == user.getOrganizationID()) && user.getRoles().contains(CommonStructures.ROLL_ASUTUSE_ADMIN))));
+			}
+
+			// Message recipient can also access status information.
+			if (!result) {
+				for (Recipient r : m_recipients) {
+					if ((CommonMethods.stringsEqualIgnoreNull(r.getPersonalIdCode(), user.getPersonCode()))
+						|| user.getPositions().contains(r.getPositionID())
+						|| ((r.getOrganizationID() == user.getOrganizationID()) && user.getRoles().contains(CommonStructures.ROLL_ASUTUSE_ADMIN))) {
+						result = true;
+						break;
+					}
+				}
+			}
 		}
-		
+
 		return result;
 	}
 }

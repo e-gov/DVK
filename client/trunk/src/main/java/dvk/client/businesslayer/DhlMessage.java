@@ -2452,42 +2452,46 @@ public class DhlMessage implements Cloneable {
 		// ei saa adressaadipõhiselt jõlgida, milline adressaat on dokumendi
 		// kõtte saanud ja milline mitte.
 		for (OrgSettings db : allKnownDatabases) {
-			// Teise andmebaasi dhl_settings andmebaasis on kirjas, millise
-			// asutuse, allüksuse ja ametikohaga on tegemist.
-			Connection anotherDbConnection = DBConnection.getConnection(db);
-			try {
-				UnitCredential[] orgsInDB = UnitCredential.getCredentials(db, anotherDbConnection);
-				for (int j = 0; j < orgsInDB.length; j++) {
-					UnitCredential cred = orgsInDB[j];
-					if (cred.getInstitutionCode().equalsIgnoreCase(senderOrgCode)) {
-						if (cred.acceptsMessagesInFolder(this.getDhlFolderName())) {
-							OrgAddressFilter addressFilter = new OrgAddressFilter();
-							addressFilter.setSubdivisionId(cred.getDivisionID());
-							addressFilter.setOccupationId(cred.getOccupationID());
-							addressFilter.setSubdivisionCode(cred.getDivisionShortName());
-							addressFilter.setOccupationCode(cred.getOccupationShortName());
-							ArrayList<MessageRecipient> directSendRecipients = addressFilter.getMatchingRecipients(myOrgRecipients);
-							
-							for (int k = 0; k < directSendRecipients.size(); k++) {
-								MessageRecipient rec = directSendRecipients.get(k);
-	
-								DhlMessage newMessage = (DhlMessage)this.clone();
-								newMessage.m_deliveryChannel = new DeliveryChannel();
-								newMessage.m_deliveryChannel.setDatabase(db);
-								newMessage.m_deliveryChannel.setUnitId(cred.getUnitID());
-								newMessage.m_deliveryChannel.setRecipient(rec);
-								result.add(newMessage);
-								logger.info("Added message clone for direct copy delivery");
+			// Never-ever send anything back to the same database it
+			// originally came from.
+			if (!myDatabase.connectionParametersEqual(db)) {
+				// Teise andmebaasi dhl_settings andmebaasis on kirjas, millise
+				// asutuse, allüksuse ja ametikohaga on tegemist.
+				Connection anotherDbConnection = DBConnection.getConnection(db);
+				try {
+					UnitCredential[] orgsInDB = UnitCredential.getCredentials(db, anotherDbConnection);
+					for (int j = 0; j < orgsInDB.length; j++) {
+						UnitCredential cred = orgsInDB[j];
+						if (cred.getInstitutionCode().equalsIgnoreCase(senderOrgCode)) {
+							if (cred.acceptsMessagesInFolder(this.getDhlFolderName())) {
+								OrgAddressFilter addressFilter = new OrgAddressFilter();
+								addressFilter.setSubdivisionId(cred.getDivisionID());
+								addressFilter.setOccupationId(cred.getOccupationID());
+								addressFilter.setSubdivisionCode(cred.getDivisionShortName());
+								addressFilter.setOccupationCode(cred.getOccupationShortName());
+								ArrayList<MessageRecipient> directSendRecipients = addressFilter.getMatchingRecipients(myOrgRecipients);
 								
-								if (centralServerRecipients.contains(rec)) {
-									centralServerRecipients.remove(rec);
+								for (int k = 0; k < directSendRecipients.size(); k++) {
+									MessageRecipient rec = directSendRecipients.get(k);
+		
+									DhlMessage newMessage = (DhlMessage)this.clone();
+									newMessage.m_deliveryChannel = new DeliveryChannel();
+									newMessage.m_deliveryChannel.setDatabase(db);
+									newMessage.m_deliveryChannel.setUnitId(cred.getUnitID());
+									newMessage.m_deliveryChannel.setRecipient(rec);
+									result.add(newMessage);
+									logger.info("Added message clone for direct copy delivery");
+									
+									if (centralServerRecipients.contains(rec)) {
+										centralServerRecipients.remove(rec);
+									}
 								}
 							}
 						}
 					}
+				} finally {
+					CommonMethods.safeCloseDatabaseConnection(anotherDbConnection);
 				}
-			} finally {
-				CommonMethods.safeCloseDatabaseConnection(anotherDbConnection);
 			}
 		}
     	

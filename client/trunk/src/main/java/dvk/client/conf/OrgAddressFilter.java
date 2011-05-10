@@ -42,22 +42,6 @@ public class OrgAddressFilter {
         this.m_occupationCode = occupationCode;
     }
     
-    private boolean getCodesSet() {
-    	return (!CommonMethods.isNullOrEmpty(this.m_subdivisionCode)
-    			|| !CommonMethods.isNullOrEmpty(this.m_occupationCode));
-    }
-    
-    private boolean getIdsSet() {
-    	return ((this.m_subdivisionId > 0) || (this.m_occupationId > 0));
-    }
-    
-    /**
-     * Näitab, kas antud filter on reaalselt kasutatav (korrektselt seadistatud)
-     */
-    public boolean isValidFilter() {
-    	return (this.getCodesSet() || this.getIdsSet());
-    }
-	
     public OrgAddressFilter() {
         clear();
     }
@@ -71,46 +55,44 @@ public class OrgAddressFilter {
     
     public ArrayList<MessageRecipient> getMatchingRecipients(ArrayList<MessageRecipient> fullList) {
     	ArrayList<MessageRecipient> result = new ArrayList<MessageRecipient>();
-    	if (this.isValidFilter() == true) {
-    		for (MessageRecipient recipient : fullList) {
-    			// Aadressandmetes on sõltuvalt konteineri versioonist antud
-    			// kas allüksuse/ametikoha ID (ver 1) või lühinimetus (ver 2).
-    			// Filtri andmetes on potentsiaalselt olemas mõlemad variandid.
-    			//
-    			// Seega tuvastame aadressandmete järgi, kas filtreerida ID-de
-    			// või lühinimetuste järgi.
+		for (MessageRecipient recipient : fullList) {
+			// Aadressandmetes on sõltuvalt konteineri versioonist antud
+			// kas allüksuse/ametikoha ID (ver 1) või lühinimetus (ver 2).
+			// Filtri andmetes on potentsiaalselt olemas mõlemad variandid.
+			//
+			// Seega tuvastame aadressandmete järgi, kas filtreerida ID-de
+			// või lühinimetuste järgi.
+			
+			if (CommonMethods.isNullOrEmpty(recipient.getRecipientDivisionCode())
+				&& CommonMethods.isNullOrEmpty(recipient.getRecipientPositionCode())
+				&& CommonMethods.isNullOrEmpty(this.getSubdivisionCode())
+				&& CommonMethods.isNullOrEmpty(this.getOccupationCode())
+				&& (recipient.getRecipientDivisionID() <= 0)
+				&& (recipient.getRecipientPositionID() <= 0)
+				&& (this.getSubdivisionId() <= 0)
+				&& (this.getOccupationId() <= 0)) {
+			
+				result.add(recipient);
+				
+			} else if (!CommonMethods.isNullOrEmpty(recipient.getRecipientDivisionCode())
+				|| !CommonMethods.isNullOrEmpty(recipient.getRecipientPositionCode())) {
     			
-    			if (CommonMethods.isNullOrEmpty(recipient.getRecipientDivisionCode())
-    				&& CommonMethods.isNullOrEmpty(recipient.getRecipientPositionCode())
-    				&& CommonMethods.isNullOrEmpty(this.getSubdivisionCode())
-    				&& CommonMethods.isNullOrEmpty(this.getOccupationCode())
-    				&& (recipient.getRecipientDivisionID() <= 0)
-    				&& (recipient.getRecipientPositionID() <= 0)
-    				&& (this.getSubdivisionId() <= 0)
-    				&& (this.getOccupationId() <= 0)) {
-    			
-    				result.add(recipient);
-    				
-				} else if (!CommonMethods.isNullOrEmpty(recipient.getRecipientDivisionCode())
-    				|| !CommonMethods.isNullOrEmpty(recipient.getRecipientPositionCode())) {
-        			
-    				if ((CommonMethods.isNullOrEmpty(this.getSubdivisionCode())
-        	        	|| this.getSubdivisionCode().equalsIgnoreCase("*")
-        	        	|| CommonMethods.stringsEqualIgnoreNull(recipient.getRecipientDivisionCode(), this.getSubdivisionCode()))
-        	        	&& (CommonMethods.isNullOrEmpty(this.getOccupationCode())
-         	        	|| this.getOccupationCode().equalsIgnoreCase("*")
-         	        	|| CommonMethods.stringsEqualIgnoreNull(recipient.getRecipientPositionCode(), this.getOccupationCode()))) {
-        	        	
-    					result.add(recipient);
-        	        }
-    			} else {
-        			if (((this.getSubdivisionId() <= 0) || (recipient.getRecipientDivisionID() == this.getSubdivisionId()))
-        	        	&& ((this.getOccupationId() <= 0) || (recipient.getRecipientPositionID() == this.getOccupationId()))) {
-        	        	result.add(recipient);
-        	        }
+				if ((CommonMethods.isNullOrEmpty(this.getSubdivisionCode())
+    	        	|| this.getSubdivisionCode().equalsIgnoreCase("*")
+    	        	|| CommonMethods.stringsEqualIgnoreNull(recipient.getRecipientDivisionCode(), this.getSubdivisionCode()))
+    	        	&& (CommonMethods.isNullOrEmpty(this.getOccupationCode())
+     	        	|| this.getOccupationCode().equalsIgnoreCase("*")
+     	        	|| CommonMethods.stringsEqualIgnoreNull(recipient.getRecipientPositionCode(), this.getOccupationCode()))) {
+    	        	
+					result.add(recipient);
     	        }
-    	    }
-    	}
+			} else {
+    			if (((this.getSubdivisionId() <= 0) || (recipient.getRecipientDivisionID() == this.getSubdivisionId()))
+    	        	&& ((this.getOccupationId() <= 0) || (recipient.getRecipientPositionID() == this.getOccupationId()))) {
+    	        	result.add(recipient);
+    	        }
+	        }
+	    }
     	return result;
     }
 }

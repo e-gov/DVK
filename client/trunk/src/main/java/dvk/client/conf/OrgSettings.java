@@ -157,7 +157,7 @@ public class OrgSettings implements Cloneable {
             }
             return result;
         } catch (Exception ex) {
-            logger.error(ex);
+            logger.error(ex.getMessage(), ex);
             return new ArrayList<OrgSettings>();
         }
     }
@@ -205,5 +205,30 @@ public class OrgSettings implements Cloneable {
             }
         }
         return result;
+    }
+
+    /**
+     * Checks if database connection parameters specified in current
+     * {@link OrgSettings} instance match the same parameters specified in
+     * another {@link OrgSettings} instance.
+     *   
+     * @param anotherInstance
+     *     {@link OrgSettings} instance to compare with this instance.
+     * @return
+     *     True if current {@link OrgSettings} instance and given
+     *     {@link OrgSettings} instance have exactly the same database
+     *     connection parameters.  
+     */
+    public boolean connectionParametersEqual(OrgSettings anotherInstance) {
+    	boolean result = CommonMethods.stringsEqualIgnoreNull(this.getDbProvider(), anotherInstance.getDbProvider());
+    	result = result && CommonMethods.stringsEqualIgnoreNull(this.getServerName(), anotherInstance.getServerName());
+    	result = result && CommonMethods.stringsEqualIgnoreNull(this.getInstanceName(), anotherInstance.getInstanceName());
+    	result = result && CommonMethods.stringsEqualIgnoreNull(this.getServerPort(), anotherInstance.getServerPort());
+    	result = result && CommonMethods.stringsEqualIgnoreNull(this.getDatabaseName(), anotherInstance.getDatabaseName());
+    	result = result && CommonMethods.stringsEqualIgnoreNull(this.getUserName(), anotherInstance.getUserName());
+    	result = result && CommonMethods.stringsEqualIgnoreNull(this.getPassword(), anotherInstance.getPassword());
+    	result = result && CommonMethods.stringsEqualIgnoreNull(this.getProcessName(), anotherInstance.getProcessName());
+    	result = result && CommonMethods.stringsEqualIgnoreNull(this.getSchemaName(), anotherInstance.getSchemaName());
+    	return result;
     }
 }

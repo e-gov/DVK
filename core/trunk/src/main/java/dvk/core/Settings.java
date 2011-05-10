@@ -59,7 +59,7 @@ public class Settings {
     public static boolean Server_IgnoreInvalidContainers = false;
     public static boolean Server_ValidateXmlFiles = false;
     public static boolean Server_ValidateSignatures = false;
-    public static boolean Server_DocumentSenderMustMatchXroadHeader = false;
+    public static boolean Server_DocumentSenderMustMatchXroadHeader = true;
     public static boolean Server_AutoRegisterUnknownSenders = false;
     
     // General settings (both client and server)
@@ -295,10 +295,10 @@ public class Settings {
             
             // Kas dokumendi saatjaks märgitud asutus peab olema sama, mis x-tee päistes sõnumi saatjaks märgitud asutus?
             if ((currentProperties.getProperty("server_document_sender_must_match_xroad_header") != null) &&
-                (currentProperties.getProperty("server_document_sender_must_match_xroad_header").equalsIgnoreCase("yes") ||
-                currentProperties.getProperty("server_document_sender_must_match_xroad_header").equalsIgnoreCase("true") ||
-                currentProperties.getProperty("server_document_sender_must_match_xroad_header").equalsIgnoreCase("1"))) {
-                Server_DocumentSenderMustMatchXroadHeader = true;
+                (currentProperties.getProperty("server_document_sender_must_match_xroad_header").equalsIgnoreCase("no") ||
+                currentProperties.getProperty("server_document_sender_must_match_xroad_header").equalsIgnoreCase("false") ||
+                currentProperties.getProperty("server_document_sender_must_match_xroad_header").equalsIgnoreCase("0"))) {
+                Server_DocumentSenderMustMatchXroadHeader = false;
             }
             
             // Should the server automatically register senders that are not found in organization database?

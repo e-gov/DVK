@@ -52,24 +52,24 @@ import org.xml.sax.InputSource;
 
 
 public class CommonMethods {
-	
+
 	static Logger logger = Logger.getLogger(CommonMethods.class.getName());
-	
+
 	/**
 	 * Genereerib operatsioonisüsteemi ajutiste failide kataloogi uue unikaalse nimega ajutise faili.
-	 * 
+	 *
 	 * @param itemIndex		Faili järjekorranumber. Võimaldab vajadusel eristada näiteks tsüklis loodud ajutisi faile.
 	 * @return				Faili nimi (absolute path)
 	 */
 	public static String createPipelineFile(int itemIndex) {
 		return createPipelineFile(itemIndex, "");
 	}
-	
+
 	/**
 	 * Genereerib operatsioonisüsteemi ajutiste failide kataloogi uue unikaalse nimega ajutise faili.
-	 * 
+	 *
 	 * @param itemIndex		Faili järjekorranumber. Võimaldab vajadusel eristada näiteks tsüklis loodud ajutisi faile.
-	 * @param extension		Faililaiend. Võimaldab ajutisele failile vajadusel ka faililaiendi anda. 
+	 * @param extension		Faililaiend. Võimaldab ajutisele failile vajadusel ka faililaiendi anda.
 	 * @return				Faili nimi (absolute path)
 	 */
     public static String createPipelineFile(int itemIndex, String extension) {
@@ -80,7 +80,7 @@ public class CommonMethods {
             if ((extension.length() > 0) && !extension.startsWith(".")) {
             	extension = "." + extension;
             }
-        	
+
         	String tmpDir = System.getProperty("java.io.tmpdir", "");
             String result = tmpDir + File.separator + "dhl_" + String.valueOf((new Date()).getTime()) + ((itemIndex > 0) ? "_item" + String.valueOf(itemIndex) : "") + extension;
             int uniqueCounter = 0;
@@ -92,11 +92,11 @@ public class CommonMethods {
             file.createNewFile();
             return result;
         } catch (Exception ex) {
-        	logger.error(ex);
+        	logger.error(ex.getMessage(), ex);
             return null;
         }
     }
-    
+
     public static void deleteOldPipelineFiles(int maxFilesToDelete, boolean giveFeedbackOnConsole) {
         // Kustutame üle 10 minuti vanused failid
         File tempPath = new File(System.getProperty("java.io.tmpdir", ""));
@@ -104,7 +104,7 @@ public class CommonMethods {
             if (giveFeedbackOnConsole) {
                 System.out.println("Deleting old temporary files from "+ tempPath.getAbsolutePath());
             }
-            
+
             FilenameFilter filter = new FilenameFilter() {
                     String startMarker = "dhl_";
                     public boolean accept(File dir, String name) {
@@ -124,19 +124,18 @@ public class CommonMethods {
                             files[i].delete();
                         }
                     } catch (Exception ex) {
-                    	logger.error(ex);
+                    	logger.error(ex.getMessage(), ex);
                     }
                 }
                 if (giveFeedbackOnConsole) {
                     System.out.println("Old files deleted.");
                 }
-            }
-            else {
+            } else {
                 System.out.println("No files found!");
             }
         }
     }
-    
+
     public static String getUniqueDirectory(String orgCode, String uniqueID) {
         try {
             String tmpDir = System.getProperty("java.io.tmpdir", "");
@@ -151,7 +150,7 @@ public class CommonMethods {
                 return result;
             }
         } catch (Exception ex) {
-        	logger.error(ex);
+        	logger.error(ex.getMessage(), ex);
             return null;
         }
     }
@@ -161,8 +160,8 @@ public class CommonMethods {
         	logger.error("Extracting gzipped XML file failed because file name was not supplied!");
         	return false;
         }
-        
-        File sourceFileAsObject = new File(sourceFile); 
+
+        File sourceFileAsObject = new File(sourceFile);
         if (!sourceFileAsObject.exists()) {
         	logger.error("Extracting gzipped XML file failed because file "+ sourceFile +" does not exist!");
         	return false;
@@ -171,7 +170,7 @@ public class CommonMethods {
         	logger.error("Extracting gzipped XML file failed because file "+ sourceFile +" is empty!");
         	return false;
         }
-    	
+
     	long totalBytesExtracted = 0;
         byte[] buf = new byte[Settings.getBinaryBufferSize()];
         int len;
@@ -214,7 +213,7 @@ public class CommonMethods {
 
             return true;
         } catch (Exception ex) {
-        	logger.error(ex);
+        	logger.error(ex.getMessage(), ex);
         	logger.error("Initial file length: "+ sourceFileAsObject.length() +", total bytes extracted before error: "+ totalBytesExtracted);
             return false;
         } finally {
@@ -239,36 +238,42 @@ public class CommonMethods {
         String tmpDir = System.getProperty("java.io.tmpdir", "");
 
         // Pakime andmed kokku
-        FileInputStream in = new FileInputStream(filePath);
         String zipOutFileName = tmpDir + File.separator + "dhl_" + requestName + "_" + orgCode + "_" + String.valueOf((new Date()).getTime()) + "_zipOutBuffer.dat";
-        FileOutputStream zipOutFile = new FileOutputStream(zipOutFileName, false);
+        InputStream in = new BufferedInputStream(new FileInputStream(filePath));
+        OutputStream zipOutFile = new BufferedOutputStream(new FileOutputStream(zipOutFileName, false));
         GZIPOutputStream out = new GZIPOutputStream(zipOutFile);
         byte[] buf = new byte[Settings.getBinaryBufferSize()];
         int len;
-        while ((len = in.read(buf)) > 0) {
-            out.write(buf, 0, len);
+        try {
+	        while ((len = in.read(buf)) > 0) {
+	            out.write(buf, 0, len);
+	        }
+        } finally {
+	        in.close();
+	        out.finish();
+	        out.close();
         }
-        in.close();
-        out.finish();
-        out.close();
 
         // Kodeerime pakitud andmed base64 kujule
         String base64OutFileName = tmpDir + File.separator + "dhl_" + requestName + "_" + orgCode + "_" + String.valueOf((new Date()).getTime()) + "_base64OutBuffer.dat";
-        in = new FileInputStream(zipOutFileName);
-        FileOutputStream b64out = new FileOutputStream(base64OutFileName, false);
+        in = new BufferedInputStream(new FileInputStream(zipOutFileName));
+        OutputStream b64out = new BufferedOutputStream(new FileOutputStream(base64OutFileName, false));
         buf = new byte[66000];  // Puhvri pikkus peaks jaguma 3-ga
-        while ((len = in.read(buf)) > 0) {
-            b64out.write(Base64.encode(buf, 0, len).getBytes());
+        try {
+	        while ((len = in.read(buf)) > 0) {
+	            b64out.write(Base64.encode(buf, 0, len).getBytes());
+	        }
+        } finally {
+	        in.close();
+	        b64out.close();
         }
-        in.close();
-        b64out.close();
 
         // Kustutame vaheproduktideks olnud failid ära
         (new File(zipOutFileName)).delete();
 
         return base64OutFileName;
     }
-    
+
     public static String base64EncodeFile(String filePath, String orgCode, String requestName) {
         if (!(new File(filePath)).exists()) {
         	logger.error("Data file does not exist!");
@@ -292,7 +297,7 @@ public class CommonMethods {
 
             return base64OutFileName;
         } catch (Exception ex) {
-        	logger.error(ex);
+        	logger.error(ex.getMessage(), ex);
             return null;
         }
     }
@@ -301,7 +306,7 @@ public class CommonMethods {
         try {
             return xmlElementToString(xmlElement).getBytes("UTF-8");
         } catch (Exception ex) {
-        	logger.error(ex);
+        	logger.error(ex.getMessage(), ex);
             return null;
         }
     }
@@ -323,7 +328,7 @@ public class CommonMethods {
             trans = null;
             source = null;
         } catch (Exception ex) {
-        	logger.error(ex);
+        	logger.error(ex.getMessage(), ex);
             result = false;
         } finally {
             safeCloseWriter(ow);
@@ -345,7 +350,7 @@ public class CommonMethods {
             trans.transform(source, new StreamResult(sw));
             return sw.toString();
         } catch (Exception ex) {
-        	logger.error(ex);
+        	logger.error(ex.getMessage(), ex);
             return "";
         }
     }
@@ -358,7 +363,7 @@ public class CommonMethods {
             DocumentBuilder builder = factory.newDocumentBuilder();
             return builder.parse(resultStream);
         } catch (Exception ex) {
-        	logger.error(ex);
+        	logger.error(ex.getMessage(), ex);
             return null;
         }
     }
@@ -405,7 +410,7 @@ public class CommonMethods {
             result = result.substring(0, result.length() - 2) + ":" + result.substring(result.length() - 2);
             return result;
         } catch (Exception ex) {
-        	logger.error(ex);
+        	logger.error(ex.getMessage(), ex);
             return "";
         }
     }
@@ -469,7 +474,7 @@ public class CommonMethods {
         }
         return new java.sql.Timestamp(date.getTime());
     }
-    
+
     public static java.sql.Date sqlDateFromDate2(java.util.Date date) {
         if (date == null) {
             return null;
@@ -492,10 +497,10 @@ public class CommonMethods {
                 return true;
             } else if (xmlBool.equalsIgnoreCase("no")) {
                 return false;
-            } else if (xmlBool.equals("1")) {
+            } else if (xmlBool.equalsIgnoreCase("1")) {
                 return true;
-            } else if (xmlBool.equals("0")) {
-                return true;
+            } else if (xmlBool.equalsIgnoreCase("0")) {
+                return false;
             } else {
                 return false;
             }
@@ -513,7 +518,7 @@ public class CommonMethods {
             }
             return byteStream.toByteArray();
         } catch (Exception ex) {
-        	logger.error(ex);
+        	logger.error(ex.getMessage(), ex);
             return null;
         }
     }
@@ -523,12 +528,14 @@ public class CommonMethods {
             // Väldime andmete korduvat lugemist ja arvutame andmete esmakordsel
             // lugemisel ühtlasi ka andmete MD5 kontrollsumma
             MessageDigest md = MessageDigest.getInstance("MD5");
-            InputStream dataStream = source.getInputStream();
-            FileOutputStream outStream = new FileOutputStream(targetFile, append);
+            InputStream dataStream = new BufferedInputStream(source.getInputStream());
+
+            OutputStream outStream = new BufferedOutputStream(new FileOutputStream(targetFile, append));
             InputStream base64DecoderStream = null;
 
-            // Puhvri pikkus peab jaguma 4-ga, kuna meil on potentsiaalselt tegemist
-            // Base64 kodeeringus andmetega, mille me tahame kohe ka dekodeerida
+            // Puhvri pikkus peab jaguma 4-ga, kuna meil on potentsiaalselt
+            // tegemist Base64 kodeeringus andmetega, mille me tahame kohe
+            // ka dekodeerida.
             byte[] buf = new byte[65536];
             int len = 0;
             try {
@@ -538,12 +545,9 @@ public class CommonMethods {
                         outStream.write(buf, 0, len);
                     }
                 } else {
-                	base64DecoderStream = new dvk.core.Base64.InputStream(dataStream);
-                	//String base64String = "";
+                	base64DecoderStream = javax.mail.internet.MimeUtility.decode(dataStream, "base64");
                     while ((len = base64DecoderStream.read(buf, 0, buf.length)) > 0) {
                         md.update(buf, 0, len);
-                        //base64String = new String(buf, 0, len);
-                        //outStream.write(Base64.decode(base64String));
                         outStream.write(buf, 0, len);
                     }
                 }
@@ -562,7 +566,7 @@ public class CommonMethods {
 
             return byteArrayToHex(digest);
         } catch (Exception ex) {
-        	logger.error(ex);
+        	logger.error(ex.getMessage(), ex);
             return null;
         }
     }
@@ -757,9 +761,9 @@ public class CommonMethods {
     public static FileSplitResult splitOutTags(String xmlFileName, String tagLocalName, boolean noMainFile, boolean noSubFiles, boolean replaceMain) {
         FileSplitResult result = new FileSplitResult();
         result.subFiles = new ArrayList<String>();
-        
+
         int dvkContainerVersion = 0;
-        
+
         FileInputStream mainInStream = null;
         InputStreamReader mainInReader = null;
         BufferedReader mainReader = null;
@@ -828,9 +832,9 @@ public class CommonMethods {
                     Matcher startAndEndMatcher = startAndEndPattern.matcher(ioBuffer);
 
                     if (startAndEndMatcher.find()) {
-                    	
+
                     	dvkContainerVersion = 1;
-                    	
+
                         if (!noSubFiles) {
                             if (currentLevel == 0) {
                                 subFileName = createPipelineFile(++itemNr);
@@ -854,9 +858,9 @@ public class CommonMethods {
                             }
                         }
                     } else if (startMatcher.find()) {
-                    	
+
                     	dvkContainerVersion = 1;
-                    	
+
                         // Puhvris on eraldatava TAGi algus
                         ++currentLevel;
 
@@ -882,9 +886,9 @@ public class CommonMethods {
                             }
                         }
                     } else if (endMatcher.find()) {
-                    	
+
                     	dvkContainerVersion = 1;
-                    	
+
                         if (!noSubFiles) {
                             // Puhvris on eraldatava TAGi lõpp
                             subWriter.write(ioBuffer);
@@ -941,7 +945,7 @@ public class CommonMethods {
                 }
             }
         } catch (Exception ex) {
-        	logger.error(ex);
+        	logger.error(ex.getMessage(), ex);
         } finally {
             // Streamid kinni
             safeCloseReader(mainReader);
@@ -972,12 +976,12 @@ public class CommonMethods {
         }
 
         // What version of DVK Container
-        if(dvkContainerVersion == 0) {
+        if (dvkContainerVersion == 0) {
         	result.setDvkContainerVersion(2);
         } else {
         	result.setDvkContainerVersion(1);
         }
-        
+
         return result;
     }
 
@@ -1045,10 +1049,10 @@ public class CommonMethods {
             safeCloseReader(mainInReader);
             safeCloseStream(mainInStream);
 
-            // Kustutame ajutise faili 
+            // Kustutame ajutise faili
             (new File(xmlFileName)).delete();
         } catch (Exception ex) {
-        	logger.error(ex);
+        	logger.error(ex.getMessage(), ex);
         } finally {
             safeCloseReader(mainReader);
             safeCloseReader(mainInReader);
@@ -1084,7 +1088,7 @@ public class CommonMethods {
 
             try {
                 reader = xmlIF.createXMLStreamReader(new File(containerFilename));
-                
+
                 reader.validateAgainst(schema);
                 while (reader.hasNext()) {
                     reader.next();
@@ -1141,7 +1145,7 @@ public class CommonMethods {
         }
         return null;
     }
-    
+
     public static boolean deleteDir(File dir) {
         if (dir.isDirectory()) {
             String[] children = dir.list();
@@ -1154,7 +1158,7 @@ public class CommonMethods {
         }
         return dir.delete();
     }
-    
+
     public static boolean copyFile(String sourceFile, String destinationFile) {
         InputStream in = null;
         OutputStream out = null;
@@ -1178,15 +1182,15 @@ public class CommonMethods {
         }
         return result;
     }
-    
+
     public static ArrayList<String> splitFileBySize(String filePath, long maxSizeBytes) throws Exception {
         ArrayList<String> result = new ArrayList<String>();
-        
+
         int bufferSize = Settings.getBinaryBufferSize();
         if (bufferSize > maxSizeBytes) {
-            bufferSize = (int)maxSizeBytes;
+            bufferSize = (int) maxSizeBytes;
         }
-        
+
         byte[] buf = new byte[bufferSize];
         FileInputStream sourceStream = null;
         FileOutputStream outStream = null;
@@ -1195,7 +1199,7 @@ public class CommonMethods {
         int readLen = 0;
         long fileSize = (new File(filePath)).length();
         int fragmentCount = (int)Math.floor((double) (fileSize / maxSizeBytes)) + 1;
-        
+
         try {
             sourceStream = new FileInputStream(filePath);
             for (int i = 0; i < fragmentCount; ++i) {
@@ -1206,14 +1210,14 @@ public class CommonMethods {
                     outStream = new FileOutputStream(fragmentFileName, false);
                     readLen = buf.length;
                     if (readLen > (maxSizeBytes - currentFileSize)) {
-                        readLen = (int)(maxSizeBytes - currentFileSize);
+                        readLen = (int) (maxSizeBytes - currentFileSize);
                     }
                     while ((currentFileSize < maxSizeBytes) && ((len = sourceStream.read(buf, 0, readLen)) > 0)) {
                         outStream.write(buf, 0, len);
                         currentFileSize += len;
                         readLen = buf.length;
                         if (readLen > (maxSizeBytes - currentFileSize)) {
-                            readLen = (int)(maxSizeBytes - currentFileSize);
+                            readLen = (int) (maxSizeBytes - currentFileSize);
                         }
                     }
                 } finally {
@@ -1226,18 +1230,18 @@ public class CommonMethods {
             sourceStream = null;
             buf = null;
         }
-        
+
         return result;
     }
-    
+
     public static Element appendTextNode(Document xmlDoc, Element parentNode, String tagName, String tagValue, String nsPrefix, String nsURI) {
         Element e = null;
         NodeList foundNodes = parentNode.getElementsByTagNameNS(nsURI, tagName);
         if (foundNodes.getLength() == 0) {
-            e = xmlDoc.createElementNS(nsURI, nsPrefix + ":"+ tagName);
+            e = xmlDoc.createElementNS(nsURI, nsPrefix + ":" + tagName);
             parentNode.appendChild(e);
         } else {
-            e = (Element)foundNodes.item(0);
+            e = (Element) foundNodes.item(0);
             CommonMethods.removeNodeChildren(e);
         }
         Text t = xmlDoc.createTextNode(tagValue);
@@ -1251,14 +1255,14 @@ public class CommonMethods {
         Element e = null;
         NodeList foundNodes = parentNode.getElementsByTagNameNS(nsURI, tagName);
         if (foundNodes.getLength() == 0) {
-            e = xmlDoc.createElementNS(nsURI, nsPrefix + ":"+ tagName);
+            e = xmlDoc.createElementNS(nsURI, nsPrefix + ":" + tagName);
             if (refNode != null) {
                 parentNode.insertBefore(e, refNode);
             } else {
                 parentNode.appendChild(e);
             }
         } else {
-            e = (Element)foundNodes.item(0);
+            e = (Element) foundNodes.item(0);
             CommonMethods.removeNodeChildren(e);
         }
         Text t = xmlDoc.createTextNode(tagValue);
@@ -1267,7 +1271,7 @@ public class CommonMethods {
         }
         return parentNode;
     }
-    
+
     // Eemaldab DVK konteineri <transport> plokist need asutused, kellele pole
     // antud dokumenti enam vaja edastada.
     public static void changeTransportData(String filePath, ArrayList<String> allowedOrgs, boolean addProxy) throws Exception {
@@ -1275,17 +1279,17 @@ public class CommonMethods {
         Element transportNode = null;
 
         // Tuvastame DVK nimeruumi versiooni
-        String dvkNamespace = CommonStructures.DhlNamespace; 
+        String dvkNamespace = CommonStructures.DhlNamespace;
         NodeList foundNodes = currentXmlContent.getDocumentElement().getElementsByTagNameNS(dvkNamespace, "transport");
         if (foundNodes.getLength() < 1) {
         	dvkNamespace = CommonStructures.DhlNamespaceV2;
         	foundNodes = currentXmlContent.getDocumentElement().getElementsByTagNameNS(dvkNamespace, "transport");
         }
-        
+
         if (foundNodes.getLength() > 0) {
-            transportNode = (Element)foundNodes.item(0);
+            transportNode = (Element) foundNodes.item(0);
             foundNodes = transportNode.getElementsByTagNameNS(dvkNamespace, "saaja");
-            
+
             // Eemaldame saajate hulgast nende asutuste/isikute andmed,
             // kellele on dokument antud serveri piires juba kohale toimetatud
             for (int i = 0; i < foundNodes.getLength(); ++i) {
@@ -1298,7 +1302,7 @@ public class CommonMethods {
                     transportNode.removeChild(foundNodes.item(i));
                 }
             }
-            
+
             // Tuvastame DHL nimeruumi prefiksi
             String defaultPrefix = currentXmlContent.lookupPrefix(dvkNamespace);
             if (defaultPrefix == null) {
@@ -1309,9 +1313,9 @@ public class CommonMethods {
                     defaultPrefix = "dhl" + String.valueOf(prefixCounter);
                 }
             }
-            
+
             // Märgime antud DVK serveri sõnumi vahendajaks
-            if (addProxy){
+            if (addProxy) {
             	Element elProxy = currentXmlContent.createElementNS(dvkNamespace, defaultPrefix + ":vahendaja");
                 elProxy = CommonMethods.appendTextNode(currentXmlContent, elProxy, "regnr", Settings.Client_DefaultOrganizationCode, defaultPrefix, dvkNamespace);
                 elProxy = CommonMethods.appendTextNode(currentXmlContent, elProxy, "isikukood", Settings.Client_DefaultPersonCode, defaultPrefix, dvkNamespace);
@@ -1322,51 +1326,50 @@ public class CommonMethods {
         // Salvestame muudetud XML andmed faili
         CommonMethods.xmlElementToFile(currentXmlContent.getDocumentElement(), filePath);
     }
-    
-    public static int toIntSafe(String val, int defaultValue) {
+
+    public static int toIntSafe(final String val, final int defaultValue) {
         try {
             if (val == null) {
                 return defaultValue;
             }
             return Integer.parseInt(val);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             return defaultValue;
         }
     }
-    
+
     public static boolean personalIDCodeHasCountryCode(String personalIDCode) {
         if (personalIDCode == null) {
             return false;
         }
-        
+
         personalIDCode = personalIDCode.trim();
         if (personalIDCode.length() < 2) {
             return false;
         }
-        
-        if ("0123456789".indexOf(personalIDCode.substring(0,1)) >= 0) {
+
+        if ("0123456789".indexOf(personalIDCode.substring(0, 1)) >= 0) {
             return false;
         }
-        if ("0123456789".indexOf(personalIDCode.substring(1,2)) >= 0) {
+        if ("0123456789".indexOf(personalIDCode.substring(1, 2)) >= 0) {
             return false;
         }
-        
+
         return true;
     }
-    
-    public static int getCharacterCountInFile(String fileName) {
+
+    public static int getCharacterCountInFile(final String fileName) {
         if ((fileName == null) || (fileName.length() < 1)) {
             return -1;
         }
         if (!(new File(fileName)).exists()) {
             return -1;
         }
-        
+
         int result = -1;
-        FileInputStream inStream = null;;
-        InputStreamReader inReader = null;;
-        BufferedReader reader = null;;
+        FileInputStream inStream = null;
+        InputStreamReader inReader = null;
+        BufferedReader reader = null;
         int charsRead = 0;
         char[] readBuffer = new char[1];
 
@@ -1380,7 +1383,7 @@ public class CommonMethods {
             }
         } catch (Exception ex) {
             result = -1;
-            logger.error(ex);
+            logger.error(ex.getMessage(), ex);
         } finally {
             safeCloseReader(reader);
             safeCloseReader(inReader);
@@ -1389,11 +1392,11 @@ public class CommonMethods {
             inReader = null;
             inStream = null;
         }
-        
+
         return result;
     }
-    
-    public static int compareVersions(String version1, String version2) {
+
+    public static int compareVersions(final String version1, final String version2) {
         if ((version1 == null) || (version2 == null)) {
             return 0;
         }
@@ -1423,25 +1426,25 @@ public class CommonMethods {
         }
         return result;
     }
-    
+
     /**
      * Saadab veakirjelduse e-mailiga administraatorile.
-     * 
+     *
      * @param emailBody     Veakirjeldus
      */
-    public static void sendEmail(String emailBody) {
+    public static void sendEmail(final String emailBody) {
         try {
             Properties mailServerConfig = new Properties();
             if ((Settings.currentProperties != null) && (Settings.currentProperties.getProperty("mail.host") != null) && (Settings.currentProperties.getProperty("mail.host").length() > 0)) {
                 mailServerConfig.setProperty("mail.host", Settings.currentProperties.getProperty("mail.host"));
                 String emailTo = Settings.currentProperties.getProperty("mail.to");
-                
+
                 InternetAddress fromAddress = new InternetAddress(Settings.currentProperties.getProperty("mail.from"));
                 fromAddress.setPersonal("DVK klient");
-                
+
                 Session session = Session.getDefaultInstance( mailServerConfig, null );
                 MimeMessage message = new MimeMessage( session );
-    
+
                 message.addRecipient( Message.RecipientType.TO, new InternetAddress(emailTo) );
                 message.addFrom( new InternetAddress[]{fromAddress} );
                 message.setSubject( "DVK client error!" );
@@ -1450,8 +1453,8 @@ public class CommonMethods {
             }
         } catch( Exception ex ){}
     }
-    
-    public static String TruncateString(String text, int len) {
+
+    public static String TruncateString(final String text, final int len) {
         if ((text == null) || (text.length() < 1) || (len < 1)) {
             return "";
         }
@@ -1460,8 +1463,8 @@ public class CommonMethods {
         }
         return text.substring(0, len);
     }
-    
-    public static int getNumberFromChildNode(Element parentNode, String valueNodeName, int defaultValue) {
+
+    public static int getNumberFromChildNode(final Element parentNode, final String valueNodeName, final int defaultValue) {
         int result = defaultValue;
         NodeList nodes = parentNode.getElementsByTagName(valueNodeName);
         if (nodes.getLength() > 0) {
@@ -1471,8 +1474,8 @@ public class CommonMethods {
         }
         return result;
     }
-    
-    public static boolean stringsEqualIgnoreNull(String s1, String s2) {
+
+    public static boolean stringsEqualIgnoreNull(final String s1, final String s2) {
     	if (s1 == null) {
     		return ((s2 == null) || (s2.length() < 1));
     	} else if (s2 == null) {
@@ -1481,11 +1484,11 @@ public class CommonMethods {
     		return s1.trim().equalsIgnoreCase(s2.trim());
     	}
     }
-    
-    public static AttachmentExtractionResult getExtractedFileFromAttachment(org.apache.axis.MessageContext context, String attachmentReference) throws AxisFault {
+
+    public static AttachmentExtractionResult getExtractedFileFromAttachment(final org.apache.axis.MessageContext context, final String attachmentReference) throws AxisFault {
         return getExtractedFileFromAttachmentPart((org.apache.axis.attachments.AttachmentPart) context.getCurrentMessage().getAttachmentsImpl().getAttachmentByReference(attachmentReference));
     }
-    
+
     public static AttachmentExtractionResult getExtractedFileFromAttachment(org.apache.axis.Message response) throws AxisFault {
     	AttachmentExtractionResult result = new AttachmentExtractionResult();
     	Iterator attachments = response.getAttachments();
@@ -1494,10 +1497,10 @@ public class CommonMethods {
         }
     	return result;
     }
-    
+
     private static AttachmentExtractionResult getExtractedFileFromAttachmentPart(org.apache.axis.attachments.AttachmentPart attachmentPart) throws AxisFault {
     	AttachmentExtractionResult result = new AttachmentExtractionResult();
-    	
+
     	// Leiame sõnumi kehas olnud viite alusels MIME lisast vajalikud andmed
         if (attachmentPart == null) {
             throw new AxisFault( CommonStructures.VIGA_PUUDUV_MIME_LISA );
@@ -1506,37 +1509,36 @@ public class CommonMethods {
         if (attachmentSource == null) {
             throw new AxisFault( CommonStructures.VIGA_PUUDUV_MIME_LISA );
         }
-        
+
         // Laeme SOAP attachmendis asunud andmed baidimassiivi
         String[] headers = attachmentPart.getMimeHeader("Content-Transfer-Encoding");
         String encoding;
-        if((headers == null) || (headers.length < 1)) {
+        if ((headers == null) || (headers.length < 1)) {
             encoding = "base64";
-        }
-        else {
+        } else {
             encoding = headers[0];
         }
-        
+
         String pipelineDataFile = CommonMethods.createPipelineFile(0);
         result.setAttachmentHash(CommonMethods.getDataFromDataSource(attachmentSource, encoding, pipelineDataFile, false));
         if (result.getAttachmentHash() == null) {
             throw new AxisFault( CommonStructures.VIGA_VIGANE_MIME_LISA );
         }
-        
+
         // Pakime andmed GZIPiga lahti
         if (!CommonMethods.gzipUnpackXML(pipelineDataFile, true)) {
             throw new AxisFault(CommonStructures.VIGA_VIGANE_MIME_LISA);
         }
-        
+
         result.setExtractedFileName(pipelineDataFile);
-        
+
         return result;
     }
-    
+
     /**
      * Eraldab X-Tee päringu kehast elemendi <heha>, mis  tuleb vastussõnumi
      * koosseisus hiljem päringu teostajale tagasi saata.
-     * 
+     *
      * @param context			Axis sõnumi kontekst
      * @param requestName		X-Tee päringu nimi (näit. sendDocuments)
      * @return					SOAP sõnumi kehas asuv <keha> element.
@@ -1548,10 +1550,10 @@ public class CommonMethods {
             SOAPBody b = msg.getSOAPBody();
             NodeList nodes = b.getElementsByTagName(requestName);
             if (nodes.getLength() > 0) {
-                Element el = (Element)nodes.item(0);
+                Element el = (Element) nodes.item(0);
                 nodes = el.getElementsByTagName("keha");
                 if (nodes.getLength() > 0) {
-                    result = (Element)nodes.item(0);
+                    result = (Element) nodes.item(0);
                 }
             }
         } catch (Exception ex) {
@@ -1572,11 +1574,11 @@ public class CommonMethods {
     public static boolean isNullOrEmpty(final String stringToEvaluate) {
     	return ((stringToEvaluate == null) || stringToEvaluate.isEmpty());
     }
-    
+
     /**
      * Seeks specified value from String list.
      * Ignores case and treats null and empty values as equal.
-     * 
+     *
      * @param list
      *     List of strings
      * @param valueToSeek
@@ -1594,10 +1596,10 @@ public class CommonMethods {
     	}
     	return false;
     }
-    
+
     /**
      * Joins list of strings to a single string (separated by specified delimiter).
-     * 
+     *
      * @param s
      *     List of strings
      * @param delimiter

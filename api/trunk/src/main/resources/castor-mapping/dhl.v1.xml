@@ -58,7 +58,7 @@
 	<class name="dvk.api.container.v1.SignedDoc">
 		<map-to xml="SignedDoc" xmlns="http://www.sk.ee/DigiDoc/v1.3.0#" />
 
-		<field name="ddocNamespace" type="string"><!-- adds attribute with digidoc namespace -->
+		<field name="ddocNamespace" type="string"><!-- adds attribute with DigiDoc namespace -->
 			<bind-xml name="xmlns" node="attribute" />
 		</field>
 
@@ -70,32 +70,40 @@
 			<bind-xml name="version" node="attribute" />
 		</field>
 
+		<field name="dataFiles" type="dvk.api.container.v1.DataFile" collection="arraylist">
+			<bind-xml name="DataFile" node="element" xmlns="http://www.sk.ee/DigiDoc/v1.3.0#" />
+		</field>
+	</class>
+
+	<class name="dvk.api.container.v1.DataFile">
+		<map-to xml="DataFile" xmlns="http://www.sk.ee/DigiDoc/v1.3.0#" />
+
+		<field name="fileBase64Content" type="string" >
+			<bind-xml node="text"/>
+		</field>
+
 		<field name="fileContentType" type="string">
-			<bind-xml name="ContentType" node="attribute" location="DataFile" />
+			<bind-xml name="ContentType" node="attribute" />
 		</field>
 
 		<field name="fileFormat" type="string">
-			<bind-xml name="Filename" node="attribute" location="DataFile" />
+			<bind-xml name="Filename" node="attribute" />
 		</field>
 
 		<field name="fileId" type="string">
-			<bind-xml name="Id" node="attribute" location="DataFile" />
+			<bind-xml name="Id" node="attribute" />
 		</field>
 
 		<field name="fileMimeType" type="string">
-			<bind-xml name="MimeType" node="attribute" location="DataFile" />
+			<bind-xml name="MimeType" node="attribute" />
 		</field>
 
 		<field name="fileSize" type="string">
-			<bind-xml name="Size" node="attribute" location="DataFile" />
+			<bind-xml name="Size" node="attribute" />
 		</field>
 
-		<field name="ddocNamespaceCopy" type="string">
-			<bind-xml name="xmlns" node="attribute" location="DataFile" />
-		</field>
-
-		<field name="fileBase64Content" type="string">
-			<bind-xml name="DataFile" node="element" xmlns="http://www.sk.ee/DigiDoc/v1.3.0#" />
+		<field name="ddocNamespace" type="string">
+			<bind-xml name="xmlns" node="attribute" />
 		</field>
 	</class>
 	<!--

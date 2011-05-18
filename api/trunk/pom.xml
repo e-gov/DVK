@@ -2,11 +2,11 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>dvk</groupId>
   <artifactId>api</artifactId>
-  <version>1.0</version>
+  <version>1.0.1</version>
   <packaging>jar</packaging>
   <name>dvkapi</name>
-  
-  
+
+
   <dependencies>
   	<dependency>
       <groupId>java</groupId>
@@ -177,7 +177,7 @@
       <systemPath>${basedir}/lib/xml-apis.jar</systemPath>
     </dependency>
   </dependencies>
-  
+
   <build>
 		<finalName>${name}</finalName>
 		<sourceDirectory>src/main/java</sourceDirectory>
@@ -198,8 +198,8 @@
 					<target>1.6</target>
 					<excludes></excludes>
 				</configuration>
-			</plugin>			
+			</plugin>
 		</plugins>
 	</build>
-  
+
 </project>

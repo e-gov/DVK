@@ -1,30 +1,15 @@
 package dvk.api.container.v1;
 
+import java.util.List;
+
 import dvk.api.container.XmlBlock;
 
-public class SignedDoc extends XmlBlock
-{
-	protected String fileFormat;
-	protected String version;
-	protected String format;
-	protected String fileContentType;
-	protected String fileId;
-	protected String fileMimeType;
-	protected String fileSize;
-	protected String fileBase64Content;
+public class SignedDoc extends XmlBlock {
 	private final static String ddocNamesapce = "http://www.sk.ee/DigiDoc/v1.3.0#";
 
-	public boolean isContentNull() {
-		return fileBase64Content == null;
-	}
-
-	public String getFileFormat() {
-		return fileFormat;
-	}
-
-	public void setFileFormat(String format) {
-		this.fileFormat = format;
-	}
+	protected String version;
+	protected String format;
+	protected List<DataFile> dataFiles;
 
 	public String getVersion() {
 		return version;
@@ -42,44 +27,12 @@ public class SignedDoc extends XmlBlock
 		this.format = format;
 	}
 
-	public String getFileContentType() {
-		return fileContentType;
+	public List<DataFile> getDataFiles() {
+		return dataFiles;
 	}
 
-	public void setFileContentType(String fileContentType) {
-		this.fileContentType = fileContentType;
-	}
-
-	public String getFileId() {
-		return fileId;
-	}
-
-	public void setFileId(String fileId) {
-		this.fileId = fileId;
-	}
-
-	public String getFileMimeType() {
-		return fileMimeType;
-	}
-
-	public void setFileMimeType(String fileMimeType) {
-		this.fileMimeType = fileMimeType;
-	}
-
-	public String getFileSize() {
-		return fileSize;
-	}
-
-	public void setFileSize(String fileSize) {
-		this.fileSize = fileSize;
-	}
-
-	public String getFileBase64Content() {
-		return fileBase64Content;
-	}
-
-	public void setFileBase64Content(String fileBase64Content) {
-		this.fileBase64Content = fileBase64Content;
+	public void setDataFiles(List<DataFile> dataFiles) {
+		this.dataFiles = dataFiles;
 	}
 
 	public String getDdocNamespace() {
@@ -87,12 +40,5 @@ public class SignedDoc extends XmlBlock
 	}
 
 	public void setDdocNamespace(String xmlns) {
-	}
-
-	public String getDdocNamespaceCopy() {
-		return ddocNamesapce;
-	}
-
-	public void setDdocNamespaceCopy(String xmlns) {
 	}
 }

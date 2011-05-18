@@ -8,17 +8,18 @@ import dvk.api.container.v2.ContainerVer2;
 import dvk.api.container.v2.Fail;
 import dvk.api.ml.Util;
 
-public class TestContainer
-{
+public class TestContainer {
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		testXmlContainerVer2();
+	    testXmlContainerVer1();
+	    //testXmlContainerVer2();
 	}
 
 	public static void testXmlContainerVer1() {
-		final String file = "./test/dvk_container_v1_sample.xml";
+		//final String file = "./test/dvk_container_v1_sample.xml";
+		final String file = "./test/dvk_container_v1_sample_multifile.xml";
 		final String outfile = "./test/dvk_container_v1.test.xml";
 
 		try {
@@ -65,7 +66,7 @@ public class TestContainer
 				System.out.println("File was not found " + file);
 				return;
 			}
-			
+
 			System.out.println("Decode file");
 
 			try {

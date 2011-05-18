@@ -40,10 +40,10 @@ public abstract class Container
 		if (mapping == null) {
 			mapping = new Mapping();
 
-			switch (version)
-				{
+			switch (version) {
 				case Ver1:
-					URL mappingURL = mapping.getClassLoader().getResource(CastorMappingsFileVer1);
+				    //mapping.loadMapping("./src/main/resources/" + CastorMappingsFileVer1);
+				    URL mappingURL = mapping.getClassLoader().getResource(CastorMappingsFileVer1);
 					mapping.loadMapping( mappingURL );
 					//mapping.loadMapping(CastorMappingsFileVer1);
 					break;

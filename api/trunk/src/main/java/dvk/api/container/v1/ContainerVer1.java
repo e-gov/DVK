@@ -3,6 +3,9 @@ package dvk.api.container.v1;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.exolab.castor.xml.Marshaller;
@@ -87,9 +90,24 @@ public class ContainerVer1 extends Container
 		}
 
 		int indx1 = xml.indexOf("?>");
-		int indx2 = xml.indexOf(">", indx1 + 2);// root element tag end
-		++indx2;
-		String docRootTag = xml.substring(indx1, indx2);
+		if (indx1 < 0) {
+		    Pattern documentRootPattern = Pattern.compile("<([\\w]+:)?dokument", Pattern.DOTALL | Pattern.CANON_EQ | Pattern.CASE_INSENSITIVE);
+		    Matcher documentRootMatcher = documentRootPattern.matcher(xml);
+		    if (documentRootMatcher.find()) {
+		        indx1 = documentRootMatcher.start();
+		    }
+		    documentRootMatcher = null;
+		    documentRootPattern = null;
+		} else {
+		    indx1 += 2;
+		}
+
+		int indx2 = xml.indexOf(">", indx1) + 1;// root element tag end
+
+		String docRootTag = "";
+		if ((indx1 >= 0) && (indx2 > indx1)) {
+		    docRootTag = xml.substring(indx1, indx2);
+		}
 
 		if (!docRootTag.contains("konteineri_versioon")) {
 			final String xmlBlockStart = "<dhl:metainfo";

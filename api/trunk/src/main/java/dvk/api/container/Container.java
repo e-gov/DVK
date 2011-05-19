@@ -44,12 +44,12 @@ public abstract class Container
 				case Ver1:
 				    //mapping.loadMapping("./src/main/resources/" + CastorMappingsFileVer1);
 				    URL mappingURL = mapping.getClassLoader().getResource(CastorMappingsFileVer1);
-					mapping.loadMapping( mappingURL );
+					mapping.loadMapping(mappingURL);
 					//mapping.loadMapping(CastorMappingsFileVer1);
 					break;
 				case Ver2:
 					URL mappingURL2 = mapping.getClassLoader().getResource(CastorMappingsFileVer2);
-					mapping.loadMapping( mappingURL2 );
+					mapping.loadMapping(mappingURL2);
 					//mapping.loadMapping(CastorMappingsFileVer2);
 					break;
 				default:

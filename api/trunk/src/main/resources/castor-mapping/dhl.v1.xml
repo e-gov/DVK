@@ -86,7 +86,7 @@
 			<bind-xml name="ContentType" node="attribute" />
 		</field>
 
-		<field name="fileFormat" type="string">
+		<field name="fileName" type="string">
 			<bind-xml name="Filename" node="attribute" />
 		</field>
 

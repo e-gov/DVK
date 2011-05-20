@@ -15,23 +15,23 @@ import org.xml.sax.helpers.DefaultHandler;
 public class XmlValidator extends DefaultHandler {
     private static final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
     private static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
-    
+
     private ArrayList<String> m_errors;
-    
+
     public XmlValidator() {
         m_errors = new ArrayList<String>();
     }
-    
+
     public static ArrayList<String> Validate(String fileName) throws Exception {
         // Kontrollime, et valideerimiseks antud faili nimi ei oleks määramata
         // ja et etteantud fail üldse eksisteeriks
-        if ((fileName == null) || (fileName.length() < 1)) {
-            throw new Exception("DVK tarkvaraline viga: Valideeritava XML faili nimi on maaramata!");
+        if (CommonMethods.isNullOrEmpty(fileName)) {
+            throw new Exception("DVK tarkvaraline viga: Valideeritava XML faili nimi on määramata!");
         }
         if (!(new File(fileName)).exists()) {
             throw new Exception("DVK tarkvaraline viga: Valideeritavat XML faili ei eksisteeri!");
         }
-        
+
         DefaultHandler handler = new XmlValidator();
 
         // ParserFactory initsialiseerimine
@@ -62,15 +62,16 @@ public class XmlValidator extends DefaultHandler {
         } catch (IOException ex) {
             throw new Exception("DVK tarkvaraline viga: " + ex.getMessage());
         }
-        
+
         return ((XmlValidator) handler).m_errors;
     }
 
-    public void error(SAXParseException e) throws SAXParseException {
+    @Override
+	public void error(SAXParseException e) throws SAXParseException {
         // üritame vältida viitamata või vigaselt viidatud XSD failist
         // tingitud vigade sattumist vigade nimekirja.
         if (e.getMessage().indexOf("Cannot find the declaration of element") < 0) {
             m_errors.add(e.getMessage());
         }
-    } 
+    }
 }

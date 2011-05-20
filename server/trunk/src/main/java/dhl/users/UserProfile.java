@@ -88,8 +88,8 @@ public class UserProfile {
     public static UserProfile getFromHeaders(XHeader header, Connection conn) throws AxisFault {
         UserProfile result = new UserProfile();
 
-        // Kontrollime, et vajalik X-Tee põis anti kaasa ja et see sisaldaks
-        // infot võhemalt sõnumi saatnud asutuse kohta.
+        // Kontrollime, et vajalik X-Tee päis anti kaasa ja et see sisaldaks
+        // infot vähemalt sõnumi saatnud asutuse kohta.
         if (header == null) {
             throw new AxisFault(CommonStructures.VIGA_XTEE_PAISED_PUUDU);
         } else if ((header.asutus == null) || (header.asutus.length() == 0)) {
@@ -114,7 +114,7 @@ public class UserProfile {
 
         // Leiame sõnumi saatnud isiku ID oma isikute registrist
         // Kui isikut registrist leida ei õnnestu, siis pole hullu - enamuse
-        // põringute puhul võib põringu teostajaks olla iaikute registris registreerimata isik
+        // päringute puhul võib päringu teostajaks olla iaikute registris registreerimata isik
         if ((header.isikukood != null) && (header.isikukood.length() > 2)) {
             result.setPersonCode(header.isikukood.substring(2));
             result.setPersonID(Isik.getIDByCode(header.isikukood.substring(2), conn));
@@ -128,14 +128,14 @@ public class UserProfile {
 
         // Leiame antud isiku teadaolevad ametid
         // Kui ametikohta registrist leida ei õnnestu, siis pole hullu - enamuse
-        // põringute puhul võib põringu teostajaks olla iaikute registris registreerimata
+        // päringute puhul võib päringu teostajaks olla iaikute registris registreerimata
         // või ametikohale registreerimata isik
         result.setPositions(Ametikoht.getPersonCurrentPositions(result.getPersonID(), result.getOrganizationID(), conn));
         /*if (result.getPositions().size() < 1) {
             throw new AxisFault( CommonStructures.VIGA_AMETIKOHATA_ISIK );
         }*/
 
-        // Leiame antud isiku allõksused
+        // Leiame antud isiku allüksused
         result.setDivisions(Ametikoht.getPersonCurrentDivisions(result.getPersonID(), result.getOrganizationID(), conn));
 
         // Leiame antud isikule omistatud rollid

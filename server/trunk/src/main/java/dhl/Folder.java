@@ -113,12 +113,12 @@ public class Folder {
     }
 
     /**
-     * Leiab kausta nime alusel kausta ID
-     * 
+     * Leiab kausta nime alusel kausta ID.
+     *
      * @param folderName        kausta nimi
      * @param organizationID    asutuse ID
-     * @param parentID          otsitava kausta õlemkausta ID
-     * @param conn              andmebaasiõhenduse objekt
+     * @param parentID          otsitava kausta ülemkausta ID
+     * @param conn              andmebaasiühenduse objekt
      * @return                  kausta ID
      */
     public static int getFolderIdByName(String folderName, int organizationID, int parentID, Connection conn) {
@@ -150,11 +150,11 @@ public class Folder {
     }
 
     /**
-     * Leiab kataloogi ID jõrgi kausta tõisnime (tõisteekonna alustades juurkaustast)
-     * 
+     * Leiab kataloogi ID järgi kausta täisnime (täisteekonna alustades juurkaustast).
+     *
      * @param folderID  Kausta ID
-     * @param conn      Andmebaasiõhenduse objekt
-     * @return          Kausta tõisnimi
+     * @param conn      Andmebaasiühenduse objekt
+     * @return          Kausta täisnimi
      */
     public static String getFolderFullPath(int folderID, Connection conn) {
         try {
@@ -205,7 +205,7 @@ public class Folder {
                         } else {
                             cs.setNull("folder_number", Types.VARCHAR);
                         }
-                        
+
                         if(xTeePais != null) {
     		    			cs.setString("xtee_isikukood", xTeePais.isikukood);
     		    			cs.setString("xtee_asutus", xTeePais.asutus);
@@ -213,8 +213,8 @@ public class Folder {
     		    			cs.setString("xtee_isikukood", null);
     		    			cs.setString("xtee_asutus", null);
     		    		}
-                        
-                        
+
+
                         cs.registerOutParameter("folder_id", Types.INTEGER);
                         cs.executeUpdate();
                         id = cs.getInt("folder_id");
@@ -242,11 +242,11 @@ public class Folder {
             return GLOBAL_ROOT_FOLDER;
         }
     }
-    
+
     /**
-     * Muudab etteantud kausta nimetust nii, et see sisaldaks ainult ASCII sõmboleid
+     * Muudab etteantud kausta nimetust nii, et see sisaldaks ainult ASCII sümboleid
      * A-Z, 0-9, /, _.
-     * 
+     *
      * @param initialName   Kliendi poolt etteantud kausta nimetus
      * @return              DVK jaoks sobilikule kujule viidud kausta nimetus
      */

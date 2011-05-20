@@ -21,8 +21,8 @@ public class ChangeOrganizationData {
         if (bodyData.asutus == null) {
             throw new AxisFault(CommonStructures.VIGA_VIGANE_KEHA);
         }
-        
-        // Kui põringuga üritatakse muuta teise asutuse andmeid, siis anname veatete
+
+        // Kui päringuga üritatakse muuta teise asutuse andmeid, siis anname veatete
         if (!bodyData.asutus.getRegistrikood().equalsIgnoreCase(user.getOrganizationCode())) {
             throw new AxisFault("Antud päringuga saab muuta ainult päringu sooritanud asutuse andmeid!");
         }
@@ -37,7 +37,7 @@ public class ChangeOrganizationData {
         }
 
         if (bodyData.ksAsutuseKoodEsitatud) {
-            // Kui andmetes sisaldub viide kõrgemalseisvale asutusele, siis õritame
+            // Kui andmetes sisaldub viide kõrgemalseisvale asutusele, siis üritame
             // tuvastada kõrgemalseisva asutuse ID
             if ((bodyData.asutus.getKsAsutuseKood() != null) && !bodyData.asutus.getKsAsutuseKood().equalsIgnoreCase("")) {
                 bodyData.asutus.setKsAsutuseID(Asutus.getIDByRegNr(bodyData.asutus.getKsAsutuseKood(), false, conn));
@@ -163,7 +163,7 @@ public class ChangeOrganizationData {
 
         // Salvestame muudatused. Kasutame X-tee päist lihtsalt mugavaks andmete edastamiseks.
         XHeader xTeePais = new XHeader(user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
-        
+
         asutus.saveToDB(conn, xTeePais);
 
         return result;

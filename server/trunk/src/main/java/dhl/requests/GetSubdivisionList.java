@@ -16,16 +16,16 @@ import org.apache.axis.AxisFault;
 import org.apache.log4j.Logger;
 
 public class GetSubdivisionList {
-	
+
 	private static Logger logger = Logger.getLogger(GetSubdivisionList.class);
-	
+
     public static getSubdivisionListResponseType V1(org.apache.axis.MessageContext context, Connection conn) throws AxisFault {
-        
+
     	logger.info("GetSubdivisionList.V1 invoked.");
-    	
+
     	getSubdivisionListResponseType result = new getSubdivisionListResponseType();
 
-        // Laeme põringu keha endale sobivasse andmestruktuuri
+        // Laeme päringu keha endale sobivasse andmestruktuuri
         getSubdivisionListRequestType bodyData = getSubdivisionListRequestType.getFromSOAPBody(context);
         result.paring = bodyData;
 
@@ -42,18 +42,18 @@ public class GetSubdivisionList {
                 list.addAll(subList);
             }
         }
-        
+
         result.allyksused = list;
         return result;
     }
-    
+
     public static getSubdivisionListV2ResponseType V2(org.apache.axis.MessageContext context, Connection conn, UserProfile user) throws Exception {
-        
+
     	logger.info("GetSubdivisionList.V2 invoked.");
-    	
+
     	getSubdivisionListV2ResponseType result = new getSubdivisionListV2ResponseType();
 
-        // Laeme põringu keha endale sobivasse andmestruktuuri
+        // Laeme päringu keha endale sobivasse andmestruktuuri
         getSubdivisionListV2RequestType bodyData = getSubdivisionListV2RequestType.getFromSOAPBody(context);
         result.paring = bodyData;
 
@@ -61,7 +61,7 @@ public class GetSubdivisionList {
         AttachmentExtractionResult exResult = CommonMethods.getExtractedFileFromAttachment(context, bodyData.asutusedHref);
         result.dataMd5Hash = exResult.getAttachmentHash();
         bodyData.loadParametersFromXML(exResult.getExtractedFileName());
-        
+
         // Leiame andmebaasist soovitud ametikohad
         ArrayList<Allyksus> list = new ArrayList<Allyksus>();
         if (bodyData != null) {
@@ -75,7 +75,7 @@ public class GetSubdivisionList {
                 list.addAll(subList);
             }
         }
-        
+
         // Koostame XML faili
         result.createResponseFile(list, user.getOrganizationCode());
         return result;

@@ -25,12 +25,12 @@ import ee.sk.utils.ConfigManager;
 
 /**
  * Dokumendi fail. Vastab andmebaasi tabelile DOKUMENDI_FAIL
- * 
+ *
  * @author Jaak Lember
  */
 public class DocumentFile {
 	static Logger logger = Logger.getLogger(DocumentFile.class.getName());
-	
+
 	private int m_id;
 	private int m_documentId;
 	private String m_fileName;
@@ -107,7 +107,7 @@ public class DocumentFile {
 	public DocumentFile() {
 		clear();
 	}
-	
+
 	public void clear() {
 		this.m_id = 0;
 		this.m_documentId = 0;
@@ -118,23 +118,23 @@ public class DocumentFile {
 		this.m_isAttachment = false;
 		this.m_localFileFullName = "";
 	}
-	
+
 	public static ArrayList<DocumentFile> getListFromContainerV1(XMLStreamReader xmlReader, ArrayList<String> extensionFilter) throws FileNotFoundException, IOException, XMLStreamException {
 		ArrayList<DocumentFile> result = new ArrayList<DocumentFile>();
 		int itemIndex = 1;
-		
+
         while (xmlReader.hasNext()) {
             xmlReader.next();
 
             if (xmlReader.hasName()) {
                 if (xmlReader.getLocalName().equalsIgnoreCase("signeddoc") && xmlReader.isEndElement()) {
-                    // Kui oleme jõudnud faili ploki lõppu, siis katkestame tsõkli
+                    // Kui oleme jõudnud faili ploki lõppu, siis katkestame tsükli
                     break;
                 } else if (xmlReader.getLocalName().equalsIgnoreCase("datafile") && xmlReader.isStartElement()) {
                 	DocumentFile item = new DocumentFile();
-                	
+
                 	item.m_fileName = xmlReader.getAttributeValue(null, "Filename");
-                	
+
                 	boolean skipFile = true;
                 	if ((extensionFilter != null) && (extensionFilter.size() > 0)) {
                 		for (int i = 0; i < extensionFilter.size(); i++) {
@@ -147,13 +147,13 @@ public class DocumentFile {
                 	} else {
                 		skipFile = false;
                 	}
-                	
+
                 	if (!skipFile) {
 	                	item.m_mimeType = xmlReader.getAttributeValue(null, "MimeType");
-	                	item.m_fileSizeBytes = Integer.parseInt(xmlReader.getAttributeValue(null, "Size"));                	
+	                	item.m_fileSizeBytes = Integer.parseInt(xmlReader.getAttributeValue(null, "Size"));
 	                	item.m_localFileFullName = CommonMethods.createPipelineFile(itemIndex);
 	                	FileOutputStream outStream = new FileOutputStream(item.m_localFileFullName, false);
-	                	
+
 	                	try {
 		                	xmlReader.next();
 		                    if (xmlReader.isCharacters()) {
@@ -180,32 +180,32 @@ public class DocumentFile {
 	                	} finally {
 	                		CommonMethods.safeCloseStream(outStream);
 	                		outStream = null;
-	                		itemIndex++;	
+	                		itemIndex++;
 	                	}
-	                	
+
 	                	result.add(item);
                 	}
                 }
             }
         }
-		
+
 		return result;
 	}
-	
+
 	public static ArrayList<DocumentFile> getListFromContainerV2(XMLStreamReader xmlReader, ArrayList<String> extensionFilter) throws AxisFault, FileNotFoundException, IOException, XMLStreamException {
 		ArrayList<DocumentFile> result = new ArrayList<DocumentFile>();
 		DocumentFile item = null;
 		int itemIndex = 1;
-		
+
         while (xmlReader.hasNext()) {
             xmlReader.next();
 
             if (xmlReader.hasName()) {
                 if (xmlReader.getLocalName().equalsIgnoreCase("failid") && xmlReader.isEndElement()) {
-                    // Kui oleme jõudnud failide ploki lõppu, siis katkestame tsõkli
+                    // Kui oleme jõudnud failide ploki lõppu, siis katkestame tsükli
                     break;
                 } else if (xmlReader.getLocalName().equalsIgnoreCase("fail") && xmlReader.isEndElement()) {
-                	// Kui jõuame faili lõpuelemendi juurde, siis lisame andmetega tõidetud faili
+                	// Kui jõuame faili lõpuelemendi juurde, siis lisame andmetega täidetud faili
                 	// objekti failide nimekirja.
                 	if (item != null) {
 	                	boolean skipFile = true;
@@ -220,7 +220,7 @@ public class DocumentFile {
 	                	} else {
 	                		skipFile = false;
 	                	}
-                	
+
 	                	if (!skipFile) {
 	                		result.add(item);
 	                	}
@@ -250,7 +250,7 @@ public class DocumentFile {
                 } else if ((item != null) && xmlReader.getLocalName().equalsIgnoreCase("zip_base64_sisu") && xmlReader.isStartElement()) {
                 	item.m_localFileFullName = CommonMethods.createPipelineFile(itemIndex);
                 	FileOutputStream outStream = new FileOutputStream(item.m_localFileFullName, false);
-                	
+
                 	try {
 	                	xmlReader.next();
 	                    if (xmlReader.isCharacters()) {
@@ -277,9 +277,9 @@ public class DocumentFile {
                 	} finally {
                 		CommonMethods.safeCloseStream(outStream);
                 		outStream = null;
-                		itemIndex++;	
+                		itemIndex++;
                 	}
-                	
+
                 	// Pakime faili lahti
                 	if (!CommonMethods.gzipUnpackXML(item.m_localFileFullName, false)) {
                 		throw new AxisFault("File data extraction failed!");
@@ -290,26 +290,26 @@ public class DocumentFile {
                     	item.m_isMainFile = CommonMethods.booleanFromXML(xmlReader.getText().trim());
                     }
                 }
-                
+
             }
         }
-		
+
 		return result;
 	}
-	
+
 	public ArrayList<String> getFilesFromDdocBdoc(String extensionFilter) throws Exception {
 		ArrayList<String> result = new ArrayList<String>();
-		
+
 		if (this.m_fileName.toLowerCase().endsWith("ddoc") || this.m_fileName.toLowerCase().endsWith("bdoc")) {
 			ConfigManager.init("jar://jdigidoc.cfg");
-			
+
 			DigiDocFactory ddocFactory = null;
 			if (this.m_fileName.toLowerCase().endsWith("bdoc")) {
 				ddocFactory = ConfigManager.instance().getBDigiDocFactory();
 			} else {
 				ddocFactory = ConfigManager.instance().getDigiDocFactory();
 			}
-			
+
 			SignedDoc container = ddocFactory.readSignedDoc(this.m_localFileFullName);
 			int dataFileCount = container.countDataFiles();
 			for (int i = 0; i < dataFileCount; i++) {
@@ -317,18 +317,18 @@ public class DocumentFile {
 				String dataFileName = df.getFileName();
 
 				if ((extensionFilter == null) || (extensionFilter.length() < 1) || (dataFileName.toLowerCase().endsWith(extensionFilter.toLowerCase()))) {
-					String extension = dataFileName.substring(dataFileName.lastIndexOf(".")); 
+					String extension = dataFileName.substring(dataFileName.lastIndexOf("."));
 					String fileName = CommonMethods.createPipelineFile(i, extension);
-					
+
 					InputStream in = null;
 					OutputStream out = null;
 			        int val = 0;
 					try {
 						out = new FileOutputStream(fileName);
 						in = df.getBodyAsStream();
-						
+
 						if ((in != null) && (out != null)) {
-							// Siin ei tasu puhverdamist õritada, kuna JDigiDoc teek ei toeta seda.
+							// Siin ei tasu puhverdamist üritada, kuna JDigiDoc teek ei toeta seda.
 				            while ((val = in.read()) >= 0) {
 				                out.write((byte) val);
 				            }
@@ -343,17 +343,17 @@ public class DocumentFile {
 				}
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	public ArrayList<String> validateFileSignatures() throws ComponentException, IncorrectSignatureException {
 		ArrayList<String> result = new ArrayList<String>();
-		
+
 		if (this.m_fileName.toLowerCase().endsWith("ddoc") || this.m_fileName.toLowerCase().endsWith("bdoc")) {
-			logger.info("Validating signatures of file " + this.m_fileName + " ("+ this.m_localFileFullName +").");
+			logger.info("Validating signatures of file " + this.m_fileName + " (" + this.m_localFileFullName + ").");
 			ConfigManager.init("jar://jdigidoc.cfg");
-			
+
 			DigiDocFactory ddocFactory = null;
 			try {
 				if (this.m_fileName.toLowerCase().endsWith("bdoc")) {
@@ -364,29 +364,29 @@ public class DocumentFile {
 			} catch (DigiDocException ex) {
 				throw new ComponentException("DigiDoc teegi initsialiseerimine ebaõnnestus!", ex);
 			}
-			
+
 			SignedDoc container = null;
 			try {
 				container = ddocFactory.readSignedDoc(this.m_localFileFullName);
 			} catch (DigiDocException ex) {
 				throw new ComponentException("DigiDoc faili avamine ebaõnnestus!", ex);
 			}
-			
+
 			if (container.countSignatures() > 0) {
 				ArrayList errs = container.verify(true, true);
-				if(errs.size() >= 0) { 
-					for(int j = 0; j < errs.size(); j++) {
-						result.add("Dokumendi \""+ this.m_fileName +"\" allkirjade kontrollimisel tuvastati viga: " + ((DigiDocException)errs.get(j)).getLocalizedMessage());
-						logger.info("Error found in signature container " + this.m_fileName + " ("+ this.m_localFileFullName +"): " + ((DigiDocException)errs.get(j)).getLocalizedMessage());
+				if (errs.size() >= 0) {
+					for (int j = 0; j < errs.size(); j++) {
+						result.add("Dokumendi \"" + this.m_fileName + "\" allkirjade kontrollimisel tuvastati viga: " + ((DigiDocException) errs.get(j)).getLocalizedMessage());
+						logger.info("Error found in signature container " + this.m_fileName + " (" + this.m_localFileFullName + "): " + ((DigiDocException) errs.get(j)).getLocalizedMessage());
 					}
 				}
 			} else {
-				logger.info("Signature container \"" + this.m_fileName + "\" ("+ this.m_localFileFullName +") does not contain any signatures to validate.");
+				logger.info("Signature container \"" + this.m_fileName + "\" (" + this.m_localFileFullName + ") does not contain any signatures to validate.");
 			}
 		} else {
-			logger.warn("Signatures of file " + this.m_fileName + " ("+ this.m_localFileFullName +") cannot be validated because this file is not a signature container!");
+			logger.warn("Signatures of file " + this.m_fileName + " (" + this.m_localFileFullName + ") cannot be validated because this file is not a signature container!");
 		}
-		
+
 		return result;
 	}
 }

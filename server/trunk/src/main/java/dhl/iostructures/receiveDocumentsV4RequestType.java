@@ -41,27 +41,27 @@ public class receiveDocumentsV4RequestType {
                 if (nodes.getLength() > 0) {
                 	receiveDocumentsV4RequestType result = new receiveDocumentsV4RequestType();
                     Element bodyNode = (Element)nodes.item(0);
-                    
+
                     // Arv
                     result.arv = CommonMethods.getNumberFromChildNode(bodyNode, "arv", 10);
-                    // Kontrollime, et ei saaks esitada põringut, mille võljundisse
-                    // ei ole lubatud õhtegi dokumenti.
+                    // Kontrollime, et ei saaks esitada päringut, mille väljundisse
+                    // ei ole lubatud ühtegi dokumenti.
                     if (result.arv < 1) {
                         result.arv = 1;
                     }
-                    
-                    // Allõksus
+
+                    // Allüksus
                     nodes = bodyNode.getElementsByTagName("allyksuse_lyhinimetus");
                     if (nodes.getLength() > 0) {
                         result.allyksuseLyhinimetus = CommonMethods.getNodeText((Element)nodes.item(0)).trim();
                     }
-                    
+
                     // Ametikoht
                     nodes = bodyNode.getElementsByTagName("ametikoha_lyhinimetus");
                     if (nodes.getLength() > 0) {
                         result.ametikohaLyhinimetus = CommonMethods.getNodeText((Element)nodes.item(0)).trim();
                     }
-                    
+
                     // Kaust
                     nodes = bodyNode.getElementsByTagName("kaust");
                     if (nodes.getLength() > 0) {
@@ -76,7 +76,7 @@ public class receiveDocumentsV4RequestType {
                     if (nodes.getLength() > 0) {
                         result.edastusID = CommonMethods.getNodeText((Element)nodes.item(0)).trim();
                     }
-                    
+
                     // Fragmendi nr
                     nodes = bodyNode.getElementsByTagName("fragment_nr");
                     if (nodes.getLength() > 0) {
@@ -86,7 +86,7 @@ public class receiveDocumentsV4RequestType {
                             CommonMethods.logError(ex, "dhl.iostructures.receiveDocumentsV2RequestType", "getFromSOAPBody");
                         }
                     }
-                    
+
                     // Fragmendi suurus
                     nodes = bodyNode.getElementsByTagName("fragmendi_suurus_baitides");
                     if (nodes.getLength() > 0) {
@@ -102,7 +102,7 @@ public class receiveDocumentsV4RequestType {
                     } else {
                         result.fragmentSizeBytes = result.fragmentSizeBytesOrig;
                     }
-                    
+
                     return result;
                 }
             }

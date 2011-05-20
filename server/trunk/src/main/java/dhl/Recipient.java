@@ -213,7 +213,7 @@ public class Recipient {
     public void setOrganizationCode(String value) {
         m_organizationCode = value;
     }
-    
+
 	public String getPositionShortName() {
 		return m_positionShortName;
 	}
@@ -234,10 +234,10 @@ public class Recipient {
 		return m_cc;
 	}
 
-	public void setCc(boolean m_cc) {
-		this.m_cc = m_cc;
+	public void setCc(boolean cc) {
+		this.m_cc = cc;
 	}
-	
+
     public Date getStatusDate() {
         return this.m_statusDate;
     }
@@ -284,7 +284,7 @@ public class Recipient {
             cs.setInt("sending_id", sendingID);
             cs.registerOutParameter("RC1", oracle.jdbc.OracleTypes.CURSOR);
             cs.execute();
-            ResultSet rs = (ResultSet)cs.getObject("RC1");
+            ResultSet rs = (ResultSet) cs.getObject("RC1");
             ArrayList<Recipient> result = new ArrayList<Recipient>();
             while (rs.next()) {
                 Recipient item = new Recipient();
@@ -480,7 +480,7 @@ public class Recipient {
         	} finally {
         		conn.setAutoCommit(defaultAutoCommit);
         	}
-            
+
             return true;
         } else {
         	throw new IllegalArgumentException("Database connection is NULL!");
@@ -588,7 +588,7 @@ public class Recipient {
                 xmlWriter.write("<ametikoha_kood>" + String.valueOf(m_positionID) + "</ametikoha_kood>");
             }
 
-            // Allõksuse kood
+            // Allüksuse kood
             if (m_divisionID > 0) {
                 xmlWriter.write("<allyksuse_kood>" + String.valueOf(m_divisionID) + "</allyksuse_kood>");
             }
@@ -631,13 +631,13 @@ public class Recipient {
         try {
             Recipient result = new Recipient();
 
-            // Jõtame jõrgnevas võõrtustamata jõrgmised andmevõljad:
-            //   ID - sest see saab võõruse andmebaasi salvestamisel
-            //   SendingID - sest see saab võõrtuse alles siis, kuin saatmisinfo on
+            // Jätame järgnevas väärtustamata järgmised andmeväljad:
+            //   ID - sest see saab vääruse andmebaasi salvestamisel
+            //   SendingID - sest see saab väärtuse alles siis, kuin saatmisinfo on
             //       andmebaasi salvatstaud
             //   SendingEndDate - sest see fikseeritakse hetkel, mil adressaat
-            //       dokumendi kõtte saab
-            //   Fault - sest see võõrtustatakse juhul, kui saatmisel mingi viga
+            //       dokumendi kätte saab
+            //   Fault - sest see väärtustatakse juhul, kui saatmisel mingi viga
             //       peaks esinema.
             int orgID = 0;
             int positionID = 0;
@@ -651,7 +651,7 @@ public class Recipient {
 
                 if (xmlReader.hasName()) {
                 	if (xmlReader.getLocalName().equalsIgnoreCase("saaja") && xmlReader.isEndElement()) {
-                        // Kui oleme jõudnud saaja elemendi lõppu, siis katkestame tsõkli
+                        // Kui oleme jõudnud saaja elemendi lõppu, siis katkestame tsükli
                         break;
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("regnr") && xmlReader.isStartElement()) {
                         xmlReader.next();
@@ -748,8 +748,8 @@ public class Recipient {
                 }
             }
 
-            // Mõõrame võõrtused andmevõljadele, mida ei saa otseselt XML-st lugeda,
-            // aga mille võõrtused tulenevad kaudselt XML-s esitatud andmetest
+            // Määrame väärtused andmeväljadele, mida ei saa otseselt XML-st lugeda,
+            // aga mille väärtused tulenevad kaudselt XML-s esitatud andmetest
             result.setSendStatusID(CommonStructures.SendStatus_Sending);
             result.setSendingStartDate(new Date());
 
@@ -763,9 +763,9 @@ public class Recipient {
                 	.replaceFirst("#1", orgCode));
             }
 
-            // Tuvastame osakonna lõhinime jõrgi osakonna ID
-            // Seda ei saa enne teha, kui kogu XML on lõbi kõidud, kuna ametikoha
-            // leidmiseks peab lisaks lõhinimele tedma ka asutuse ID-d.
+            // Tuvastame osakonna lühinime järgi osakonna ID
+            // Seda ei saa enne teha, kui kogu XML on läbi käidud, kuna ametikoha
+            // leidmiseks peab lisaks lühinimele tedma ka asutuse ID-d.
             if ((occupationShortName != null) && (occupationShortName.length() > 0)) {
             	int occupationId = Ametikoht.getIdByShortName(orgID, occupationShortName, conn);
             	if (occupationId > 0) {
@@ -773,9 +773,9 @@ public class Recipient {
             	}
             }
 
-            // Tuvastame allõksuse lõhinime jõrgi allõksuse ID
-            // Seda ei saa enne teha, kui kogu XML on lõbi kõidud, kuna allõksuse
-            // leidmiseks peab lisaks lõhinimele tedma ka asutuse ID-d.
+            // Tuvastame allüksuse lühinime järgi allüksuse ID
+            // Seda ei saa enne teha, kui kogu XML on läbi käidud, kuna allüksuse
+            // leidmiseks peab lisaks lühinimele tedma ka asutuse ID-d.
             if ((subdivisionShortName != null) && (subdivisionShortName.length() > 0)) {
             	int subdivisionId = Allyksus.getIdByShortName(orgID, subdivisionShortName, conn);
             	if (subdivisionId > 0) {
@@ -811,7 +811,7 @@ public class Recipient {
 	    	this.setSendStatusID(anotherRecipient.getSendStatusID());
 	    	this.setSendingEndDate(anotherRecipient.getSendingEndDate());
 
-	    	// Recipient-specific status information 
+	    	// Recipient-specific status information
 	    	this.setRecipientStatusId(anotherRecipient.getRecipientStatusId());
 	    	this.setMetaXML(anotherRecipient.getMetaXML());
 	    	this.setFault(anotherRecipient.getFault());

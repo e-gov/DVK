@@ -22,14 +22,14 @@ import dvk.core.CommonMethods;
 import dvk.core.Settings;
 
 /**
- * Klass, mis sisaldab meetodeid DVK konteineri konverteerimiseks õhtest
- * versioonist teise.
- * 
+ * Contains functionality for converting DEC container from one version
+ * to another.
+ *
  * @author Marko Kurm, marko.kurm@mircolink.ee
- * 
+ *
  */
 public class Conversion {
-	
+
 	private static Logger logger = Logger.getLogger(Conversion.class);
 
 	private int version;
@@ -43,7 +43,7 @@ public class Conversion {
 	private String outputFile;
 
 	/**
-	 * 
+	 *
 	 * @param inputXMLFile
 	 * @param outputXMLFile
 	 * @param inputVersion
@@ -62,18 +62,12 @@ public class Conversion {
 	/**
 	 * Retrieves the conversion data from the database according to the
 	 * inputVersion and outputVersion.
-	 * 
+	 *
 	 * @param conn
 	 *            database connection
-	 * @param inputVersion
-	 *            input DVK container version
-	 * @param outputVersion
-	 *            output DVK container version
-	 * 
-	 * @return conversion data
 	 */
 	public void getConversionFromDB(Connection conn) {
-		
+
 		try {
 			if (conn != null) {
 				String sql = "SELECT * FROM konversioon WHERE version = ? AND result_version = ?";
@@ -89,11 +83,9 @@ public class Conversion {
 					if (xsltClob != null) {
 						Reader r = xsltClob.getCharacterStream();
 						StringBuffer sb = new StringBuffer();
-						char[] charbuf = new char[Settings
-								.getBinaryBufferSize()];
+						char[] charbuf = new char[Settings.getBinaryBufferSize()];
 
-						for (int i = r.read(charbuf); i > 0; i = r
-								.read(charbuf)) {
+						for (int i = r.read(charbuf); i > 0; i = r.read(charbuf)) {
 							sb.append(charbuf, 0, i);
 						}
 
@@ -161,7 +153,7 @@ public class Conversion {
 
 	/**
 	 * Converts the inputFile to outputFile using the XSLT.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public void convert() throws Exception {
@@ -169,23 +161,23 @@ public class Conversion {
 		logger.debug("InputFile: " + this.getInputFile());
 		logger.debug("OutputFile: " + this.getOutputFile());
 		logger.debug("Version: " + this.getVersion());
-		logger.debug("TargetVersion: " + this.getTargetVersion());		
-		
+		logger.debug("TargetVersion: " + this.getTargetVersion());
+
 		if ((new File(this.getInputFile())).exists()) {
 			javax.xml.transform.TransformerFactory tFactory = javax.xml.transform.TransformerFactory.newInstance();
 			if (tFactory != null) {
 				if ((this.getXslt() != null) && (this.getXslt().length() > 0)) {
 					ByteArrayInputStream bis = new ByteArrayInputStream(this.getXslt().getBytes("UTF-8"));
-		
+
 					javax.xml.transform.Transformer transformer = tFactory
 							.newTransformer(new javax.xml.transform.stream.StreamSource(bis));
-					
+
 					if (transformer != null) {
 						StreamResult outputTarget = new StreamResult();
 						outputTarget.setOutputStream(new FileOutputStream(new File(this.getOutputFile())));
 						transformer.transform(new javax.xml.transform.stream.StreamSource(
 								new File(this.getInputFile())), outputTarget);
-			
+
 						logger.debug("XML Transformed.");
 					} else {
 						logger.error("Container transformation failed! Failed creating Transformer for XSLT transformation.");
@@ -221,7 +213,7 @@ public class Conversion {
 
 	/**
 	 * Testimiseks.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {

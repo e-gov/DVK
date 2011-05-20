@@ -14,7 +14,7 @@ public class markDocumentsReceivedV2Item {
     public String metaXML;
     public Date staatuseMuutmiseAeg;
     public String guid;
-    
+
     public markDocumentsReceivedV2Item() {
     	this.documentID = 0;
     	this.recipientStatusID = 0;
@@ -33,7 +33,7 @@ public class markDocumentsReceivedV2Item {
                 e = (Element)nodes.item(0);
                 result.documentID = Integer.parseInt(CommonMethods.getNodeText(e));
             }
-            
+
             // Dokumendi GUID
             nodes = root.getElementsByTagName("dokument_guid");
             if ((nodes != null) && (nodes.getLength() > 0)) {
@@ -42,7 +42,7 @@ public class markDocumentsReceivedV2Item {
             }
 
             // Vastuvõtja staatuse ID
-            // (vanas versioonis ja kliendis toimis valesti ja jõtame ka praegu sisse, et vanad asjad kohe katki ei lõheks)
+            // (vanas versioonis ja kliendis toimis valesti ja jätame ka praegu sisse, et vanad asjad kohe katki ei läheks)
             // TODO: Eemaldada see koodilõik
             nodes = root.getElementsByTagName("staatus_id");
             if((nodes != null) && (nodes.getLength() > 0))
@@ -64,7 +64,7 @@ public class markDocumentsReceivedV2Item {
                 e = (Element)nodes.item(0);
                 result.recipientFault = Fault.getFromXML(e);
             }
-            
+
             // Staatuse muutmise aeg
             NodeList statusDateNodes = root.getElementsByTagName("staatuse_muutmise_aeg");
             if (statusDateNodes.getLength() > 0) {

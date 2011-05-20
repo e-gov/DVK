@@ -43,19 +43,19 @@ public class markDocumentsReceivedV3RequestType {
                     	Element docRefNode = (Element)docRefNodes.item(0);
 
                     	NodeList foundNodes = docRefNode.getElementsByTagName("item");
-                        
-                    	// Kontrollime, et sisendis sisalduks võhemalt 1 dokumendi andmed
+
+                    	// Kontrollime, et sisendis sisalduks vähemalt 1 dokumendi andmed
                         if (foundNodes == null) {
-                            throw new AxisFault("Dokumentide nimekiri on tõhi või vigase XML struktuuriga!");
+                            throw new AxisFault("Dokumentide nimekiri on tühi või vigase XML struktuuriga!");
                         }
                         if (foundNodes.getLength() < 1) {
-                            throw new AxisFault("Dokumentide nimekiri on tõhi või vigase XML struktuuriga!");
+                            throw new AxisFault("Dokumentide nimekiri on tühi või vigase XML struktuuriga!");
                         }
                         for (int i = 0; i < foundNodes.getLength(); ++i) {
                         	markDocumentsReceivedV2Item item = markDocumentsReceivedV2Item.getFromXML((Element)foundNodes.item(i));
                         	result.dokumendid.add(item);
                         }
-                        
+
                         NodeList folderNodes = bodyNode.getElementsByTagName("kaust");
                         if (folderNodes.getLength() > 0) {
                             result.kaust = CommonMethods.getNodeText(folderNodes.item(0));

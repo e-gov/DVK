@@ -28,7 +28,7 @@ public class getSendingOptionsV2RequestType {
         Element el = null;
         Element el1 = null;
         getSendingOptionsV2RequestType result = new getSendingOptionsV2RequestType();
-        
+
         try {
             msg = context.getRequestMessage();
             body = msg.getSOAPBody();
@@ -38,7 +38,7 @@ public class getSendingOptionsV2RequestType {
                 nodes = el.getElementsByTagName("keha");
                 if (nodes.getLength() > 0) {
                     el = (Element)nodes.item(0);
-                    
+
                     // Asutuste nimekiri
                     nodes = el.getElementsByTagName("asutused");
                     if (nodes.getLength() > 0) {
@@ -51,7 +51,7 @@ public class getSendingOptionsV2RequestType {
                             }
                         }
                     }
-                    
+
                     // Ainult vastuvõtmist ootavate dokumentidega asutused
                     nodes = el.getElementsByTagName("vastuvotmata_dokumente_ootel");
                     if (nodes.getLength() > 0) {
@@ -62,7 +62,7 @@ public class getSendingOptionsV2RequestType {
                         }
                     }
 
-                    // Ainult asutused, kes on vahetanud võhemalt N dokumenti
+                    // Ainult asutused, kes on vahetanud vähemalt N dokumenti
                     nodes = el.getElementsByTagName("vahetatud_dokumente_vahemalt");
                     if (nodes.getLength() > 0) {
                         el1 = (Element)nodes.item(0);
@@ -77,7 +77,7 @@ public class getSendingOptionsV2RequestType {
                         result.vahetatudDokumenteKuniStr = CommonMethods.getNodeText(el1);
                         result.vahetatudDokumenteKuni = Integer.parseInt(result.vahetatudDokumenteKuniStr);
                     }
-                    
+
                     return result;
                 }
             }

@@ -106,9 +106,7 @@
       <xs:documentation xml:lang="en">Personal ID code type</xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string">
-      <xs:pattern value=""/>
-      <xs:pattern value="\d{11}"/>
-      <xs:pattern value="\c{2}\d+"/>
+      <xs:pattern value="(\d{11}|\c{2}\d+)?"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="epostType">

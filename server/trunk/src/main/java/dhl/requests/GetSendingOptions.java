@@ -25,10 +25,10 @@ import org.apache.log4j.Logger;
 
 public class GetSendingOptions {
 	private static Logger logger = Logger.getLogger(GetSendingOptions.class);
-	
+
     public static getSendingOptionsResponseType V1(org.apache.axis.MessageContext context, Connection conn, OrgSettings hostOrgSettings) throws AxisFault {
     	logger.info("GetSendingOptions.V1 invoked.");
-    	
+
     	getSendingOptionsResponseType result = new getSendingOptionsResponseType();
 
         // Laeme päringu keha endale sobivasse andmestruktuuri
@@ -79,7 +79,7 @@ public class GetSendingOptions {
                 // Tagastame nimekirja kõigist seotud asutustest
                 org = Asutus.getList(conn);
             }
-            
+
             // Kui kõrgemalseisva asutuse ID on määratud, siis
             // kirjutame selle alusel kõrgmalseisva asutuse koodi üle.
             for (Asutus o : org) {
@@ -90,13 +90,13 @@ public class GetSendingOptions {
             }
         }
         result.asutused = org;
-        
+
         return result;
     }
-    
+
     public static getSendingOptionsV2ResponseType V2(org.apache.axis.MessageContext context, Connection conn, OrgSettings hostOrgSettings) throws Exception {
     	logger.info("GetSendingOptions.V2 invoked.");
-    	
+
     	getSendingOptionsV2ResponseType result = new getSendingOptionsV2ResponseType();
 
     	// Laeme päringu keha endale sobivasse andmestruktuuri
@@ -147,7 +147,7 @@ public class GetSendingOptions {
                 // Tagastame nimekirja kõigist seotud asutustest
                 org = Asutus.getList(conn);
             }
-            
+
             // Kui kõrgemalseisva asutuse ID on määratud, siis
             // kirjutame selle alusel kõrgmalseisva asutuse koodi üle.
             for (Asutus o : org) {
@@ -157,7 +157,7 @@ public class GetSendingOptions {
             	}
             }
         }
-        
+
         // Filtreerime välja etteantud kriteeriumitele vastavad asutused
         if (bodyData.vastuvotmataDokumenteOotel || (bodyData.vahetatudDokumenteKuni >= 0) || (bodyData.vahetatudDokumenteVahemalt >= 0)) {
             int i = 0;
@@ -184,7 +184,7 @@ public class GetSendingOptions {
                     if (bodyData.vahetatudDokumenteKuni > -1) {
                         remove = remove || (stat.getVahetatudDokumente() > bodyData.vahetatudDokumenteKuni);
                     }
-                    
+
                     if (remove) {
                         org.remove(i);
                     } else {
@@ -194,34 +194,33 @@ public class GetSendingOptions {
             }
         }
         result.asutused = org;
-        
+
         return result;
     }
-    
+
     public static getSendingOptionsV3ResponseType V3(org.apache.axis.MessageContext context, Connection conn, OrgSettings hostOrgSettings, UserProfile user) throws AxisFault {
     	logger.info("GetSendingOptions.V3 invoked. Parameter values: ");
-    	
+
     	getSendingOptionsV3ResponseType result = new getSendingOptionsV3ResponseType();
-    	try
-    	{
+    	try {
 	        // Laeme päringu keha endale sobivasse andmestruktuuri
 	        getSendingOptionsV3RequestType bodyData = getSendingOptionsV3RequestType.getFromSOAPBody(context);
 	        result.paring = bodyData;
-	        
+
 	        logger.debug("vahetatudDokumenteKuni: " + bodyData.vahetatudDokumenteKuni);
 	        logger.debug("vahetatudDokumenteVahemalt: " + bodyData.vahetatudDokumenteVahemalt);
 	        logger.debug("vastuvotmataDokumenteOotel: " + bodyData.vastuvotmataDokumenteOotel);
-	        
+
 	        // Laeme sisendparameetrid SOAP sõnumi manuses asuvast XML failist
 	        AttachmentExtractionResult exResult = CommonMethods.getExtractedFileFromAttachment(context, bodyData.kehaHref);
 	        result.dataMd5Hash = exResult.getAttachmentHash();
 	        bodyData.loadParametersFromXML(exResult.getExtractedFileName());
-	        
+
 	        // Leiame andmebaasist soovitud asutused
 	        ArrayList<Asutus> organizationList = new ArrayList<Asutus>();
 	        ArrayList<Allyksus> subdivisionList = new ArrayList<Allyksus>();
 	        ArrayList<Ametikoht> occupationList = new ArrayList<Ametikoht>();
-	        
+
 	        if (Settings.Server_RunOnClientDatabase) {
 	            // Kui DVK server on seadistatud töötama kliendi andmebaasi peal,
 	            // siis ei ole kunagi ühtegi dokumenti vastuvõtmise ootel, kuna
@@ -241,7 +240,7 @@ public class GetSendingOptions {
 	                                tmpOrg.setRegistrikood(cred.getInstitutionCode());
 	                                tmpOrg.setId(cred.getUnitID());
 	                                organizationList.add(tmpOrg);
-	                                
+
 	                                if ((cred.getDivisionShortName() != null) && (cred.getDivisionShortName().length() > 0)) {
 		                                Allyksus tmpSub = new Allyksus();
 		                                tmpSub.setAsutusKood(cred.getInstitutionCode());
@@ -266,7 +265,7 @@ public class GetSendingOptions {
 		                                	}
 		                                }
 	                                }
-	                                
+
 	                                if (cred.getOccupationID() > 0) {
 		                                Ametikoht tmpOccupation = new Ametikoht();
 		                                tmpOccupation.setAsutusKood(cred.getInstitutionCode());
@@ -301,7 +300,7 @@ public class GetSendingOptions {
 	                        tmpOrg.setRegistrikood(cred.getInstitutionCode());
 	                        tmpOrg.setId(cred.getUnitID());
 	                        organizationList.add(tmpOrg);
-	                        
+
 	                        if ((cred.getDivisionShortName() != null) && (cred.getDivisionShortName().length() > 0)) {
 	                            Allyksus tmpSub = new Allyksus();
 	                            tmpSub.setAsutusKood(cred.getInstitutionCode());
@@ -326,7 +325,7 @@ public class GetSendingOptions {
                                 	}
                                 }
 	                        }
-	                        
+
 	                        if (cred.getOccupationID() > 0) {
 	                            Ametikoht tmpOccupation = new Ametikoht();
 	                            tmpOccupation.setAsutusKood(cred.getInstitutionCode());
@@ -361,7 +360,7 @@ public class GetSendingOptions {
 	                    Asutus tmpOrg = new Asutus();
 	                    tmpOrg.loadByRegNr(bodyData.asutused[i], conn);
 	                    organizationList.add(tmpOrg);
-	                    
+
 	                    ArrayList<Allyksus> orgSubdivisions = Allyksus.getList(tmpOrg.getId(), "", conn);
 	                    for (int j = 0; j < orgSubdivisions.size(); j++) {
 	                    	Allyksus tmpSub = orgSubdivisions.get(j);
@@ -386,7 +385,7 @@ public class GetSendingOptions {
                             	}
                             }
 	                    }
-	                    
+
 	                    ArrayList<Ametikoht> orgOccupations = Ametikoht.getList(tmpOrg.getId(), "", conn);
 	                    for (int j = 0; j < orgOccupations.size(); j++) {
 		                    Ametikoht tmpOccupation = orgOccupations.get(j);
@@ -419,7 +418,7 @@ public class GetSendingOptions {
 	            	subdivisionList = Allyksus.getList(0, "", conn);
 	            	occupationList = Ametikoht.getList(0, "", conn);
 	            }
-	            
+
 	            // Kui kõrgemalseisva asutuse ID on määratud, siis
 	            // kirjutame selle alusel kõrgmalseisva asutuse koodi üle.
 	            for (Asutus o : organizationList) {
@@ -429,7 +428,7 @@ public class GetSendingOptions {
 	            	}
 	            }
 	        }
-	        
+
 	        // Filtreerime välja etteantud kriteeriumitele vastavad asutused
 	        logger.debug("Filtreerime välja etteantud kriteeriumitele vastavad asutused.");
 	        if (bodyData.vastuvotmataDokumenteOotel || (bodyData.vahetatudDokumenteKuni >= 0) || (bodyData.vahetatudDokumenteVahemalt >= 0)) {
@@ -449,11 +448,11 @@ public class GetSendingOptions {
 	                	logger.warn("DVK tarkvaraline viga: Viga asutuse statistika lugemisel!");
 	                    throw new AxisFault("DVK tarkvaraline viga: Viga asutuse statistika lugemisel!");
 	                } else {
-	                	
+
 	                	logger.debug("Checking institution statistics.");
 	                	logger.debug("Vahetatud dokumente: " + stat.getVahetatudDokumente());
 	                	logger.debug("Vastuvotmata dokumente: " + stat.getVastuvotmataDokumente());
-	                	
+
 	                    remove = false;
 	                    if (bodyData.vastuvotmataDokumenteOotel) {
 	                        remove = remove || (stat.getVastuvotmataDokumente() < 1);
@@ -464,7 +463,7 @@ public class GetSendingOptions {
 	                    if (bodyData.vahetatudDokumenteKuni > -1) {
 	                        remove = remove || (stat.getVahetatudDokumente() > bodyData.vahetatudDokumenteKuni);
 	                    }
-	                    
+
 	                    if (remove) {
 	                    	organizationList.remove(i);
 	                    } else {
@@ -472,7 +471,7 @@ public class GetSendingOptions {
 	                    }
 	                }
 	            }
-	            
+
 	            // Allüksuste listi filtreerimine
 	            logger.debug("Allüksuste listi filtreerimine.");
 	            i = 0;
@@ -499,7 +498,7 @@ public class GetSendingOptions {
 	                    if (bodyData.vahetatudDokumenteKuni > -1) {
 	                        remove = remove || (stat.getVahetatudDokumente() > bodyData.vahetatudDokumenteKuni);
 	                    }
-	                    
+
 	                    if (remove) {
 	                    	subdivisionList.remove(i);
 	                    } else {
@@ -507,7 +506,7 @@ public class GetSendingOptions {
 	                    }
 	                }
 	            }
-	            
+
 	            // Ametikohtade listi filtreerimine
 	            i = 0;
 	            while (i < occupationList.size()) {
@@ -531,7 +530,7 @@ public class GetSendingOptions {
 	                    if (bodyData.vahetatudDokumenteKuni > -1) {
 	                        remove = remove || (stat.getVahetatudDokumente() > bodyData.vahetatudDokumenteKuni);
 	                    }
-	                    
+
 	                    if (remove) {
 	                    	occupationList.remove(i);
 	                    } else {
@@ -540,30 +539,30 @@ public class GetSendingOptions {
 	                }
 	            }
 	        }
-	        
+
 	        logger.debug("Creating response file.");
-	        
-	        if(organizationList != null && organizationList.size() > 0) {
-	        	for(Asutus a: organizationList) {
+
+	        if (organizationList != null && organizationList.size() > 0) {
+	        	for (Asutus a: organizationList) {
 	        		logger.debug("Asutuse registrikood: " + a.getRegistrikood());
 	        		logger.debug("Asutuse nimetus: " + a.getNimetus());
 	        	}
 	        }
-	        
-	        if(subdivisionList != null && subdivisionList.size() > 0) {
-	        	for(Allyksus a: subdivisionList) {
+
+	        if (subdivisionList != null && subdivisionList.size() > 0) {
+	        	for (Allyksus a: subdivisionList) {
 	        		logger.debug("Allüksuse lühinimetus: " + a.getLyhinimetus());
 	        		logger.debug("Allüksuse nimetus: " + a.getNimetus());
 	        	}
 	        }
-	        
-	        if(occupationList != null && occupationList.size() > 0) {
-	        	for(Ametikoht a: occupationList) {
+
+	        if (occupationList != null && occupationList.size() > 0) {
+	        	for (Ametikoht a: occupationList) {
 	        		logger.debug("Ametikoha lühinimetus: " + a.getLyhinimetus());
 	        		logger.debug("Ametikoht nimetus: " + a.getNimetus());
 	        	}
 	        }
-	        
+
 	        // Koostame XML faili
 	        result.createResponseFile(organizationList, subdivisionList, occupationList, user.getOrganizationCode());
     	} catch (AxisFault fault) {
@@ -571,7 +570,7 @@ public class GetSendingOptions {
     	} catch (Exception ex) {
     		logger.error(ex.getMessage(), ex);
     	}
-    	
+
         return result;
     }
 }

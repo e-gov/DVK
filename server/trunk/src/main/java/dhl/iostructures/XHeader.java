@@ -12,7 +12,7 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis.Message;
 
-// X-Tee põise representatsioon koodi tasemel
+// X-Tee päise representatsioon koodi tasemel
 public final class XHeader {
 	public static String XTEE_PREFIX = "xtee";
 	public static String XTEE_URI = "http://x-tee.riik.ee/xsd/xtee.xsd";
@@ -35,14 +35,14 @@ public final class XHeader {
 		this.isikukood = isikukood;
 	}
 
-	// Lisab kõesoleva objekti andmed SOAP põisesse
+	// Lisab käesoleva objekti andmed SOAP päisesse
 	public SOAPEnvelope appendToSOAPHeader(SOAPEnvelope envelope, SOAPFactory factory) {
 		try {
 			// Deklareerime x-tee nimeruumi
 			OMNamespace nsXtee = factory.createOMNamespace(CommonStructures.NS_XTEE_URI, CommonStructures.NS_XTEE_PREFIX);
 			envelope.declareNamespace(nsXtee);
 
-			// Lisame põise võljad
+			// Lisame päise väljad
 			OMElement elAsutus = factory.createOMElement("asutus", CommonStructures.NS_XTEE_URI, CommonStructures.NS_XTEE_PREFIX);
 			elAsutus.setText(asutus);
 			OMElement elAndmekogu = factory.createOMElement("andmekogu", CommonStructures.NS_XTEE_URI, CommonStructures.NS_XTEE_PREFIX);
@@ -70,7 +70,7 @@ public final class XHeader {
 		return envelope;
 	}
 
-	// Lisab kõesoleva objekti andmed SOAP põisesse
+	// Lisab käesoleva objekti andmed SOAP päisesse
 	public boolean appendToSOAPHeader(org.apache.axis.Message msg) {
 		try {
 			// get SOAP envelope from SOAP message

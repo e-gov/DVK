@@ -70,7 +70,7 @@ public class GetSendStatus {
                     ow = new OutputStreamWriter(out, "UTF-8");
                     ow.write("<keha>");
 
-                    // Leiame andmebaasist kõsitud dokumentide staatuse
+                    // Leiame andmebaasist küsitud dokumentide staatuse
                     Sending sendingData = null;
                     dhl.iostructures.edastus tmpEdastus = null;
                     boolean isCanceled = false;
@@ -137,7 +137,7 @@ public class GetSendStatus {
                                 }
 
                                 // Kui sõnumi saatnud asutus on sama, mis praegu sõnumi
-                                // staatust põriv asutus, siis lisame antud dokumendi
+                                // staatust päriv asutus, siis lisame antud dokumendi
                                 // andmed vastuse XML-i.
                                 if (senderOK) {
                                     resp.appendObjectXML(ow, conn);
@@ -155,7 +155,7 @@ public class GetSendStatus {
                                     if (r.getIdInRemoteServer() > 0) {
                                         logger.debug("Recipient " + r.getOrganizationCode() + " status is stored in remote server.");
 
-                                    	// Teeme staatuse põringu võlisesse serverisse
+                                    	// Teeme staatuse päringu välisesse serverisse
                                         tmpEdastus = getSendStatusFromRemoteServer(r, conn);
                                         if (tmpEdastus != null) {
                                             // Save status information to local server
@@ -163,7 +163,7 @@ public class GetSendStatus {
                                         	XHeader xTeePais = new XHeader(user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
                                         	r.update(conn, xTeePais);
 
-                                        	resp.edastus.add( tmpEdastus );
+                                        	resp.edastus.add(tmpEdastus);
                                             isCanceled = isCanceled || (tmpEdastus.getSaaja().getSendStatusID() == CommonStructures.SendStatus_Canceled);
                                             isSent = isSent || (tmpEdastus.getSaaja().getSendStatusID() == CommonStructures.SendStatus_Sent);
                                             isSending = isSending || (tmpEdastus.getSaaja().getSendStatusID() == CommonStructures.SendStatus_Sending);
@@ -249,7 +249,7 @@ public class GetSendStatus {
                 ow = new OutputStreamWriter(out, "UTF-8");
                 ow.write("<keha>");
 
-                // Leiame andmebaasist kõsitud dokumentide staatuse
+                // Leiame andmebaasist küsitud dokumentide staatuse
                 Sending sendingData = null;
                 dhl.iostructures.edastus tmpEdastus = null;
                 boolean isCanceled = false;
@@ -326,12 +326,12 @@ public class GetSendStatus {
                             	totalStatus = CommonStructures.SendStatus_Sent_Name;
                             }
 
-                            // Kui rakendus tõõtab kliendi andmetabelite peal, siis
-                            // pole vahet, kas kõsiti ajalugu või mitte, kuna mingeid mõistlikke
-                            // staatuse ajaloo andmeid pole niikuinii (ega isegi teki tõõ kõigus).
+                            // Kui rakendus töötab kliendi andmetabelite peal, siis
+                            // pole vahet, kas küsiti ajalugu või mitte, kuna mingeid mõistlikke
+                            // staatuse ajaloo andmeid pole niikuinii (ega isegi teki töö käigus).
 
                             // Kui sõnumi saatnud asutus on sama, mis praegu sõnumi
-                            // staatust põriv asutus, siis lisame antud dokumendi
+                            // staatust päriv asutus, siis lisame antud dokumendi
                             // andmed vastuse XML-i.
                             if (senderOK) {
                             	getSendStatusV2ResponseType.appendObjectXML(docID, doc.getGuid(), edastusList, historyList, totalStatus, ow, conn);
@@ -344,7 +344,7 @@ public class GetSendStatus {
                         if (docID != 0) {
                         	logger.debug("Fetching sendingData. dhl_id: " + docID);
                         	sendingData.loadByDocumentID(docID, conn);
-                        } else if(doc.getGuid() != null && !doc.getGuid().trim().equalsIgnoreCase("")) {
+                        } else if (!CommonMethods.isNullOrEmpty(doc.getGuid())) {
                         	logger.debug("Fetching sendingData. GUID: " + doc.getGuid());
                         	sendingData.loadByDocumentGUID(doc.getGuid(), conn);
                         	docID = sendingData.getDocumentID();
@@ -356,7 +356,7 @@ public class GetSendStatus {
                         	logger.debug("Document recipient count: " + sendingData.getRecipients().size());
                         	for (Recipient r : sendingData.getRecipients()) {
                                 if (r.getIdInRemoteServer() > 0) {
-                                    // Teeme staatuse põringu võlisesse serverisse
+                                    // Teeme staatuse päringu välisesse serverisse
                                     tmpEdastus = getSendStatusFromRemoteServer(r, conn);
                                     if (tmpEdastus != null) {
                                     	logger.debug("Recipient " + r.getOrganizationCode() + " status is stored in remote server.");
@@ -374,8 +374,8 @@ public class GetSendStatus {
                                 } else {
                                 	logger.debug("Recipient " + r.getOrganizationCode() + " status is stored in local server.");
 
-                                	tmpEdastus = new dhl.iostructures.edastus( r, sendingData.getStartDate() );
-                                    edastusList.add( tmpEdastus );
+                                	tmpEdastus = new dhl.iostructures.edastus(r, sendingData.getStartDate());
+                                    edastusList.add(tmpEdastus);
                                     isCanceled = isCanceled || (r.getSendStatusID() == CommonStructures.SendStatus_Canceled);
                                     isSent = isSent || (r.getSendStatusID() == CommonStructures.SendStatus_Sent);
                                     isSending = isSending || (r.getSendStatusID() == CommonStructures.SendStatus_Sending);
@@ -389,7 +389,7 @@ public class GetSendStatus {
                             	totalStatus = CommonStructures.SendStatus_Sent_Name;
                             }
 
-                            // Kui kõsiti ka ajalugu, siis võtame andmebaasist võlja
+                            // Kui küsiti ka ajalugu, siis võtame andmebaasist välja
                             // antud dokumendi staatuse ajaloo.
                             if (bodyData.staatuseAjalugu) {
                             	historyList = DocumentStatusHistory.getList(docID, conn);
@@ -443,11 +443,11 @@ public class GetSendStatus {
 
 
 
-        // TODO: Kas siin peaks vajadusel ka ajaloo võlja kõsima?
+        // TODO: Kas siin peaks vajadusel ka ajaloo välja küsima?
 
-        logger.debug("Requesting status of "+ msgArray.size() +" documents from server: " + server.getProducerName() + "("+ server.getAddress() +")");
+        logger.debug("Requesting status of " + msgArray.size() + " documents from server: " + server.getProducerName() + "(" + server.getAddress() + ")");
         ArrayList<GetSendStatusResponseItem> statusResponse = dvkClient.getSendStatus(header, msgArray, 1, false);
-        logger.debug("Remote server returned status information about "+ statusResponse.size() + " documents.");
+        logger.debug("Remote server returned status information about " + statusResponse.size() + " documents.");
 
         if (statusResponse.size() > 0) {
             GetSendStatusResponseItem item = statusResponse.get(0);

@@ -30,7 +30,7 @@ public class RemoteServer {
 
     public String getProducerSOAPAction() {
         if ((m_producerName != null) && !m_producerName.equalsIgnoreCase("")) {
-            return "http://producers."+ m_producerName +".xtee.riik.ee/producer/" + m_producerName;
+            return "http://producers." + m_producerName + ".xtee.riik.ee/producer/" + m_producerName;
         } else {
             return "";
         }
@@ -47,18 +47,18 @@ public class RemoteServer {
     public RemoteServer() {
         clear();
     }
-    
+
     public RemoteServer(int id, Connection conn) {
         clear();
         loadByID(id, conn);
     }
-    
+
     public void clear() {
         m_id = 0;
         m_producerName = "";
         m_address = "";
     }
-    
+
     public void loadByID(int id, Connection conn) {
         try {
             if (conn != null) {
@@ -79,14 +79,14 @@ public class RemoteServer {
             clear();
         }
     }
-    
+
     public static ArrayList<RemoteServer> getList(Connection conn) {
         try {
             if (conn != null) {
                 CallableStatement cs = conn.prepareCall("{call GET_SERVERS(?)}");
                 cs.registerOutParameter("RC1", oracle.jdbc.OracleTypes.CURSOR);
                 cs.execute();
-                ResultSet rs = (ResultSet)cs.getObject("RC1");
+                ResultSet rs = (ResultSet) cs.getObject("RC1");
                 ArrayList<RemoteServer> result = new ArrayList<RemoteServer>();
                 while (rs.next()) {
                     RemoteServer item = new RemoteServer();

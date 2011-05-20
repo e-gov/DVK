@@ -311,17 +311,17 @@ public class Sending {
             Sending result = new Sending();
             result.setSender(null);
 
-            // Enne alamstruktuuride juurde asumist võõrtustame õra kõik lihtandmetõõpi
-            // muutujad. Võõrtustamata jõtame:
-            //   ID - sest see saab võõrtuse andmebaasi salvestamisel
-            //   DocumentID - sest see saab võõrtuse, kui dokument andmebaasi salvestatakse
-            //   EndDate - sest see saab võõrtuse alles siis, kui kõik adressaadid
-            //       on oma koopia antud dokumendist kõtte saanud
+            // Enne alamstruktuuride juurde asumist väärtustame ära kõik lihtandmetüüpi
+            // muutujad. Väärtustamata jätame:
+            //   ID - sest see saab väärtuse andmebaasi salvestamisel
+            //   DocumentID - sest see saab väärtuse, kui dokument andmebaasi salvestatakse
+            //   EndDate - sest see saab väärtuse alles siis, kui kõik adressaadid
+            //       on oma koopia antud dokumendist kätte saanud
 
-            // Mõrgime, et lisatud dokument on saatmisel
+            // Märgime, et lisatud dokument on saatmisel
             result.setSendStatusID(CommonStructures.SendStatus_Sending);
 
-            // Saatmise alguskuupõevaks-kellaajaks mõrgime praeguse hetke
+            // Saatmise alguskuupäevaks-kellaajaks märgime praeguse hetke
             result.setStartDate(cal.getTime());
 
             int senderCount = 0;
@@ -333,7 +333,7 @@ public class Sending {
                 	logger.debug("Element localName: " + xmlReader.getLocalName());
                     if (xmlReader.getLocalName().equalsIgnoreCase("transport") && xmlReader.isEndElement()) {
                     	logger.debug("Found transport.");
-                        // Kui oleme jõudnud transport ploki lõppu, siis katkestame tsõkli
+                        // Kui oleme jõudnud transport ploki lõppu, siis katkestame tsükli
                         break;
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("saatja") && xmlReader.isStartElement()) {
                     	logger.debug("Found sender.");
@@ -357,23 +357,23 @@ public class Sending {
             }
 
             // Kui "transport" plokk saatja ega saajate kohta infot ei sisalda,
-            // siis jõrelikult ei saadetud dokumenti edastamiseks.
+            // siis järelikult ei saadetud dokumenti edastamiseks.
             if (((result.getSender() == null) || (result.getSender().getOrganizationID() < 1)) && (result.getRecipients().size() < 1)) {
                 return null;
             }
 
-            // Kuna saatjaid saab olla tõpselt õks, siis anname veateate niipea,
-            // kui saatjaid pole või on õle õhe.
+            // Kuna saatjaid saab olla täpselt üks, siis anname veateate niipea,
+            // kui saatjaid pole või on üle ühe.
             if (senderCount != 1) {
                 throw new AxisFault(CommonStructures.VIGA_VALE_ARV_SAATJAID);
             }
 
-            // Kui õhtegi saajat pole esitatud, siis tagastame veateate
+            // Kui ühtegi saajat pole esitatud, siis tagastame veateate
             if (recipientCount < 1) {
                 throw new AxisFault(CommonStructures.VIGA_VALE_ARV_VASTUVOTJAID);
             }
 
-            // Kui õhegi kontrolli taha pidama ei jõõnud, siis tagastame võõrtuse
+            // Kui ühegi kontrolli taha pidama ei jäänud, siis tagastame väärtuse
             return result;
         } catch (XMLStreamException ex) {
             throw new AxisFault("Exception parsing DVK message transport section: " + ex.getMessage());

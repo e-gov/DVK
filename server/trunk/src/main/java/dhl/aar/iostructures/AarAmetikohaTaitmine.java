@@ -213,7 +213,7 @@ public class AarAmetikohaTaitmine {
         m_pkIsik = null;
         m_oigused = null;
     }
-    
+
     public static AarAmetikohaTaitmine fromXML(XMLStreamReader xmlReader) throws AxisFault {
         try {
             AarAmetikohaTaitmine result = new AarAmetikohaTaitmine();
@@ -223,7 +223,7 @@ public class AarAmetikohaTaitmine {
 
                 if (xmlReader.hasName()) {
                     if (xmlReader.getLocalName().equalsIgnoreCase("taitmine") && xmlReader.isEndElement()) {
-                        // Kui oleme jõudnud asutuse elemendi lõppu, siis katkestame tsõkli
+                        // Kui oleme jõudnud asutuse elemendi lõppu, siis katkestame tsükli
                         break;
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("taitmine_id") && xmlReader.isStartElement()) {
                         xmlReader.next();
@@ -348,13 +348,13 @@ public class AarAmetikohaTaitmine {
                 }
             }
 
-            // Kui õhegi kontrolli taha pidama ei jõõnud, siis tagastame võõrtuse
+            // Kui ühegi kontrolli taha pidama ei jäänud, siis tagastame väärtuse
             return result;
         } catch (XMLStreamException ex) {
             throw new AxisFault("Exception parsing AAR message organization data section: " + ex.getMessage());
         }
     }
-    
+
     public static ArrayList<AarAmetikohaTaitmine> getListFromXML(String dataFile) {
         try {
             ArrayList<AarAmetikohaTaitmine> result = null;
@@ -371,7 +371,7 @@ public class AarAmetikohaTaitmine {
             return null;
         }
     }
-    
+
     public static ArrayList<AarAmetikohaTaitmine> getListFromXML(XMLStreamReader reader, String rootTagName) {
         try {
             ArrayList<AarAmetikohaTaitmine> result = new ArrayList<AarAmetikohaTaitmine>();

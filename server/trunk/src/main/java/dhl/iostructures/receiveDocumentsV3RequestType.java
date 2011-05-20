@@ -42,21 +42,21 @@ public class receiveDocumentsV3RequestType {
                 if (nodes.getLength() > 0) {
                     receiveDocumentsV3RequestType result = new receiveDocumentsV3RequestType();
                     Element bodyNode = (Element)nodes.item(0);
-                    
+
                     // Arv
                     result.arv = CommonMethods.getNumberFromChildNode(bodyNode, "arv", 10);
-                    // Kontrollime, et ei saaks esitada põringut, mille võljundisse
-                    // ei ole lubatud õhtegi dokumenti.
+                    // Kontrollime, et ei saaks esitada päringut, mille väljundisse
+                    // ei ole lubatud ühtegi dokumenti.
                     if (result.arv < 1) {
                         result.arv = 1;
                     }
-                    
-                    // Allõksus
+
+                    // Allüksus
                     result.allyksus = CommonMethods.getNumberFromChildNode(bodyNode, "allyksus", 0);
-                    
+
                     // Ametikoht
                     result.ametikoht = CommonMethods.getNumberFromChildNode(bodyNode, "ametikoht", 0);
-                    
+
                     // Kaust
                     nodes = bodyNode.getElementsByTagName("kaust");
                     if (nodes.getLength() > 0) {
@@ -71,7 +71,7 @@ public class receiveDocumentsV3RequestType {
                     if (nodes.getLength() > 0) {
                         result.edastusID = CommonMethods.getNodeText((Element)nodes.item(0)).trim();
                     }
-                    
+
                     // Fragmendi nr
                     nodes = bodyNode.getElementsByTagName("fragment_nr");
                     if (nodes.getLength() > 0) {
@@ -81,7 +81,7 @@ public class receiveDocumentsV3RequestType {
                             CommonMethods.logError(ex, "dhl.iostructures.receiveDocumentsV2RequestType", "getFromSOAPBody");
                         }
                     }
-                    
+
                     // Fragmendi suurus
                     nodes = bodyNode.getElementsByTagName("fragmendi_suurus_baitides");
                     if (nodes.getLength() > 0) {
@@ -97,7 +97,7 @@ public class receiveDocumentsV3RequestType {
                     } else {
                         result.fragmentSizeBytes = result.fragmentSizeBytesOrig;
                     }
-                    
+
                     return result;
                 }
             }

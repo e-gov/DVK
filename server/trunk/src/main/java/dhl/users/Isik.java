@@ -156,7 +156,7 @@ public class Isik {
         m_muudetud = null;
         m_muutja = "";
     }
-    
+
     public static Isik getByCode(String isikukood, Connection conn) {
         try {
             if (conn != null) {
@@ -224,7 +224,7 @@ public class Isik {
             return 0;
         }
     }
-    
+
     public int addToDB(Connection conn) {
         try {
             if (conn != null) {
@@ -256,7 +256,7 @@ public class Isik {
             return 0;
         }
     }
-    
+
     public int updateInDB(Connection conn) {
         try {
             if (conn != null) {
@@ -287,7 +287,7 @@ public class Isik {
             return 0;
         }
     }
-    
+
     public int saveToDB(Connection conn) {
         if (m_id > 0) {
             return updateInDB(conn);
@@ -295,29 +295,28 @@ public class Isik {
             return addToDB(conn);
         }
     }
-    
+
     public static int syncWithAar(Isik person, AarIsik aarPerson, Connection conn) {
         try {
             if (aarPerson == null) {
                 return 0;
             }
-            
+
             if (person == null) {
                 person = new Isik();
             }
-            
+
             // Kannamae keskregistrist saadud andmed kohaliku
-            // andmeobjekti kõlge
+            // andmeobjekti külge
             person.setIsikukood(aarPerson.getIsikukood());
             person.setPerenimi(aarPerson.getPerenimi());
             person.setEesnimi(aarPerson.getEesnimi());
             person.setTelefon(aarPerson.getTelefon());
             person.setEpost(aarPerson.getEPost());
             person.saveToDB(conn);
-            
+
             return person.getId();
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             CommonMethods.logError(ex, "dhl.users.Isik", "syncWithAar");
             return 0;
         }

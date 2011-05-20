@@ -33,7 +33,7 @@ public class receiveDocumentsV2ResponseType implements SOAPOutputBodyRepresentat
 
             SOAPBodyElement element = body.addBodyElement(se.createName("receiveDocumentsResponse"));
 
-            // Sõnumi põringu osa
+            // Sõnumi päringu osa
             SOAPElement elParing = element.addChildElement(se.createName("paring"));
             SOAPElement elArv = elParing.addChildElement("arv");
             elArv.addTextNode(String.valueOf(paring.arv));

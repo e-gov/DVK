@@ -49,38 +49,38 @@ import org.apache.log4j.Logger;
 
 public class SendDocuments {
 	private static Logger logger = Logger.getLogger(SendDocuments.class);
-	
+
     public static RequestInternalResult V1(org.apache.axis.MessageContext context, Connection conn, UserProfile user, OrgSettings hostOrgSettings, XHeader xTeePais) throws Exception, ParserConfigurationException {
     	logger.info("SendDocuments.V1 invoked.");
-    	
+
         Timer t = new Timer();
         RequestInternalResult result = new RequestInternalResult();
         String pipelineDataFile = CommonMethods.createPipelineFile(0);
-        
+
         try {
-            // Laeme põringu keha endale sobivasse andmestruktuuri
+            // Laeme päringu keha endale sobivasse andmestruktuuri
             sendDocumentsRequestType bodyData = sendDocumentsRequestType.getFromSOAPBody( context );
             if (bodyData == null) {
                 throw new AxisFault( CommonStructures.VIGA_VIGANE_KEHA );
             }
             result.folder = bodyData.kaust;
-            
+
             // Tuvastame, millisesse kausta soovitakse dokumenti salvestada
-            // - Kui DVK server on seadistatud tõõtama kliendi tabelite peal,
+            // - Kui DVK server on seadistatud töötama kliendi tabelite peal,
             //   siis pole meil kaustade tabelit olemas ja seega ei saa kausta
             //   ID-d tuvastada.
             int senderTargetFolder = Folder.GLOBAL_ROOT_FOLDER;
             if (!Settings.Server_RunOnClientDatabase) {
                 senderTargetFolder = Folder.getFolderIdByPath( bodyData.kaust, user.getOrganizationID(), conn, false, true, xTeePais );
             }
-            
+
             // Leiame sõnumi kehas olnud viite alusels MIME lisast vajalikud andmed
             org.apache.axis.attachments.AttachmentPart px = (org.apache.axis.attachments.AttachmentPart) context.getCurrentMessage().getAttachmentsImpl().getAttachmentByReference(bodyData.dokumendid);
             if (px == null) {
                 throw new AxisFault( CommonStructures.VIGA_PUUDUV_MIME_LISA );
             }
             DataSource attachmentSource = px.getActivationDataHandler().getDataSource();
-            
+
             if (attachmentSource == null) {
                 throw new AxisFault( CommonStructures.VIGA_PUUDUV_MIME_LISA );
             }
@@ -127,61 +127,61 @@ public class SendDocuments {
                     // Valideerime XML dokumendi
                     Fault validationFault = CommonMethods.validateDVKContainer(docFiles.subFiles.get(i));
 
-                    // Sõltuvalt sellest, kas server tõõtab serveri või kliendi
+                    // Sõltuvalt sellest, kas server töötab serveri või kliendi
                     // andmebaasi peal, koostame DVK konteineri XML failidest
                     // vastavad andmeobjektid ja salvestame need andmebaasi
                     if (Settings.Server_RunOnClientDatabase) {
-                        // Võtame võlja antud andmebaasis seadistatud asutuste nimekirja, et
-                        // saaksime XML parsimisel võtta võlja eraldi kirjed, kui smaa sõnumit
+                        // Võtame välja antud andmebaasis seadistatud asutuste nimekirja, et
+                        // saaksime XML parsimisel võtta välja eraldi kirjed, kui sama sõnumit
                         // on saadetud mitmele asutusele
                         UnitCredential[] credentials = UnitCredential.getCredentials(hostOrgSettings, conn);
-                        
+
                         // Leiame dokumendile DHL_ID
                         int dhlID = Counter.getNextDhlID(hostOrgSettings, conn);
-                        
+
                         ArrayList<DhlMessage> msgList = DhlMessage.getFromXML(docFiles.subFiles.get(i), credentials);
                         for (int j = 0; j < msgList.size(); ++j) {
                             DhlMessage msg = msgList.get(j);
                             msg.setDhlID(dhlID);
-                            
-                            // Kontrollime, et dokumendi saatjaks või vahendajaks mõrgitud asutus
+
+                            // Kontrollime, et dokumendi saatjaks või vahendajaks märgitud asutus
                             // ja dokumendi reaalselt saatnud asutus oleksid samad.
                             if ((msg.getSenderOrgCode() != user.getOrganizationCode()) &&
                                (msg.getProxyOrgCode() !=  user.getOrganizationCode()) &&
                                Settings.Server_DocumentSenderMustMatchXroadHeader) {
                                 throw new AxisFault( CommonStructures.VIGA_SAATJA_ASUTUSED_ERINEVAD );
                             }
-                            
+
                             if (validationFault != null) {
                                 msg.setFaultActor(validationFault.getFaultActor());
                                 msg.setFaultCode(validationFault.getFaultCode());
                                 msg.setFaultDetail(validationFault.getFaultDetail());
                                 msg.setFaultString(validationFault.getFaultString());
                             }
-                            
+
                             clientDocuments.add(msg);
                         }
                     } else {
                     	// Loome dokumendi andmestruktuuri
                         Document doc = Document.fromXML(docFiles.subFiles.get(i), user.getOrganizationID(), (Settings.Server_ValidateXmlFiles || Settings.Server_ValidateSignatures), conn, xTeePais);
-                        
+
                         // Vajadusel valideerime saadetavad XML dokumendid
                         validateXmlFiles(doc.getFiles());
-                        
-                        // Vajadusel kontrollime saadetavate .ddoc ja .bdoc failide allkirjad õle
+
+                        // Vajadusel kontrollime saadetavate .ddoc ja .bdoc failide allkirjad üle
                         validateSignedFileSignatures(doc.getFiles());
-                        
-                        // Lisame võõrtused sõnumi põisest ja kehast
+
+                        // Lisame väärtused sõnumi päisest ja kehast
                         doc.setFolderID( senderTargetFolder );
                         doc.setOrganizationID( user.getOrganizationID() );
-                        
-                        // Mõõrame dokumendi sõilitustõhtajaks vaikimisi võõrtuse
+
+                        // Määrame dokumendi säilitustähtajaks vaikimisi väärtuse
                         Calendar calendar = Calendar.getInstance();
                         calendar.setTime(new Date());
                         calendar.add(Calendar.DATE, Settings.Server_DocumentDefaultLifetime);
                         doc.setConservationDeadline(calendar.getTime());
-                        
-                        // Kontrollime, et dokumendi saatjaks või vahendajaks mõrgitud asutus
+
+                        // Kontrollime, et dokumendi saatjaks või vahendajaks märgitud asutus
                         // ja dokumendi reaalselt saatnud asutus oleksid samad.
                         if ((doc.getSendingList() != null) && Settings.Server_DocumentSenderMustMatchXroadHeader) {
                             Sending tmpSending;
@@ -193,7 +193,7 @@ public class SendDocuments {
                                     logger.info("User org ID: " + String.valueOf(user.getOrganizationID()));
                                     logger.info("Sender org ID: " + String.valueOf(tmpSending.getSender().getOrganizationID()));
                                     logger.info("Proxy org ID: " + String.valueOf(tmpSending.getProxy().getOrganizationID()));
-                                	
+
                                 	throw new AxisFault(CommonStructures.VIGA_SAATJA_ASUTUSED_ERINEVAD);
                                 }
                                 if (validationFault != null) {
@@ -203,7 +203,7 @@ public class SendDocuments {
                                 }
                             }
                         }
-                        
+
                         // Lisame dokumendile automaatselt lisatavad adressaadid
                         FileSplitResult splitResult = CommonMethods.splitOutTags(doc.getFilePath(), "SignedDoc", false, false, false);
                         doc.setSimplifiedXmlDoc(CommonMethods.xmlDocumentFromFile(splitResult.mainFile, false));
@@ -254,9 +254,9 @@ public class SendDocuments {
                         // Salvestame dokumendi andmebaasi
                         tmpMsg.addToDB(hostOrgSettings, conn);
 
-                        // Tagastame siin kirje ID asemel DHL_ID võõrtuse, kuna
+                        // Tagastame siin kirje ID asemel DHL_ID väärtuse, kuna
                         // kliendi poolel peaks DVK unikaalne identifikaator
-                        // asuma just sellel andmevõljal.
+                        // asuma just sellel andmeväljal.
                         if (tmpMsg.getId() > 0) {
                             ow.write("<dhl_id>"+ String.valueOf(tmpMsg.getDhlID()) +"</dhl_id>");
                         } else {
@@ -289,7 +289,7 @@ public class SendDocuments {
                 ow = null;
                 out = null;
 
-                // Kustutame ajutisest kataloogist õra andmebaasi salvestatud failid
+                // Kustutame ajutisest kataloogist ära andmebaasi salvestatud failid
                 t.reset();
                 if (Settings.Server_RunOnClientDatabase) {
                     for (int i = 0; i < clientDocuments.size(); ++i) {
@@ -325,7 +325,7 @@ public class SendDocuments {
         String responseDataFile = null;
 
         try {
-            // Laeme põringu keha endale sobivasse andmestruktuuri
+            // Laeme päringu keha endale sobivasse andmestruktuuri
             sendDocumentsV2RequestType bodyData = sendDocumentsV2RequestType.getFromSOAPBody( context );
             if (bodyData == null) {
                 throw new RequestProcessingException(CommonStructures.VIGA_VIGANE_KEHA);
@@ -333,7 +333,7 @@ public class SendDocuments {
             result.folder = bodyData.kaust;
 
             // Tuvastame, millisesse kausta soovitakse dokumenti salvestada
-            // - Kui DVK server on seadistatud tõõtama kliendi tabelite peal,
+            // - Kui DVK server on seadistatud töötama kliendi tabelite peal,
             //   siis pole meil kaustade tabelit olemas ja seega ei saa kausta
             //   ID-d tuvastada.
             int senderTargetFolder = Folder.GLOBAL_ROOT_FOLDER;
@@ -350,7 +350,7 @@ public class SendDocuments {
             if (attachmentSource == null) {
                 throw new RequestProcessingException(CommonStructures.VIGA_PUUDUV_MIME_LISA);
             }
-            
+
             // Kontrollime, kas andmeid soovitakse saata fragmentideks jaotatud kujul
             if (bodyData.fragmenteKokku > 0) {
                 if ((bodyData.fragmentNr < 0) || (bodyData.fragmentNr >= bodyData.fragmenteKokku)) {
@@ -360,7 +360,7 @@ public class SendDocuments {
                     throw new FragmentedDataProcessingException("Dokumendi saatmisel fragmentideks jaotatuna tuleks maarata ka elemendi edastus_id vaartus!");
                 }
             }
-            
+
             // Laeme SOAP attachmendis asunud andmed baidimassiivi
             String[] headers = px.getMimeHeader("Content-Transfer-Encoding");
             String encoding;
@@ -381,8 +381,8 @@ public class SendDocuments {
             // fragmentide tabelisse
             if (bodyData.fragmenteKokku > 0) {
                 if (Settings.Server_RunOnClientDatabase) {
-                    // Kui DVK server on seadistatud tõõtama kliendi andmetabelite peal,
-                    // siis teostame fragmentide tõõtlemise andmebaasi asemel kõvakettal
+                    // Kui DVK server on seadistatud töötama kliendi andmetabelite peal,
+                    // siis teostame fragmentide töötlemise andmebaasi asemel kõvakettal
                     String uniqueFolder = CommonMethods.getUniqueDirectory(user.getOrganizationCode(), bodyData.edastusID);
                     if (uniqueFolder == null) {
                         throw new FragmentedDataProcessingException("Viga dokumendi fragmendi tootlemisel! Ei onnestunud luua ajutist kausta fragmentide salvestamiseks!");
@@ -440,95 +440,95 @@ public class SendDocuments {
                         }
                     } else {
                         pipelineDataFile = DocumentFragment.getFullDocument(user.getOrganizationID(), bodyData.edastusID, true, conn);
-                        
+
                         // Kustutame andmebaasist fragmendid
                         DocumentFragment.deleteFragments(user.getOrganizationID(), bodyData.edastusID, true, conn);
-                        
+
                         if (pipelineDataFile == null) {
                             throw new FragmentedDataProcessingException("Viga fragmentidena saadetud faili kokkupanemisel!");
                         }
                     }
                 }
             }
-            
+
             FileOutputStream out = null;
             OutputStreamWriter ow = null;
             BufferedWriter bw = null;
             ArrayList<Document> serverDocuments = new ArrayList<Document>();
             ArrayList<DhlMessage> clientDocuments = new ArrayList<DhlMessage>();
-            if ((bodyData.fragmenteKokku <= 0) || (bodyData.fragmentNr == (bodyData.fragmenteKokku-1))) {
+            if ((bodyData.fragmenteKokku <= 0) || (bodyData.fragmentNr == (bodyData.fragmenteKokku - 1))) {
                 // Pakime andmed GZIPiga lahti
                 t.reset();
                 if (!CommonMethods.gzipUnpackXML(pipelineDataFile, true)) {
-                    throw new RequestProcessingException(CommonStructures.VIGA_VIGANE_MIME_LISA );
+                    throw new RequestProcessingException(CommonStructures.VIGA_VIGANE_MIME_LISA);
                 }
                 t.markElapsed("Extracting attachment data");
-                
+
                 // Pakime saadetud dokumentide faili lahti ja laeme selle XML struktuuri
                 t.reset();
                 FileSplitResult docFiles = CommonMethods.splitOutTags(pipelineDataFile, "dokument", true, false, true);
                 t.markElapsed("Splitting attachment data");
                 if ((docFiles == null) || (docFiles.subFiles == null) || (docFiles.subFiles.size() < 1)) {
-                     throw new RequestProcessingException( CommonStructures.VIGA_VIGANE_MIME_LISA );
+                     throw new RequestProcessingException(CommonStructures.VIGA_VIGANE_MIME_LISA);
                 }
-                
+
                 t.reset();
                 for (int i = 0; i < docFiles.subFiles.size(); ++i) {
                     try {
                         // Valideerime XML dokumendi
                         Fault validationFault = CommonMethods.validateDVKContainer(docFiles.subFiles.get(i));
-                        
-                        // Sõltuvalt sellest, kas server tõõtab serveri või kliendi
+
+                        // Sõltuvalt sellest, kas server töötab serveri või kliendi
                         // andmebaasi peal, koostame DVK konteineri XML failidest
                         // vastavad andmeobjektid ja salvestame need andmebaasi
                         if (Settings.Server_RunOnClientDatabase) {
-                            // Võtame võlja antud andmebaasis seadistatud asutuste nimekirja, et
-                            // saaksime XML parsimisel võtta võlja eraldi kirjed, kui smaa sõnumit
+                            // Võtame välja antud andmebaasis seadistatud asutuste nimekirja, et
+                            // saaksime XML parsimisel võtta välja eraldi kirjed, kui smaa sõnumit
                             // on saadetud mitmele asutusele
                             UnitCredential[] credentials = UnitCredential.getCredentials(hostOrgSettings, conn);
 
                             // Leiame dokumendile DHL_ID
                             int dhlID = Counter.getNextDhlID(hostOrgSettings, conn);
-                            
+
                             ArrayList<DhlMessage> msgList = DhlMessage.getFromXML(docFiles.subFiles.get(i), credentials);
                             for (int j = 0; j < msgList.size(); ++j) {
                                 DhlMessage msg = msgList.get(j);
                                 msg.setDhlID(dhlID);
-                                
-                                // Kontrollime, et dokumendi saatjaks või vahendajaks mõrgitud asutus
+
+                                // Kontrollime, et dokumendi saatjaks või vahendajaks märgitud asutus
                                 // ja dokumendi reaalselt saatnud asutus oleksid samad.
                                 if (!msg.getSenderOrgCode().equalsIgnoreCase(user.getOrganizationCode()) &&
                                    !msg.getProxyOrgCode().equalsIgnoreCase(user.getOrganizationCode()) &&
                                    Settings.Server_DocumentSenderMustMatchXroadHeader) {
                                     throw new ContainerValidationException(CommonStructures.VIGA_SAATJA_ASUTUSED_ERINEVAD + " X-Tee: " + user.getOrganizationCode() + ", Sender: " + msg.getSenderOrgCode());
                                 }
-                                
+
                                 if (validationFault != null) {
                                     msg.setFaultActor(validationFault.getFaultActor());
                                     msg.setFaultCode(validationFault.getFaultCode());
                                     msg.setFaultDetail(validationFault.getFaultDetail());
                                     msg.setFaultString(validationFault.getFaultString());
                                 }
-                                
+
                                 clientDocuments.add(msg);
                             }
                         } else {
                             Document doc = Document.fromXML(docFiles.subFiles.get(i), user.getOrganizationID(), (Settings.Server_ValidateXmlFiles || Settings.Server_ValidateSignatures), conn, xTeePais);
-                            
+
                             // Vajadusel valideerime saadetavad XML dokumendid
                             validateXmlFiles(doc.getFiles());
-                            
-                            // Vajadusel kontrollime saadetavate .ddoc ja .bdoc failide allkirjad õle
+
+                            // Vajadusel kontrollime saadetavate .ddoc ja .bdoc failide allkirjad üle
                             validateSignedFileSignatures(doc.getFiles());
-                            
-                            // Lisame võõrtused sõnumi põisest ja kehast
-                            doc.setFolderID( senderTargetFolder );
-                            doc.setOrganizationID( user.getOrganizationID() );
-                            
+
+                            // Lisame väärtused sõnumi päisest ja kehast
+                            doc.setFolderID(senderTargetFolder);
+                            doc.setOrganizationID(user.getOrganizationID());
+
                             Date conservationDeadline = bodyData.sailitustahtaeg;
                             if (conservationDeadline == null) {
-                                // Kui saatja on dokumendi sõilitustõhtaja mõõramata jõtnud või mõõranud
-                                // tõhtaja vigaselt, siis mõõrame dokumendi sõilitustõhtajaks vaikimisi võõrtuse
+                                // Kui saatja on dokumendi säilitustähtaja määramata jätnud või määranud
+                                // tähtaja vigaselt, siis määrame dokumendi säilitustähtajaks vaikimisi väärtuse
                                 Calendar calendar = Calendar.getInstance();
                                 calendar.setTime(new Date());
                                 calendar.add(Calendar.DATE, Settings.Server_DocumentDefaultLifetime);
@@ -537,8 +537,8 @@ public class SendDocuments {
                             } else {
                                 doc.setConservationDeadline(conservationDeadline);
                             }
-                            
-                            // Kontrollime, et dokumendi saatjaks või vahendajaks mõrgitud asutus
+
+                            // Kontrollime, et dokumendi saatjaks või vahendajaks märgitud asutus
                             // ja dokumendi reaalselt saatnud asutus oleksid samad.
                             if ((doc.getSendingList() != null) && Settings.Server_DocumentSenderMustMatchXroadHeader) {
                                 Sending tmpSending;
@@ -555,7 +555,7 @@ public class SendDocuments {
                                     }
                                 }
                             }
-                            
+
                             // Lisame dokumendile automaatselt lisatavad adressaadid
                             FileSplitResult splitResult = CommonMethods.splitOutTags(doc.getFilePath(), "SignedDoc", false, false, false);
                             doc.setSimplifiedXmlDoc(CommonMethods.xmlDocumentFromFile(splitResult.mainFile, false));
@@ -568,7 +568,7 @@ public class SendDocuments {
                             CommonMethods.safeCloseWriter(bw);
                             CommonMethods.safeCloseWriter(ow);
                             CommonMethods.safeCloseStream(out);
-                            
+
                             // Lisame uue dokumendi laekunud dokumentide listi
                             serverDocuments.add(doc);
                         }
@@ -583,16 +583,16 @@ public class SendDocuments {
                 }
                 t.markElapsed("Parsing document XML");
             }
-            
+
             // Salvestame saadud dokumendid andmebaasi ja koostame
             // uute dokumentide ID-de põhjal vastussõnumi.
             try {
                 t.reset();
                 responseDataFile = CommonMethods.createPipelineFile(0);
                 out = new FileOutputStream(responseDataFile, false);
-                ow = new OutputStreamWriter(out, "UTF-8"); 
+                ow = new OutputStreamWriter(out, "UTF-8");
                 ow.write("<keha>");
-                
+
                 if ((bodyData.fragmenteKokku <= 0) || (bodyData.fragmentNr == (bodyData.fragmenteKokku-1))) {
                     if (Settings.Server_RunOnClientDatabase) {
                         DhlMessage tmpMsg;
@@ -605,13 +605,13 @@ public class SendDocuments {
                             tmpMsg.setQueryID(xTeePais.id);
                             tmpMsg.setCaseName(xTeePais.toimik);
                             tmpMsg.setDhlFolderName(bodyData.kaust);
-                            
+
                             // Salvestame dokumendi andmebaasi
                             tmpMsg.addToDB(hostOrgSettings, conn);
-                            
-                            // Tagastame siin kirje ID asemel DHL_ID võõrtuse, kuna
+
+                            // Tagastame siin kirje ID asemel DHL_ID väärtuse, kuna
                             // kliendi poolel peaks DVK unikaalne identifikaator
-                            // asuma just sellel andmevõljal.
+                            // asuma just sellel andmeväljal.
                             if (tmpMsg.getId() > 0) {
                                 ow.write("<dhl_id>"+ String.valueOf(tmpMsg.getDhlID()) +"</dhl_id>");
                             } else {
@@ -622,13 +622,13 @@ public class SendDocuments {
                         dhl.Document tmpDoc;
                         for (int i = 0; i < serverDocuments.size(); ++i) {
                             tmpDoc = serverDocuments.get(i);
-                            
+
                             // Salvestame dokumendi andmebaasi
                             tmpDoc.addToDB(conn, xTeePais);
-                            
+
                             // Edastame dokumendi vajadusel mõnda teise DVK serverisse
                             ForwardDocument(tmpDoc, bodyData.kaust, conn, 2, xTeePais);
-                            
+
                             if (tmpDoc.getId() > 0) {
                                 ow.write("<dhl_id>"+ String.valueOf(tmpDoc.getId()) +"</dhl_id>");
                             } else {
@@ -646,8 +646,8 @@ public class SendDocuments {
                 CommonMethods.safeCloseStream(out);
                 ow = null;
                 out = null;
-                
-                // Kustutame ajutisest kataloogist õra andmebaasi salvestatud failid
+
+                // Kustutame ajutisest kataloogist ära andmebaasi salvestatud failid
                 t.reset();
                 if (Settings.Server_RunOnClientDatabase) {
                     for (int i = 0; i < clientDocuments.size(); ++i) {
@@ -660,7 +660,7 @@ public class SendDocuments {
                 }
                 t.markElapsed("Deleting temporary document files");
             }
-            
+
             t.reset();
             result.responseFile = CommonMethods.gzipPackXML(responseDataFile, user.getOrganizationCode(), "sendDocuments");
             t.markElapsed("Compressing response XML");
@@ -673,15 +673,15 @@ public class SendDocuments {
         		(new File(responseDataFile)).delete();
         	}
         }
-        
+
         return result;
     }
-    
+
     /**
-     * Uus versioon põringust. Muudatused:
-     * 
+     * Uus versioon päringust. Muudatused:
+     *
      * 1. Kaotatud element <allyksuse_kood />
-     * 
+     *
      * @param context
      * @param conn
      * @param user
@@ -692,31 +692,31 @@ public class SendDocuments {
      * @throws ParserConfigurationException
      */
     public static RequestInternalResult V3(org.apache.axis.MessageContext context, Connection conn, UserProfile user, OrgSettings hostOrgSettings, XHeader xTeePais) throws Exception, ParserConfigurationException {
-        
+
     	logger.info("SendDocuments.V3 invoked.");
-    	
+
     	Timer t = new Timer();
         RequestInternalResult result = new RequestInternalResult();
         String pipelineDataFile = CommonMethods.createPipelineFile(0);
         String responseDataFile = null;
-        
+
         try {
-            // Laeme põringu keha endale sobivasse andmestruktuuri
+            // Laeme päringu keha endale sobivasse andmestruktuuri
             sendDocumentsV2RequestType bodyData = sendDocumentsV2RequestType.getFromSOAPBody( context );
             if (bodyData == null) {
                 throw new RequestProcessingException(CommonStructures.VIGA_VIGANE_KEHA);
             }
             result.folder = bodyData.kaust;
-            
+
             // Tuvastame, millisesse kausta soovitakse dokumenti salvestada
-            // - Kui DVK server on seadistatud tõõtama kliendi tabelite peal,
+            // - Kui DVK server on seadistatud töötama kliendi tabelite peal,
             //   siis pole meil kaustade tabelit olemas ja seega ei saa kausta
             //   ID-d tuvastada.
             int senderTargetFolder = Folder.GLOBAL_ROOT_FOLDER;
             if (!Settings.Server_RunOnClientDatabase) {
                 senderTargetFolder = Folder.getFolderIdByPath( bodyData.kaust, user.getOrganizationID(), conn, false, true, xTeePais );
-            }            
-            
+            }
+
             // Leiame sõnumi kehas olnud viite alusels MIME lisast vajalikud andmed
             org.apache.axis.attachments.AttachmentPart px = (org.apache.axis.attachments.AttachmentPart) context.getCurrentMessage().getAttachmentsImpl().getAttachmentByReference(bodyData.dokumendid);
             if (px == null) {
@@ -726,7 +726,7 @@ public class SendDocuments {
             if (attachmentSource == null) {
                 throw new RequestProcessingException(CommonStructures.VIGA_PUUDUV_MIME_LISA);
             }
-            
+
             // Kontrollime, kas andmeid soovitakse saata fragmentideks jaotatud kujul
             if (bodyData.fragmenteKokku > 0) {
                 if ((bodyData.fragmentNr < 0) || (bodyData.fragmentNr >= bodyData.fragmenteKokku)) {
@@ -757,8 +757,8 @@ public class SendDocuments {
             // fragmentide tabelisse
             if (bodyData.fragmenteKokku > 0) {
                 if (Settings.Server_RunOnClientDatabase) {
-                    // Kui DVK server on seadistatud tõõtama kliendi andmetabelite peal,
-                    // siis teostame fragmentide tõõtlemise andmebaasi asemel kõvakettal
+                    // Kui DVK server on seadistatud töötama kliendi andmetabelite peal,
+                    // siis teostame fragmentide töötlemise andmebaasi asemel kõvakettal
                     String uniqueFolder = CommonMethods.getUniqueDirectory(user.getOrganizationCode(), bodyData.edastusID);
                     if (uniqueFolder == null) {
                         throw new FragmentedDataProcessingException("Viga dokumendi fragmendi tootlemisel! Ei onnestunud luua ajutist kausta fragmentide salvestamiseks!");
@@ -816,22 +816,22 @@ public class SendDocuments {
                         }
                     } else {
                         pipelineDataFile = DocumentFragment.getFullDocument(user.getOrganizationID(), bodyData.edastusID, true, conn);
-                        
+
                         // Kustutame andmebaasist fragmendid
                         DocumentFragment.deleteFragments(user.getOrganizationID(), bodyData.edastusID, true, conn);
-                        
+
                         if (pipelineDataFile == null) {
                             throw new FragmentedDataProcessingException("Viga fragmentidena saadetud faili kokkupanemisel!");
                         }
                     }
                 }
             }
-            
+
             FileOutputStream out = null;
             OutputStreamWriter ow = null;
             BufferedWriter bw = null;
             ArrayList<Document> serverDocuments = new ArrayList<Document>();
-            ArrayList<DhlMessage> clientDocuments = new ArrayList<DhlMessage>();            
+            ArrayList<DhlMessage> clientDocuments = new ArrayList<DhlMessage>();
             if ((bodyData.fragmenteKokku <= 0) || (bodyData.fragmentNr == (bodyData.fragmenteKokku-1))) {
                 // Pakime andmed GZIPiga lahti
                 t.reset();
@@ -839,73 +839,73 @@ public class SendDocuments {
                     throw new RequestProcessingException(CommonStructures.VIGA_VIGANE_MIME_LISA);
                 }
                 t.markElapsed("Extracting attachment data");
-                
+
                 // Pakime saadetud dokumentide faili lahti ja laeme selle XML struktuuri
                 t.reset();
-                
+
                 FileSplitResult docFiles = CommonMethods.splitOutTags(pipelineDataFile, "dokument", true, false, true);
                 t.markElapsed("Splitting attachment data");
                     if ((docFiles == null) || (docFiles.subFiles == null) || (docFiles.subFiles.size() < 1)) {
                      throw new RequestProcessingException(CommonStructures.VIGA_VIGANE_MIME_LISA);
                 }
-                
+
                 t.reset();
                 for (int i = 0; i < docFiles.subFiles.size(); ++i) {
                     try {
                         // Valideerime XML dokumendi
                         Fault validationFault = CommonMethods.validateDVKContainer(docFiles.subFiles.get(i));
-                        
-                        // Sõltuvalt sellest, kas server tõõtab serveri või kliendi
+
+                        // Sõltuvalt sellest, kas server töötab serveri või kliendi
                         // andmebaasi peal, koostame DVK konteineri XML failidest
                         // vastavad andmeobjektid ja salvestame need andmebaasi
                         if (Settings.Server_RunOnClientDatabase) {
-                            // Võtame võlja antud andmebaasis seadistatud asutuste nimekirja, et
-                            // saaksime XML parsimisel võtta võlja eraldi kirjed, kui smaa sõnumit
+                            // Võtame välja antud andmebaasis seadistatud asutuste nimekirja, et
+                            // saaksime XML parsimisel võtta välja eraldi kirjed, kui smaa sõnumit
                             // on saadetud mitmele asutusele
                             UnitCredential[] credentials = UnitCredential.getCredentials(hostOrgSettings, conn);
 
                             // Leiame dokumendile DHL_ID
                             int dhlID = Counter.getNextDhlID(hostOrgSettings, conn);
-                            
+
                             ArrayList<DhlMessage> msgList = DhlMessage.getFromXML(docFiles.subFiles.get(i), credentials);
                             for (int j = 0; j < msgList.size(); ++j) {
                                 DhlMessage msg = msgList.get(j);
                                 msg.setDhlID(dhlID);
-                                
-                                // Kontrollime, et dokumendi saatjaks või vahendajaks mõrgitud asutus
+
+                                // Kontrollime, et dokumendi saatjaks või vahendajaks märgitud asutus
                                 // ja dokumendi reaalselt saatnud asutus oleksid samad.
                                 if (!msg.getSenderOrgCode().equalsIgnoreCase(user.getOrganizationCode()) &&
                                    !msg.getProxyOrgCode().equalsIgnoreCase(user.getOrganizationCode()) &&
                                    Settings.Server_DocumentSenderMustMatchXroadHeader) {
                                     throw new ContainerValidationException(CommonStructures.VIGA_SAATJA_ASUTUSED_ERINEVAD + " X-Tee: " + user.getOrganizationCode() + ", Sender: " + msg.getSenderOrgCode());
                                 }
-                                
+
                                 if (validationFault != null) {
                                     msg.setFaultActor(validationFault.getFaultActor());
                                     msg.setFaultCode(validationFault.getFaultCode());
                                     msg.setFaultDetail(validationFault.getFaultDetail());
                                     msg.setFaultString(validationFault.getFaultString());
                                 }
-                                
+
                                 clientDocuments.add(msg);
                             }
                         } else {
                             Document doc = Document.fromXML(docFiles.subFiles.get(i), user.getOrganizationID(), (Settings.Server_ValidateXmlFiles || Settings.Server_ValidateSignatures), conn, xTeePais);
-                            
+
                             // Vajadusel valideerime saadetavad XML dokumendid
                             validateXmlFiles(doc.getFiles());
-                            
-                            // Vajadusel kontrollime saadetavate .ddoc ja .bdoc failide allkirjad õle
+
+                            // Vajadusel kontrollime saadetavate .ddoc ja .bdoc failide allkirjad üle
                             validateSignedFileSignatures(doc.getFiles());
-                            
-                            // Lisame võõrtused sõnumi põisest ja kehast
+
+                            // Lisame väärtused sõnumi päisest ja kehast
                             doc.setFolderID( senderTargetFolder );
                             doc.setOrganizationID( user.getOrganizationID() );
-                            
+
                             Date conservationDeadline = bodyData.sailitustahtaeg;
                             if (conservationDeadline == null) {
-                                // Kui saatja on dokumendi sõilitustõhtaja mõõramata jõtnud või mõõranud
-                                // tõhtaja vigaselt, siis mõõrame dokumendi sõilitustõhtajaks vaikimisi võõrtuse
+                                // Kui saatja on dokumendi säilitustähtaja määramata jätnud või määranud
+                                // tähtaja vigaselt, siis määrame dokumendi säilitustähtajaks vaikimisi väärtuse
                                 Calendar calendar = Calendar.getInstance();
                                 calendar.setTime(new Date());
                                 calendar.add(Calendar.DATE, Settings.Server_DocumentDefaultLifetime);
@@ -914,8 +914,8 @@ public class SendDocuments {
                             } else {
                                 doc.setConservationDeadline(conservationDeadline);
                             }
-                            
-                            // Kontrollime, et dokumendi saatjaks või vahendajaks mõrgitud asutus
+
+                            // Kontrollime, et dokumendi saatjaks või vahendajaks märgitud asutus
                             // ja dokumendi reaalselt saatnud asutus oleksid samad.
                             if ((doc.getSendingList() != null) && Settings.Server_DocumentSenderMustMatchXroadHeader) {
                                 Sending tmpSending;
@@ -932,7 +932,7 @@ public class SendDocuments {
                                     }
                                 }
                             }
-                            
+
                             // Lisame dokumendile automaatselt lisatavad adressaadid
                             FileSplitResult splitResult = CommonMethods.splitOutTags(doc.getFilePath(), "failid", false, false, false);
                             doc.setSimplifiedXmlDoc(CommonMethods.xmlDocumentFromFile(splitResult.mainFile, false));
@@ -945,7 +945,7 @@ public class SendDocuments {
                             CommonMethods.safeCloseWriter(bw);
                             CommonMethods.safeCloseWriter(ow);
                             CommonMethods.safeCloseStream(out);
-                            
+
                             // Lisame uue dokumendi laekunud dokumentide listi
                             serverDocuments.add(doc);
                         }
@@ -960,16 +960,16 @@ public class SendDocuments {
                 }
                 t.markElapsed("Parsing document XML");
             }
-            
+
             // Salvestame saadud dokumendid andmebaasi ja koostame
             // uute dokumentide ID-de põhjal vastussõnumi.
             try {
                 t.reset();
                 responseDataFile = CommonMethods.createPipelineFile(0);
                 out = new FileOutputStream(responseDataFile, false);
-                ow = new OutputStreamWriter(out, "UTF-8"); 
+                ow = new OutputStreamWriter(out, "UTF-8");
                 ow.write("<keha>");
-                
+
                 if ((bodyData.fragmenteKokku <= 0) || (bodyData.fragmentNr == (bodyData.fragmenteKokku-1))) {
                     if (Settings.Server_RunOnClientDatabase) {
                         DhlMessage tmpMsg;
@@ -982,13 +982,13 @@ public class SendDocuments {
                             tmpMsg.setQueryID(xTeePais.id);
                             tmpMsg.setCaseName(xTeePais.toimik);
                             tmpMsg.setDhlFolderName(bodyData.kaust);
-                            
+
                             // Salvestame dokumendi andmebaasi
                             tmpMsg.addToDB(hostOrgSettings, conn);
-                            
-                            // Tagastame siin kirje ID asemel DHL_ID võõrtuse, kuna
+
+                            // Tagastame siin kirje ID asemel DHL_ID väärtuse, kuna
                             // kliendi poolel peaks DVK unikaalne identifikaator
-                            // asuma just sellel andmevõljal.
+                            // asuma just sellel andmeväljal.
                             if (tmpMsg.getId() > 0) {
                                 ow.write("<dhl_id>"+ String.valueOf(tmpMsg.getDhlID()) +"</dhl_id>");
                             } else {
@@ -999,14 +999,14 @@ public class SendDocuments {
                         dhl.Document tmpDoc;
                         for (int i = 0; i < serverDocuments.size(); ++i) {
                             tmpDoc = serverDocuments.get(i);
-                            
+
                             // Salvestame dokumendi andmebaasi
                             //tmpDoc.addToDB( conn );
                             tmpDoc.addToDB(conn, xTeePais);
-                            
+
                             // Edastame dokumendi vajadusel mõnda teise DVK serverisse
                             ForwardDocument(tmpDoc, bodyData.kaust, conn, 3, xTeePais);
-                            
+
                             if (tmpDoc.getId() > 0) {
                                 ow.write("<dhl_id>"+ String.valueOf(tmpDoc.getId()) +"</dhl_id>");
                             }
@@ -1025,8 +1025,8 @@ public class SendDocuments {
                 CommonMethods.safeCloseStream(out);
                 ow = null;
                 out = null;
-                
-                // Kustutame ajutisest kataloogist õra andmebaasi salvestatud failid
+
+                // Kustutame ajutisest kataloogist ära andmebaasi salvestatud failid
                 t.reset();
                 if (Settings.Server_RunOnClientDatabase) {
                     for (int i = 0; i < clientDocuments.size(); ++i) {
@@ -1039,7 +1039,7 @@ public class SendDocuments {
                 }
                 t.markElapsed("Deleting temporary document files");
             }
-            
+
             t.reset();
             result.responseFile = CommonMethods.gzipPackXML(responseDataFile, user.getOrganizationCode(), "sendDocuments");
             t.markElapsed("Compressing response XML");
@@ -1051,10 +1051,10 @@ public class SendDocuments {
         		(new File(responseDataFile)).delete();
         	}
         }
-        
+
         return result;
     }
-    
+
     // Edastab dokumendi teise DVK serverisse
     private static ArrayList<Sending> ForwardDocument(dhl.Document doc, String kaust, Connection conn, int requestVersion, XHeader xTeePais) throws Exception {
         ArrayList<Sending> sendingList = doc.getSendingList();
@@ -1068,7 +1068,7 @@ public class SendDocuments {
                     break;
                 }
             }
-            
+
             if ((lastSending != null) && (lastSending.getRecipients() != null)) {
                 ArrayList<Recipient> recipients = lastSending.getRecipients();
                 Asutus org = new Asutus();
@@ -1092,30 +1092,30 @@ public class SendDocuments {
                         }
                     }
                 }
-                
+
                 if (needToForward) {
                 	for (int j = 0; j < addressKeys.size(); ++j) {
                         int key = addressKeys.get(j);
                         ArrayList<OrgForwardHelper> orgArray = addressTable.get(key);
-                        
+
                         // Koostame nimekirja asutustest, mille aadressid peavad konteineri
-                        // <transport> plokki alles jõõma
+                        // <transport> plokki alles jääma
                         ArrayList<String> allowedOrgs = new ArrayList<String>();
                         for (int i = 0; i < orgArray.size(); ++i) {
                             allowedOrgs.add(orgArray.get(i).OrgCode);
                             logger.info("Organization " + orgArray.get(i).OrgCode + " will be left to forwarded message addressee list.");
                         }
-                        
-                        // Kopeerime dokumendi faili uueks tõõfailiks
+
+                        // Kopeerime dokumendi faili uueks tööfailiks
                         String simplifiedFile = CommonMethods.createPipelineFile(0);
                         if (CommonMethods.copyFile(doc.getFilePath(), simplifiedFile)) {
                             String newFile = CommonMethods.createPipelineFile(1);
-                            if(requestVersion == 3) {
+                            if (requestVersion == 3) {
                             	CommonMethods.splitOutTags(simplifiedFile, "failid", false, false, true);
                             } else {
                             	CommonMethods.splitOutTags(simplifiedFile, "SignedDoc", false, false, true);
                             }
-                            
+
                             FileOutputStream out = null;
                             OutputStreamWriter ow = null;
                             BufferedWriter bw = null;
@@ -1130,7 +1130,7 @@ public class SendDocuments {
                                 CommonMethods.safeCloseWriter(ow);
                                 CommonMethods.safeCloseStream(out);
                             }
-                            
+
                             // Forward document
                             RemoteServer server = new RemoteServer(key, conn);
                             if ((server != null) && (server.getAddress() != null) && !server.getAddress().equalsIgnoreCase("")) {
@@ -1141,14 +1141,14 @@ public class SendDocuments {
                                     Settings.Client_DefaultPersonCode,
                                     "",
                                     (CommonMethods.personalIDCodeHasCountryCode(Settings.Client_DefaultPersonCode) ? Settings.Client_DefaultPersonCode : "EE"+Settings.Client_DefaultPersonCode));
-        
+
                                 DhlMessage dvkMessage = new DhlMessage();
                                 dvkMessage.setFilePath(newFile);
                                 dvkMessage.setDhlFolderName(kaust);
-                                
+
                                 int docNewID = dvkClient.sendDocuments(header, dvkMessage, requestVersion);
                                 for (int i = 0; i < orgArray.size(); ++i) {
-                                    // Mõrgime dokumendi ID vastuvõtja andmete juurde
+                                    // Märgime dokumendi ID vastuvõtja andmete juurde
                                     Recipient tmpRecipient = lastSending.getRecipients().get(orgArray.get(i).Index);
                                     tmpRecipient.setIdInRemoteServer(docNewID);
                                     tmpRecipient.update(conn, xTeePais);

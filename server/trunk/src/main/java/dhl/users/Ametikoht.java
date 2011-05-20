@@ -25,7 +25,7 @@ public class Ametikoht {
     private String m_params;
     private int m_aarID;
     private String m_lyhinimetus;
-    
+
     // Abimuutuja, mida andmebaasi pole vaja salvestada
     private String m_asutusKood;
     private String m_allyksuseLyhinimetus;
@@ -133,7 +133,7 @@ public class Ametikoht {
     public void setLyhinimetus(String value) {
         this.m_lyhinimetus = value;
     }
-    
+
     public String getAsutusKood() {
         return m_asutusKood;
     }
@@ -149,7 +149,7 @@ public class Ametikoht {
     public void setAllyksuseLyhinimetus(String value) {
         this.m_allyksuseLyhinimetus = value;
     }
-    
+
     public Ametikoht() {
         clear();
     }
@@ -171,7 +171,7 @@ public class Ametikoht {
         m_asutusKood = "";
         m_allyksuseLyhinimetus = "";
     }
-    
+
     public static Ametikoht getByAarID(int aarID, Connection conn) {
         try {
             if (conn != null) {
@@ -219,7 +219,7 @@ public class Ametikoht {
             return null;
         }
     }
-    
+
     public static int getIdByAarID(int aarID, Connection conn) {
         try {
             if (conn != null) {
@@ -239,7 +239,7 @@ public class Ametikoht {
             return 0;
         }
     }
-    
+
     public static int getIdByShortName(int orgId, String shortName, Connection conn) {
         try {
             if (conn != null) {
@@ -260,7 +260,7 @@ public class Ametikoht {
             return 0;
         }
     }
-    
+
     public static ArrayList<Ametikoht> getList(int orgID, String name, Connection conn) {
         try {
             if (conn != null) {
@@ -270,7 +270,7 @@ public class Ametikoht {
                 	cs.setInt("asutus_id", orgID);
                 } else {
                 	cs.setNull("asutus_id", Types.INTEGER);
-                }                
+                }
                 if ((name != null) && (name.length() > 0)) {
                 	cs.setString("nimetus", name);
                 } else {
@@ -278,7 +278,7 @@ public class Ametikoht {
                 }
                 cs.registerOutParameter("RC1", oracle.jdbc.OracleTypes.CURSOR);
                 cs.execute();
-                ResultSet rs = (ResultSet)cs.getObject("RC1");
+                ResultSet rs = (ResultSet) cs.getObject("RC1");
                 ArrayList<Ametikoht> result = new ArrayList<Ametikoht>();
                 while (rs.next()) {
                     Ametikoht item = new Ametikoht();
@@ -295,6 +295,7 @@ public class Ametikoht {
                     item.setParams(rs.getString("params"));
                     item.setLyhinimetus(rs.getString("lyhinimetus"));
                     item.setAarID(rs.getInt("aar_id"));
+                    item.setAsutusKood(rs.getString("asutuse_kood"));
                     item.setAllyksuseLyhinimetus(rs.getString("allyksuse_lyhinimetus"));
                     result.add(item);
                 }
@@ -309,7 +310,7 @@ public class Ametikoht {
             return null;
         }
     }
-    
+
     public static ArrayList<Integer> getPersonCurrentPositions(int personID, int orgID, Connection conn) {
         try {
             if (conn != null) {
@@ -318,7 +319,7 @@ public class Ametikoht {
                 cs.setInt("organization_id", orgID);
                 cs.registerOutParameter("RC1", oracle.jdbc.OracleTypes.CURSOR);
                 cs.execute();
-                ResultSet rs = (ResultSet)cs.getObject("RC1");
+                ResultSet rs = (ResultSet) cs.getObject("RC1");
                 ArrayList<Integer> result = new ArrayList<Integer>();
                 while (rs.next()) {
                     result.add(rs.getInt("ametikoht_id"));
@@ -334,7 +335,7 @@ public class Ametikoht {
             return new ArrayList<Integer>();
         }
     }
-    
+
     public static ArrayList<Integer> getPersonCurrentDivisions(int personID, int orgID, Connection conn) {
         try {
             if (conn != null) {
@@ -343,7 +344,7 @@ public class Ametikoht {
                 cs.setInt("organization_id", orgID);
                 cs.registerOutParameter("RC1", oracle.jdbc.OracleTypes.CURSOR);
                 cs.execute();
-                ResultSet rs = (ResultSet)cs.getObject("RC1");
+                ResultSet rs = (ResultSet) cs.getObject("RC1");
                 ArrayList<Integer> result = new ArrayList<Integer>();
                 while (rs.next()) {
                     result.add(rs.getInt("allyksus_id"));
@@ -359,7 +360,7 @@ public class Ametikoht {
             return new ArrayList<Integer>();
         }
     }
-    
+
     public int addToDB(Connection conn) {
         try {
             if (conn != null) {
@@ -390,7 +391,7 @@ public class Ametikoht {
             return 0;
         }
     }
-    
+
     public int updateInDB(Connection conn) {
         try {
             if (conn != null) {
@@ -420,7 +421,7 @@ public class Ametikoht {
             return 0;
         }
     }
-    
+
     public int saveToDB(Connection conn) {
         if (m_id > 0) {
             return updateInDB(conn);
@@ -428,13 +429,13 @@ public class Ametikoht {
             return addToDB(conn);
         }
     }
-    
+
     public static int syncWithAar(Ametikoht job, AarAmetikoht aarJob, int orgID, Connection conn) {
         try {
             if (aarJob == null) {
                 return 0;
             }
-            
+
             // Asutuse tuvastamine
             if (orgID <= 0) {
                 orgID = Asutus.getIDByAarID(aarJob.getAsutusID(), conn);
@@ -442,8 +443,8 @@ public class Ametikoht {
             if (orgID <= 0) {
                 return 0;
             }
-            
-            // Allõksuse tuvastamine
+
+            // Allüksuse tuvastamine
             int allyksusID = 0;
             if (aarJob.getAllyksusID() > 0) {
                 Allyksus tmpAY = Allyksus.getByAarID(aarJob.getAllyksusID(), conn);
@@ -462,13 +463,13 @@ public class Ametikoht {
                     allyksusID = newAY.saveToDB(conn);
                 }
             }
-            
+
             if (job == null) {
                 job = new Ametikoht();
             }
-            
+
             // Kannamae keskregistrist saadud andmed kohaliku
-            // andmeobjekti kõlge
+            // andmeobjekti külge
             job.setAsutusID(orgID);
             job.setNimetus(aarJob.getNimetus());
             job.setAlates(aarJob.getAlates());
@@ -482,15 +483,14 @@ public class Ametikoht {
             job.setAllyksusID(allyksusID);
             job.setAarID(aarJob.getAmetikohtID());
             int jobID = job.saveToDB(conn);
-            
-            // Ametikoha tõitmised
+
+            // Ametikoha täitmised
             if ((aarJob.getTaitmised() != null) && (aarJob.getTaitmised().size() > 0)) {
                 AmetikohaTaitmine.syncListWithAar(aarJob.getTaitmised(), jobID, conn);
             }
-            
+
             return job.getID();
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             CommonMethods.logError(ex, "dhl.users.Ametikoht", "SyncWithAar");
             return 0;
         }

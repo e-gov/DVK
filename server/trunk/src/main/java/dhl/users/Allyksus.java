@@ -21,7 +21,7 @@ public class Allyksus {
     private int m_aarID;
     private String m_lyhinimetus;
     private String m_adrUri;
-    
+
     // Abimuutuja, mida andmebaasi pole vaja salvestada
     private String m_asutusKood;
     private String m_ksAllyksuseLyhinimetus;
@@ -97,7 +97,7 @@ public class Allyksus {
     public void setAarID(int value) {
         m_aarID = value;
     }
-    
+
     public String getLyhinimetus() {
         return this.m_lyhinimetus;
     }
@@ -114,7 +114,7 @@ public class Allyksus {
         this.m_adrUri = value;
     }
 
-    
+
     public String getAsutusKood() {
         return m_asutusKood;
     }
@@ -122,7 +122,7 @@ public class Allyksus {
     public void setAsutusKood(String value) {
         m_asutusKood = value;
     }
-    
+
     public String getKsAllyksuseLyhinimetus() {
         return this.m_ksAllyksuseLyhinimetus;
     }
@@ -134,7 +134,7 @@ public class Allyksus {
     public Allyksus() {
         clear();
     }
-    
+
     public void clear() {
         m_id = 0;
         m_asutusID = 0;
@@ -150,7 +150,7 @@ public class Allyksus {
         m_adrUri = "";
         m_ksAllyksuseLyhinimetus = "";
     }
-    
+
     public static Allyksus getByAarID(int aarID, Connection conn) {
         try {
             if (conn != null) {
@@ -194,7 +194,7 @@ public class Allyksus {
             return null;
         }
     }
-    
+
     public static int getIdByAarID(int aarID, Connection conn) {
         try {
             if (conn != null) {
@@ -214,7 +214,7 @@ public class Allyksus {
             return 0;
         }
     }
-    
+
     public static int getIdByShortName(int orgId, String shortName, Connection conn) {
         try {
             if (conn != null) {
@@ -235,7 +235,7 @@ public class Allyksus {
             return 0;
         }
     }
-    
+
     public static ArrayList<Allyksus> getList(int orgID, String name, Connection conn) {
         try {
             if (conn != null) {
@@ -253,7 +253,7 @@ public class Allyksus {
                 }
                 cs.registerOutParameter("RC1", oracle.jdbc.OracleTypes.CURSOR);
                 cs.execute();
-                ResultSet rs = (ResultSet)cs.getObject("RC1");
+                ResultSet rs = (ResultSet) cs.getObject("RC1");
                 ArrayList<Allyksus> result = new ArrayList<Allyksus>();
                 while (rs.next()) {
                     Allyksus item = new Allyksus();
@@ -268,6 +268,7 @@ public class Allyksus {
                     item.setAarID(rs.getInt("aar_id"));
                     item.setLyhinimetus(rs.getString("lyhinimetus"));
                     item.setAdrUri(rs.getString("adr_uri"));
+                    item.setAsutusKood(rs.getString("asutuse_kood"));
                     item.setKsAllyksuseLyhinimetus(rs.getString("ks_allyksuse_lyhinimetus"));
                     result.add(item);
                 }
@@ -282,7 +283,7 @@ public class Allyksus {
             return null;
         }
     }
-    
+
     public int addToDB(Connection conn) {
         try {
             if (conn != null) {
@@ -311,7 +312,7 @@ public class Allyksus {
             return 0;
         }
     }
-    
+
     public int updateInDB(Connection conn) {
         try {
             if (conn != null) {
@@ -339,7 +340,7 @@ public class Allyksus {
             return 0;
         }
     }
-    
+
     public int saveToDB(Connection conn) {
         if (m_id > 0) {
             return updateInDB(conn);

@@ -18,9 +18,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public class RecipientTemplate {
-	
+
 	private static Logger logger = Logger.getLogger(RecipientTemplate.class);
-	
+
     private int m_id;
     private int m_organizationID;
     private int m_positionID;
@@ -168,7 +168,7 @@ public class RecipientTemplate {
         m_positionShortName = "";
         m_divisionShortName = "";
     }
-    
+
     public static Document applyToDocument(Document doc, String xmlPath, Connection conn) {
         XPathFactory factory = XPathFactory.newInstance();
         XPath xpath = factory.newXPath();
@@ -211,17 +211,17 @@ public class RecipientTemplate {
                             doc.setSendingList(new ArrayList<Sending>());
                             doc.getSendingList().add(s);
                         }
-                        if (doc.getSendingList().get(doc.getSendingList().size()-1).getRecipients() == null) {
-                            doc.getSendingList().get(doc.getSendingList().size()-1).setRecipients(new ArrayList<Recipient>());
+                        if (doc.getSendingList().get(doc.getSendingList().size() - 1).getRecipients() == null) {
+                            doc.getSendingList().get(doc.getSendingList().size() - 1).setRecipients(new ArrayList<Recipient>());
                         }
-                        doc.getSendingList().get(doc.getSendingList().size()-1).getRecipients().add(newRecipient);
-                        
-                        if(doc.getDvkContainerVersion() == 1) {
-                        	
-                        	// XML konteineri transport ploki tõiendamine
+                        doc.getSendingList().get(doc.getSendingList().size() - 1).getRecipients().add(newRecipient);
+
+                        if (doc.getDvkContainerVersion() == 1) {
+
+                        	// XML konteineri transport ploki täiendamine
                             nodes = xmlDocNS.getDocumentElement().getElementsByTagNameNS(CommonStructures.DhlNamespace, "transport");
                             if (nodes.getLength() > 0) {
-                                el = (Element)nodes.item(0);
+                                el = (Element) nodes.item(0);
                                 String defaultPrefix = xmlDocNS.lookupPrefix(CommonStructures.DhlNamespace);
                                 if (defaultPrefix == null) {
                                     defaultPrefix = "dhl";
@@ -232,55 +232,55 @@ public class RecipientTemplate {
                                     }
                                 }
 
-                                el1 = xmlDocNS.createElementNS(CommonStructures.DhlNamespace, defaultPrefix+":saaja");
+                                el1 = xmlDocNS.createElementNS(CommonStructures.DhlNamespace, defaultPrefix + ":saaja");
                                 el.appendChild(el1);
-                                
-                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespace, defaultPrefix+":regnr");
+
+                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespace, defaultPrefix + ":regnr");
                                 Asutus a = new Asutus(newRecipient.getOrganizationID(), conn);
                                 el2.setTextContent(a.getRegistrikood());
                                 a = null;
                                 el1.appendChild(el2);
-                                
-                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespace, defaultPrefix+":isikukood");
+
+                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespace, defaultPrefix + ":isikukood");
                                 el2.setTextContent(newRecipient.getPersonalIdCode());
                                 el1.appendChild(el2);
 
-                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespace, defaultPrefix+":ametikoha_kood");
+                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespace, defaultPrefix + ":ametikoha_kood");
                                 el2.setTextContent(String.valueOf(newRecipient.getPositionID()));
                                 el1.appendChild(el2);
-                                
-                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespace, defaultPrefix+":allyksuse_kood");
+
+                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespace, defaultPrefix + ":allyksuse_kood");
                                 el2.setTextContent(String.valueOf(newRecipient.getDivisionID()));
                                 el1.appendChild(el2);
-                                
-                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespace, defaultPrefix+":epost");
+
+                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespace, defaultPrefix + ":epost");
                                 el2.setTextContent(newRecipient.getEmail());
                                 el1.appendChild(el2);
-                                
-                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespace, defaultPrefix+":nimi");
+
+                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespace, defaultPrefix + ":nimi");
                                 el2.setTextContent(newRecipient.getName());
                                 el1.appendChild(el2);
-                                
-                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespace, defaultPrefix+":asutuse_nimi");
+
+                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespace, defaultPrefix + ":asutuse_nimi");
                                 el2.setTextContent(newRecipient.getOrganizationName());
                                 el1.appendChild(el2);
 
-                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespace, defaultPrefix+":osakonna_kood");
+                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespace, defaultPrefix + ":osakonna_kood");
                                 el2.setTextContent(newRecipient.getDepartmentNumber());
                                 el1.appendChild(el2);
-                                	
-                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespace, defaultPrefix+":osakonna_nimi");
+
+                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespace, defaultPrefix + ":osakonna_nimi");
                                 el2.setTextContent(newRecipient.getDepartmentName());
                                 el1.appendChild(el2);
-                                
+
                             }
-                        	
-                        } else if(doc.getDvkContainerVersion() == 2) {
-                        	
-                        	// XML konteineri transport ploki tõiendamine
+
+                        } else if (doc.getDvkContainerVersion() == 2) {
+
+                        	// XML konteineri transport ploki täiendamine
                             nodes = xmlDocNS.getDocumentElement().getElementsByTagNameNS(CommonStructures.DhlNamespaceV2, "transport");
                             if (nodes.getLength() > 0) {
-                                el = (Element)nodes.item(0);
+                                el = (Element) nodes.item(0);
                                 String defaultPrefix = xmlDocNS.lookupPrefix(CommonStructures.DhlNamespaceV2);
                                 if (defaultPrefix == null) {
                                     defaultPrefix = "dhl";
@@ -291,55 +291,55 @@ public class RecipientTemplate {
                                     }
                                 }
 
-                                el1 = xmlDocNS.createElementNS(CommonStructures.DhlNamespaceV2, defaultPrefix+":saaja");
+                                el1 = xmlDocNS.createElementNS(CommonStructures.DhlNamespaceV2, defaultPrefix + ":saaja");
                                 el.appendChild(el1);
-                                
-                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespaceV2, defaultPrefix+":regnr");
+
+                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespaceV2, defaultPrefix + ":regnr");
                                 Asutus a = new Asutus(newRecipient.getOrganizationID(), conn);
                                 el2.setTextContent(a.getRegistrikood());
                                 a = null;
                                 el1.appendChild(el2);
-                                
-                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespaceV2, defaultPrefix+":isikukood");
+
+                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespaceV2, defaultPrefix + ":isikukood");
                                 el2.setTextContent(newRecipient.getPersonalIdCode());
-                                el1.appendChild(el2);                                
-                                
-                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespaceV2, defaultPrefix+":epost");
+                                el1.appendChild(el2);
+
+                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespaceV2, defaultPrefix + ":epost");
                                 el2.setTextContent(newRecipient.getEmail());
                                 el1.appendChild(el2);
-                                
-                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespaceV2, defaultPrefix+":nimi");
+
+                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespaceV2, defaultPrefix + ":nimi");
                                 el2.setTextContent(newRecipient.getName());
                                 el1.appendChild(el2);
-                                
-                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespaceV2, defaultPrefix+":asutuse_nimi");
+
+                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespaceV2, defaultPrefix + ":asutuse_nimi");
                                 el2.setTextContent(newRecipient.getOrganizationName());
                                 el1.appendChild(el2);
-                                
+
                                 // Versioon 2 - uued elemendid
                                 // ametikoha_lyhinimetus
                                 // allyksuse_lyhinimetus
                                 // teadmiseks
-                                
-                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespaceV2, defaultPrefix+":ametikoha_lyhinimetus");
+
+                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespaceV2, defaultPrefix + ":ametikoha_lyhinimetus");
                                 el2.setTextContent(newRecipient.getPositionShortName());
                                 el1.appendChild(el2);
-                                
-                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespaceV2, defaultPrefix+":allyksuse_lyhinimetus");
+
+                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespaceV2, defaultPrefix + ":allyksuse_lyhinimetus");
                                 el2.setTextContent(newRecipient.getDivisionShortName());
                                 el1.appendChild(el2);
-                                
-                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespaceV2, defaultPrefix+":teadmiseks");
+
+                                el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespaceV2, defaultPrefix + ":teadmiseks");
                                 el2.setTextContent(new Boolean(newRecipient.isCc()).toString());
                                 el1.appendChild(el2);
-                                
+
                             }
-                        	
+
                         } else {
                         	logger.error("Unknown document container version: " + doc.getDvkContainerVersion());
                         }
-                        
-                        
+
+
                     }
                 } catch (Exception ex) {
                     CommonMethods.logError(ex, "dhl.RecipientTemplate", "applyToDocument");
@@ -360,14 +360,14 @@ public class RecipientTemplate {
 
         return doc;
     }
-    
+
     public static ArrayList<RecipientTemplate> getList(Connection conn) {
         try {
             if (conn != null) {
                 CallableStatement cs = conn.prepareCall("{call GET_RECIPIENTTEMPLATES(?)}");
                 cs.registerOutParameter("RC1", oracle.jdbc.OracleTypes.CURSOR);
                 cs.execute();
-                ResultSet rs = (ResultSet)cs.getObject("RC1");
+                ResultSet rs = (ResultSet) cs.getObject("RC1");
                 ArrayList<RecipientTemplate> result = new ArrayList<RecipientTemplate>();
                 while (rs.next()) {
                     RecipientTemplate item = new RecipientTemplate();

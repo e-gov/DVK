@@ -15,16 +15,16 @@ import org.apache.axis.AxisFault;
 import org.apache.log4j.Logger;
 
 public class GetOccupationList {
-    
+
 	private static Logger logger = Logger.getLogger(GetOccupationList.class);
-	
+
 	public static getOccupationListResponseType V1(org.apache.axis.MessageContext context, Connection conn) throws AxisFault {
-        
+
 		logger.info("GetOccupationList.V1 invoked.");
-		
+
 		getOccupationListResponseType result = new getOccupationListResponseType();
 
-        // Laeme põringu keha endale sobivasse andmestruktuuri
+        // Laeme päringu keha endale sobivasse andmestruktuuri
         getOccupationListRequestType bodyData = getOccupationListRequestType.getFromSOAPBody(context);
         result.paring = bodyData;
 
@@ -41,18 +41,18 @@ public class GetOccupationList {
                 list.addAll(subList);
             }
         }
-        
+
         result.ametikohad = list;
         return result;
     }
-    
+
     public static getOccupationListV2ResponseType V2(org.apache.axis.MessageContext context, Connection conn, UserProfile user) throws Exception {
-        
+
     	logger.info("GetOccupationList.V2 invoked.");
-    	
+
     	getOccupationListV2ResponseType result = new getOccupationListV2ResponseType();
 
-        // Laeme põringu keha endale sobivasse andmestruktuuri
+        // Laeme päringu keha endale sobivasse andmestruktuuri
         getOccupationListV2RequestType bodyData = getOccupationListV2RequestType.getFromSOAPBody(context);
         result.paring = bodyData;
 
@@ -60,7 +60,7 @@ public class GetOccupationList {
         AttachmentExtractionResult exResult = CommonMethods.getExtractedFileFromAttachment(context, bodyData.asutusedHref);
         result.dataMd5Hash = exResult.getAttachmentHash();
         bodyData.loadParametersFromXML(exResult.getExtractedFileName());
-        
+
         // Leiame andmebaasist soovitud ametikohad
         ArrayList<Ametikoht> list = new ArrayList<Ametikoht>();
         if (bodyData != null) {
@@ -74,7 +74,7 @@ public class GetOccupationList {
                 list.addAll(subList);
             }
         }
-        
+
         // Koostame XML faili
         result.createResponseFile(list, user.getOrganizationCode());
         return result;

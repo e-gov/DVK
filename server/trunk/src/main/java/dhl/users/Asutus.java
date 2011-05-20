@@ -324,7 +324,7 @@ public class Asutus {
     public boolean getDvkOtseSaatmine() {
         return m_dvkOtseSaatmine;
     }
-    
+
     public void setDvkSaatmine(boolean dvkSaatmine) {
         this.m_dvkSaatmine = dvkSaatmine;
     }
@@ -332,7 +332,7 @@ public class Asutus {
     public boolean getDvkSaatmine() {
         return m_dvkSaatmine;
     }
-    
+
     public void setDHSNimetus(String dhsNimetus) {
         this.m_dhsNimetus = dhsNimetus;
     }
@@ -617,7 +617,7 @@ public class Asutus {
             throw new AxisFault(e.getMessage());
         }
     }
-    
+
     public static int getIDByAarID(int aarID, Connection conn) throws AxisFault {
         try {
             if (conn != null) {
@@ -699,7 +699,7 @@ public class Asutus {
             return null;
         }
     }
-    
+
     public void addToDB(Connection conn, XHeader xTeePais) {
         try {
             if (conn != null) {
@@ -741,7 +741,7 @@ public class Asutus {
                 cs.setInt("dhl_otse_saatmine", (m_dvkOtseSaatmine ? 1 : 0));
                 cs.setString("dhs_nimetus", m_dhsNimetus);
                 cs.setString("toetatav_dvk_versioon", m_toetatavDVKVersioon);
-                
+
                 if(xTeePais != null) {
                 	cs.setString("xtee_isikukood", xTeePais.isikukood);
                 	cs.setString("xtee_asutus", xTeePais.asutus);
@@ -749,7 +749,7 @@ public class Asutus {
                 	cs.setString("xtee_isikukood", null);
                 	cs.setString("xtee_asutus", null);
                 }
-                
+
                 CommonMethods.setNullableIntParam(cs, "server_id", m_serverID);
                 CommonMethods.setNullableIntParam(cs, "aar_id", m_aarID);
                 cs.executeUpdate();
@@ -761,7 +761,7 @@ public class Asutus {
             clear();
         }
     }
-    
+
     public void updateInDB(Connection conn, XHeader xTeePais) {
         try {
             if (conn != null) {
@@ -803,7 +803,7 @@ public class Asutus {
                 cs.setInt("dhl_otse_saatmine", (m_dvkOtseSaatmine ? 1 : 0));
                 cs.setString("dhs_nimetus", m_dhsNimetus);
                 cs.setString("toetatav_dvk_versioon", m_toetatavDVKVersioon);
-                
+
                 if(xTeePais != null) {
                 	cs.setString("xtee_isikukood", xTeePais.isikukood);
                 	cs.setString("xtee_asutus", xTeePais.asutus);
@@ -811,7 +811,7 @@ public class Asutus {
                 	cs.setString("xtee_isikukood", null);
                 	cs.setString("xtee_asutus", null);
                 }
-                
+
                 CommonMethods.setNullableIntParam(cs, "server_id", m_serverID);
                 CommonMethods.setNullableIntParam(cs, "aar_id", m_aarID);
                 cs.executeUpdate();
@@ -822,7 +822,7 @@ public class Asutus {
             clear();
         }
     }
-    
+
     public void saveToDB(Connection conn, XHeader xTeePais) {
         if (m_id > 0) {
             updateInDB(conn, xTeePais);
@@ -833,7 +833,7 @@ public class Asutus {
 
     /**
      * Laeb kõigist teistest teadaolevatest serveritest asutuste nimekirjad
-     * ja sõnkroniseerib kohaliku asutuste registri saadud andmetega
+     * ja sünkroniseerib kohaliku asutuste registri saadud andmetega.
      */
     public static void getOrgsFromAllKnownServers(String orgCodeToFind, Connection conn, XHeader xTeePais) throws Exception {
         boolean foundMissingOrg = false;
@@ -848,7 +848,7 @@ public class Asutus {
                     Settings.Client_DefaultPersonCode,
                     "",
                     (CommonMethods.personalIDCodeHasCountryCode(Settings.Client_DefaultPersonCode) ? Settings.Client_DefaultPersonCode : "EE"+Settings.Client_DefaultPersonCode));
-                
+
                 try {
 	                GetSendingOptionsV3ResponseType result = dvkClient.getSendingOptions(header, null, null, null, false, -1, -1, 1);
 	                if ((result != null) && (result.asutused != null)) {
@@ -872,27 +872,27 @@ public class Asutus {
                 } catch (Exception ex) {
                 	CommonMethods.logError(ex, "dhl.users.Asutus", "getOrgsFromAllKnownServers");
                 }
-                
-                // If we found the necessary organization then let's not bother another server 
+
+                // If we found the necessary organization then let's not bother another server
                 if (foundMissingOrg) {
                     return;
                 }
             }
         }
     }
-    
+
     public static void runAarSyncronization(Connection conn) {
         try {
-            // Asutuste sõnkroniseerimine
+            // Asutuste sünkroniseerimine
             ArrayList<Asutus> orgs = getList(conn);
             ArrayList<String> orgCodes = new ArrayList<String>();
             for (int i = 0; i < orgs.size(); ++i) {
                 orgCodes.add(orgs.get(i).getRegistrikood());
             }
-            
+
             AarClient aarClient = new AarClient(Settings.Server_CentralRightsDatabaseURL, Settings.Server_CentralRightsDatabaseOrgCode, Settings.Server_CentralRightsDatabasePersonCode);
             ArrayList<AarAsutus> aarOrgs = aarClient.asutusedRequest(orgCodes, null);
-            
+
             AarAsutus aarOrg = null;
             boolean found = false;
             for (int i = 0; i < aarOrgs.size(); ++i) {
@@ -909,8 +909,8 @@ public class Asutus {
                     aarOrgs.get(i).setDvkID(syncWithAar(null, aarOrg, conn));
                 }
             }
-            
-            // Ametikohtade sõnkroniseerimine
+
+            // Ametikohtade sünkroniseerimine
             for (int i = 0; i < aarOrgs.size(); ++i) {
                 aarOrg = aarOrgs.get(i);
                 if (aarOrg.getAmetikohad() != null) {
@@ -927,8 +927,8 @@ public class Asutus {
                     }
                 }
             }
-            
-            // õiguste sõnkroniseerimine
+
+            // Õiguste sünkroniseerimine
             for (int i = 0; i < aarOrgs.size(); ++i) {
                 aarOrg = aarOrgs.get(i);
                 ArrayList<AarOigus> aarRights = aarClient.oigusedRequest(aarOrg.getRegistrikood(), 0, "");
@@ -947,13 +947,13 @@ public class Asutus {
             CommonMethods.logError(ex, "dhl.users.Asutus", "runAarSyncronization");
         }
     }
-    
+
     private static int syncWithAar(Asutus org, AarAsutus aarOrg, Connection conn) {
         try {
             if (aarOrg == null) {
                 return 0;
             }
-            
+
             // Kõrgemalseisva asutuse andmed
             int topOrgID = 0;
             if (aarOrg.getKsAsutusID() > 0) {
@@ -964,7 +964,7 @@ public class Asutus {
                         getTopOrgData = false;
                     }
                 }
-                
+
                 // Kui antud asutuse kõrgemalseisva asutuse andmeid kohalikus
                 // asutuste registris ei ole, siis laeme need keskregistrist
                 // ja salvestame kohalikku registrisse.
@@ -977,13 +977,13 @@ public class Asutus {
                     }
                 }
             }
-            
+
             if (org == null) {
                 org = new Asutus();
             }
-            
+
             // Kannamae keskregistrist saadud andmed kohaliku
-            // andmeobjekti kõlge
+            // andmeobjekti külge
             org.setRegistrikood(aarOrg.getRegistrikood());
             org.setAarID(aarOrg.getAsutusID());
             org.setKsAsutuseID(topOrgID);
@@ -1000,8 +1000,8 @@ public class Asutus {
             org.setWww(aarOrg.getWww());
             org.setAsutamiseKuupaev(aarOrg.getAsutamiseKp());
             org.saveToDB(conn, null);
-            
-            
+
+
             return org.getId();
         }
         catch (Exception ex) {

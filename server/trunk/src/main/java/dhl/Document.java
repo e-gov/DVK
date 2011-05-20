@@ -37,11 +37,11 @@ public class Document {
     private int m_folderID;
     private ArrayList<Sending> m_sendingList;
     private Date m_conservationDeadline;
-    
+
     // DEC container version
     private int m_dvkContainerVersion;
     private String m_guid;
-    
+
     // Helper variables that are used in data processing
     // but won't be saved to database
     private org.w3c.dom.Document m_simplifiedXmlDoc;
@@ -94,7 +94,7 @@ public class Document {
     public ArrayList<Sending> getSendingList() {
         return m_sendingList;
     }
-    
+
     public void setConservationDeadline(Date conservationDeadline) {
         this.m_conservationDeadline = conservationDeadline;
     }
@@ -110,7 +110,7 @@ public class Document {
     public void setFiles(ArrayList<DocumentFile> value) {
         this.m_files = value;
     }
-    
+
 	public int getDvkContainerVersion() {
 		return m_dvkContainerVersion;
 	}
@@ -126,7 +126,7 @@ public class Document {
 	public void setGuid(String mGuid) {
 		m_guid = mGuid;
 	}
-    
+
     public Document() {
         clear();
     }
@@ -152,7 +152,7 @@ public class Document {
         m_dvkContainerVersion = dvkContainerVersion;
         m_files = new ArrayList<DocumentFile>();
     }
-    
+
     public void clear() {
         m_id = 0;
         m_organizationID = 0;
@@ -204,41 +204,41 @@ public class Document {
 		    	try {
 		    		Calendar cal = Calendar.getInstance();
 		    		m_id = getNextID(conn);
-		    		
+
 		    		File file = new File(m_filePath);
 		        	long fileSize = 0;
-		        	if(file.exists()) {
+		        	if (file.exists()) {
 		        		fileSize = file.length();
 		        	}
-		    		
+
 		    		CallableStatement cs = conn.prepareCall("{call ADD_DOKUMENT(?,?,?,?,?,?,?,?,?,?)}");
 		    		cs.setInt(1, m_id);
 		    		cs.setInt(2, m_organizationID);
 		    		cs.setInt(3, m_folderID);
 		    		cs.setString(4, " ");
 		    		cs.setTimestamp(5, CommonMethods.sqlDateFromDate(m_conservationDeadline), cal);
-		    		
-		    		if(fileSize > 0) {
+
+		    		if (fileSize > 0) {
 		    			cs.setLong(6, fileSize);
 		            } else {
 		            	cs.setNull(6, java.sql.Types.BIGINT);
 		            }
-		    		
+
 		    		cs.setInt(7, m_dvkContainerVersion);
 		    		cs.setString(8, m_guid);
-		    		
-		    		if(xTeePais != null) {
+
+		    		if (xTeePais != null) {
 		    			cs.setString(9, xTeePais.isikukood);
 		    			cs.setString(10, xTeePais.asutus);
 		    		} else {
 		    			cs.setString(9, null);
 		    			cs.setString(10, null);
 		    		}
-		    		
+
 		    		// Execute
 		    		cs.execute();
 		    		cs.close();
-		    		
+
 		    		// XML to CLOB
 		    		// int fileCharsCount = CommonMethods.getCharacterCountInFile(m_filePath);
 		    		// inStream = new FileInputStream(m_filePath);
@@ -268,10 +268,10 @@ public class Document {
                     } else {
                     	throw new Exception("Document file " + m_filePath + " of document "+ String.valueOf(m_id) +" does not exist and therefore cannot be saved into database!");
                     }
-		    		
+
 		    		// Execute
 		    		conn.commit();
-	    		} catch(Exception e) {
+	    		} catch (Exception e) {
 	    			logger.error("Exception while saving document to database: ", e);
 	    			conn.rollback();
                     conn.setAutoCommit(defaultAutoCommit);
@@ -284,7 +284,7 @@ public class Document {
 	                inReader = null;
 	                reader = null;
 	    		}
-	    		
+
 	    		// Salvestame dokumendi transpordiinfo
 	            for (Sending tmpSending: m_sendingList) {
 	                tmpSending.setDocumentID(m_id);
@@ -296,11 +296,11 @@ public class Document {
 	                    throw new AxisFault("Error saving addressing information to database!");
 	                }
 	            }
-	
+
 	            // Kinnitame andmebaasis tehtud muudatused
 	            conn.commit();
 	            conn.setAutoCommit(defaultAutoCommit);
-	    		
+
 	    	} else {
 	    		logger.error("Database connection is null.");
 	    	}
@@ -323,11 +323,11 @@ public class Document {
                 return false;
             }
         } catch (Exception ex) {
-        	logger.error(ex);
+        	logger.error(ex.getMessage(), ex);
             return false;
         }
     }
-    
+
     public static boolean updateExpirationDate(int id, Date expirationDate, Connection conn) {
         try {
             if (conn != null) {
@@ -343,7 +343,7 @@ public class Document {
                 return false;
             }
         } catch (Exception ex) {
-        	logger.error(ex);
+        	logger.error(ex.getMessage(), ex);
             return false;
         }
     }
@@ -351,12 +351,12 @@ public class Document {
     /**
      * Tagastab nimekirja etteantud dokumentidest, mille allalaadimiseks
      * on etteantud isikul õigus.
-     * 
+     *
      * @param organizationID			asutuse ID
      * @param folderID					kausta ID
      * @param userID					isiku ID
-     * @param divisionID				all�ksuse ID
-     * @param divisionShortName			all�ksuse lühinimetus
+     * @param divisionID				allüksuse ID
+     * @param divisionShortName			allüksuse lühinimetus
      * @param occupationID				ametikoha ID
      * @param occupationShortName		ametikoha lühinimetus
      * @param resultLimit				maksimaalne lubatud tulemuste arv
@@ -378,7 +378,7 @@ public class Document {
                 Calendar cal = Calendar.getInstance();
                 boolean defaultAutoCommit = conn.getAutoCommit();
                 conn.setAutoCommit(false);
-                
+
                 CallableStatement cs = conn.prepareCall("{call GET_DOCUMENTSSENTTO(?,?,?,?,?,?,?,?,?)}");
                 cs.setInt("organization_id", organizationID);
                 if (folderID >= 0) {
@@ -410,7 +410,7 @@ public class Document {
                 cs.setInt("result_limit", resultLimit);
                 cs.registerOutParameter("RC1", oracle.jdbc.OracleTypes.CURSOR);
                 cs.execute();
-                ResultSet rs = (ResultSet)cs.getObject("RC1");
+                ResultSet rs = (ResultSet) cs.getObject("RC1");
                 ArrayList<Document> result = new ArrayList<Document>();
                 int docCounter = 0;
                 while (rs.next()) {
@@ -422,7 +422,7 @@ public class Document {
                     item.setFolderID(rs.getInt("kaust_id"));
                     item.setConservationDeadline(rs.getTimestamp("sailitustahtaeg", cal));
                     item.setDvkContainerVersion(rs.getInt("versioon"));
-                    
+
                     // Loeme CLOB-ist dokumendi andmed
                     Clob tmpBlob = rs.getClob("sisu");
                     Reader r = tmpBlob.getCharacterStream();
@@ -443,7 +443,7 @@ public class Document {
                         out.close();
                         fos.close();
                     }
-                    
+
                     if (totalReadLength < 1) {
                         (new File(itemDataFile)).delete();
                         item.setFilePath(null);
@@ -453,23 +453,23 @@ public class Document {
                 }
                 rs.close();
                 cs.close();
-                
+
                 conn.commit();
                 conn.setAutoCommit(defaultAutoCommit);
-                
+
                 return result;
             } else {
                 return null;
             }
         } catch (Exception ex) {
-        	logger.error(ex);
+        	logger.error(ex.getMessage(), ex);
             return null;
         }
     }
 
     /**
      * Loob XML-i põhjal <code>Document</code> objekti.
-     * 
+     *
      * @param dataFile XML fail
      * @param organizationID organisatsiooni ID
      * @param conn andmebaasiühendus
@@ -486,19 +486,19 @@ public class Document {
             XMLStreamReader reader = inputFactory.createXMLStreamReader(new FileInputStream(dataFile), "UTF-8");
 
             // TEST
-            //OMElement omElement = new StAXOMBuilder(reader).getDocumentElement(); 
+            //OMElement omElement = new StAXOMBuilder(reader).getDocumentElement();
             //String xml = omElement.toStringWithConsume();
             //logger.debug("XML: " + xml);
-            
+
             // Teeme kindlaks, mis versiooni DVK konteinerist kasutatakse
             //int containerVersion = CommonMethods.determineContainerVersion(reader);
             //result.setDvkContainerVersion(containerVersion);
-            
+
             ArrayList<String> fileExtensionFilter = new ArrayList<String>(3);
             fileExtensionFilter.add("xml");
             fileExtensionFilter.add("ddoc");
             fileExtensionFilter.add("bdoc");
-            
+
             try {
             	int guidElementCount = 0;
                 while (reader.hasNext()) {
@@ -520,7 +520,7 @@ public class Document {
                             result.m_files = DocumentFile.getListFromContainerV2(reader, fileExtensionFilter);
                         } else if (reader.getLocalName().equalsIgnoreCase("konteineri_versioon") && reader.isStartElement()) {
                         	reader.next();
-                        	if(reader.isCharacters()) {
+                        	if (reader.isCharacters()) {
                         		String version = reader.getText().trim();
                         		try {
                         			Integer versionAsInteger = Integer.parseInt(version);
@@ -533,8 +533,8 @@ public class Document {
                         } else if (reader.getLocalName().equalsIgnoreCase("dokument_guid") && reader.isStartElement()) {
                         	logger.debug("Found element <dokument_guid>. Reading contents...");
                         	reader.next();
-                        	if(guidElementCount == 0) {
-                        		if(reader.isCharacters()) {
+                        	if (guidElementCount == 0) {
+                        		if (reader.isCharacters()) {
                         			String dokumentGuidTmp = reader.getText().trim();
                         			logger.debug("Found dokument GUID: " + dokumentGuidTmp);
                         			result.setGuid(dokumentGuidTmp);
@@ -544,7 +544,7 @@ public class Document {
                         }
                     }
                 }
-                
+
                 // Kontrollime veelkord andmed üle
                 // Kui "transport" plokk saatja ega saajate kohta infot ei sisalda,
                 // siis järelikult ei saadetud dokumenti edastamiseks.
@@ -567,7 +567,7 @@ public class Document {
                 if ((tmpSending.getRecipients() == null) || (tmpSending.getRecipients().size() < 1)) {
                     throw new AxisFault(CommonStructures.VIGA_VALE_ARV_VASTUVOTJAID);
                 }
-                
+
             } finally {
                 reader.close();
             }
@@ -582,12 +582,12 @@ public class Document {
     public static ArrayList<Document> sendingStatusFromXML(String dataFile, int requestVersion) {
         ArrayList<Document> result = new ArrayList<Document>();
         try {
-        	
-        	if(requestVersion == 1) {
+
+        	if (requestVersion == 1) {
         		XMLInputFactory inputFactory = XMLInputFactory.newInstance();
-                XMLStreamReader reader = inputFactory.createXMLStreamReader(new FileInputStream(dataFile), "UTF-8");                
+                XMLStreamReader reader = inputFactory.createXMLStreamReader(new FileInputStream(dataFile), "UTF-8");
                 try {
-                	
+
                 		while (reader.hasNext()) {
                             reader.next();
 
@@ -602,34 +602,34 @@ public class Document {
                                 }
                             }
                         }
-                    
+
                 } finally {
                     reader.close();
                 }
-                
+
         	} else {
                 org.w3c.dom.Document xmlDoc = CommonMethods.xmlDocumentFromFile(dataFile, true);
                 NodeList itemNodeList = xmlDoc.getElementsByTagName("item");
-                
-                if(itemNodeList != null) {
-                	for(int i = 0; i < itemNodeList.getLength(); i++) {
+
+                if (itemNodeList != null) {
+                	for (int i = 0; i < itemNodeList.getLength(); i++) {
                 		Document tmpDoc = new Document();
                 		boolean documentFilled = false;
                 		Node node = itemNodeList.item(i);
                 		NodeList childNodes = node.getChildNodes();
-                		if(childNodes != null) {
-                			for(int j = 0; j < childNodes.getLength(); j++) {
+                		if (childNodes != null) {
+                			for (int j = 0; j < childNodes.getLength(); j++) {
                 				Node childNode = childNodes.item(j);
-                				if(childNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE && childNode.getLocalName() != null && childNode.getLocalName().equalsIgnoreCase("dhl_id")) {
+                				if (childNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE && childNode.getLocalName() != null && childNode.getLocalName().equalsIgnoreCase("dhl_id")) {
                 					tmpDoc.setId(Integer.parseInt(childNode.getTextContent()));
                 					documentFilled = true;
                 				}
-                				if(childNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE && childNode.getLocalName() != null && childNode.getLocalName().equalsIgnoreCase("dokument_guid")) {
+                				if (childNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE && childNode.getLocalName() != null && childNode.getLocalName().equalsIgnoreCase("dokument_guid")) {
                 					tmpDoc.setGuid(childNode.getTextContent());
                 					documentFilled = true;
                 				}
                 			}
-                			if(documentFilled) {
+                			if (documentFilled) {
                 				result.add(tmpDoc);
                 			}
                 		}
@@ -637,13 +637,13 @@ public class Document {
                 }
         	}
         	return result;
-            
+
         } catch (Exception ex) {
-        	logger.error(ex);
+        	logger.error(ex.getMessage(), ex);
             return null;
         }
     }
-    
+
     public static ArrayList<ExpiredDocumentData> getExpiredDocuments(Connection conn) {
         try {
             if (conn != null) {
@@ -655,7 +655,7 @@ public class Document {
                     cs = conn.prepareCall("{call GET_EXPIREDDOCUMENTS(?)}");
                     cs.registerOutParameter("RC1", oracle.jdbc.OracleTypes.CURSOR);
                     cs.execute();
-                    rs = (ResultSet)cs.getObject("RC1");
+                    rs = (ResultSet) cs.getObject("RC1");
                     while (rs.next()) {
                         ExpiredDocumentData item = new ExpiredDocumentData();
                         item.setDocumentID(rs.getInt("dokument_id"));
@@ -663,8 +663,7 @@ public class Document {
                         item.setConservationDeadline(rs.getTimestamp("sailitustahtaeg", cal));
                         result.add(item);
                     }
-                }
-                finally {
+                } finally {
                     rs.close();
                     cs.close();
                 }
@@ -673,7 +672,7 @@ public class Document {
                 return null;
             }
         } catch (Exception ex) {
-        	logger.error(ex);
+        	logger.error(ex.getMessage(), ex);
             return null;
         }
     }

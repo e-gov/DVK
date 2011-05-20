@@ -1,4 +1,4 @@
-CREATE OR REPLACE 
+CREATE OR REPLACE
 PACKAGE globalPkg AUTHID CURRENT_USER AS
     identity number(38,0);
     log_identity number(38,0);
@@ -822,7 +822,7 @@ into    klassifikaatori_tyyp(
         nimetus)
 values  (2,
         'Dokumendi olek');
-        
+
 insert
 into    klassifikaator(
         klassifikaator_id,
@@ -1195,7 +1195,7 @@ table   vastuvotja_mall
     osakonna_nr varchar2(100),
     osakonna_nimi varchar2(500),
     saatmisviis_id number(38,0) not null,
-    asutuse_nimi varchar2(500), 
+    asutuse_nimi varchar2(500),
     allyksus_id number(38,0),
     tingimus_xpath varchar2(4000),
     allyksuse_lyhinimetus varchar2(25) null,
@@ -1371,189 +1371,189 @@ foreign key (staatus_id)
 referencing klassifikaator (klassifikaator_id)
 /
 
-CREATE INDEX "STAATUSE_AJALUGU_FK1_IDX" ON "STAATUSE_AJALUGU" ("VASTUVOTJA_ID") 
-PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+CREATE INDEX "STAATUSE_AJALUGU_FK1_IDX" ON "STAATUSE_AJALUGU" ("VASTUVOTJA_ID")
+PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS
 STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
 PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT)
 /
 
 /* LOGIMISPROTSEDUURID */
 
-CREATE OR REPLACE PACKAGE DVKLOG AS 
-  
+CREATE OR REPLACE PACKAGE DVKLOG AS
+
   -- Logimise muutujad
   xtee_isikukood VARCHAR2(100);
-  xtee_asutus VARCHAR2(100);  
+  xtee_asutus VARCHAR2(100);
 
   PROCEDURE LOG_DOKUMENT (
     dokument_new IN dokument%ROWTYPE,
     dokument_old IN dokument%ROWTYPE,
     operation IN VARCHAR2
   );
-  
+
   PROCEDURE LOG_TRANSPORT (
     transport_new IN transport%ROWTYPE,
     transport_old IN transport%ROWTYPE,
     operation IN VARCHAR2
   );
-  
+
   PROCEDURE LOG_ASUTUS (
     asutus_new IN asutus%ROWTYPE,
     asutus_old IN asutus%ROWTYPE,
     operation IN VARCHAR2
   );
-  
+
   PROCEDURE LOG_DOKUMENDI_FRAGMENT (
     dokumendi_fragment_new IN dokumendi_fragment%ROWTYPE,
     dokumendi_fragment_old IN dokumendi_fragment%ROWTYPE,
     operation IN VARCHAR2
   );
-  
+
   PROCEDURE LOG_KAUST (
     kaust_new IN kaust%ROWTYPE,
     kaust_old IN kaust%ROWTYPE,
     operation IN VARCHAR2
   );
-  
+
   PROCEDURE LOG_SAATJA (
     saatja_new IN saatja%ROWTYPE,
     saatja_old IN saatja%ROWTYPE,
     operation IN VARCHAR2
   );
-  
+
   PROCEDURE LOG_STAATUSE_AJALUGU (
     staatuse_ajalugu_new IN staatuse_ajalugu%ROWTYPE,
     staatuse_ajalugu_old IN staatuse_ajalugu%ROWTYPE,
     operation IN VARCHAR2
   );
-  
+
   PROCEDURE LOG_VAHENDAJA (
     vahendaja_new IN vahendaja%ROWTYPE,
     vahendaja_old IN vahendaja%ROWTYPE,
     operation IN VARCHAR2
   );
-  
+
   PROCEDURE LOG_VASTUVOTJA (
     vastuvotja_new IN vastuvotja%ROWTYPE,
     vastuvotja_old IN vastuvotja%ROWTYPE,
     operation IN VARCHAR2
   );
-  
+
   PROCEDURE LOG_ALLKIRI (
     allkiri_new IN allkiri%ROWTYPE,
     allkiri_old IN allkiri%ROWTYPE,
     operation IN VARCHAR2
   );
-  
-  
+
+
   PROCEDURE LOG_ALLYKSUS (
     allyksus_new IN allyksus%ROWTYPE,
     allyksus_old IN allyksus%ROWTYPE,
     operation IN VARCHAR2
   );
-  
+
   PROCEDURE LOG_AMETIKOHT (
     ametikoht_new IN ametikoht%ROWTYPE,
     ametikoht_old IN ametikoht%ROWTYPE,
     operation IN VARCHAR2
   );
-  
+
   PROCEDURE LOG_AMETIKOHT_TAITMINE (
     ametikoht_taitmine_new IN ametikoht_taitmine%ROWTYPE,
     ametikoht_taitmine_old IN ametikoht_taitmine%ROWTYPE,
     operation IN VARCHAR2
   );
-  
+
   PROCEDURE LOG_DOKUMENDI_AJALUGU (
     dokumendi_ajalugu_new IN dokumendi_ajalugu%ROWTYPE,
     dokumendi_ajalugu_old IN dokumendi_ajalugu%ROWTYPE,
     operation IN VARCHAR2
   );
-  
+
   PROCEDURE LOG_DOKUMENDI_FAIL (
     dokumendi_fail_new IN dokumendi_fail%ROWTYPE,
     dokumendi_fail_old IN dokumendi_fail%ROWTYPE,
     operation IN VARCHAR2
   );
-  
+
   PROCEDURE LOG_DOKUMENDI_METAANDMED (
     dokumendi_metaandmed_new IN dokumendi_metaandmed%ROWTYPE,
     dokumendi_metaandmed_old IN dokumendi_metaandmed%ROWTYPE,
     operation IN VARCHAR2
   );
-  
+
   PROCEDURE LOG_DYNAAMILISED_METAANDMED (
     dynaamilised_metaandmed_new IN dynaamilised_metaandmed%ROWTYPE,
     dynaamilised_metaandmed_old IN dynaamilised_metaandmed%ROWTYPE,
     operation IN VARCHAR2
   );
-  
+
   PROCEDURE LOG_EHAK (
     ehak_new IN ehak%ROWTYPE,
     ehak_old IN ehak%ROWTYPE,
     operation IN VARCHAR2
   );
-  
+
   PROCEDURE LOG_ISIK (
     isik_new IN isik%ROWTYPE,
     isik_old IN isik%ROWTYPE,
     operation IN VARCHAR2
   );
-  
+
   PROCEDURE LOG_KLASSIFIKAATOR (
     klassifikaator_new IN klassifikaator%ROWTYPE,
     klassifikaator_old IN klassifikaator%ROWTYPE,
     operation IN VARCHAR2
   );
-  
+
   PROCEDURE LOG_KLASSIFIKAATORI_TYYP (
     klassifikaatori_tyyp_new IN klassifikaatori_tyyp%ROWTYPE,
     klassifikaatori_tyyp_old IN klassifikaatori_tyyp%ROWTYPE,
     operation IN VARCHAR2
   );
-  
+
   PROCEDURE LOG_KONVERSIOON (
     konversioon_new IN konversioon%ROWTYPE,
     konversioon_old IN konversioon%ROWTYPE,
     operation IN VARCHAR2
   );
-  
+
   PROCEDURE LOG_OIGUS_ANTUD (
     oigus_antud_new IN oigus_antud%ROWTYPE,
     oigus_antud_old IN oigus_antud%ROWTYPE,
     operation IN VARCHAR2
   );
-  
+
   PROCEDURE LOG_OIGUS_OBJEKTILE (
     oigus_objektile_new IN oigus_objektile%ROWTYPE,
     oigus_objektile_old IN oigus_objektile%ROWTYPE,
     operation IN VARCHAR2
   );
-  
+
   PROCEDURE LOG_PARAMEETRID (
     parameetrid_new IN parameetrid%ROWTYPE,
     parameetrid_old IN parameetrid%ROWTYPE,
     operation IN VARCHAR2
   );
-  
+
   PROCEDURE LOG_SERVER (
     server_new IN server%ROWTYPE,
     server_old IN server%ROWTYPE,
     operation IN VARCHAR2
   );
-  
+
   PROCEDURE LOG_VASTUVOTJA_MALL (
     vastuvotja_mall_new IN vastuvotja_mall%ROWTYPE,
     vastuvotja_mall_old IN vastuvotja_mall%ROWTYPE,
     operation IN VARCHAR2
   );
-  
+
   PROCEDURE LOG_VASTUVOTJA_STAATUS (
     vastuvotja_staatus_new IN vastuvotja_staatus%ROWTYPE,
     vastuvotja_staatus_old IN vastuvotja_staatus%ROWTYPE,
     operation IN VARCHAR2
   );
-  
+
   PROCEDURE LOG_LOGI (
     logi_new IN logi%ROWTYPE,
     logi_old IN logi%ROWTYPE,
@@ -1570,20 +1570,20 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     dokument_new IN dokument%ROWTYPE,
     dokument_old IN dokument%ROWTYPE,
     operation IN VARCHAR2
-  ) AS  
-  
+  ) AS
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'DOKUMENT';
-  
+
   BEGIN
-  
+
     --DEBUG('DVKLOG.LOG_DOKUMENT started...');
-  
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-  
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -1592,12 +1592,12 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
             and c.constraint_type = 'P'
             and upper(cc.table_name) = tablename
             and rownum < 2;
-  
+
     -- dokument_id changed
-    IF(NVL(dokument_new.dokument_id, 0) != NVL(dokument_old.dokument_id, 0)) THEN    
+    IF(NVL(dokument_new.dokument_id, 0) != NVL(dokument_old.dokument_id, 0)) THEN
       --DEBUG('dokument_id changed');
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('dokument_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -1642,12 +1642,12 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- asutus_id changed
-    IF(NVL(dokument_new.asutus_id, 0) != NVL(dokument_old.asutus_id, 0)) THEN    
+    IF(NVL(dokument_new.asutus_id, 0) != NVL(dokument_old.asutus_id, 0)) THEN
       --DEBUG('asutus_id changed');
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = upper('dokument') AND upper(column_name) = upper('asutus_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -1692,12 +1692,12 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- kaust_id changed
-    IF(NVL(dokument_new.kaust_id, 0) != NVL(dokument_old.kaust_id, 0)) THEN    
+    IF(NVL(dokument_new.kaust_id, 0) != NVL(dokument_old.kaust_id, 0)) THEN
       --DEBUG('kaust_id changed');
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = upper('dokument') AND upper(column_name) = upper('kaust_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -1742,12 +1742,12 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- sailitustahtaeg changed
-    IF(NVL(dokument_new.sailitustahtaeg, sysdate) != NVL(dokument_old.sailitustahtaeg, sysdate)) THEN    
+    IF(NVL(dokument_new.sailitustahtaeg, sysdate) != NVL(dokument_old.sailitustahtaeg, sysdate)) THEN
       --DEBUG('sailitustahtaeg changed');
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = upper('dokument') AND upper(column_name) = upper('sailitustahtaeg');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -1792,12 +1792,12 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- eelmise_versiooni_id changed
-    IF(NVL(dokument_new.eelmise_versiooni_id, 0) != NVL(dokument_old.eelmise_versiooni_id, 0)) THEN    
+    IF(NVL(dokument_new.eelmise_versiooni_id, 0) != NVL(dokument_old.eelmise_versiooni_id, 0)) THEN
       --DEBUG('eelmise_versiooni_id changed');
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = upper('dokument') AND upper(column_name) = upper('eelmise_versiooni_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -1842,12 +1842,12 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- versioon changed
-    IF(NVL(dokument_new.versioon, 0) != NVL(dokument_old.versioon, 0)) THEN    
+    IF(NVL(dokument_new.versioon, 0) != NVL(dokument_old.versioon, 0)) THEN
       --DEBUG('versioon changed');
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = upper('dokument') AND upper(column_name) = upper('versioon');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -1892,12 +1892,12 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- suurus changed
-    IF(NVL(dokument_new.suurus, 0) != NVL(dokument_old.suurus, 0)) THEN    
+    IF(NVL(dokument_new.suurus, 0) != NVL(dokument_old.suurus, 0)) THEN
       --DEBUG('suurus changed');
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = upper('dokument') AND upper(column_name) = upper('suurus');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -1942,12 +1942,12 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- guid changed
-    IF(NVL(dokument_new.guid, ' ') != NVL(dokument_old.guid, ' ')) THEN    
+    IF(NVL(dokument_new.guid, ' ') != NVL(dokument_old.guid, ' ')) THEN
       --DEBUG('guid changed');
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = upper('dokument') AND upper(column_name) = upper('guid');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -1992,7 +1992,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
   END LOG_DOKUMENT;
 
   PROCEDURE LOG_TRANSPORT (
@@ -2000,18 +2000,18 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     transport_old IN transport%ROWTYPE,
     operation IN VARCHAR2
   ) AS
-  
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'TRANSPORT';
     primary_key_value NUMBER(38,0) := transport_old.transport_id;
-    
+
   BEGIN
-  
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-  
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -2020,11 +2020,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
             and c.constraint_type = 'P'
             and upper(cc.table_name) = tablename
             and rownum < 2;
-  
+
     -- transport_id changed
     IF(NVL(transport_new.transport_id, 0) != NVL(transport_old.transport_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('transport_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -2069,11 +2069,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
     -- dokument_id changed
     IF(NVL(transport_new.dokument_id, 0) != NVL(transport_old.dokument_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('dokument_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -2118,11 +2118,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
     -- saatmise_algus changed
     IF(NVL(transport_new.saatmise_algus, sysdate) != NVL(transport_old.saatmise_algus, sysdate)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('saatmise_algus');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -2167,11 +2167,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
     -- saatmise_lopp changed
     IF(NVL(transport_new.saatmise_lopp, sysdate) != NVL(transport_old.saatmise_lopp, sysdate)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('saatmise_lopp');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -2216,11 +2216,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
     -- staatus_id changed
     IF(NVL(transport_new.staatus_id, 0) != NVL(transport_old.staatus_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('staatus_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -2265,7 +2265,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
   END LOG_TRANSPORT;
 
   PROCEDURE LOG_ASUTUS (
@@ -2273,19 +2273,19 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     asutus_old IN asutus%ROWTYPE,
     operation IN VARCHAR2
   ) AS
-  
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'ASUTUS';
     primary_key_value NUMBER(38,0) := asutus_old.asutus_id;
-  
+
   BEGIN
-  
+
     -- asutus_id changed
     IF(NVL(asutus_new.asutus_id, 0) != NVL(asutus_old.asutus_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('asutus_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -2330,11 +2330,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
     -- registrikood changed
     IF(NVL(asutus_new.registrikood, ' ') != NVL(asutus_old.registrikood, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('registrikood');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -2379,11 +2379,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
     -- e_registrikood changed
     IF(NVL(asutus_new.e_registrikood, ' ') != NVL(asutus_old.e_registrikood, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('e_registrikood');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -2428,11 +2428,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
     -- ks_asutus_id changed
     IF(NVL(asutus_new.ks_asutus_id, 0) != NVL(asutus_old.ks_asutus_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('ks_asutus_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -2477,11 +2477,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- ks_asutus_kood changed
     IF(NVL(asutus_new.ks_asutus_kood, ' ') != NVL(asutus_old.ks_asutus_kood, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('ks_asutus_kood');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -2526,11 +2526,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- nimetus changed
     IF(NVL(asutus_new.nimetus, ' ') != NVL(asutus_old.nimetus, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('nimetus');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -2575,11 +2575,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- lnimi changed
     IF(NVL(asutus_new.lnimi, ' ') != NVL(asutus_old.lnimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('lnimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -2624,11 +2624,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- liik1 changed
     IF(NVL(asutus_new.liik1, ' ') != NVL(asutus_old.liik1, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('liik1');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -2673,11 +2673,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- liik2 changed
     IF(NVL(asutus_new.liik2, ' ') != NVL(asutus_old.liik2, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('liik2');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -2722,11 +2722,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- tegevusala changed
     IF(NVL(asutus_new.tegevusala, ' ') != NVL(asutus_old.tegevusala, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('tegevusala');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -2771,11 +2771,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- tegevuspiirkond changed
     IF(NVL(asutus_new.tegevuspiirkond, ' ') != NVL(asutus_old.tegevuspiirkond, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('tegevuspiirkond');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -2820,11 +2820,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- maakond changed
     IF(NVL(asutus_new.maakond, ' ') != NVL(asutus_old.maakond, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('maakond');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -2869,11 +2869,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- asukoht changed
     IF(NVL(asutus_new.asukoht, ' ') != NVL(asutus_old.asukoht, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('asukoht');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -2918,11 +2918,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- aadress changed
     IF(NVL(asutus_new.aadress, ' ') != NVL(asutus_old.aadress, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('aadress');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -2967,11 +2967,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- postikood changed
     IF(NVL(asutus_new.postikood, ' ') != NVL(asutus_old.postikood, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('postikood');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -3016,11 +3016,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- telefon changed
     IF(NVL(asutus_new.telefon, ' ') != NVL(asutus_old.telefon, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('telefon');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -3065,11 +3065,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- faks changed
     IF(NVL(asutus_new.faks, ' ') != NVL(asutus_old.faks, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('faks');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -3114,11 +3114,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- e_post changed
     IF(NVL(asutus_new.e_post, ' ') != NVL(asutus_old.e_post, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('e_post');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -3163,11 +3163,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- www changed
     IF(NVL(asutus_new.www, ' ') != NVL(asutus_old.www, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('www');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -3212,11 +3212,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- logo changed
     IF(NVL(asutus_new.logo, ' ') != NVL(asutus_old.logo, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('logo');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -3261,11 +3261,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- asutamise_kp changed
     IF(NVL(asutus_new.asutamise_kp, sysdate) != NVL(asutus_old.asutamise_kp, sysdate)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('asutamise_kp');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -3310,11 +3310,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- mood_akt_nimi changed
     IF(NVL(asutus_new.mood_akt_nimi, ' ') != NVL(asutus_old.mood_akt_nimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('mood_akt_nimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -3359,11 +3359,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- mood_akt_nr changed
     IF(NVL(asutus_new.mood_akt_nr, ' ') != NVL(asutus_old.mood_akt_nr, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('mood_akt_nr');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -3408,11 +3408,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- mood_akt_kp changed
     IF(NVL(asutus_new.mood_akt_kp, sysdate) != NVL(asutus_old.mood_akt_kp, sysdate)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('mood_akt_kp');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -3457,11 +3457,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- pm_akt_nimi changed
     IF(NVL(asutus_new.pm_akt_nimi, ' ') != NVL(asutus_old.pm_akt_nimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('pm_akt_nimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -3506,11 +3506,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- pm_akt_nr changed
     IF(NVL(asutus_new.pm_akt_nr, ' ') != NVL(asutus_old.pm_akt_nr, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('pm_akt_nr');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -3555,11 +3555,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- pm_kinnitamise_kp changed
     IF(NVL(asutus_new.pm_kinnitamise_kp, sysdate) != NVL(asutus_old.pm_kinnitamise_kp, sysdate)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('pm_kinnitamise_kp');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -3604,11 +3604,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- pm_kande_kp changed
     IF(NVL(asutus_new.pm_kande_kp, sysdate) != NVL(asutus_old.pm_kande_kp, sysdate)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('pm_kande_kp');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -3653,11 +3653,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- created changed
     IF(NVL(asutus_new.created, sysdate) != NVL(asutus_old.created, sysdate)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('created');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -3702,11 +3702,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- last_modified changed
     IF(NVL(asutus_new.last_modified, sysdate) != NVL(asutus_old.last_modified, sysdate)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('last_modified');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -3751,11 +3751,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- username changed
     IF(NVL(asutus_new.username, ' ') != NVL(asutus_old.username, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('username');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -3800,11 +3800,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- params changed
     IF(NVL(asutus_new.params, ' ') != NVL(asutus_old.params, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('params');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -3849,11 +3849,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- dhl_otse_saatmine changed
     IF(NVL(asutus_new.dhl_otse_saatmine, 0) != NVL(asutus_old.dhl_otse_saatmine, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('dhl_otse_saatmine');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -3898,11 +3898,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- dhl_saatmine changed
     IF(NVL(asutus_new.dhl_saatmine, 0) != NVL(asutus_old.dhl_saatmine, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('dhl_saatmine');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -3947,11 +3947,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
     -- dhs_nimetus changed
     IF(NVL(asutus_new.dhs_nimetus, ' ') != NVL(asutus_old.dhs_nimetus, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('dhs_nimetus');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -3996,11 +3996,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
     -- toetatav_dvk_versioon changed
     IF(NVL(asutus_new.toetatav_dvk_versioon, ' ') != NVL(asutus_old.toetatav_dvk_versioon, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('toetatav_dvk_versioon');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -4045,11 +4045,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- server_id changed
     IF(NVL(asutus_new.server_id, 0) != NVL(asutus_old.server_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('server_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -4094,11 +4094,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- aar_id changed
     IF(NVL(asutus_new.aar_id, 0) != NVL(asutus_old.aar_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('aar_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -4143,7 +4143,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
   END LOG_ASUTUS;
 
   PROCEDURE LOG_DOKUMENDI_FRAGMENT (
@@ -4151,18 +4151,18 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     dokumendi_fragment_old IN dokumendi_fragment%ROWTYPE,
     operation IN VARCHAR2
   ) AS
-  
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'DOKUMENDI_FRAGMENT';
     primary_key_value NUMBER(38,0) := dokumendi_fragment_old.fragment_id;
-    
+
   BEGIN
-  
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-  
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -4171,11 +4171,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
             and c.constraint_type = 'P'
             and upper(cc.table_name) = tablename
             and rownum < 2;
-            
+
     -- fragment_id changed
     IF(NVL(dokumendi_fragment_new.fragment_id, 0) != NVL(dokumendi_fragment_old.fragment_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('fragment_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -4220,11 +4220,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-            
+
     -- sissetulev changed
     IF(NVL(dokumendi_fragment_new.sissetulev, 0) != NVL(dokumendi_fragment_old.sissetulev, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('sissetulev');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -4269,11 +4269,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- asutus_id changed
     IF(NVL(dokumendi_fragment_new.asutus_id, 0) != NVL(dokumendi_fragment_old.asutus_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('asutus_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -4318,11 +4318,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- edastus_id changed
     IF(NVL(dokumendi_fragment_new.edastus_id, ' ') != NVL(dokumendi_fragment_old.edastus_id, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('edastus_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -4367,11 +4367,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- fragment_nr changed
     IF(NVL(dokumendi_fragment_new.fragment_nr, 0) != NVL(dokumendi_fragment_old.fragment_nr, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('fragment_nr');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -4416,11 +4416,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- fragmente_kokku changed
     IF(NVL(dokumendi_fragment_new.fragmente_kokku, 0) != NVL(dokumendi_fragment_old.fragmente_kokku, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('fragmente_kokku');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -4465,11 +4465,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- loodud changed
     IF(NVL(dokumendi_fragment_new.loodud, sysdate) != NVL(dokumendi_fragment_old.loodud, sysdate)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('loodud');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -4514,7 +4514,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
   END LOG_DOKUMENDI_FRAGMENT;
 
   PROCEDURE LOG_KAUST (
@@ -4522,18 +4522,18 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     kaust_old IN kaust%ROWTYPE,
     operation IN VARCHAR2
   ) AS
-  
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'KAUST';
     primary_key_value NUMBER(38,0) := kaust_old.kaust_id;
-  
+
   BEGIN
-  
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-  
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -4542,12 +4542,12 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
             and c.constraint_type = 'P'
             and upper(cc.table_name) = tablename
             and rownum < 2;
-  
-  
+
+
     -- kaust_id changed
     IF(NVL(kaust_new.kaust_id, 0) != NVL(kaust_old.kaust_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('kaust_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -4592,11 +4592,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- nimi changed
     IF(NVL(kaust_new.nimi, ' ') != NVL(kaust_old.nimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('nimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -4641,11 +4641,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- ylemkaust_id changed
     IF(NVL(kaust_new.ylemkaust_id, 0) != NVL(kaust_old.ylemkaust_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('ylemkaust_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -4690,11 +4690,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- asutus_id changed
     IF(NVL(kaust_new.asutus_id, 0) != NVL(kaust_old.asutus_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('asutus_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -4739,11 +4739,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- kausta_number changed
     IF(NVL(kaust_new.kausta_number, ' ') != NVL(kaust_old.kausta_number, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('kausta_number');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -4788,7 +4788,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
   END LOG_KAUST;
 
   PROCEDURE LOG_SAATJA (
@@ -4796,18 +4796,18 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     saatja_old IN saatja%ROWTYPE,
     operation IN VARCHAR2
   ) AS
-  
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'SAATJA';
     primary_key_value NUMBER(38,0) := saatja_old.saatja_id;
-  
+
   BEGIN
-  
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-  
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -4816,11 +4816,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
             and c.constraint_type = 'P'
             and upper(cc.table_name) = tablename
             and rownum < 2;
-            
+
     -- saatja_id changed
     IF(NVL(saatja_new.saatja_id, 0) != NVL(saatja_old.saatja_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('saatja_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -4865,11 +4865,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- transport_id changed
     IF(NVL(saatja_new.transport_id, 0) != NVL(saatja_old.transport_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('transport_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -4914,11 +4914,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- asutus_id changed
     IF(NVL(saatja_new.asutus_id, 0) != NVL(saatja_old.asutus_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('asutus_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -4963,11 +4963,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- ametikoht_id changed
     IF(NVL(saatja_new.ametikoht_id, 0) != NVL(saatja_old.ametikoht_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('ametikoht_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -5012,11 +5012,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- isikukood changed
     IF(NVL(saatja_new.isikukood, ' ') != NVL(saatja_old.isikukood, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('isikukood');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -5061,11 +5061,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- nimi changed
     IF(NVL(saatja_new.nimi, ' ') != NVL(saatja_old.nimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('nimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -5110,11 +5110,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- email changed
     IF(NVL(saatja_new.email, ' ') != NVL(saatja_old.email, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('email');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -5159,11 +5159,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- osakonna_nr changed
     IF(NVL(saatja_new.osakonna_nr, ' ') != NVL(saatja_old.osakonna_nr, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('osakonna_nr');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -5208,11 +5208,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- osakonna_nimi changed
     IF(NVL(saatja_new.osakonna_nimi, ' ') != NVL(saatja_old.osakonna_nimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('osakonna_nimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -5257,11 +5257,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- asutuse_nimi changed
     IF(NVL(saatja_new.asutuse_nimi, ' ') != NVL(saatja_old.asutuse_nimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('asutuse_nimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -5306,11 +5306,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- allyksus_id changed
     IF(NVL(saatja_new.allyksus_id, 0) != NVL(saatja_old.allyksus_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('allyksus_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -5355,11 +5355,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- allyksuse_lyhinimetus changed
     IF(NVL(saatja_new.allyksuse_lyhinimetus, ' ') != NVL(saatja_old.allyksuse_lyhinimetus, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('allyksuse_lyhinimetus');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -5404,11 +5404,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- ametikoha_lyhinimetus changed
     IF(NVL(saatja_new.ametikoha_lyhinimetus, ' ') != NVL(saatja_old.ametikoha_lyhinimetus, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('ametikoha_lyhinimetus');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -5453,7 +5453,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
   END LOG_SAATJA;
 
   PROCEDURE LOG_STAATUSE_AJALUGU (
@@ -5461,18 +5461,18 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     staatuse_ajalugu_old IN staatuse_ajalugu%ROWTYPE,
     operation IN VARCHAR2
   ) AS
-    
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'STAATUSE_AJALUGU';
     primary_key_value NUMBER(38,0) := staatuse_ajalugu_old.staatuse_ajalugu_id;
-  
+
   BEGIN
-  
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-  
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -5481,11 +5481,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
             and c.constraint_type = 'P'
             and upper(cc.table_name) = tablename
             and rownum < 2;
-         
+
     -- staatuse_ajalugu_id changed
     IF(NVL(staatuse_ajalugu_new.staatuse_ajalugu_id, 0) != NVL(staatuse_ajalugu_old.staatuse_ajalugu_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('staatuse_ajalugu_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -5530,11 +5530,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-            
+
     -- vastuvotja_id changed
     IF(NVL(staatuse_ajalugu_new.vastuvotja_id, 0) != NVL(staatuse_ajalugu_old.vastuvotja_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('vastuvotja_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -5579,11 +5579,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- staatus_id changed
     IF(NVL(staatuse_ajalugu_new.staatus_id, 0) != NVL(staatuse_ajalugu_old.staatus_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('staatus_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -5628,11 +5628,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-            
+
     -- staatuse_muutmise_aeg changed
     IF(NVL(staatuse_ajalugu_new.staatuse_muutmise_aeg, sysdate) != NVL(staatuse_ajalugu_old.staatuse_muutmise_aeg, sysdate)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('staatuse_muutmise_aeg');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -5677,11 +5677,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- fault_code changed
     IF(NVL(staatuse_ajalugu_new.fault_code, ' ') != NVL(staatuse_ajalugu_old.fault_code, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('fault_code');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -5726,11 +5726,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- fault_actor changed
     IF(NVL(staatuse_ajalugu_new.fault_actor, ' ') != NVL(staatuse_ajalugu_old.fault_actor, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('fault_actor');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -5775,11 +5775,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- fault_string changed
     IF(NVL(staatuse_ajalugu_new.fault_string, ' ') != NVL(staatuse_ajalugu_old.fault_string, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('fault_string');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -5824,11 +5824,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- fault_detail changed
     IF(NVL(staatuse_ajalugu_new.fault_detail, ' ') != NVL(staatuse_ajalugu_old.fault_detail, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('fault_detail');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -5873,11 +5873,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- vastuvotja_staatus_id changed
     IF(NVL(staatuse_ajalugu_new.vastuvotja_staatus_id, 0) != NVL(staatuse_ajalugu_old.vastuvotja_staatus_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('vastuvotja_staatus_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -5922,7 +5922,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-            
+
   END LOG_STAATUSE_AJALUGU;
 
   PROCEDURE LOG_VAHENDAJA (
@@ -5930,18 +5930,18 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     vahendaja_old IN vahendaja%ROWTYPE,
     operation IN VARCHAR2
   ) AS
-  
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'VAHENDAJA';
     primary_key_value NUMBER(38,0) := vahendaja_old.vahendaja_id;
-  
+
   BEGIN
-  
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-  
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -5950,11 +5950,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
             and c.constraint_type = 'P'
             and upper(cc.table_name) = tablename
             and rownum < 2;
-  
+
     -- vahendaja_id changed
     IF(NVL(vahendaja_new.vahendaja_id, 0) != NVL(vahendaja_old.vahendaja_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('vahendaja_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -5999,11 +5999,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
     -- transport_id changed
     IF(NVL(vahendaja_new.transport_id, 0) != NVL(vahendaja_old.transport_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('transport_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -6048,11 +6048,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- asutus_id changed
     IF(NVL(vahendaja_new.asutus_id, 0) != NVL(vahendaja_old.asutus_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('asutus_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -6097,11 +6097,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- ametikoht_id changed
     IF(NVL(vahendaja_new.ametikoht_id, 0) != NVL(vahendaja_old.ametikoht_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('ametikoht_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -6146,12 +6146,12 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
-    
+
+
     -- isikukood changed
     IF(NVL(vahendaja_new.isikukood, ' ') != NVL(vahendaja_old.isikukood, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('isikukood');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -6196,11 +6196,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- nimi changed
     IF(NVL(vahendaja_new.nimi, ' ') != NVL(vahendaja_old.nimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('nimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -6245,11 +6245,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- email changed
     IF(NVL(vahendaja_new.email, ' ') != NVL(vahendaja_old.email, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('email');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -6294,11 +6294,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- osakonna_nr changed
     IF(NVL(vahendaja_new.osakonna_nr, ' ') != NVL(vahendaja_old.osakonna_nr, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('osakonna_nr');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -6343,11 +6343,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- osakonna_nimi changed
     IF(NVL(vahendaja_new.osakonna_nimi, ' ') != NVL(vahendaja_old.osakonna_nimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('osakonna_nimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -6392,11 +6392,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- asutuse_nimi changed
     IF(NVL(vahendaja_new.asutuse_nimi, ' ') != NVL(vahendaja_old.asutuse_nimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('asutuse_nimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -6440,12 +6440,12 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_isikukood,
         DVKLOG.xtee_asutus
       );
-    END IF;    
-    
+    END IF;
+
     -- allyksus_id changed
     IF(NVL(vahendaja_new.allyksus_id, 0) != NVL(vahendaja_old.allyksus_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('allyksus_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -6490,11 +6490,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
     -- allyksuse_lyhinimetus changed
     IF(NVL(vahendaja_new.allyksuse_lyhinimetus, ' ') != NVL(vahendaja_old.allyksuse_lyhinimetus, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('allyksuse_lyhinimetus');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -6539,11 +6539,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- ametikoha_lyhinimetus changed
     IF(NVL(vahendaja_new.ametikoha_lyhinimetus, ' ') != NVL(vahendaja_old.ametikoha_lyhinimetus, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('ametikoha_lyhinimetus');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -6588,26 +6588,26 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
   END;
-  
+
   PROCEDURE LOG_VASTUVOTJA (
     vastuvotja_new IN vastuvotja%ROWTYPE,
     vastuvotja_old IN vastuvotja%ROWTYPE,
     operation IN VARCHAR2
   ) AS
-    
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'VASTUVOTJA';
     primary_key_value NUMBER(38,0) := vastuvotja_old.vastuvotja_id;
-  
+
   BEGIN
-  
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-    
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -6616,11 +6616,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
             and c.constraint_type = 'P'
             and upper(cc.table_name) = tablename
             and rownum < 2;
-  
+
     -- vastuvotja_id changed
     IF(NVL(vastuvotja_new.vastuvotja_id, 0) != NVL(vastuvotja_old.vastuvotja_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('vastuvotja_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -6665,11 +6665,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- transport_id changed
     IF(NVL(vastuvotja_new.transport_id, 0) != NVL(vastuvotja_old.transport_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('transport_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -6714,11 +6714,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- asutus_id changed
     IF(NVL(vastuvotja_new.asutus_id, 0) != NVL(vastuvotja_old.asutus_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('asutus_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -6763,11 +6763,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- ametikoht_id changed
     IF(NVL(vastuvotja_new.ametikoht_id, 0) != NVL(vastuvotja_old.ametikoht_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('ametikoht_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -6812,11 +6812,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- isikukood changed
     IF(NVL(vastuvotja_new.isikukood, ' ') != NVL(vastuvotja_old.isikukood, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('isikukood');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -6861,11 +6861,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- nimi changed
     IF(NVL(vastuvotja_new.nimi, ' ') != NVL(vastuvotja_old.nimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('nimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -6910,11 +6910,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- email changed
     IF(NVL(vastuvotja_new.email, ' ') != NVL(vastuvotja_old.email, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('email');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -6959,11 +6959,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- osakonna_nr changed
     IF(NVL(vastuvotja_new.osakonna_nr, ' ') != NVL(vastuvotja_old.osakonna_nr, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('osakonna_nr');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -7008,11 +7008,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- osakonna_nimi changed
     IF(NVL(vastuvotja_new.osakonna_nimi, ' ') != NVL(vastuvotja_old.osakonna_nimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('osakonna_nimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -7057,11 +7057,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- saatmisviis_id changed
     IF(NVL(vastuvotja_new.saatmisviis_id, 0) != NVL(vastuvotja_old.saatmisviis_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('saatmisviis_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -7106,11 +7106,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- staatus_id changed
     IF(NVL(vastuvotja_new.staatus_id, 0) != NVL(vastuvotja_old.staatus_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('staatus_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -7155,11 +7155,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- saatmise_algus changed
     IF(NVL(vastuvotja_new.saatmise_algus, sysdate) != NVL(vastuvotja_old.saatmise_algus, sysdate)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('saatmise_algus');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -7204,11 +7204,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- saatmise_lopp changed
     IF(NVL(vastuvotja_new.saatmise_lopp, sysdate) != NVL(vastuvotja_old.saatmise_lopp, sysdate)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('saatmise_lopp');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -7253,11 +7253,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- fault_code changed
     IF(NVL(vastuvotja_new.fault_code, ' ') != NVL(vastuvotja_old.fault_code, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('fault_code');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -7302,11 +7302,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- fault_actor changed
     IF(NVL(vastuvotja_new.fault_actor, ' ') != NVL(vastuvotja_old.fault_actor, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('fault_actor');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -7351,11 +7351,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- fault_string changed
     IF(NVL(vastuvotja_new.fault_string, ' ') != NVL(vastuvotja_old.fault_string, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('fault_string');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -7400,11 +7400,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- fault_detail changed
     IF(NVL(vastuvotja_new.fault_detail, ' ') != NVL(vastuvotja_old.fault_detail, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('fault_detail');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -7449,11 +7449,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- vastuvotja_staatus_id changed
     IF(NVL(vastuvotja_new.vastuvotja_staatus_id, 0) != NVL(vastuvotja_old.vastuvotja_staatus_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('vastuvotja_staatus_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -7498,11 +7498,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- asutuse_nimi changed
     IF(NVL(vastuvotja_new.asutuse_nimi, ' ') != NVL(vastuvotja_old.asutuse_nimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('asutuse_nimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -7547,11 +7547,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- allyksus_id changed
     IF(NVL(vastuvotja_new.allyksus_id, 0) != NVL(vastuvotja_old.allyksus_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('allyksus_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -7596,11 +7596,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- dok_id_teises_serveris changed
     IF(NVL(vastuvotja_new.dok_id_teises_serveris, 0) != NVL(vastuvotja_old.dok_id_teises_serveris, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('dok_id_teises_serveris');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -7645,11 +7645,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- allyksuse_lyhinimetus changed
     IF(NVL(vastuvotja_new.allyksuse_lyhinimetus, ' ') != NVL(vastuvotja_old.allyksuse_lyhinimetus, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('allyksuse_lyhinimetus');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -7694,11 +7694,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- ametikoha_lyhinimetus changed
     IF(NVL(vastuvotja_new.ametikoha_lyhinimetus, ' ') != NVL(vastuvotja_old.ametikoha_lyhinimetus, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('ametikoha_lyhinimetus');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -7743,7 +7743,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
   END LOG_VASTUVOTJA;
 
   PROCEDURE LOG_ALLKIRI (
@@ -7751,21 +7751,21 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     allkiri_old IN allkiri%ROWTYPE,
     operation IN VARCHAR2
   ) AS
-  
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'VASTUVOTJA';
     primary_key_value NUMBER(38,0) := allkiri_old.allkiri_id;
-    
+
     d DATE := sysdate;
-    
+
   BEGIN
-  
-  
+
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-    
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -7774,12 +7774,12 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
             and c.constraint_type = 'P'
             and upper(cc.table_name) = tablename
             and rownum < 2;
-  
-    
+
+
     -- allkiri_id changed
     IF(NVL(allkiri_new.allkiri_id, 0) != NVL(allkiri_old.allkiri_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('allkiri_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -7824,11 +7824,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- dokument_id changed
     IF(NVL(allkiri_new.dokument_id, 0) != NVL(allkiri_old.dokument_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('dokument_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -7873,11 +7873,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- eesnimi changed
     IF(NVL(allkiri_new.eesnimi, ' ') != NVL(allkiri_old.eesnimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('eesnimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -7922,11 +7922,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- perenimi changed
     IF(NVL(allkiri_new.perenimi, ' ') != NVL(allkiri_old.perenimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('perenimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -7971,11 +7971,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- isikukood changed
     IF(NVL(allkiri_new.isikukood, ' ') != NVL(allkiri_old.isikukood, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('isikukood');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -8020,11 +8020,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- kuupaev changed
     IF(NVL(allkiri_new.kuupaev, d) != NVL(allkiri_old.kuupaev, d)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('kuupaev');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -8069,11 +8069,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- roll changed
     IF(NVL(allkiri_new.roll, ' ') != NVL(allkiri_old.roll, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('roll');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -8118,11 +8118,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- riik changed
     IF(NVL(allkiri_new.riik, ' ') != NVL(allkiri_old.riik, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('riik');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -8167,11 +8167,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- maakond changed
     IF(NVL(allkiri_new.maakond, ' ') != NVL(allkiri_old.maakond, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('maakond');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -8216,11 +8216,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- linn changed
     IF(NVL(allkiri_new.linn, ' ') != NVL(allkiri_old.linn, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('linn');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -8265,11 +8265,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- indeks changed
     IF(NVL(allkiri_new.indeks, ' ') != NVL(allkiri_old.indeks, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('indeks');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -8314,7 +8314,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
   END LOG_ALLKIRI;
 
   PROCEDURE LOG_ALLYKSUS (
@@ -8322,21 +8322,21 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     allyksus_old IN allyksus%ROWTYPE,
     operation IN VARCHAR2
   ) AS
-  
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'ALLYKSUS';
     primary_key_value NUMBER(38,0) := allyksus_old.id;
-    
+
     d DATE := sysdate;
-    
+
   BEGIN
-  
-  
+
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-    
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -8345,11 +8345,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
             and c.constraint_type = 'P'
             and upper(cc.table_name) = tablename
             and rownum < 2;
-  
+
     -- id changed
     IF(NVL(allyksus_new.id, 0) != NVL(allyksus_old.id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -8394,11 +8394,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
     -- asutus_id changed
     IF(NVL(allyksus_new.asutus_id, 0) != NVL(allyksus_old.asutus_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('asutus_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -8443,11 +8443,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- vanem_id changed
     IF(NVL(allyksus_new.vanem_id, 0) != NVL(allyksus_old.vanem_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('vanem_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -8492,11 +8492,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- allyksus changed
     IF(NVL(allyksus_new.allyksus, ' ') != NVL(allyksus_old.allyksus, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('allyksus');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -8541,11 +8541,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- created changed
     IF(NVL(allyksus_new.created, d) != NVL(allyksus_old.created, d)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('created');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -8590,11 +8590,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- last_modified changed
     IF(NVL(allyksus_new.last_modified, d) != NVL(allyksus_old.last_modified, d)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('last_modified');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -8639,11 +8639,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- username changed
     IF(NVL(allyksus_new.username, ' ') != NVL(allyksus_old.username, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('username');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -8688,11 +8688,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- muutm_arv changed
     IF(NVL(allyksus_new.muutm_arv, 0) != NVL(allyksus_old.muutm_arv, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('muutm_arv');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -8737,11 +8737,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- aar_id changed
     IF(NVL(allyksus_new.aar_id, 0) != NVL(allyksus_old.aar_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('aar_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -8786,11 +8786,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- lyhinimetus changed
     IF(NVL(allyksus_new.lyhinimetus, ' ') != NVL(allyksus_old.lyhinimetus, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('lyhinimetus');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -8835,11 +8835,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- adr_uri changed
     IF(NVL(allyksus_new.adr_uri, ' ') != NVL(allyksus_old.adr_uri, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('adr_uri');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -8884,7 +8884,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
   END LOG_ALLYKSUS;
 
   PROCEDURE LOG_AMETIKOHT (
@@ -8892,21 +8892,21 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     ametikoht_old IN ametikoht%ROWTYPE,
     operation IN VARCHAR2
   ) AS
-    
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'AMETIKOHT';
     primary_key_value NUMBER(38,0) := ametikoht_old.ametikoht_id;
-    
+
     d DATE := sysdate;
-    
+
   BEGIN
-  
-  
+
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-    
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -8915,12 +8915,12 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
             and c.constraint_type = 'P'
             and upper(cc.table_name) = tablename
             and rownum < 2;
-            
-    
+
+
     -- ametikoht_id changed
     IF(NVL(ametikoht_new.ametikoht_id, 0) != NVL(ametikoht_old.ametikoht_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('ametikoht_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -8965,11 +8965,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- ks_ametikoht_id changed
     IF(NVL(ametikoht_new.ks_ametikoht_id, 0) != NVL(ametikoht_old.ks_ametikoht_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('ks_ametikoht_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -9014,11 +9014,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- asutus_id changed
     IF(NVL(ametikoht_new.asutus_id, 0) != NVL(ametikoht_old.asutus_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('asutus_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -9063,11 +9063,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- ametikoht_nimetus changed
     IF(NVL(ametikoht_new.ametikoht_nimetus, ' ') != NVL(ametikoht_old.ametikoht_nimetus, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('ametikoht_nimetus');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -9112,11 +9112,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- alates changed
     IF(NVL(ametikoht_new.alates, d) != NVL(ametikoht_old.alates, d)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('alates');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -9161,11 +9161,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- kuni changed
     IF(NVL(ametikoht_new.kuni, d) != NVL(ametikoht_old.kuni, d)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('kuni');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -9210,11 +9210,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- created changed
     IF(NVL(ametikoht_new.created, d) != NVL(ametikoht_old.created, d)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('created');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -9259,11 +9259,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- last_modified changed
     IF(NVL(ametikoht_new.last_modified, d) != NVL(ametikoht_old.last_modified, d)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('last_modified');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -9308,11 +9308,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- username changed
     IF(NVL(ametikoht_new.username, ' ') != NVL(ametikoht_old.username, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('username');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -9357,11 +9357,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- allyksus_id changed
     IF(NVL(ametikoht_new.allyksus_id, 0) != NVL(ametikoht_old.allyksus_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('allyksus_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -9406,11 +9406,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- params changed
     IF(NVL(ametikoht_new.params, ' ') != NVL(ametikoht_old.params, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('params');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -9455,11 +9455,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- aar_id changed
     IF(NVL(ametikoht_new.aar_id, 0) != NVL(ametikoht_old.aar_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('aar_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -9504,11 +9504,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- lyhinimetus changed
     IF(NVL(ametikoht_new.lyhinimetus, ' ') != NVL(ametikoht_old.lyhinimetus, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('lyhinimetus');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -9553,7 +9553,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
   END LOG_AMETIKOHT;
 
 
@@ -9562,20 +9562,20 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     ametikoht_taitmine_old IN ametikoht_taitmine%ROWTYPE,
     operation IN VARCHAR2
   ) AS
-    
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'AMETIKOHT_TAITMINE';
     primary_key_value NUMBER(38,0) := ametikoht_taitmine_old.taitmine_id;
-    
+
     d DATE := sysdate;
-    
+
   BEGIN
-  
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-    
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -9584,11 +9584,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
             and c.constraint_type = 'P'
             and upper(cc.table_name) = tablename
             and rownum < 2;
-  
+
     -- taitmine_id changed
     IF(NVL(ametikoht_taitmine_new.taitmine_id, 0) != NVL(ametikoht_taitmine_old.taitmine_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('taitmine_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -9633,11 +9633,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- ametikoht_id changed
     IF(NVL(ametikoht_taitmine_new.ametikoht_id, 0) != NVL(ametikoht_taitmine_old.ametikoht_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('ametikoht_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -9682,11 +9682,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- i_id changed
     IF(NVL(ametikoht_taitmine_new.i_id, 0) != NVL(ametikoht_taitmine_old.i_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('i_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -9731,11 +9731,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- alates changed
     IF(NVL(ametikoht_taitmine_new.alates, d) != NVL(ametikoht_taitmine_old.alates, d)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('alates');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -9780,11 +9780,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- kuni changed
     IF(NVL(ametikoht_taitmine_new.kuni, d) != NVL(ametikoht_taitmine_old.kuni, d)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('kuni');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -9829,11 +9829,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- roll changed
     IF(NVL(ametikoht_taitmine_new.roll, ' ') != NVL(ametikoht_taitmine_old.roll, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('roll');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -9878,11 +9878,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- created changed
     IF(NVL(ametikoht_taitmine_new.created, d) != NVL(ametikoht_taitmine_old.created, d)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('created');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -9927,11 +9927,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- last_modified changed
     IF(NVL(ametikoht_taitmine_new.last_modified, d) != NVL(ametikoht_taitmine_old.last_modified, d)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('last_modified');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -9976,11 +9976,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- username changed
     IF(NVL(ametikoht_taitmine_new.username, ' ') != NVL(ametikoht_taitmine_old.username, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('username');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -10025,11 +10025,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- peatatud changed
     IF(NVL(ametikoht_taitmine_new.peatatud, 0) != NVL(ametikoht_taitmine_old.peatatud, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('peatatud');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -10074,11 +10074,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- aar_id changed
     IF(NVL(ametikoht_taitmine_new.aar_id, 0) != NVL(ametikoht_taitmine_old.aar_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('aar_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -10123,7 +10123,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
   END LOG_AMETIKOHT_TAITMINE;
 
   PROCEDURE LOG_DOKUMENDI_AJALUGU (
@@ -10131,20 +10131,20 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     dokumendi_ajalugu_old IN dokumendi_ajalugu%ROWTYPE,
     operation IN VARCHAR2
   ) AS
-  
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'DOKUMENDI_AJALUGU';
     primary_key_value NUMBER(38,0) := dokumendi_ajalugu_old.ajalugu_id;
-    
+
     d DATE := sysdate;
-    
+
   BEGIN
-  
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-    
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -10153,11 +10153,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
             and c.constraint_type = 'P'
             and upper(cc.table_name) = tablename
             and rownum < 2;
-    
+
     -- ajalugu_id changed
     IF(NVL(dokumendi_ajalugu_new.ajalugu_id, 0) != NVL(dokumendi_ajalugu_old.ajalugu_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('ajalugu_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -10202,11 +10202,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- dokument_id changed
     IF(NVL(dokumendi_ajalugu_new.dokument_id, 0) != NVL(dokumendi_ajalugu_old.dokument_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('dokument_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -10251,7 +10251,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
   END LOG_DOKUMENDI_AJALUGU;
 
   PROCEDURE LOG_DOKUMENDI_FAIL (
@@ -10259,20 +10259,20 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     dokumendi_fail_old IN dokumendi_fail%ROWTYPE,
     operation IN VARCHAR2
   ) AS
-  
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'DOKUMENDI_FAIL';
     primary_key_value NUMBER(38,0) := dokumendi_fail_old.fail_id;
-    
+
     d DATE := sysdate;
-    
+
   BEGIN
-  
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-    
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -10281,11 +10281,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
             and c.constraint_type = 'P'
             and upper(cc.table_name) = tablename
             and rownum < 2;
-            
+
     -- fail_id changed
     IF(NVL(dokumendi_fail_new.fail_id, 0) != NVL(dokumendi_fail_old.fail_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('fail_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -10330,11 +10330,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- dokument_id changed
     IF(NVL(dokumendi_fail_new.dokument_id, 0) != NVL(dokumendi_fail_old.dokument_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('dokument_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -10379,11 +10379,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- nimi changed
     IF(NVL(dokumendi_fail_new.nimi, ' ') != NVL(dokumendi_fail_old.nimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('nimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -10428,11 +10428,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- suurus changed
     IF(NVL(dokumendi_fail_new.suurus, 0) != NVL(dokumendi_fail_old.suurus, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('suurus');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -10477,11 +10477,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- mime_tyyp changed
     IF(NVL(dokumendi_fail_new.mime_tyyp, ' ') != NVL(dokumendi_fail_old.mime_tyyp, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('mime_tyyp');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -10526,11 +10526,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- pohifail changed
     IF(NVL(dokumendi_fail_new.pohifail, 0) != NVL(dokumendi_fail_old.pohifail, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('pohifail');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -10575,11 +10575,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- valine_manus changed
     IF(NVL(dokumendi_fail_new.valine_manus, 0) != NVL(dokumendi_fail_old.valine_manus, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('valine_manus');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -10624,7 +10624,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
   END LOG_DOKUMENDI_FAIL;
 
   PROCEDURE LOG_DOKUMENDI_METAANDMED (
@@ -10632,20 +10632,20 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     dokumendi_metaandmed_old IN dokumendi_metaandmed%ROWTYPE,
     operation IN VARCHAR2
   ) AS
-  
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'DOKUMENDI_METAANDMED';
     primary_key_value NUMBER(38,0) := dokumendi_metaandmed_old.dokument_id;
-    
+
     d DATE := sysdate;
-    
+
   BEGIN
-  
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-    
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -10654,11 +10654,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
             and c.constraint_type = 'P'
             and upper(cc.table_name) = tablename
             and rownum < 2;
-            
+
     -- dokument_id changed
     IF(NVL(dokumendi_metaandmed_new.dokument_id, 0) != NVL(dokumendi_metaandmed_old.dokument_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('dokument_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -10703,11 +10703,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- koostaja_asutuse_nr changed
     IF(NVL(dokumendi_metaandmed_new.koostaja_asutuse_nr, ' ') != NVL(dokumendi_metaandmed_old.koostaja_asutuse_nr, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('koostaja_asutuse_nr');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -10752,11 +10752,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- saaja_asutuse_nr changed
     IF(NVL(dokumendi_metaandmed_new.saaja_asutuse_nr, ' ') != NVL(dokumendi_metaandmed_old.saaja_asutuse_nr, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('saaja_asutuse_nr');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -10801,11 +10801,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- koostaja_dokumendinimi changed
     IF(NVL(dokumendi_metaandmed_new.koostaja_dokumendinimi, ' ') != NVL(dokumendi_metaandmed_old.koostaja_dokumendinimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('koostaja_dokumendinimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -10850,11 +10850,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- koostaja_dokumendityyp changed
     IF(NVL(dokumendi_metaandmed_new.koostaja_dokumendityyp, ' ') != NVL(dokumendi_metaandmed_old.koostaja_dokumendityyp, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('koostaja_dokumendityyp');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -10899,11 +10899,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- koostaja_dokumendinr changed
     IF(NVL(dokumendi_metaandmed_new.koostaja_dokumendinr, ' ') != NVL(dokumendi_metaandmed_old.koostaja_dokumendinr, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('koostaja_dokumendinr');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -10948,11 +10948,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- koostaja_failinimi changed
     IF(NVL(dokumendi_metaandmed_new.koostaja_failinimi, ' ') != NVL(dokumendi_metaandmed_old.koostaja_failinimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('koostaja_failinimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -10997,11 +10997,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- koostaja_kataloog changed
     IF(NVL(dokumendi_metaandmed_new.koostaja_kataloog, ' ') != NVL(dokumendi_metaandmed_old.koostaja_kataloog, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('koostaja_kataloog');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -11046,11 +11046,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- koostaja_votmesona changed
     IF(NVL(dokumendi_metaandmed_new.koostaja_votmesona, ' ') != NVL(dokumendi_metaandmed_old.koostaja_votmesona, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('koostaja_votmesona');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -11095,11 +11095,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- koostaja_kokkuvote changed
     IF(NVL(dokumendi_metaandmed_new.koostaja_kokkuvote, ' ') != NVL(dokumendi_metaandmed_old.koostaja_kokkuvote, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('koostaja_kokkuvote');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -11144,11 +11144,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- koostaja_kuupaev changed
     IF(NVL(dokumendi_metaandmed_new.koostaja_kuupaev, d) != NVL(dokumendi_metaandmed_old.koostaja_kuupaev, d)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('koostaja_kuupaev');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -11193,11 +11193,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- koostaja_asutuse_nimi changed
     IF(NVL(dokumendi_metaandmed_new.koostaja_asutuse_nimi, ' ') != NVL(dokumendi_metaandmed_old.koostaja_asutuse_nimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('koostaja_asutuse_nimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -11242,11 +11242,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- koostaja_asutuse_kontakt changed
     IF(NVL(dokumendi_metaandmed_new.koostaja_asutuse_kontakt, ' ') != NVL(dokumendi_metaandmed_old.koostaja_asutuse_kontakt, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('koostaja_asutuse_kontakt');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -11291,11 +11291,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- autori_osakond changed
     IF(NVL(dokumendi_metaandmed_new.autori_osakond, ' ') != NVL(dokumendi_metaandmed_old.autori_osakond, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('autori_osakond');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -11340,11 +11340,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- autori_isikukood changed
     IF(NVL(dokumendi_metaandmed_new.autori_isikukood, ' ') != NVL(dokumendi_metaandmed_old.autori_isikukood, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('autori_isikukood');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -11389,11 +11389,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- autori_nimi changed
     IF(NVL(dokumendi_metaandmed_new.autori_nimi, ' ') != NVL(dokumendi_metaandmed_old.autori_nimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('autori_nimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -11438,11 +11438,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- autori_kontakt changed
     IF(NVL(dokumendi_metaandmed_new.autori_kontakt, ' ') != NVL(dokumendi_metaandmed_old.autori_kontakt, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('autori_kontakt');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -11487,11 +11487,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- seotud_dokumendinr_koostajal changed
     IF(NVL(dokumendi_metaandmed_new.seotud_dokumendinr_koostajal, ' ') != NVL(dokumendi_metaandmed_old.seotud_dokumendinr_koostajal, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('seotud_dokumendinr_koostajal');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -11536,11 +11536,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- seotud_dokumendinr_saajal changed
     IF(NVL(dokumendi_metaandmed_new.seotud_dokumendinr_saajal, ' ') != NVL(dokumendi_metaandmed_old.seotud_dokumendinr_saajal, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('seotud_dokumendinr_saajal');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -11585,11 +11585,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- saatja_dokumendinr changed
     IF(NVL(dokumendi_metaandmed_new.saatja_dokumendinr, ' ') != NVL(dokumendi_metaandmed_old.saatja_dokumendinr, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('saatja_dokumendinr');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -11634,11 +11634,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- saatja_kuupaev changed
     IF(NVL(dokumendi_metaandmed_new.saatja_kuupaev, d) != NVL(dokumendi_metaandmed_old.saatja_kuupaev, d)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('saatja_kuupaev');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -11683,11 +11683,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- saatja_asutuse_kontakt changed
     IF(NVL(dokumendi_metaandmed_new.saatja_asutuse_kontakt, ' ') != NVL(dokumendi_metaandmed_old.saatja_asutuse_kontakt, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('saatja_asutuse_kontakt');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -11732,11 +11732,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- saaja_isikukood changed
     IF(NVL(dokumendi_metaandmed_new.saaja_isikukood, ' ') != NVL(dokumendi_metaandmed_old.saaja_isikukood, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('saaja_isikukood');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -11781,11 +11781,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- saaja_nimi changed
     IF(NVL(dokumendi_metaandmed_new.saaja_nimi, ' ') != NVL(dokumendi_metaandmed_old.saaja_nimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('saaja_nimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -11830,11 +11830,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- saaja_osakond changed
     IF(NVL(dokumendi_metaandmed_new.saaja_osakond, ' ') != NVL(dokumendi_metaandmed_old.saaja_osakond, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('saaja_osakond');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -11879,11 +11879,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- seotud_dhl_id changed
     IF(NVL(dokumendi_metaandmed_new.seotud_dhl_id, 0) != NVL(dokumendi_metaandmed_old.seotud_dhl_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('seotud_dhl_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -11928,11 +11928,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- kommentaar changed
     IF(NVL(dokumendi_metaandmed_new.kommentaar, ' ') != NVL(dokumendi_metaandmed_old.kommentaar, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('kommentaar');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -11977,7 +11977,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
   END LOG_DOKUMENDI_METAANDMED;
 
   PROCEDURE LOG_DYNAAMILISED_METAANDMED (
@@ -11985,20 +11985,20 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     dynaamilised_metaandmed_old IN dynaamilised_metaandmed%ROWTYPE,
     operation IN VARCHAR2
   ) AS
-  
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'DYNAAMILISED_METAANDMED';
     primary_key_value NUMBER(38,0) := dynaamilised_metaandmed_old.dokument_id;
-    
+
     d DATE := sysdate;
-    
+
   BEGIN
-  
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-    
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -12007,11 +12007,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
             and c.constraint_type = 'P'
             and upper(cc.table_name) = tablename
             and rownum < 2;
-  
+
     -- dokument_id changed
     IF(NVL(dynaamilised_metaandmed_new.dokument_id, 0) != NVL(dynaamilised_metaandmed_old.dokument_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('dokument_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -12056,11 +12056,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- nimi changed
     IF(NVL(dynaamilised_metaandmed_new.nimi, ' ') != NVL(dynaamilised_metaandmed_old.nimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('nimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -12105,11 +12105,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- vaartus changed
     IF(NVL(dynaamilised_metaandmed_new.vaartus, ' ') != NVL(dynaamilised_metaandmed_old.vaartus, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('vaartus');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -12154,7 +12154,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
   END LOG_DYNAAMILISED_METAANDMED;
 
   PROCEDURE LOG_EHAK (
@@ -12162,20 +12162,20 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     ehak_old IN ehak%ROWTYPE,
     operation IN VARCHAR2
   ) AS
-  
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'EHAK';
     primary_key_value NUMBER(38,0) := ehak_old.ehak_id;
-    
+
     d DATE := sysdate;
-    
+
   BEGIN
-  
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-    
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -12184,11 +12184,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
             and c.constraint_type = 'P'
             and upper(cc.table_name) = tablename
             and rownum < 2;
-            
+
     -- ehak_id changed
     IF(NVL(ehak_new.ehak_id, ' ') != NVL(ehak_old.ehak_id, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('ehak_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -12233,11 +12233,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- nimi changed
     IF(NVL(ehak_new.nimi, ' ') != NVL(ehak_old.nimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('nimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -12282,11 +12282,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- roopnimi changed
     IF(NVL(ehak_new.roopnimi, ' ') != NVL(ehak_old.roopnimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('roopnimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -12331,11 +12331,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- tyyp changed
     IF(NVL(ehak_new.tyyp, ' ') != NVL(ehak_old.tyyp, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('tyyp');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -12380,11 +12380,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- maakond changed
     IF(NVL(ehak_new.maakond, ' ') != NVL(ehak_old.maakond, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('maakond');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -12429,11 +12429,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- vald changed
     IF(NVL(ehak_new.vald, ' ') != NVL(ehak_old.vald, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('vald');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -12478,11 +12478,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- created changed
     IF(NVL(ehak_new.created, d) != NVL(ehak_old.created, d)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('created');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -12527,11 +12527,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- last_modified changed
     IF(NVL(ehak_new.last_modified, d) != NVL(ehak_old.last_modified, d)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('last_modified');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -12576,11 +12576,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- username changed
     IF(NVL(ehak_new.username, ' ') != NVL(ehak_old.username, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('username');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -12625,7 +12625,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
   END LOG_EHAK;
 
   PROCEDURE LOG_ISIK (
@@ -12633,20 +12633,20 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     isik_old IN isik%ROWTYPE,
     operation IN VARCHAR2
   ) AS
-  
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'ISIK';
     primary_key_value NUMBER(38,0) := isik_old.i_id;
-    
+
     d DATE := sysdate;
-    
+
   BEGIN
-  
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-    
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -12659,7 +12659,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     -- i_id changed
     IF(NVL(isik_new.i_id, 0) != NVL(isik_old.i_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('i_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -12704,11 +12704,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- kood changed
     IF(NVL(isik_new.kood, ' ') != NVL(isik_old.kood, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('kood');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -12753,11 +12753,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- perenimi changed
     IF(NVL(isik_new.perenimi, ' ') != NVL(isik_old.perenimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('perenimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -12802,11 +12802,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- eesnimi changed
     IF(NVL(isik_new.eesnimi, ' ') != NVL(isik_old.eesnimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('eesnimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -12851,11 +12851,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- maakond changed
     IF(NVL(isik_new.maakond, ' ') != NVL(isik_old.maakond, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('maakond');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -12900,11 +12900,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- aadress changed
     IF(NVL(isik_new.aadress, ' ') != NVL(isik_old.aadress, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('aadress');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -12949,11 +12949,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- postikood changed
     IF(NVL(isik_new.postikood, ' ') != NVL(isik_old.postikood, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('postikood');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -12998,11 +12998,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- telefon changed
     IF(NVL(isik_new.telefon, ' ') != NVL(isik_old.telefon, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('telefon');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -13047,11 +13047,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- e_post changed
     IF(NVL(isik_new.e_post, ' ') != NVL(isik_old.e_post, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('e_post');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -13096,11 +13096,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- www changed
     IF(NVL(isik_new.www, ' ') != NVL(isik_old.www, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('www');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -13145,11 +13145,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- params changed
     IF(NVL(isik_new.params, ' ') != NVL(isik_old.params, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('params');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -13194,11 +13194,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- created changed
     IF(NVL(isik_new.created, d) != NVL(isik_old.created, d)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('created');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -13243,11 +13243,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- last_modified changed
     IF(NVL(isik_new.last_modified, d) != NVL(isik_old.last_modified, d)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('last_modified');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -13292,11 +13292,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- username changed
     IF(NVL(isik_new.username, ' ') != NVL(isik_old.username, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('username');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -13349,20 +13349,20 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     klassifikaator_old IN klassifikaator%ROWTYPE,
     operation IN VARCHAR2
   ) AS
-  
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'KLASSIFIKAATOR';
     primary_key_value NUMBER(38,0) := klassifikaator_old.klassifikaator_id;
-    
+
     d DATE := sysdate;
-    
+
   BEGIN
-  
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-    
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -13371,11 +13371,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
             and c.constraint_type = 'P'
             and upper(cc.table_name) = tablename
             and rownum < 2;
-            
+
     -- klassifikaator_id changed
     IF(NVL(klassifikaator_new.klassifikaator_id, 0) != NVL(klassifikaator_old.klassifikaator_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('klassifikaator_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -13420,11 +13420,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- nimetus changed
     IF(NVL(klassifikaator_new.nimetus, ' ') != NVL(klassifikaator_old.nimetus, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('nimetus');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -13469,11 +13469,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- klassifikaatori_tyyp_id changed
     IF(NVL(klassifikaator_new.klassifikaatori_tyyp_id, 0) != NVL(klassifikaator_old.klassifikaatori_tyyp_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('klassifikaatori_tyyp_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -13518,7 +13518,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
   END LOG_KLASSIFIKAATOR;
 
   PROCEDURE LOG_KLASSIFIKAATORI_TYYP (
@@ -13526,20 +13526,20 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     klassifikaatori_tyyp_old IN klassifikaatori_tyyp%ROWTYPE,
     operation IN VARCHAR2
   ) AS
-  
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'KLASSIFIKAATORI_TYYP';
     primary_key_value NUMBER(38,0) := klassifikaatori_tyyp_old.klassifikaatori_tyyp_id;
-    
+
     d DATE := sysdate;
-    
+
   BEGIN
-  
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-    
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -13548,11 +13548,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
             and c.constraint_type = 'P'
             and upper(cc.table_name) = tablename
             and rownum < 2;
-            
+
     -- klassifikaatori_tyyp_id changed
     IF(NVL(klassifikaatori_tyyp_new.klassifikaatori_tyyp_id, 0) != NVL(klassifikaatori_tyyp_old.klassifikaatori_tyyp_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('klassifikaatori_tyyp_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -13597,11 +13597,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- nimetus changed
     IF(NVL(klassifikaatori_tyyp_new.nimetus, ' ') != NVL(klassifikaatori_tyyp_old.nimetus, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('nimetus');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -13646,28 +13646,28 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
   END LOG_KLASSIFIKAATORI_TYYP;
 
   PROCEDURE LOG_KONVERSIOON (
     konversioon_new IN konversioon%ROWTYPE,
     konversioon_old IN konversioon%ROWTYPE,
     operation IN VARCHAR2
-  ) AS 
-  
+  ) AS
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'KONVERSIOON';
     primary_key_value NUMBER(38,0) := konversioon_old.id;
-    
+
     d DATE := sysdate;
-    
+
   BEGIN
-  
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-    
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -13676,11 +13676,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
             and c.constraint_type = 'P'
             and upper(cc.table_name) = tablename
             and rownum < 2;
-            
+
     -- id changed
     IF(NVL(konversioon_new.id, 0) != NVL(konversioon_old.id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -13725,11 +13725,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- version changed
     IF(NVL(konversioon_new.version, 0) != NVL(konversioon_old.version, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('version');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -13774,11 +13774,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- result_version changed
     IF(NVL(konversioon_new.result_version, 0) != NVL(konversioon_old.result_version, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('result_version');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -13823,7 +13823,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
   END LOG_KONVERSIOON;
 
   PROCEDURE LOG_OIGUS_ANTUD (
@@ -13831,20 +13831,20 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     oigus_antud_old IN oigus_antud%ROWTYPE,
     operation IN VARCHAR2
   ) AS
-  
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'OIGUS_ANTUD';
     primary_key_value NUMBER(38,0) := oigus_antud_old.oigus_antud_id;
-    
+
     d DATE := sysdate;
-    
+
   BEGIN
-  
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-    
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -13853,11 +13853,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
             and c.constraint_type = 'P'
             and upper(cc.table_name) = tablename
             and rownum < 2;
-            
+
     -- oigus_antud_id changed
     IF(NVL(oigus_antud_new.oigus_antud_id, 0) != NVL(oigus_antud_old.oigus_antud_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('oigus_antud_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -13902,11 +13902,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- asutus_id changed
     IF(NVL(oigus_antud_new.asutus_id, 0) != NVL(oigus_antud_old.asutus_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('asutus_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -13951,11 +13951,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- muu_asutus_id changed
     IF(NVL(oigus_antud_new.muu_asutus_id, 0) != NVL(oigus_antud_old.muu_asutus_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('muu_asutus_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -14000,11 +14000,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- ametikoht_id changed
     IF(NVL(oigus_antud_new.ametikoht_id, 0) != NVL(oigus_antud_old.ametikoht_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('ametikoht_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -14049,11 +14049,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- roll changed
     IF(NVL(oigus_antud_new.roll, ' ') != NVL(oigus_antud_old.roll, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('roll');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -14098,11 +14098,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- alates changed
     IF(NVL(oigus_antud_new.alates, d) != NVL(oigus_antud_old.alates, d)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('alates');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -14147,11 +14147,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- kuni changed
     IF(NVL(oigus_antud_new.kuni, d) != NVL(oigus_antud_old.kuni, d)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('kuni');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -14196,11 +14196,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- created changed
     IF(NVL(oigus_antud_new.created, d) != NVL(oigus_antud_old.created, d)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('created');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -14245,11 +14245,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- last_modified changed
     IF(NVL(oigus_antud_new.last_modified, d) != NVL(oigus_antud_old.last_modified, d)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('last_modified');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -14294,11 +14294,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- username changed
     IF(NVL(oigus_antud_new.username, ' ') != NVL(oigus_antud_old.username, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('username');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -14343,11 +14343,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- peatatud changed
     IF(NVL(oigus_antud_new.peatatud, 0) != NVL(oigus_antud_old.peatatud, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('peatatud');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -14392,11 +14392,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- allyksus_id changed
     IF(NVL(oigus_antud_new.allyksus_id, 0) != NVL(oigus_antud_old.allyksus_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('allyksus_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -14441,7 +14441,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
   END LOG_OIGUS_ANTUD;
 
   PROCEDURE LOG_OIGUS_OBJEKTILE (
@@ -14449,20 +14449,20 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     oigus_objektile_old IN oigus_objektile%ROWTYPE,
     operation IN VARCHAR2
   ) AS
-  
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'OIGUS_OBJEKTILE';
     primary_key_value NUMBER(38,0) := oigus_objektile_old.oigus_objektile_id;
-    
+
     d DATE := sysdate;
-    
+
   BEGIN
-  
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-    
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -14471,11 +14471,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
             and c.constraint_type = 'P'
             and upper(cc.table_name) = tablename
             and rownum < 2;
-            
+
     -- oigus_objektile_id changed
     IF(NVL(oigus_objektile_new.oigus_objektile_id, 0) != NVL(oigus_objektile_old.oigus_objektile_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('oigus_objektile_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -14520,11 +14520,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- asutus_id changed
     IF(NVL(oigus_objektile_new.asutus_id, 0) != NVL(oigus_objektile_old.asutus_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('asutus_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -14569,11 +14569,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- ametikoht_id changed
     IF(NVL(oigus_objektile_new.ametikoht_id, 0) != NVL(oigus_objektile_old.ametikoht_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('ametikoht_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -14618,11 +14618,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- dokument_id changed
     IF(NVL(oigus_objektile_new.dokument_id, 0) != NVL(oigus_objektile_old.dokument_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('dokument_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -14667,11 +14667,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- kaust_id changed
     IF(NVL(oigus_objektile_new.kaust_id, 0) != NVL(oigus_objektile_old.kaust_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('kaust_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -14716,11 +14716,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- kehtib_alates changed
     IF(NVL(oigus_objektile_new.kehtib_alates, d) != NVL(oigus_objektile_old.kehtib_alates, d)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('kehtib_alates');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -14765,11 +14765,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- kehtib_kuni changed
     IF(NVL(oigus_objektile_new.kehtib_kuni, d) != NVL(oigus_objektile_old.kehtib_kuni, d)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('kehtib_kuni');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -14814,7 +14814,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
   END LOG_OIGUS_OBJEKTILE;
 
   PROCEDURE LOG_PARAMEETRID (
@@ -14822,19 +14822,19 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     parameetrid_old IN parameetrid%ROWTYPE,
     operation IN VARCHAR2
   ) AS
-  
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'PARAMEETRID';
-    
+
     d DATE := sysdate;
-    
+
   BEGIN
-  
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-    
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -14843,11 +14843,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
             and c.constraint_type = 'P'
             and upper(cc.table_name) = tablename
             and rownum < 2;
-            
+
     -- aar_viimane_sync changed
     IF(NVL(parameetrid_new.aar_viimane_sync, d) != NVL(parameetrid_old.aar_viimane_sync, d)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('aar_viimane_sync');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -14892,7 +14892,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
   END LOG_PARAMEETRID;
 
   PROCEDURE LOG_SERVER (
@@ -14900,20 +14900,20 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     server_old IN server%ROWTYPE,
     operation IN VARCHAR2
   ) AS
-  
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'SERVER';
     primary_key_value NUMBER(38,0) := server_old.server_id;
-    
+
     d DATE := sysdate;
-    
+
   BEGIN
-  
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-    
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -14922,11 +14922,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
             and c.constraint_type = 'P'
             and upper(cc.table_name) = tablename
             and rownum < 2;
-            
+
     -- server_id changed
     IF(NVL(server_new.server_id, 0) != NVL(server_old.server_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('server_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -14971,11 +14971,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- andmekogu_nimi changed
     IF(NVL(server_new.andmekogu_nimi, ' ') != NVL(server_old.andmekogu_nimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('andmekogu_nimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -15020,11 +15020,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- aadress changed
     IF(NVL(server_new.aadress, ' ') != NVL(server_old.aadress, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('aadress');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -15069,7 +15069,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
   END LOG_SERVER;
 
   PROCEDURE LOG_VASTUVOTJA_MALL (
@@ -15077,20 +15077,20 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     vastuvotja_mall_old IN vastuvotja_mall%ROWTYPE,
     operation IN VARCHAR2
   ) AS
-  
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'VASTUVOTJA_MALL';
     primary_key_value NUMBER(38,0) := vastuvotja_mall_old.vastuvotja_mall_id;
-    
+
     d DATE := sysdate;
-    
+
   BEGIN
-  
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-    
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -15099,11 +15099,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
             and c.constraint_type = 'P'
             and upper(cc.table_name) = tablename
             and rownum < 2;
-            
+
     -- vastuvotja_mall_id changed
     IF(NVL(vastuvotja_mall_new.vastuvotja_mall_id, 0) != NVL(vastuvotja_mall_old.vastuvotja_mall_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('vastuvotja_mall_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -15148,11 +15148,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- asutus_id changed
     IF(NVL(vastuvotja_mall_new.asutus_id, 0) != NVL(vastuvotja_mall_old.asutus_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('asutus_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -15197,11 +15197,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- ametikoht_id changed
     IF(NVL(vastuvotja_mall_new.ametikoht_id, 0) != NVL(vastuvotja_mall_old.ametikoht_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('ametikoht_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -15246,11 +15246,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- isikukood changed
     IF(NVL(vastuvotja_mall_new.isikukood, ' ') != NVL(vastuvotja_mall_old.isikukood, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('isikukood');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -15295,11 +15295,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- nimi changed
     IF(NVL(vastuvotja_mall_new.nimi, ' ') != NVL(vastuvotja_mall_old.nimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('nimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -15344,11 +15344,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- email changed
     IF(NVL(vastuvotja_mall_new.email, ' ') != NVL(vastuvotja_mall_old.email, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('email');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -15393,11 +15393,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- osakonna_nr changed
     IF(NVL(vastuvotja_mall_new.osakonna_nr, ' ') != NVL(vastuvotja_mall_old.osakonna_nr, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('osakonna_nr');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -15442,11 +15442,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- osakonna_nimi changed
     IF(NVL(vastuvotja_mall_new.osakonna_nimi, ' ') != NVL(vastuvotja_mall_old.osakonna_nimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('osakonna_nimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -15491,11 +15491,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- saatmisviis_id changed
     IF(NVL(vastuvotja_mall_new.saatmisviis_id, 0) != NVL(vastuvotja_mall_old.saatmisviis_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('saatmisviis_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -15540,11 +15540,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- asutuse_nimi changed
     IF(NVL(vastuvotja_mall_new.asutuse_nimi, ' ') != NVL(vastuvotja_mall_old.asutuse_nimi, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('asutuse_nimi');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -15589,11 +15589,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- allyksus_id changed
     IF(NVL(vastuvotja_mall_new.allyksus_id, 0) != NVL(vastuvotja_mall_old.allyksus_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('allyksus_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -15638,11 +15638,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- tingimus_xpath changed
     IF(NVL(vastuvotja_mall_new.tingimus_xpath, ' ') != NVL(vastuvotja_mall_old.tingimus_xpath, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('tingimus_xpath');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -15687,11 +15687,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- allyksuse_lyhinimetus changed
     IF(NVL(vastuvotja_mall_new.allyksuse_lyhinimetus, ' ') != NVL(vastuvotja_mall_old.allyksuse_lyhinimetus, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('allyksuse_lyhinimetus');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -15736,11 +15736,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- ametikoha_lyhinimetus changed
     IF(NVL(vastuvotja_mall_new.ametikoha_lyhinimetus, ' ') != NVL(vastuvotja_mall_old.ametikoha_lyhinimetus, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('ametikoha_lyhinimetus');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -15785,7 +15785,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
   END LOG_VASTUVOTJA_MALL;
 
   PROCEDURE LOG_VASTUVOTJA_STAATUS (
@@ -15793,20 +15793,20 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     vastuvotja_staatus_old IN vastuvotja_staatus%ROWTYPE,
     operation IN VARCHAR2
   ) AS
-  
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'VASTUVOTJA_STAATUS';
     primary_key_value NUMBER(38,0) := vastuvotja_staatus_old.vastuvotja_staatus_id;
-    
+
     d DATE := sysdate;
-    
+
   BEGIN
-  
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-    
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -15815,11 +15815,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
             and c.constraint_type = 'P'
             and upper(cc.table_name) = tablename
             and rownum < 2;
-            
+
     -- vastuvotja_staatus_id changed
     IF(NVL(vastuvotja_staatus_new.vastuvotja_staatus_id, 0) != NVL(vastuvotja_staatus_old.vastuvotja_staatus_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('vastuvotja_staatus_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -15864,11 +15864,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- nimetus changed
     IF(NVL(vastuvotja_staatus_new.nimetus, ' ') != NVL(vastuvotja_staatus_old.nimetus, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('nimetus');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -15913,7 +15913,7 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
   END LOG_VASTUVOTJA_STAATUS;
 
   PROCEDURE LOG_LOGI (
@@ -15921,20 +15921,20 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
     logi_old IN logi%ROWTYPE,
     operation IN VARCHAR2
   ) AS
-  
+
     clmn      user_tab_columns%ROWTYPE;
     usr       varchar2(20);
     pkey_col  varchar2(50);
     tablename varchar2(50) := 'LOGI';
     primary_key_value NUMBER(38,0) := logi_old.log_id;
-    
+
     d DATE := sysdate;
-    
+
   BEGIN
-  
+
     -- Current user
     SELECT USER INTO usr FROM dual;
-    
+
     -- Current table primary key column
     select  cc.column_name
     into    pkey_col
@@ -15943,11 +15943,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
             and c.constraint_type = 'P'
             and upper(cc.table_name) = tablename
             and rownum < 2;
-  
+
     -- log_id changed
     IF(NVL(logi_new.log_id, 0) != NVL(logi_old.log_id, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('log_id');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -15992,11 +15992,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-  
+
     -- tabel changed
     IF(NVL(logi_new.tabel, ' ') != NVL(logi_old.tabel, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('tabel');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -16041,11 +16041,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- op changed
     IF(NVL(logi_new.op, ' ') != NVL(logi_old.op, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('op');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -16090,11 +16090,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- uidcol changed
     IF(NVL(logi_new.uidcol, ' ') != NVL(logi_old.uidcol, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('uidcol');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -16139,11 +16139,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- tabel_uid changed
     IF(NVL(logi_new.tabel_uid, 0) != NVL(logi_old.tabel_uid, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('tabel_uid');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -16188,11 +16188,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- veerg changed
     IF(NVL(logi_new.veerg, ' ') != NVL(logi_old.veerg, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('veerg');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -16237,11 +16237,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- ctype changed
     IF(NVL(logi_new.ctype, ' ') != NVL(logi_old.ctype, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('ctype');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -16286,11 +16286,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- vana_vaartus changed
     IF(NVL(logi_new.vana_vaartus, ' ') != NVL(logi_old.vana_vaartus, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('vana_vaartus');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -16335,11 +16335,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- uus_vaartus changed
     IF(NVL(logi_new.uus_vaartus, ' ') != NVL(logi_old.uus_vaartus, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('uus_vaartus');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -16384,11 +16384,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- muutmise_aeg changed
     IF(NVL(logi_new.muutmise_aeg, d) != NVL(logi_old.muutmise_aeg, d)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('muutmise_aeg');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -16433,11 +16433,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- ab_kasutaja changed
     IF(NVL(logi_new.ab_kasutaja, ' ') != NVL(logi_old.ab_kasutaja, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('ab_kasutaja');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -16482,11 +16482,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- ef_kasutaja changed
     IF(NVL(logi_new.ef_kasutaja, ' ') != NVL(logi_old.ef_kasutaja, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('ef_kasutaja');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -16531,11 +16531,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- kasutaja_kood changed
     IF(NVL(logi_new.kasutaja_kood, ' ') != NVL(logi_old.kasutaja_kood, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('kasutaja_kood');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -16580,11 +16580,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- comm changed
     IF(NVL(logi_new.comm, ' ') != NVL(logi_old.comm, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('comm');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -16629,11 +16629,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- created changed
     IF(NVL(logi_new.created, d) != NVL(logi_old.created, d)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('created');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -16678,11 +16678,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- last_modified changed
     IF(NVL(logi_new.last_modified, d) != NVL(logi_old.last_modified, d)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('last_modified');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -16727,11 +16727,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- username changed
     IF(NVL(logi_new.username, ' ') != NVL(logi_old.username, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('username');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -16776,11 +16776,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- ametikoht changed
     IF(NVL(logi_new.ametikoht, 0) != NVL(logi_old.ametikoht, 0)) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('ametikoht');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -16825,11 +16825,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- xtee_isikukood changed
     IF(NVL(logi_new.xtee_isikukood, ' ') != NVL(logi_old.xtee_isikukood, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('xtee_isikukood');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -16874,11 +16874,11 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
     -- xtee_asutus changed
     IF(NVL(logi_new.xtee_asutus, ' ') != NVL(logi_old.xtee_asutus, ' ')) THEN
       SELECT * INTO clmn FROM user_tab_columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('xtee_asutus');
-    
+
       INSERT INTO logi(
         log_id,
         tabel,
@@ -16923,14 +16923,14 @@ CREATE OR REPLACE PACKAGE BODY DVKLOG AS
         DVKLOG.xtee_asutus
       );
     END IF;
-    
+
   END LOG_LOGI;
-  
+
 END DVKLOG;
 /
 
 
-  CREATE OR REPLACE TRIGGER TR_ALLKIRI_LOG 
+  CREATE OR REPLACE TRIGGER TR_ALLKIRI_LOG
   after insert or update or delete
   on ALLKIRI referencing old as old new as new
   for each row
@@ -16983,9 +16983,9 @@ BEGIN
 END;
 /
 ALTER TRIGGER TR_ALLKIRI_LOG ENABLE;
- 
 
-  CREATE OR REPLACE TRIGGER TR_ALLYKSUS_LOG 
+
+  CREATE OR REPLACE TRIGGER TR_ALLYKSUS_LOG
   after insert or update or delete
   on ALLYKSUS referencing old as old new as new
   for each row
@@ -17016,7 +17016,7 @@ BEGIN
   ALLYKSUS_new.AAR_ID := :new.AAR_ID;
   ALLYKSUS_new.LYHINIMETUS := :new.LYHINIMETUS;
   ALLYKSUS_new.ADR_URI := :new.ADR_URI;
-  
+
   ALLYKSUS_old.ID := :old.ID;
   ALLYKSUS_old.ASUTUS_ID := :old.ASUTUS_ID;
   ALLYKSUS_old.VANEM_ID := :old.VANEM_ID;
@@ -17040,9 +17040,9 @@ BEGIN
 END;
 /
 ALTER TRIGGER TR_ALLYKSUS_LOG ENABLE;
- 
 
-  CREATE OR REPLACE TRIGGER TR_AMETIKOHT_LOG 
+
+  CREATE OR REPLACE TRIGGER TR_AMETIKOHT_LOG
   after insert or update or delete
   on AMETIKOHT referencing old as old new as new
   for each row
@@ -17075,7 +17075,7 @@ BEGIN
   AMETIKOHT_new.PARAMS := :new.PARAMS;
   AMETIKOHT_new.AAR_ID := :new.AAR_ID;
   AMETIKOHT_new.LYHINIMETUS := :new.LYHINIMETUS;
-  
+
   AMETIKOHT_old.AMETIKOHT_ID := :old.AMETIKOHT_ID;
   AMETIKOHT_old.KS_AMETIKOHT_ID := :old.KS_AMETIKOHT_ID;
   AMETIKOHT_old.ASUTUS_ID := :old.ASUTUS_ID;
@@ -17099,9 +17099,9 @@ BEGIN
 END;
 /
 ALTER TRIGGER TR_AMETIKOHT_LOG ENABLE;
- 
 
-  CREATE OR REPLACE TRIGGER TR_AMETIKOHT_TAITMINE_LOG 
+
+  CREATE OR REPLACE TRIGGER TR_AMETIKOHT_TAITMINE_LOG
   after insert or update or delete
   on AMETIKOHT_TAITMINE referencing old as old new as new
   for each row
@@ -17154,9 +17154,9 @@ BEGIN
 END;
 /
 ALTER TRIGGER TR_AMETIKOHT_TAITMINE_LOG ENABLE;
- 
 
-  CREATE OR REPLACE TRIGGER TR_ASUTUS_LOG 
+
+  CREATE OR REPLACE TRIGGER TR_ASUTUS_LOG
   after insert or update or delete
   on ASUTUS referencing old as old new as new
   for each row
@@ -17175,7 +17175,7 @@ BEGIN
       operation := 'DELETE';
     end if;
   end if;
-  
+
   asutus_new.ASUTUS_ID := :new.ASUTUS_ID;
   asutus_new.REGISTRIKOOD := :new.REGISTRIKOOD;
   asutus_new.E_REGISTRIKOOD := :new.E_REGISTRIKOOD;
@@ -17263,9 +17263,9 @@ BEGIN
 END;
 /
 ALTER TRIGGER TR_ASUTUS_LOG ENABLE;
- 
 
-  CREATE OR REPLACE TRIGGER TR_DOKUMENDI_AJALUGU_LOG 
+
+  CREATE OR REPLACE TRIGGER TR_DOKUMENDI_AJALUGU_LOG
   after insert or update or delete
   on DOKUMENDI_AJALUGU referencing old as old new as new
   for each row
@@ -17306,9 +17306,9 @@ BEGIN
 END;
 /
 ALTER TRIGGER TR_DOKUMENDI_AJALUGU_LOG ENABLE;
- 
 
-  CREATE OR REPLACE TRIGGER TR_DOKUMENDI_FAIL_LOG 
+
+  CREATE OR REPLACE TRIGGER TR_DOKUMENDI_FAIL_LOG
   after insert or update or delete
   on DOKUMENDI_FAIL referencing old as old new as new
   for each row
@@ -17355,9 +17355,9 @@ BEGIN
 END;
 /
 ALTER TRIGGER TR_DOKUMENDI_FAIL_LOG ENABLE;
- 
 
-  CREATE OR REPLACE TRIGGER TR_DOKUMENT_LOG 
+
+  CREATE OR REPLACE TRIGGER TR_DOKUMENT_LOG
   after insert or update or delete
   on DOKUMENT referencing old as old new as new
   for each row
@@ -17406,9 +17406,9 @@ BEGIN
 END;
 /
 ALTER TRIGGER TR_DOKUMENT_LOG ENABLE;
- 
 
-  CREATE OR REPLACE TRIGGER TR_DOKUMENDI_METAANDMED_LOG 
+
+  CREATE OR REPLACE TRIGGER TR_DOKUMENDI_METAANDMED_LOG
   after insert or update or delete
   on DOKUMENDI_METAANDMED referencing old as old new as new
   for each row
@@ -17493,9 +17493,9 @@ BEGIN
 END;
 /
 ALTER TRIGGER TR_DOKUMENDI_METAANDMED_LOG ENABLE;
- 
 
-  CREATE OR REPLACE TRIGGER TR_DYNAAMILISED_METAANDMED_LOG 
+
+  CREATE OR REPLACE TRIGGER TR_DYNAAMILISED_METAANDMED_LOG
   after insert or update or delete
   on DYNAAMILISED_METAANDMED referencing old as old new as new
   for each row
@@ -17532,9 +17532,9 @@ BEGIN
 END;
 /
 ALTER TRIGGER TR_DYNAAMILISED_METAANDMED_LOG ENABLE;
- 
 
-  CREATE OR REPLACE TRIGGER TR_EHAK_LOG 
+
+  CREATE OR REPLACE TRIGGER TR_EHAK_LOG
   after insert or update or delete
   on EHAK referencing old as old new as new
   for each row
@@ -17583,9 +17583,9 @@ BEGIN
 END;
 /
 ALTER TRIGGER TR_EHAK_LOG ENABLE;
- 
 
-  CREATE OR REPLACE TRIGGER TR_ISIK_LOG 
+
+  CREATE OR REPLACE TRIGGER TR_ISIK_LOG
   after insert or update or delete
   on ISIK referencing old as old new as new
   for each row
@@ -17644,9 +17644,9 @@ BEGIN
 END;
 /
 ALTER TRIGGER TR_ISIK_LOG ENABLE;
- 
 
-  CREATE OR REPLACE TRIGGER TR_KAUST_LOG 
+
+  CREATE OR REPLACE TRIGGER TR_KAUST_LOG
   after insert or update or delete
   on KAUST referencing old as old new as new
   for each row
@@ -17687,9 +17687,9 @@ BEGIN
 END;
 /
 ALTER TRIGGER TR_KAUST_LOG ENABLE;
- 
 
-  CREATE OR REPLACE TRIGGER TR_KLASSIFIKAATOR_LOG 
+
+  CREATE OR REPLACE TRIGGER TR_KLASSIFIKAATOR_LOG
   after insert or update or delete
   on KLASSIFIKAATOR referencing old as old new as new
   for each row
@@ -17726,9 +17726,9 @@ BEGIN
 END;
 /
 ALTER TRIGGER TR_KLASSIFIKAATOR_LOG ENABLE;
- 
 
-  CREATE OR REPLACE TRIGGER TR_KLASSIFIKAATORI_TYYP_LOG 
+
+  CREATE OR REPLACE TRIGGER TR_KLASSIFIKAATORI_TYYP_LOG
   after insert or update or delete
   on KLASSIFIKAATORI_TYYP referencing old as old new as new
   for each row
@@ -17753,7 +17753,7 @@ BEGIN
 
   KLASSIFIKAATORI_TYYP_old.KLASSIFIKAATORI_TYYP_ID := :old.KLASSIFIKAATORI_TYYP_ID;
   KLASSIFIKAATORI_TYYP_old.NIMETUS := :old.NIMETUS;
-  
+
   DVKLOG.LOG_KLASSIFIKAATORI_TYYP(
     KLASSIFIKAATORI_TYYP_new,
     KLASSIFIKAATORI_TYYP_old,
@@ -17763,9 +17763,9 @@ BEGIN
 END;
 /
 ALTER TRIGGER TR_KLASSIFIKAATORI_TYYP_LOG ENABLE;
- 
 
-  CREATE OR REPLACE TRIGGER TR_KONVERSIOON_LOG 
+
+  CREATE OR REPLACE TRIGGER TR_KONVERSIOON_LOG
   after insert or update or delete
   on KONVERSIOON referencing old as old new as new
   for each row
@@ -17804,9 +17804,9 @@ BEGIN
 END;
 /
 ALTER TRIGGER TR_KONVERSIOON_LOG ENABLE;
- 
 
-  CREATE OR REPLACE TRIGGER TR_OIGUS_ANTUD_LOG 
+
+  CREATE OR REPLACE TRIGGER TR_OIGUS_ANTUD_LOG
   after insert or update or delete
   on OIGUS_ANTUD referencing old as old new as new
   for each row
@@ -17861,9 +17861,9 @@ BEGIN
 END;
 /
 ALTER TRIGGER TR_OIGUS_ANTUD_LOG ENABLE;
- 
 
-  CREATE OR REPLACE TRIGGER TR_OIGUS_OBJEKTILE_LOG 
+
+  CREATE OR REPLACE TRIGGER TR_OIGUS_OBJEKTILE_LOG
   after insert or update or delete
   on OIGUS_OBJEKTILE referencing old as old new as new
   for each row
@@ -17908,9 +17908,9 @@ BEGIN
 END;
 /
 ALTER TRIGGER TR_OIGUS_OBJEKTILE_LOG ENABLE;
- 
 
-  CREATE OR REPLACE TRIGGER TR_PARAMEETRID_LOG 
+
+  CREATE OR REPLACE TRIGGER TR_PARAMEETRID_LOG
   after insert or update or delete
   on PARAMEETRID referencing old as old new as new
   for each row
@@ -17931,7 +17931,7 @@ BEGIN
   end if;
 
   PARAMEETRID_new.AAR_VIIMANE_SYNC := :new.AAR_VIIMANE_SYNC;
-  
+
   PARAMEETRID_old.AAR_VIIMANE_SYNC := :old.AAR_VIIMANE_SYNC;
 
   DVKLOG.LOG_PARAMEETRID(
@@ -17943,9 +17943,9 @@ BEGIN
 END;
 /
 ALTER TRIGGER TR_PARAMEETRID_LOG ENABLE;
- 
 
-  CREATE OR REPLACE TRIGGER TR_SAATJA_LOG 
+
+  CREATE OR REPLACE TRIGGER TR_SAATJA_LOG
   after insert or update or delete
   on SAATJA referencing old as old new as new
   for each row
@@ -18002,9 +18002,9 @@ BEGIN
 END;
 /
 ALTER TRIGGER TR_SAATJA_LOG ENABLE;
- 
 
-  CREATE OR REPLACE TRIGGER TR_SERVER_LOG 
+
+  CREATE OR REPLACE TRIGGER TR_SERVER_LOG
   after insert or update or delete
   on SERVER referencing old as old new as new
   for each row
@@ -18041,9 +18041,9 @@ BEGIN
 END;
 /
 ALTER TRIGGER TR_SERVER_LOG ENABLE;
- 
 
-  CREATE OR REPLACE TRIGGER TR_STAATUSE_AJALUGU_LOG 
+
+  CREATE OR REPLACE TRIGGER TR_STAATUSE_AJALUGU_LOG
   after insert or update or delete
   on STAATUSE_AJALUGU referencing old as old new as new
   for each row
@@ -18094,9 +18094,9 @@ BEGIN
 END;
 /
 ALTER TRIGGER TR_STAATUSE_AJALUGU_LOG ENABLE;
- 
 
-  CREATE OR REPLACE TRIGGER TR_TRANSPORT_LOG 
+
+  CREATE OR REPLACE TRIGGER TR_TRANSPORT_LOG
   after insert or update or delete
   on TRANSPORT referencing old as old new as new
   for each row
@@ -18137,9 +18137,9 @@ BEGIN
 END;
 /
 ALTER TRIGGER TR_TRANSPORT_LOG ENABLE;
- 
 
-  CREATE OR REPLACE TRIGGER TR_VAHENDAJA_LOG 
+
+  CREATE OR REPLACE TRIGGER TR_VAHENDAJA_LOG
   after insert or update or delete
   on VAHENDAJA referencing old as old new as new
   for each row
@@ -18196,9 +18196,9 @@ BEGIN
 END;
 /
 ALTER TRIGGER TR_VAHENDAJA_LOG ENABLE;
- 
 
-  CREATE OR REPLACE TRIGGER TR_VASTUVOTJA_LOG 
+
+  CREATE OR REPLACE TRIGGER TR_VASTUVOTJA_LOG
   after insert or update or delete
   on VASTUVOTJA referencing old as old new as new
   for each row
@@ -18277,9 +18277,9 @@ BEGIN
 END;
 /
 ALTER TRIGGER TR_VASTUVOTJA_LOG ENABLE;
- 
 
-  CREATE OR REPLACE TRIGGER TR_VASTUVOTJA_MALL_LOG 
+
+  CREATE OR REPLACE TRIGGER TR_VASTUVOTJA_MALL_LOG
   after insert or update or delete
   on VASTUVOTJA_MALL referencing old as old new as new
   for each row
@@ -18338,9 +18338,9 @@ BEGIN
 END;
 /
 ALTER TRIGGER TR_VASTUVOTJA_MALL_LOG ENABLE;
- 
 
-  CREATE OR REPLACE TRIGGER TR_VASTUVOTJA_STAATUS_LOG 
+
+  CREATE OR REPLACE TRIGGER TR_VASTUVOTJA_STAATUS_LOG
   after insert or update or delete
   on VASTUVOTJA_STAATUS referencing old as old new as new
   for each row
@@ -18412,7 +18412,7 @@ BEGIN
   logi_new.AMETIKOHT := :new.AMETIKOHT;
   logi_new.XTEE_ISIKUKOOD := :new.XTEE_ISIKUKOOD;
   logi_new.XTEE_ASUTUS := :new.XTEE_ASUTUS;
-  
+
   logi_old.LOG_ID := :old.LOG_ID;
   logi_old.TABEL := :old.TABEL;
   logi_old.OP := :old.OP;
@@ -18444,7 +18444,7 @@ END;
 /
 
 ALTER TRIGGER TR_VASTUVOTJA_STAATUS_LOG ENABLE;
-/ 
+/
 
 
 /* PROTSEDUURID */
@@ -18568,8 +18568,8 @@ begin
     into    cnt
     from    transport t
     where   t.dokument_id = Get_LastSendingByDocID.document_id;
-    
-    if cnt > 0 then    
+
+    if cnt > 0 then
         select  t.transport_id,
                 t.saatmise_algus,
                 t.saatmise_lopp,
@@ -18672,7 +18672,7 @@ begin
             Add_Sender.department_name,
             Add_Sender.division_short_name,
             Add_Sender.position_short_name);
-    
+
     Add_Sender.sender_id := globalPkg.identity;
 end;
 /
@@ -18705,7 +18705,7 @@ begin
             Add_Sending.sending_start_date,
             Add_Sending.sending_end_date,
             Add_Sending.send_status_id);
-    
+
     Add_Sending.sending_id := globalPkg.identity;
 end;
 /
@@ -18741,7 +18741,7 @@ begin
                 and nvl(Get_DocumentsSentTo.division_short_name, nvl(v1.allyksuse_lyhinimetus,' ')) = nvl(v1.allyksuse_lyhinimetus,' ')
                 and nvl(Get_DocumentsSentTo.occupation_id_, nvl(v1.ametikoht_id,0)) = nvl(v1.ametikoht_id,0)
                 and nvl(Get_DocumentsSentTo.occupation_short_name, nvl(v1.ametikoha_lyhinimetus,' ')) = nvl(v1.ametikoha_lyhinimetus,' ')
-                
+
         -- Dokumendid, mis adresseeriti päringu teostaja ametikohale (ametikoha ID või lühinimetus)
         union
         select  t2.dokument_id
@@ -18770,7 +18770,7 @@ begin
                 and nvl(Get_DocumentsSentTo.division_short_name, nvl(v2.allyksuse_lyhinimetus,' ')) = nvl(v2.allyksuse_lyhinimetus,' ')
                 and nvl(Get_DocumentsSentTo.occupation_id_, nvl(v2.ametikoht_id,0)) = nvl(v2.ametikoht_id,0)
                 and nvl(Get_DocumentsSentTo.occupation_short_name, nvl(v2.ametikoha_lyhinimetus,' ')) = nvl(v2.ametikoha_lyhinimetus,' ')
-        
+
         -- Dokumendid, mis adresseeriti päringu teostaja allüksusele
         union
         select  t3.dokument_id
@@ -18799,7 +18799,7 @@ begin
                 and nvl(Get_DocumentsSentTo.division_short_name, nvl(v3.allyksuse_lyhinimetus,' ')) = nvl(v3.allyksuse_lyhinimetus,' ')
                 and nvl(Get_DocumentsSentTo.occupation_id_, nvl(v3.ametikoht_id,0)) = nvl(v3.ametikoht_id,0)
                 and nvl(Get_DocumentsSentTo.occupation_short_name, nvl(v3.ametikoha_lyhinimetus,' ')) = nvl(v3.ametikoha_lyhinimetus,' ')
-        
+
         -- Dokumendid, mis adresseeriti päringu teostaja ametikohale
         -- päringu teostaja allüksuses (vastupidine juhtum oleks, et
         -- dokument saadeti mõnele teisele ametikohale samas allüksuses).
@@ -18830,7 +18830,7 @@ begin
                 and nvl(Get_DocumentsSentTo.division_short_name, nvl(v4.allyksuse_lyhinimetus,' ')) = nvl(v4.allyksuse_lyhinimetus,' ')
                 and nvl(Get_DocumentsSentTo.occupation_id_, nvl(v4.ametikoht_id,0)) = nvl(v4.ametikoht_id,0)
                 and nvl(Get_DocumentsSentTo.occupation_short_name, nvl(v4.ametikoha_lyhinimetus,' ')) = nvl(v4.ametikoha_lyhinimetus,' ')
-        
+
         -- Juhul kui tegemist on asutuse administraatoriga
         union
         select  t5.dokument_id
@@ -18950,7 +18950,7 @@ begin
     from    asutus a
     where   a.registrikood = Get_AsutusByRegNr.registrikood
             and rownum < 2;
-    
+
     if cnt > 0 then
         select  a.asutus_id,
                 a.e_registrikood,
@@ -19119,7 +19119,7 @@ begin
     from    asutus a
     where   a.asutus_id = Get_AsutusByID.id
             and rownum < 2;
-    
+
     if cnt > 0 then
         select  a.registrikood,
                 a.e_registrikood,
@@ -19253,7 +19253,7 @@ begin
     from    asutus a
     where   a.registrikood = Get_AsutusIDByRegNr.registrikood
             and (Get_AsutusIDByRegNr.dvk_voimeline < 1 or a.dhl_saatmine = 1);
-    
+
     if cnt > 0 then
         select  a.asutus_id
         into    Get_AsutusIDByRegNr.id
@@ -19287,7 +19287,7 @@ begin
             )
             and k.ylemkaust_id = Get_FolderIdByName.parent_id
             and rownum < 2;
-    
+
     if cnt > 0 then
         select  k.kaust_id
         into    Get_FolderIdByName.folder_id
@@ -19317,7 +19317,7 @@ begin
     into    cnt
     from    isik i
     where   i.kood = Get_IsikIDByCode.isikukood;
-    
+
     if cnt > 0 then
         select  i.i_id
         into    Get_IsikIDByCode.id
@@ -19429,7 +19429,7 @@ for tbl in
 )
 loop
     dbms_output.put_line(tbl.table_name);
-    
+
     select  cc.column_name
     into    pkey_col
     from    user_cons_columns cc, user_constraints c
@@ -19437,7 +19437,7 @@ loop
             and c.constraint_type = 'P'
             and cc.table_name = tbl.table_name
             and rownum < 2;
-    
+
     sql_string := 'create or replace trigger TR_' || tbl.table_name || '_LOG
     after insert or update or delete
     on ' || tbl.table_name || '
@@ -19456,12 +19456,12 @@ loop
                 operation := ''DELETE'';
             end if;
         end if;
-        
+
         select  user
         into    usr
         from    dual;
         ';
-    
+
     for clmn in
     (
         select column_name, data_type, data_length from user_tab_columns where table_name = tbl.table_name
@@ -19475,7 +19475,7 @@ loop
         ';
         end if;
     end loop;
-    
+
     sql_string := sql_string || 'end;';
 
     execute immediate sql_string;
@@ -19497,7 +19497,7 @@ begin
     into    cnt
     from    kaust a
     where   a.kaust_id = GET_FOLDERFULLPATH.marker;
-    
+
     if cnt > 0 then
         while GET_FOLDERFULLPATH.marker is not null
         loop
@@ -19507,7 +19507,7 @@ begin
                     GET_FOLDERFULLPATH.marker
             from    kaust a
             where   a.kaust_id = GET_FOLDERFULLPATH.marker;
-            
+
             GET_FOLDERFULLPATH.folder_path := GET_FOLDERFULLPATH.folder_name || separator || GET_FOLDERFULLPATH.folder_path;
             if GET_FOLDERFULLPATH.marker > 0 then
                 separator := '/';
@@ -19547,7 +19547,7 @@ begin
             parent_id,
             org_id,
             folder_number);
-    
+
     ADD_FOLDER.folder_id := globalPkg.identity;
 end;
 /
@@ -19620,7 +19620,7 @@ begin
     from    asutus a
     where   a.registrikood = Add_Asutus.registrikood
             and rownum < 2;
-    
+
     if cnt < 1 then
         insert
         into    asutus(
@@ -19700,7 +19700,7 @@ begin
                 Add_Asutus.toetatav_dvk_versioon,
                 Add_Asutus.server_id,
                 Add_Asutus.aar_id);
-        
+
         Add_Asutus.id := globalPkg.identity;
     else
         select  a.asutus_id
@@ -19857,7 +19857,7 @@ begin
     from    vastuvotja
     where   asutus_id = Get_AsutusStat.asutus_id
             and staatus_id = 101;
-    
+
     select  (
                 select  count(*)
                 from    vastuvotja
@@ -19898,7 +19898,7 @@ begin
     from    server s
     where   s.server_id = Get_ServerByID.server_id
             and rownum < 2;
-    
+
     if cnt > 0 then
         select  s.andmekogu_nimi,
                 s.aadress
@@ -19978,7 +19978,7 @@ begin
             Add_Proxy.department_name,
             Add_Proxy.position_short_name,
             Add_Proxy.division_short_name);
-    
+
     Add_Proxy.proxy_id := globalPkg.identity;
 end;
 /
@@ -20006,7 +20006,7 @@ begin
     from    vahendaja v
     where   v.transport_id = Get_ProxyBySendingID.sending_id
             and rownum < 2;
-    
+
     if cnt > 0 then
         select  v.vahendaja_id,
                 v.asutus_id,
@@ -20117,7 +20117,7 @@ begin
     into    cnt
     from    asutus a
     where   a.aar_id = Get_AsutusIDByAarID.aar_id;
-    
+
     if cnt > 0 then
         select  a.asutus_id
         into    Get_AsutusIDByAarID.id
@@ -20151,7 +20151,7 @@ begin
     from    allyksus a
     where   a.aar_id = Get_AllyksusByAarID.aar_id
             and rownum < 2;
-    
+
     if cnt > 0 then
         select  a.id,
                 a.asutus_id,
@@ -20203,7 +20203,7 @@ begin
     from    allyksus a
     where   a.aar_id = Get_AllyksusIdByAarID.aar_id
             and rownum < 2;
-    
+
     if cnt > 0 then
         select  a.id
         into    Get_AllyksusIdByAarID.id
@@ -20227,30 +20227,38 @@ begin
     -- OR operaatori vältimiseks (Oracle puhul väga aeglane)
     open RC1 for
     select  a.*,
-            null as ks_allyksuse_lyhinimetus
-    from    allyksus a
+            null as ks_allyksuse_lyhinimetus,
+            o.registrikood as asutuse_kood
+    from    allyksus a, asutus o
     where   a.asutus_id = nvl(Get_AllyksusList.asutus_id, a.asutus_id)
+    		and o.asutus_id = a.asutus_id
             and a.allyksus = Get_AllyksusList.nimetus
             and a.vanem_id is null
     union all
     select  a1.*,
-            null as ks_allyksuse_lyhinimetus
-    from    allyksus a1
+            null as ks_allyksuse_lyhinimetus,
+            o1.registrikood as asutuse_kood
+    from    allyksus a1, asutus o1
     where   a1.asutus_id = nvl(Get_AllyksusList.asutus_id, a1.asutus_id)
+    		and o1.asutus_id = a1.asutus_id
             and Get_AllyksusList.nimetus is null
             and a1.vanem_id is null
     union all
     select  a2.*,
-            ksa2.lyhinimetus as ks_allyksuse_lyhinimetus
-    from    allyksus a2, allyksus ksa2
+            ksa2.lyhinimetus as ks_allyksuse_lyhinimetus,
+            o2.registrikood as asutuse_kood
+    from    allyksus a2, asutus o2, allyksus ksa2
     where   a2.asutus_id = nvl(Get_AllyksusList.asutus_id, a2.asutus_id)
+    		and o2.asutus_id = a2.asutus_id
             and a2.allyksus = Get_AllyksusList.nimetus
             and a2.vanem_id = ksa2.id
     union all
     select  a3.*,
-            ksa3.lyhinimetus as ks_allyksuse_lyhinimetus
-    from    allyksus a3, allyksus ksa3
+            ksa3.lyhinimetus as ks_allyksuse_lyhinimetus,
+            o3.registrikood as asutuse_kood
+    from    allyksus a3, asutus o3, allyksus ksa3
     where   a3.asutus_id = nvl(Get_AllyksusList.asutus_id, a3.asutus_id)
+    		and o3.asutus_id = a3.asutus_id
             and Get_AllyksusList.nimetus is null
             and a3.vanem_id = ksa3.id;
 end;
@@ -20308,7 +20316,7 @@ begin
             Add_Allyksus.aar_id_,
             Add_Allyksus.lyhinimetus,
             Add_Allyksus.adr_uri);
-    
+
     Add_Allyksus.id := globalPkg.identity;
 end;
 /
@@ -20377,7 +20385,7 @@ begin
     from    ametikoht_taitmine a
     where   a.aar_id = Get_AmetikohaTaitmineByAarID.aar_id
             and rownum < 2;
-    
+
     if cnt > 0 then
         select  a.taitmine_id,
                 a.ametikoht_id,
@@ -20486,7 +20494,7 @@ begin
             Add_AmetikohaTaitmine.username,
             Add_AmetikohaTaitmine.peatatud,
             Add_AmetikohaTaitmine.aar_id_);
-    
+
     Add_AmetikohaTaitmine.id := globalPkg.identity;
 end;
 /
@@ -20557,7 +20565,7 @@ begin
     from    ametikoht a
     where   a.aar_id = Get_AmetikohtByAarID.aar_id
             and rownum < 2;
-    
+
     if cnt > 0 then
         select  a.ametikoht_id,
                 a.ks_ametikoht_id,
@@ -20615,7 +20623,7 @@ begin
     from    ametikoht a
     where   a.aar_id = Get_AmetikohtIdByAarID.aar_id
             and rownum < 2;
-    
+
     if cnt > 0 then
         select  a.ametikoht_id
         into    Get_AmetikohtIdByAarID.id
@@ -20639,36 +20647,44 @@ begin
     -- OR operaatori vältimiseks (Oracle puhul väga aeglane)
     open RC1 for
     select  a.*,
-            null as allyksuse_lyhinimetus
-    from    ametikoht a
+            null as allyksuse_lyhinimetus,
+            o.registrikood as asutuse_kood
+    from    ametikoht a, asutus o
     where   a.asutus_id = nvl(Get_AmetikohtList.asutus_id, a.asutus_id)
+    		and o.asutus_id = a.asutus_id
             and a.ametikoht_nimetus = Get_AmetikohtList.nimetus
             and a.allyksus_id is null
             and nvl(a.alates, add_months(sysdate, -1)) < sysdate
             and nvl(a.kuni, add_months(sysdate, 1)) > sysdate
     union all
     select  a1.*,
-            null as allyksuse_lyhinimetus
-    from    ametikoht a1
+            null as allyksuse_lyhinimetus,
+            o1.registrikood as asutuse_kood
+    from    ametikoht a1, asutus o1
     where   a1.asutus_id = nvl(Get_AmetikohtList.asutus_id, a1.asutus_id)
+    		and o1.asutus_id = a1.asutus_id
             and Get_AmetikohtList.nimetus is null
             and a1.allyksus_id is null
             and nvl(a1.alates, add_months(sysdate, -1)) < sysdate
             and nvl(a1.kuni, add_months(sysdate, 1)) > sysdate
     union all
     select  a2.*,
-            y2.lyhinimetus as allyksuse_lyhinimetus
-    from    ametikoht a2, allyksus y2
+            y2.lyhinimetus as allyksuse_lyhinimetus,
+            o2.registrikood as asutuse_kood
+    from    ametikoht a2, asutus o2, allyksus y2
     where   a2.asutus_id = nvl(Get_AmetikohtList.asutus_id, a2.asutus_id)
+    		and o2.asutus_id = a2.asutus_id
             and a2.ametikoht_nimetus = Get_AmetikohtList.nimetus
             and y2.id = a2.allyksus_id
             and nvl(a2.alates, add_months(sysdate, -1)) < sysdate
             and nvl(a2.kuni, add_months(sysdate, 1)) > sysdate
     union all
     select  a3.*,
-            y3.lyhinimetus as allyksuse_lyhinimetus
-    from    ametikoht a3, allyksus y3
+            y3.lyhinimetus as allyksuse_lyhinimetus,
+            o3.registrikood as asutuse_kood
+    from    ametikoht a3, asutus o3, allyksus y3
     where   a3.asutus_id = nvl(Get_AmetikohtList.asutus_id, a3.asutus_id)
+    		and o3.asutus_id = a3.asutus_id
             and Get_AmetikohtList.nimetus is null
             and y3.id = a3.allyksus_id
             and nvl(a3.alates, add_months(sysdate, -1)) < sysdate
@@ -20738,7 +20754,7 @@ begin
             Add_Ametikoht.params,
             Add_Ametikoht.lyhinimetus,
             Add_Ametikoht.aar_id_);
-    
+
     Add_Ametikoht.id := globalPkg.identity;
 end;
 /
@@ -20818,7 +20834,7 @@ begin
     from    isik i
     where   i.kood = Get_IsikByCode.isikukood
             and rownum < 2;
-    
+
     if cnt > 0 then
         select  i.i_id,
                 i.perenimi,
@@ -20915,7 +20931,7 @@ begin
             Add_Isik.created,
             Add_Isik.last_modified,
             Add_Isik.username);
-    
+
     Add_Isik.id := globalPkg.identity;
 end;
 /
@@ -20981,7 +20997,7 @@ begin
     where   a.asutus_id = Get_AmetikohtIdByShortName.org_id
             and a.lyhinimetus = Get_AmetikohtIdByShortName.short_name
             and rownum < 2;
-    
+
     if cnt > 0 then
         select  a.ametikoht_id
         into    Get_AmetikohtIdByShortName.id
@@ -21009,7 +21025,7 @@ begin
     where   a.asutus_id = Get_AllyksusIdByShortName.org_id
             and a.lyhinimetus = Get_AllyksusIdByShortName.short_name
             and rownum < 2;
-    
+
     if cnt > 0 then
         select  a.id
         into    Get_AllyksusIdByShortName.id
@@ -21037,7 +21053,7 @@ begin
     where   asutus_id = Get_AllyksusStat.asutus_id
             and allyksus_id = Get_AllyksusStat.allyksus_id
             and staatus_id = 101;
-    
+
     select  (
                 select  count(*)
                 from    vastuvotja
@@ -21069,7 +21085,7 @@ begin
     where   asutus_id = Get_AmetikohtStat.asutus_id
             and ametikoht_id = Get_AmetikohtStat.ametikoht_id
             and staatus_id = 101;
-    
+
     select  (
                 select  count(*)
                 from    vastuvotja
@@ -21132,8 +21148,8 @@ begin
     from    transport t, dokument d
     where   t.dokument_id = d.dokument_id and
             d.guid = Get_LastSendingByDocGUID.document_guid;
-    
-    if cnt > 0 then    
+
+    if cnt > 0 then
         select  t.transport_id,
                 t.saatmise_algus,
                 t.saatmise_lopp,
@@ -21151,7 +21167,7 @@ begin
                             d2.guid = Get_LastSendingByDocGUID.document_guid
                 )
                 and rownum < 2;
-                
+
         select dokument_id into Get_LastSendingByDocGUID.document_id
         from dokument
         where guid = Get_LastSendingByDocGUID.document_guid;
@@ -21209,56 +21225,56 @@ END;
 
 ------- Generated by SYS.DBMS_METADATA on 6-juuni-2008 at 16:06:34 -------
 
-  CREATE INDEX "ASUTUS_ID_IDX" ON "SAATJA" ("ASUTUS_ID") 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  CREATE INDEX "ASUTUS_ID_IDX" ON "SAATJA" ("ASUTUS_ID")
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS
   STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
   PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT)
 /
 ------- Generated by SYS.DBMS_METADATA on 6-juuni-2008 at 16:06:51 -------
 
-  CREATE INDEX "ASUTUS_ID_IDX1" ON "DOKUMENT" ("ASUTUS_ID") 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  CREATE INDEX "ASUTUS_ID_IDX1" ON "DOKUMENT" ("ASUTUS_ID")
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS
   STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
   PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT)
 /
 ------- Generated by SYS.DBMS_METADATA on 6-juuni-2008 at 16:07:09 -------
 
-  CREATE INDEX "ASUTUS_ID_IDX2" ON "VASTUVOTJA" ("ASUTUS_ID") 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  CREATE INDEX "ASUTUS_ID_IDX2" ON "VASTUVOTJA" ("ASUTUS_ID")
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS
   STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
   PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT)
 /
 ------- Generated by SYS.DBMS_METADATA on 6-juuni-2008 at 16:07:29 -------
 
-  CREATE UNIQUE INDEX "DOKUMENT_ID_IDX" ON "TRANSPORT" ("DOKUMENT_ID") 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  CREATE UNIQUE INDEX "DOKUMENT_ID_IDX" ON "TRANSPORT" ("DOKUMENT_ID")
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS
   STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
   PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT)
 /
 ------- Generated by SYS.DBMS_METADATA on 6-juuni-2008 at 16:08:00 -------
 
-  CREATE UNIQUE INDEX "TRANSPORT_ID_IDX" ON "SAATJA" ("TRANSPORT_ID") 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  CREATE UNIQUE INDEX "TRANSPORT_ID_IDX" ON "SAATJA" ("TRANSPORT_ID")
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS
   STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
   PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT)
 /
 ------- Generated by SYS.DBMS_METADATA on 6-juuni-2008 at 16:08:15 -------
 
-  CREATE INDEX "TRANSPORT_ID_IDX1" ON "VASTUVOTJA" ("TRANSPORT_ID") 
-  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  CREATE INDEX "TRANSPORT_ID_IDX1" ON "VASTUVOTJA" ("TRANSPORT_ID")
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS
   STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
   PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT)
 /
 
 
 create index "ALLYKSUS_LYHINIMETUS_IDX" on "ALLYKSUS"(nvl(lyhinimetus,' '))
-PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS
  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT)
 /
 
 create index "AMETIKOHT_LYHINIMETUS_IDX" on "AMETIKOHT"(nvl(lyhinimetus,' '))
-PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS
  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT)
 /
@@ -21275,13 +21291,13 @@ PROCEDURE ADD_DOKUMENT_FRAGMENT(
   sisu in blob,
   xtee_isikukood in varchar2,
   xtee_asutus in varchar2
-) AS 
+) AS
 BEGIN
 
   -- Set session scope variables
   DVKLOG.xtee_isikukood := ADD_DOKUMENT_FRAGMENT.xtee_isikukood;
   DVKLOG.xtee_asutus := ADD_DOKUMENT_FRAGMENT.xtee_asutus;
-  
+
   INSERT INTO dokumendi_fragment (
     fragment_id,
     sissetulev,
@@ -21356,39 +21372,39 @@ END;
 
 CREATE OR REPLACE
 PROCEDURE ADD_VASTUVOTJA (
-  vastuvotja_id in vastuvotja.vastuvotja_id%TYPE, 
-  transport_id in vastuvotja.transport_id%TYPE, 
-  asutus_id in vastuvotja.asutus_id%TYPE, 
-  ametikoht_id in vastuvotja.ametikoht_id%TYPE, 
-  allyksus_id in vastuvotja.allyksus_id%TYPE, 
-  isikukood in vastuvotja.isikukood%TYPE, 
-  nimi in vastuvotja.nimi%TYPE, 
-  asutuse_nimi in vastuvotja.asutuse_nimi%TYPE, 
-  email in vastuvotja.email%TYPE, 
-  osakonna_nr in vastuvotja.osakonna_nr%TYPE, 
-  osakonna_nimi in vastuvotja.osakonna_nimi%TYPE, 
-  saatmisviis_id in vastuvotja.saatmisviis_id%TYPE, 
-  staatus_id in vastuvotja.staatus_id%TYPE, 
-  saatmise_algus in vastuvotja.saatmise_algus%TYPE, 
-  saatmise_lopp in vastuvotja.saatmise_lopp%TYPE, 
-  fault_code in vastuvotja.fault_code%TYPE, 
-  fault_actor in vastuvotja.fault_actor%TYPE, 
-  fault_string in vastuvotja.fault_string%TYPE, 
-  fault_detail in vastuvotja.fault_detail%TYPE, 
-  vastuvotja_staatus_id in vastuvotja.vastuvotja_staatus_id%TYPE, 
-  metaxml in vastuvotja.metaxml%TYPE, 
-  dok_id_teises_serveris in vastuvotja.dok_id_teises_serveris%TYPE, 
-  allyksuse_lyhinimetus in vastuvotja.allyksuse_lyhinimetus%TYPE, 
+  vastuvotja_id in vastuvotja.vastuvotja_id%TYPE,
+  transport_id in vastuvotja.transport_id%TYPE,
+  asutus_id in vastuvotja.asutus_id%TYPE,
+  ametikoht_id in vastuvotja.ametikoht_id%TYPE,
+  allyksus_id in vastuvotja.allyksus_id%TYPE,
+  isikukood in vastuvotja.isikukood%TYPE,
+  nimi in vastuvotja.nimi%TYPE,
+  asutuse_nimi in vastuvotja.asutuse_nimi%TYPE,
+  email in vastuvotja.email%TYPE,
+  osakonna_nr in vastuvotja.osakonna_nr%TYPE,
+  osakonna_nimi in vastuvotja.osakonna_nimi%TYPE,
+  saatmisviis_id in vastuvotja.saatmisviis_id%TYPE,
+  staatus_id in vastuvotja.staatus_id%TYPE,
+  saatmise_algus in vastuvotja.saatmise_algus%TYPE,
+  saatmise_lopp in vastuvotja.saatmise_lopp%TYPE,
+  fault_code in vastuvotja.fault_code%TYPE,
+  fault_actor in vastuvotja.fault_actor%TYPE,
+  fault_string in vastuvotja.fault_string%TYPE,
+  fault_detail in vastuvotja.fault_detail%TYPE,
+  vastuvotja_staatus_id in vastuvotja.vastuvotja_staatus_id%TYPE,
+  metaxml in vastuvotja.metaxml%TYPE,
+  dok_id_teises_serveris in vastuvotja.dok_id_teises_serveris%TYPE,
+  allyksuse_lyhinimetus in vastuvotja.allyksuse_lyhinimetus%TYPE,
   ametikoha_lyhinimetus in vastuvotja.ametikoha_lyhinimetus%TYPE,
   xtee_isikukood in varchar2,
   xtee_asutus in varchar2
-) AS 
+) AS
 BEGIN
-  
+
   -- Set session scope variables
   DVKLOG.xtee_isikukood := ADD_VASTUVOTJA.xtee_isikukood;
   DVKLOG.xtee_asutus := ADD_VASTUVOTJA.xtee_asutus;
-  
+
   INSERT INTO vastuvotja (
     VASTUVOTJA_ID,
     TRANSPORT_ID,
@@ -21440,45 +21456,45 @@ BEGIN
     ADD_VASTUVOTJA.ALLYKSUSE_LYHINIMETUS,
     ADD_VASTUVOTJA.AMETIKOHA_LYHINIMETUS
   );
-  
+
 END ADD_VASTUVOTJA;
 /
 
 create or replace
 PROCEDURE UPDATE_VASTUVOTJA (
-  vastuvotja_id in vastuvotja.vastuvotja_id%TYPE, 
-  transport_id in vastuvotja.transport_id%TYPE, 
-  asutus_id in vastuvotja.asutus_id%TYPE, 
-  ametikoht_id in vastuvotja.ametikoht_id%TYPE, 
-  allyksus_id in vastuvotja.allyksus_id%TYPE, 
-  isikukood in vastuvotja.isikukood%TYPE, 
-  nimi in vastuvotja.nimi%TYPE, 
-  asutuse_nimi in vastuvotja.asutuse_nimi%TYPE, 
-  email in vastuvotja.email%TYPE, 
-  osakonna_nr in vastuvotja.osakonna_nr%TYPE, 
-  osakonna_nimi in vastuvotja.osakonna_nimi%TYPE, 
-  saatmisviis_id in vastuvotja.saatmisviis_id%TYPE, 
-  staatus_id in vastuvotja.staatus_id%TYPE, 
-  saatmise_algus in vastuvotja.saatmise_algus%TYPE, 
-  saatmise_lopp in vastuvotja.saatmise_lopp%TYPE, 
-  fault_code in vastuvotja.fault_code%TYPE, 
-  fault_actor in vastuvotja.fault_actor%TYPE, 
-  fault_string in vastuvotja.fault_string%TYPE, 
-  fault_detail in vastuvotja.fault_detail%TYPE, 
-  vastuvotja_staatus_id in vastuvotja.vastuvotja_staatus_id%TYPE, 
-  metaxml in vastuvotja.metaxml%TYPE, 
-  dok_id_teises_serveris in vastuvotja.dok_id_teises_serveris%TYPE, 
-  allyksuse_lyhinimetus in vastuvotja.allyksuse_lyhinimetus%TYPE, 
+  vastuvotja_id in vastuvotja.vastuvotja_id%TYPE,
+  transport_id in vastuvotja.transport_id%TYPE,
+  asutus_id in vastuvotja.asutus_id%TYPE,
+  ametikoht_id in vastuvotja.ametikoht_id%TYPE,
+  allyksus_id in vastuvotja.allyksus_id%TYPE,
+  isikukood in vastuvotja.isikukood%TYPE,
+  nimi in vastuvotja.nimi%TYPE,
+  asutuse_nimi in vastuvotja.asutuse_nimi%TYPE,
+  email in vastuvotja.email%TYPE,
+  osakonna_nr in vastuvotja.osakonna_nr%TYPE,
+  osakonna_nimi in vastuvotja.osakonna_nimi%TYPE,
+  saatmisviis_id in vastuvotja.saatmisviis_id%TYPE,
+  staatus_id in vastuvotja.staatus_id%TYPE,
+  saatmise_algus in vastuvotja.saatmise_algus%TYPE,
+  saatmise_lopp in vastuvotja.saatmise_lopp%TYPE,
+  fault_code in vastuvotja.fault_code%TYPE,
+  fault_actor in vastuvotja.fault_actor%TYPE,
+  fault_string in vastuvotja.fault_string%TYPE,
+  fault_detail in vastuvotja.fault_detail%TYPE,
+  vastuvotja_staatus_id in vastuvotja.vastuvotja_staatus_id%TYPE,
+  metaxml in vastuvotja.metaxml%TYPE,
+  dok_id_teises_serveris in vastuvotja.dok_id_teises_serveris%TYPE,
+  allyksuse_lyhinimetus in vastuvotja.allyksuse_lyhinimetus%TYPE,
   ametikoha_lyhinimetus in vastuvotja.ametikoha_lyhinimetus%TYPE,
   xtee_isikukood in varchar2,
   xtee_asutus in varchar2
-) AS 
+) AS
 BEGIN
-  
+
   -- Set session scope variables
   DVKLOG.xtee_isikukood := UPDATE_VASTUVOTJA.xtee_isikukood;
   DVKLOG.xtee_asutus := UPDATE_VASTUVOTJA.xtee_asutus;
-  
+
   UPDATE vastuvotja set
     TRANSPORT_ID = UPDATE_VASTUVOTJA.TRANSPORT_ID,
     ASUTUS_ID = UPDATE_VASTUVOTJA.ASUTUS_ID,
@@ -21504,7 +21520,7 @@ BEGIN
     ALLYKSUSE_LYHINIMETUS = UPDATE_VASTUVOTJA.ALLYKSUSE_LYHINIMETUS,
     AMETIKOHA_LYHINIMETUS = UPDATE_VASTUVOTJA.AMETIKOHA_LYHINIMETUS
   WHERE VASTUVOTJA_ID = UPDATE_VASTUVOTJA.VASTUVOTJA_ID;
-  
+
 END UPDATE_VASTUVOTJA;
 /
 
@@ -21515,28 +21531,28 @@ DECLARE
 
     v_inputFile VARCHAR2(100) := 'v2_v1.xsl';
     v_dir VARCHAR2(100) := 'DIR_TEMP_KONV';
-    v_conversion_id konversioon.id%TYPE;  
-  
+    v_conversion_id konversioon.id%TYPE;
+
     dest_clob   CLOB;
     src_clob    BFILE  := BFILENAME(v_dir, v_inputFile);
     dst_offset  number := 1 ;
     src_offset  number := 1 ;
     lang_ctx    number := DBMS_LOB.DEFAULT_LANG_CTX;
     warning     number;
-  
+
 BEGIN
 
   -- insert a NULL record to lock
   INSERT INTO konversioon (
-    version, 
-    result_version, 
+    version,
+    result_version,
     xslt
   ) VALUES (
     2,
     1,
     EMPTY_CLOB()
   ) RETURNING id INTO v_conversion_id;
-  
+
   -- lock record
   SELECT xslt
   INTO dest_clob
@@ -21563,10 +21579,10 @@ BEGIN
 
   -- close file
   dbms_lob.fileclose(src_clob);
-  
+
   EXCEPTION
     WHEN OTHERS THEN
       dbms_lob.fileclose(src_clob);
-  
+
 END;
 /

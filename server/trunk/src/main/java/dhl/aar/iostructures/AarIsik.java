@@ -72,7 +72,7 @@ public class AarIsik {
         m_telefon = "";
         m_ePost = "";
     }
-    
+
     public static AarIsik fromXML(XMLStreamReader xmlReader, String rootTagName) throws AxisFault {
         try {
             AarIsik result = new AarIsik();
@@ -82,7 +82,7 @@ public class AarIsik {
 
                 if (xmlReader.hasName()) {
                     if (xmlReader.getLocalName().equalsIgnoreCase(rootTagName) && xmlReader.isEndElement()) {
-                        // Kui oleme jõudnud asutuse elemendi lõppu, siis katkestame tsõkli
+                        // Kui oleme jõudnud asutuse elemendi lõppu, siis katkestame tsükli
                         break;
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("isiku_id") && xmlReader.isStartElement()) {
                         xmlReader.next();
@@ -125,13 +125,13 @@ public class AarIsik {
                 }
             }
 
-            // Kui õhegi kontrolli taha pidama ei jõõnud, siis tagastame võõrtuse
+            // Kui ühegi kontrolli taha pidama ei jäänud, siis tagastame väärtuse
             return result;
         } catch (XMLStreamException ex) {
             throw new AxisFault("Exception parsing AAR message organization data section: " + ex.getMessage());
         }
     }
-    
+
     public static ArrayList<AarIsik> getListFromXML(String dataFile) {
         try {
             ArrayList<AarIsik> result = new ArrayList<AarIsik>();

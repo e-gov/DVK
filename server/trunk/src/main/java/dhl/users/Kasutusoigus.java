@@ -124,7 +124,7 @@ public class Kasutusoigus {
     public Kasutusoigus() {
         clear();
     }
-    
+
     public void clear() {
         m_id = 0;
         m_asutusID = 0;
@@ -138,7 +138,7 @@ public class Kasutusoigus {
         m_muutja = "";
         m_peatatud = false;
     }
-    
+
     public static ArrayList<String> getPersonCurrentRoles(int personID, int orgID, Connection conn) {
         try {
             if (conn != null) {
@@ -147,7 +147,7 @@ public class Kasutusoigus {
                 cs.setInt("organization_id", orgID);
                 cs.registerOutParameter("RC1", oracle.jdbc.OracleTypes.CURSOR);
                 cs.execute();
-                ResultSet rs = (ResultSet)cs.getObject("RC1");
+                ResultSet rs = (ResultSet) cs.getObject("RC1");
                 ArrayList<String> result = new ArrayList<String>();
                 while (rs.next()) {
                     result.add(rs.getString("roll"));
@@ -163,7 +163,7 @@ public class Kasutusoigus {
             return new ArrayList<String>();
         }
     }
-    
+
     public static Kasutusoigus getFromDB(String roll, int asutusID, int ametikohtID, int allyksusID, Connection conn) {
         try {
             if (conn != null) {
@@ -209,7 +209,7 @@ public class Kasutusoigus {
             return null;
         }
     }
-    
+
     public int addToDB(Connection conn) {
         try {
             if (conn != null) {
@@ -239,7 +239,7 @@ public class Kasutusoigus {
             return 0;
         }
     }
-    
+
     public int updateInDB(Connection conn) {
         try {
             if (conn != null) {
@@ -268,7 +268,7 @@ public class Kasutusoigus {
             return 0;
         }
     }
-    
+
     public int saveToDB(Connection conn) {
         if (m_id > 0) {
             return updateInDB(conn);
@@ -276,25 +276,25 @@ public class Kasutusoigus {
             return addToDB(conn);
         }
     }
-    
+
     public static int syncWithAar(Kasutusoigus right, AarOigus aarRight, int asutusID, int ametikohtID, int allyksusID, Connection conn) {
         try {
             if (aarRight == null) {
                 return 0;
             }
-            
+
             if (right == null) {
                 right = new Kasutusoigus();
             }
-            
+
             // Kannamae keskregistrist saadud andmed kohaliku
-            // andmeobjekti kõlge
+            // andmeobjekti külge
             right.setRoll(aarRight.getOigusNimi());
             right.setAlates(aarRight.getOigusAlates());
             right.setKuni(aarRight.getOigusKuni());
             right.setAsutusID(asutusID);
             right.setAmetikohtID(ametikohtID);
-            right.setAllyksusID(allyksusID);            
+            right.setAllyksusID(allyksusID);
             if (right.getID() <= 0) {
                 right.setLoodud(new Date());
             } else {
@@ -302,10 +302,9 @@ public class Kasutusoigus {
             }
             right.setMuutja(Settings.Server_CentralRightsDatabasePersonCode);
             right.saveToDB(conn);
-            
+
             return right.getID();
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             CommonMethods.logError(ex, "dhl.users.Kasutusoigus", "syncWithAar");
             return 0;
         }

@@ -38,7 +38,7 @@ public class receiveDocumentsV3ResponseType implements SOAPOutputBodyRepresentat
 
             SOAPBodyElement element = body.addBodyElement(se.createName("receiveDocumentsResponse"));
 
-            // Sõnumi põringu osa
+            // Sõnumi päringu osa
             if (paring != null) {
             SOAPElement elParing = element.addChildElement(se.createName("paring"));
                 if (paring != null) {
@@ -48,7 +48,7 @@ public class receiveDocumentsV3ResponseType implements SOAPOutputBodyRepresentat
                     }
                 }
             }
-            
+
             // Sõnumi keha osa
             SOAPElement elKeha = element.addChildElement(se.createName("keha"));
             if ((edastusID != null) && !edastusID.equalsIgnoreCase("")) {

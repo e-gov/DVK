@@ -31,13 +31,13 @@ public class DocumentStatusHistory {
 	private Fault m_fault;
     private int m_recipientStatusId;
     private String m_metaXML;
-    
+
     // Abimuutujad, mida andmebaasi ei salvestata
     private String m_orgCode;
     private String m_personCode;
     private String m_subdivisionShortName;
     private String m_occupationShortName;
-    
+
     public int getId() {
         return this.m_id;
     }
@@ -93,8 +93,8 @@ public class DocumentStatusHistory {
     public void setMetaXML(String value) {
         this.m_metaXML = value;
     }
-    
-    
+
+
     public String getOrgCode() {
         return this.m_orgCode;
     }
@@ -135,13 +135,13 @@ public class DocumentStatusHistory {
     	this.m_fault = null;
     	this.m_recipientStatusId = 0;
     	this.m_metaXML = "";
-        
+
     	this.m_orgCode = "";
     	this.m_personCode = "";
     	this.m_subdivisionShortName = "";
     	this.m_occupationShortName = "";
     }
-    
+
     public DocumentStatusHistory(
     	int id,
     	int recipientId,
@@ -150,7 +150,7 @@ public class DocumentStatusHistory {
     	Fault fault,
     	int recipientStatusId,
     	String metaXml) {
-    	
+
     	this.m_id = id;
     	this.m_recipientId = recipientId;
     	this.m_sendingStatusId = sendingStatusId;
@@ -158,25 +158,25 @@ public class DocumentStatusHistory {
     	this.m_fault = fault;
     	this.m_recipientStatusId = recipientStatusId;
     	this.m_metaXML = metaXml;
-    	
+
     	this.m_orgCode = "";
     	this.m_personCode = "";
     	this.m_subdivisionShortName = "";
     	this.m_occupationShortName = "";
     }
-    
+
     public int addToDB(Connection conn, XHeader xTeePais) throws SQLException, IllegalArgumentException {
         if (conn != null) {
             Calendar cal = Calendar.getInstance();
             StringReader r = new StringReader(m_metaXML);
             CallableStatement cs = conn.prepareCall("{call ADD_STAATUSE_AJALUGU(?,?,?,?,?,?,?,?,?,?,?,?,?)}");
             cs.registerOutParameter("staatuse_ajalugu_id_out", Types.INTEGER);
-            
+
             cs.setInt("staatuse_ajalugu_id", m_id);
             cs.setInt("vastuvotja_id", m_recipientId);
             cs.setInt("staatus_id", m_sendingStatusId);
             cs.setTimestamp("staatuse_muutmise_aeg", CommonMethods.sqlDateFromDate(m_statusDate), cal);
-            
+
             if (m_fault != null) {
                 cs.setString("fault_code", CommonMethods.TruncateString(m_fault.getFaultCode(), 50));
                 cs.setString("fault_actor", CommonMethods.TruncateString(m_fault.getFaultActor(), 250));
@@ -188,31 +188,31 @@ public class DocumentStatusHistory {
                 cs.setNull("fault_string", Types.VARCHAR);
                 cs.setNull("fault_detail", Types.VARCHAR);
             }
-            
+
             cs = CommonMethods.setNullableIntParam(cs, "vastuvotja_staatus_id", m_recipientStatusId);
-            
-            if(xTeePais != null) {
+
+            if (xTeePais != null) {
             	cs.setString("xtee_isikukood", xTeePais.isikukood);
                 cs.setString("xtee_asutus", xTeePais.asutus);
     		} else {
     			cs.setString("xtee_isikukood", null);
                 cs.setString("xtee_asutus", null);
-    		}     
-            
-            cs.setCharacterStream("metaxml", r, m_metaXML.length());                  
-            
+    		}
+
+            cs.setCharacterStream("metaxml", r, m_metaXML.length());
+
             cs.executeUpdate();
             m_id = cs.getInt("staatuse_ajalugu_id_out");
             logger.debug("Added new history entry with ID: " + String.valueOf(m_id));
             cs.close();
-            
-            
+
+
             return m_id;
         } else {
         	throw new IllegalArgumentException("Database connection is NULL!");
         }
     }
-    
+
     public static ArrayList<DocumentStatusHistory> getList(int documentId, Connection conn) throws IllegalArgumentException, IOException, SQLException {
         if (conn != null) {
             Calendar cal = Calendar.getInstance();
@@ -220,7 +220,7 @@ public class DocumentStatusHistory {
             cs.setInt("document_id", documentId);
             cs.registerOutParameter("RC1", oracle.jdbc.OracleTypes.CURSOR);
             cs.execute();
-            ResultSet rs = (ResultSet)cs.getObject("RC1");
+            ResultSet rs = (ResultSet) cs.getObject("RC1");
             ArrayList<DocumentStatusHistory> result = new ArrayList<DocumentStatusHistory>();
             while (rs.next()) {
             	DocumentStatusHistory item = new DocumentStatusHistory();
@@ -228,19 +228,19 @@ public class DocumentStatusHistory {
             	item.setRecipientId(rs.getInt("vastuvotja_id"));
             	item.setSendingStatusId(rs.getInt("staatus_id"));
             	item.setStatusDate(rs.getTimestamp("staatuse_muutmise_aeg", cal));
-                
+
             	String faultString = rs.getString("fault_string");
                 if ((faultString != null) && (faultString.length() > 0)) {
                     Fault f = new Fault(rs.getString("fault_code"), rs.getString("fault_actor"), faultString, rs.getString("fault_detail"));
                     item.setFault(f);
                 }
-            	
+
                 item.setRecipientStatusId(rs.getInt("vastuvotja_staatus_id"));
                 item.setOrgCode(rs.getString("asutuse_regnr"));
                 item.setPersonCode(rs.getString("isikukood"));
                 item.setSubdivisionShortName(rs.getString("allyksuse_lyhinimetus"));
                 item.setOccupationShortName(rs.getString("ametikoha_lyhinimetus"));
-                
+
                 // Loeme CLOB-ist dokumendi andmed
                 Clob tmpBlob = rs.getClob("metaxml");
                 if (tmpBlob != null) {
@@ -262,7 +262,7 @@ public class DocumentStatusHistory {
         	throw new IllegalArgumentException("Database connection is NULL!");
         }
     }
-    
+
     public void appendObjectXML(OutputStreamWriter xmlWriter, Connection conn) throws IOException {
         // Item element start
         xmlWriter.write("<staatus>");
@@ -282,11 +282,11 @@ public class DocumentStatusHistory {
             xmlWriter.write("<ametikoha_lyhinimetus>" + m_occupationShortName + "</ametikoha_lyhinimetus>");
         }
         xmlWriter.write("</saaja>");
-        
+
         // Ajaloo kirje unikaalne ID
         xmlWriter.write("<staatuse_ajalugu_id>" + String.valueOf(m_id) + "</staatuse_ajalugu_id>");
-        
-        // Staatuse kuupõev
+
+        // Staatuse kuupäev
         xmlWriter.write("<staatuse_muutmise_aeg>" + CommonMethods.getDateISO8601(m_statusDate) + "</staatuse_muutmise_aeg>");
 
         // Staatuse kood
@@ -305,12 +305,12 @@ public class DocumentStatusHistory {
                 break;
         }
         xmlWriter.write("<staatus>" + statOut + "</staatus>");
-        
+
         // Fault
         if (m_fault != null) {
         	m_fault.appendObjectXML(xmlWriter);
         }
-        
+
         // Vastuvõtja saadetud staatus
         xmlWriter.write("<vastuvotja_staatus_id>" + String.valueOf(m_recipientStatusId) + "</vastuvotja_staatus_id>");
 

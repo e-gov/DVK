@@ -115,7 +115,7 @@ public class AmetikohaTaitmine {
     public AmetikohaTaitmine() {
         clear();
     }
-    
+
     public void clear() {
         m_id = 0;
         m_ametikohtID = 0;
@@ -129,7 +129,7 @@ public class AmetikohaTaitmine {
         m_peatatud = false;
         m_aarID = 0;
     }
-    
+
     public static AmetikohaTaitmine getByAarID(int aarID, Connection conn) {
         try {
             if (conn != null) {
@@ -173,7 +173,7 @@ public class AmetikohaTaitmine {
             return null;
         }
     }
-    
+
     public static ArrayList<AmetikohaTaitmine> getList(int jobID, String personCode, Connection conn) {
         try {
             if (conn != null) {
@@ -183,7 +183,7 @@ public class AmetikohaTaitmine {
                 cs.setString("isikukood", personCode);
                 cs.registerOutParameter("RC1", oracle.jdbc.OracleTypes.CURSOR);
                 cs.execute();
-                ResultSet rs = (ResultSet)cs.getObject("RC1");
+                ResultSet rs = (ResultSet) cs.getObject("RC1");
                 ArrayList<AmetikohaTaitmine> result = new ArrayList<AmetikohaTaitmine>();
                 while (rs.next()) {
                     AmetikohaTaitmine item = new AmetikohaTaitmine();
@@ -211,7 +211,7 @@ public class AmetikohaTaitmine {
             return null;
         }
     }
-    
+
     public int addToDB(Connection conn) {
         try {
             if (conn != null) {
@@ -240,7 +240,7 @@ public class AmetikohaTaitmine {
             return 0;
         }
     }
-    
+
     public int updateInDB(Connection conn) {
         try {
             if (conn != null) {
@@ -268,7 +268,7 @@ public class AmetikohaTaitmine {
             return 0;
         }
     }
-    
+
     public int saveToDB(Connection conn) {
         if (m_id > 0) {
             return updateInDB(conn);
@@ -276,12 +276,12 @@ public class AmetikohaTaitmine {
             return addToDB(conn);
         }
     }
-    
+
     public static void syncListWithAar(ArrayList<AarAmetikohaTaitmine> aarTaitmised, int ametikohtID, Connection conn) {
         if ((aarTaitmised == null) || (ametikohtID <= 0)) {
             return;
         }
-        
+
         for (int i = 0; i < aarTaitmised.size(); ++i) {
             AarAmetikohaTaitmine aarTaitmine = aarTaitmised.get(i);
             AmetikohaTaitmine taitmine = AmetikohaTaitmine.getByAarID(aarTaitmine.getTaitmineID(), conn);
@@ -296,24 +296,24 @@ public class AmetikohaTaitmine {
             syncWithAar(taitmine, aarTaitmine, ametikohtID, conn);
         }
     }
-    
+
     public static int syncWithAar(AmetikohaTaitmine taitmine, AarAmetikohaTaitmine aarTaitmine, int jobID, Connection conn) {
         try {
             if (aarTaitmine == null) {
                 return 0;
             }
-            
+
             int isikID = Isik.getIDByCode(aarTaitmine.getIsik().getIsikukood(), conn);
             if (isikID <= 0) {
                 isikID = Isik.syncWithAar(null, aarTaitmine.getIsik(), conn);
             }
-            
+
             if (taitmine == null) {
                 taitmine = new AmetikohaTaitmine();
             }
-            
+
             // Kannamae keskregistrist saadud andmed kohaliku
-            // andmeobjekti kõlge
+            // andmeobjekti külge
             taitmine.setAmetikohtID(jobID);
             taitmine.setIsikID(isikID);
             taitmine.setAlates(aarTaitmine.getAlates());
@@ -327,10 +327,9 @@ public class AmetikohaTaitmine {
             taitmine.setMuutja(Settings.Server_CentralRightsDatabasePersonCode);
             taitmine.setAarID(aarTaitmine.getTaitmineID());
             taitmine.saveToDB(conn);
-            
+
             return taitmine.getID();
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             CommonMethods.logError(ex, "dhl.users.AmetikohaTaitmine", "SyncWithAar");
             return 0;
         }

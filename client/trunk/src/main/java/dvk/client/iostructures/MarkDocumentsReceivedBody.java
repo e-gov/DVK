@@ -12,9 +12,9 @@ import dvk.client.businesslayer.DhlMessage;
 import dvk.core.CommonMethods;
 
 public class MarkDocumentsReceivedBody implements SOAPBodyOverride {
-	
+
 	private static Logger logger = Logger.getLogger(MarkDocumentsReceivedBody.class);
-	
+
     public String dokumendid;
     public String kaust;
     public String edastusID;
@@ -43,15 +43,15 @@ public class MarkDocumentsReceivedBody implements SOAPBodyOverride {
         result += "</keha></dhl:markDocumentsReceived>";
         return result;
     }
-    
+
     public static String createResponseFile(ArrayList<Integer> documents, int statusID, dvk.core.Fault clientFault, String metaXML, int requestVersion, Date statusDate) throws Exception {
     	String attachmentFile = "";
     	FileOutputStream outStream = null;
         OutputStreamWriter outWriter = null;
         BufferedWriter writer = null;
-        
+
         logger.debug("Creating responseFile for MarkDocumentsReceivedBody.");
-        
+
         try {
             // Väljundfail
             attachmentFile = CommonMethods.createPipelineFile(0);
@@ -88,15 +88,15 @@ public class MarkDocumentsReceivedBody implements SOAPBodyOverride {
         }
         return attachmentFile;
     }
-    
+
     public static String createResponseFile(ArrayList<DhlMessage> documents, int requestVersion, Date statusDate) throws Exception {
     	String attachmentFile = "";
     	FileOutputStream outStream = null;
         OutputStreamWriter outWriter = null;
         BufferedWriter writer = null;
-        
+
         try {
-            // V�ljundfail
+            // Väljundfail
             attachmentFile = CommonMethods.createPipelineFile(0);
             outStream = new FileOutputStream(attachmentFile, false);
             outWriter = new OutputStreamWriter(outStream, "UTF-8");

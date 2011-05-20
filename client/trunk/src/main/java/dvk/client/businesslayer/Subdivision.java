@@ -18,7 +18,7 @@ import org.w3c.dom.NodeList;
 
 public class Subdivision {
 	private static Logger logger = Logger.getLogger(Subdivision.class.getName());
-	
+
 	private int m_id;
     private String m_name;
     private String m_orgCode;
@@ -48,7 +48,7 @@ public class Subdivision {
     public void setOrgCode(String value) {
         m_orgCode = value;
     }
-    
+
     public String getShortName() {
         return this.m_shortName;
     }
@@ -64,12 +64,12 @@ public class Subdivision {
     public void setParentSubdivisionShortName(String value) {
         this.m_parentSubdivisionShortName = value;
     }
-    
+
 
     public Subdivision() {
         clear();
     }
-    
+
     public void clear() {
         m_id = 0;
         m_name = "";
@@ -77,7 +77,7 @@ public class Subdivision {
         m_shortName = "";
         m_parentSubdivisionShortName = "";
     }
-    
+
     public boolean saveToDB(Connection conn, OrgSettings db) {
         try {
             if (conn != null) {
@@ -102,12 +102,16 @@ public class Subdivision {
             }
         } catch (Exception ex) {
             try { conn.rollback(); }
-            catch(SQLException ex1) { CommonMethods.logError(ex, this.getClass().getName(), "saveToDB"); }
-            CommonMethods.logError(ex, this.getClass().getName(), "saveToDB");
+            catch(SQLException ex1) { logger.error(ex1.getMessage(), ex1); }
+            logger.error(ex.getMessage(), ex);
+            logger.error("Subdivision data: ID: " + String.valueOf(m_id)
+            	+ ", Name: " + m_name + ", Code: " + m_orgCode + ", Short name: "
+            	+ m_shortName + ", Parent subdivision: "
+            	+ m_parentSubdivisionShortName);
             return false;
         }
     }
-    
+
     public static ArrayList<Subdivision> getList(OrgSettings db, Connection dbConnection) {
         try {
             if (dbConnection != null) {
@@ -145,7 +149,7 @@ public class Subdivision {
             return null;
         }
     }
-    
+
     public boolean deleteFromDb(OrgSettings db, Connection dbConnection) throws Exception {
     	boolean result = false;
     	try {
@@ -176,7 +180,7 @@ public class Subdivision {
         }
         return result;
     }
-    
+
     public static Subdivision fromXML(Element itemRootElement) {
         if (itemRootElement == null) {
             return null;
@@ -202,14 +206,16 @@ public class Subdivision {
                     }
                 }
             }
-            
-            logger.debug("Deserialized subdivision data.");
+
+			logger.debug("Original XML data:");
+			logger.debug(CommonMethods.xmlElementToString(itemRootElement));
+            logger.debug("Deserialized subdivision data:");
             logger.debug("m_id = " + String.valueOf(item.m_id));
     		logger.debug("m_name = " + item.m_name);
 			logger.debug("m_orgCode = " + item.m_orgCode);
 			logger.debug("m_shortName = " + item.m_shortName);
 			logger.debug("m_parentSubdivisionShortName = " + item.m_parentSubdivisionShortName);
-            
+
             if (item.getID() < 1) {
                 return null;
             } else {
@@ -220,18 +226,18 @@ public class Subdivision {
             return null;
         }
     }
-    
+
     public static Subdivision FindFromList(ArrayList<Subdivision> list, String orgCode, String shortName) {
-        try {            
+        try {
         	for (int i = 0; i < list.size(); ++i) {
         		Subdivision item = list.get(i);
-                
+
             	if (((CommonMethods.isNullOrEmpty(orgCode) && CommonMethods.isNullOrEmpty(item.m_orgCode))
             		|| (!CommonMethods.isNullOrEmpty(orgCode) && orgCode.equalsIgnoreCase(item.m_orgCode)))
             		&&
             		((CommonMethods.isNullOrEmpty(shortName) && CommonMethods.isNullOrEmpty(item.m_shortName))
             		|| (!CommonMethods.isNullOrEmpty(shortName) && shortName.equalsIgnoreCase(item.m_shortName)))) {
-            		
+
             		return item;
             	}
             }

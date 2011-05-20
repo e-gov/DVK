@@ -11,32 +11,32 @@ import dvk.core.ShortName;
 public class GetSendingOptionsV3Body implements SOAPBodyOverride {
     public String kehaHref;
     public String attachmentFileName;
-    
+
     public boolean vastuvotmataDokumenteOotel;
     public int vahetatudDokumenteVahemalt;
     public int vahetatudDokumenteKuni;
     public ArrayList<String> asutused;
     public ArrayList<ShortName> allyksused;
     public ArrayList<ShortName> ametikohad;
-    
+
     public GetSendingOptionsV3Body() {
     	this.kehaHref = "";
     	this.attachmentFileName = "";
     	this.asutused = new ArrayList<String>();
     	this.allyksused = new ArrayList<ShortName>();
     	this.ametikohad = new ArrayList<ShortName>();
-    	this.vastuvotmataDokumenteOotel = false;        
+    	this.vastuvotmataDokumenteOotel = false;
     	this.vahetatudDokumenteVahemalt = -1;
     	this.vahetatudDokumenteKuni = -1;
     }
-	
+
 	public String getBodyContentsAsText() {
 		return "<dhl:getSendingOptions><keha href=\"cid:" + kehaHref + "\"/></dhl:getSendingOptions>";
     }
-	
+
 	public String createAttachmentFile() throws Exception {
 		String xmlFile = CommonMethods.createPipelineFile(0);
-        
+
     	FileOutputStream out = null;
         OutputStreamWriter ow = null;
         BufferedWriter bw = null;
@@ -45,9 +45,9 @@ public class GetSendingOptionsV3Body implements SOAPBodyOverride {
             ow = new OutputStreamWriter(out, "UTF-8");
             bw = new BufferedWriter(ow);
 
-            // Server tahab praegu igal juhul oma XML paise lisada
+            // Server tahab praegu igal juhul oma XML päise lisada
             //bw.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
-            
+
             bw.write("<keha>");
 
             if (vastuvotmataDokumenteOotel) {
@@ -86,7 +86,7 @@ public class GetSendingOptionsV3Body implements SOAPBodyOverride {
                 }
                 bw.write("</ametikohad>");
             }
-            
+
             bw.write("</keha>");
         }
         catch (Exception ex) {
@@ -101,7 +101,7 @@ public class GetSendingOptionsV3Body implements SOAPBodyOverride {
             ow = null;
             out = null;
         }
-        
+
         this.attachmentFileName = CommonMethods.gzipPackXML(xmlFile, "", "getSendingOptions");
 		return this.attachmentFileName;
 	}

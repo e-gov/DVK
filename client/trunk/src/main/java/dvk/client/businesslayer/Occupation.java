@@ -47,7 +47,7 @@ public class Occupation {
     public void setOrgCode(String value) {
         m_orgCode = value;
     }
-    
+
     public String getShortName() {
         return this.m_shortName;
     }
@@ -55,7 +55,7 @@ public class Occupation {
     public void setShortName(String value) {
         this.m_shortName = value;
     }
-    
+
     public String getParentSubdivisionShortName() {
         return this.m_parentSubdivisionShortName;
     }
@@ -67,7 +67,7 @@ public class Occupation {
     public Occupation() {
         clear();
     }
-    
+
     public void clear() {
         m_id = 0;
         m_name = "";
@@ -75,7 +75,7 @@ public class Occupation {
         m_shortName = "";
         m_parentSubdivisionShortName = "";
     }
-    
+
     public boolean saveToDB(Connection conn, OrgSettings db) {
         try {
             if (conn != null) {
@@ -102,10 +102,14 @@ public class Occupation {
             try { conn.rollback(); }
             catch(SQLException ex1) { logger.error(ex1.getMessage(), ex1); }
             logger.error(ex.getMessage(), ex);
+            logger.error("Occupation data: ID: " + String.valueOf(m_id)
+            	+ ", Name: " + m_name + ", Code: " + m_orgCode + ", Short name: "
+            	+ m_shortName + ", Parent subdivision: "
+            	+ m_parentSubdivisionShortName);
             return false;
         }
     }
-    
+
     public static ArrayList<Occupation> getList(OrgSettings db, Connection dbConnection) {
         try {
             if (dbConnection != null) {
@@ -143,7 +147,7 @@ public class Occupation {
             return null;
         }
     }
-    
+
     public boolean deleteFromDb(OrgSettings db, Connection dbConnection) throws Exception {
     	boolean result = false;
     	try {
@@ -174,7 +178,7 @@ public class Occupation {
         }
         return result;
     }
-    
+
     public static Occupation fromXML(Element itemRootElement) {
         if (itemRootElement == null) {
             return null;
@@ -200,7 +204,16 @@ public class Occupation {
                     }
                 }
             }
-            
+
+			logger.debug("Original XML data:");
+			logger.debug(CommonMethods.xmlElementToString(itemRootElement));
+            logger.debug("Deserialized occupation data:");
+            logger.debug("m_id = " + String.valueOf(item.m_id));
+    		logger.debug("m_name = " + item.m_name);
+			logger.debug("m_orgCode = " + item.m_orgCode);
+			logger.debug("m_shortName = " + item.m_shortName);
+			logger.debug("m_parentSubdivisionShortName = " + item.m_parentSubdivisionShortName);
+
             if (item.getID() < 1) {
                 return null;
             } else {
@@ -211,18 +224,18 @@ public class Occupation {
             return null;
         }
     }
-    
+
     public static Occupation FindFromList(ArrayList<Occupation> list, String orgCode, String shortName) {
-        try {            
+        try {
         	for (int i = 0; i < list.size(); ++i) {
             	Occupation item = list.get(i);
-                
+
             	if (((CommonMethods.isNullOrEmpty(orgCode) && CommonMethods.isNullOrEmpty(item.m_orgCode))
             		|| (!CommonMethods.isNullOrEmpty(orgCode) && orgCode.equalsIgnoreCase(item.m_orgCode)))
             		&&
             		((CommonMethods.isNullOrEmpty(shortName) && CommonMethods.isNullOrEmpty(item.m_shortName))
             		|| (!CommonMethods.isNullOrEmpty(shortName) && shortName.equalsIgnoreCase(item.m_shortName)))) {
-            		
+
             		return item;
             	}
             }

@@ -10,6 +10,8 @@
   <properties>
   	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   	
+  	<!-- Change this! -->
+  	<!-- This variable should contain the root path of DVK "core" project -->
   	<dvkCoreDir>P:\ria\dvk\workspace\dvk_core</dvkCoreDir>
   </properties>
   

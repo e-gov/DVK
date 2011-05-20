@@ -21,9 +21,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class MessageRecipient {
-	
+
 	private static Logger logger = Logger.getLogger(MessageRecipient.class);
-	
+
     private int m_id;
 	private int m_messageID;
     private String m_recipientOrgCode;
@@ -62,7 +62,7 @@ public class MessageRecipient {
     public void setId(int value) {
         this.m_id = value;
     }
-    
+
     public void setMessageID(int messageID) {
         this.m_messageID = messageID;
     }
@@ -91,7 +91,7 @@ public class MessageRecipient {
         this.m_recipientPersonCode = recipientPersonCode;
     }
 
-    public String getRecipientPersonCode() {        
+    public String getRecipientPersonCode() {
         return m_recipientPersonCode;
     }
 
@@ -124,7 +124,7 @@ public class MessageRecipient {
     public void setRecipientDivisionCode(String value) {
         this.m_recipientDivisionCode = value;
     }
-    
+
     public String getRecipientDivisionName() {
         return m_recipientDivisionName;
     }
@@ -140,16 +140,16 @@ public class MessageRecipient {
     public void setRecipientPositionID(int value) {
         m_recipientPositionID = value;
     }
-    
+
     /**
-     * @return			Adressaadi ametikoha l�hinimi
+     * @return			Adressaadi ametikoha lühinimi
      */
     public String getRecipientPositionCode() {
         return this.m_recipientPositionCode;
     }
 
     /**
-     * @param value		Adressaadi ametikoha l�hinimi
+     * @param value		Adressaadi ametikoha lühinimi
      */
     public void setRecipientPositionCode(String value) {
         this.m_recipientPositionCode = value;
@@ -258,7 +258,7 @@ public class MessageRecipient {
     public void setServiceURL(String value) {
         m_serviceURL = value;
     }
-    
+
     public MessageRecipient() {
         m_id = 0;
     	m_messageID = 0;
@@ -367,7 +367,7 @@ public class MessageRecipient {
     	logger.debug("m_recipientPositionName: " + m_recipientPositionName);
     	logger.debug("m_recipientDivisionCode: " + m_recipientDivisionCode);
     	logger.debug("m_recipientPositionCode: " + m_recipientPositionCode);
-    	
+
         try {
             if (dbConnection != null) {
                 Calendar cal = Calendar.getInstance();
@@ -377,7 +377,7 @@ public class MessageRecipient {
                 if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
                     cs = dbConnection.prepareCall("{? = call \"Save_DhlMessageRecipient\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 }
-                
+
                 // SQL Anywhere JDBC client requires that output parameters are supplied as last parameter(s).
                 // Otherwise all input parameters will be incorrectly moved down by one position in parameter list.
                 if (!CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
@@ -445,7 +445,7 @@ public class MessageRecipient {
             return false;
         }
     }
-    
+
     public static int getId(int messageId, String orgCode, String personCode, String subdivisionShortName, String occupationShortName, OrgSettings db, Connection dbConnection) throws Exception {
         int result = 0;
         if (dbConnection != null) {
@@ -564,7 +564,7 @@ public class MessageRecipient {
     }
 
     public static MessageRecipient FindRecipientFromList(ArrayList<MessageRecipient> list, String orgCode, String personCode) {
-        try {            
+        try {
             for (int i = 0; i < list.size(); ++i) {
                 MessageRecipient r = list.get(i);
                 if (!personCode.toLowerCase().equals("null")){
@@ -572,7 +572,7 @@ public class MessageRecipient {
                         return r;
                     }
                 }
-                else{ 
+                else{
                     if (r.getRecipientOrgCode().equals(orgCode)) {
                         return r;
                     }

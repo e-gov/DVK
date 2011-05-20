@@ -24,13 +24,13 @@ import org.apache.log4j.Logger;
 public class OrgCapabilityChecker {
 
 	private static Logger logger = Logger.getLogger(OrgCapabilityChecker.class);
-	
+
 	public static void main(String[] args) {
         Date startDate = new Date();
-        
+
         try {
 	        ClientAPI dvkClient = new ClientAPI();
-	
+
 	        // Vaatame, kas kasutaja on käivitamisel ka mingeid argumente ette andnud
 	        String propertiesFile = "dvk_client.properties";
 	        for (int i = 0; i < args.length; ++i) {
@@ -38,17 +38,17 @@ public class OrgCapabilityChecker {
 	                propertiesFile = args[i].substring(6).replaceAll("\"","");
 	            }
 	        }
-	        
+
 	        // Kontrollime seaded üle
 	        if (!(new File(propertiesFile)).exists()) {
 	            System.out.println("Application properties file " + propertiesFile + " does not exist!");
 	            return;
 	        }
-	
+
 	        // Laeme rakenduse seaded
 	        Settings.loadProperties(propertiesFile);
 	        List<OrgSettings> allKnownDatabases = OrgSettings.getSettings(Settings.Client_ConfigFile);
-	
+
 	        // Filtreerime välja need andmebaasid, mille andmeid antud klient
 	        // peab keskserveriga sünkroniseerima.
 	        // S.t. filtreerimisel jäetakse välja need andmebaasid, mille andmed
@@ -59,14 +59,14 @@ public class OrgCapabilityChecker {
 	        		databases.add(db);
 	        	}
 	        }
-	        
+
 	        // Kontrollime, et seadetes on märgitud vähemalt üks andmebaas, kus
 	        // andmeid saaks uuendada.
 	        if ((databases == null) || (databases.size() < 1)) {
 	            System.out.println("No database configured in configuration file "+ Settings.Client_ConfigFile +"!");
 	            return;
 	        }
-	
+
 	        // TODO: See ei ole päris õige. Tegelikult tuleks siin asutused grupeerida
 	        // turvaserverite kaupa ja siis iga grupi kohta eraldi päring teha. Antud juhul
 	        // toimib loogika valesti, kui sama klient vahendab andmeid üle test-x-tee ja
@@ -79,18 +79,18 @@ public class OrgCapabilityChecker {
 	            return;
 	        }
 	        dvkClient.setOrgSettings(databases.get(0).getDvkSettings());
-	
+
 	        // Tutvustame ennast kasutajale
 	        System.out.println("DVK Client started organization data syncronization with DVK central server. Syncronized databases: " + String.valueOf(databases.size()));
 	        System.out.println("Local X-Road secure server: " + Settings.Client_ServiceUrl);
 	        System.out.println("DVK version: " + Settings.Client_SpecificationVersion);
-	
+
 	        System.out.println("    Preparing request for DVK server...");
-	
+
 	        GetSendingOptionsV3ResponseType result = new GetSendingOptionsV3ResponseType();
-	        
+
 	        // Use credentials from first known database to query DEC for all DEC-enabled organizations.
-	        UnitCredential[] credList = new UnitCredential[] {}; 
+	        UnitCredential[] credList = new UnitCredential[] {};
 	        OrgSettings firstKnownDatabase =  databases.get(0);
 	        Connection dbConnection = DBConnection.getConnection(firstKnownDatabase);
 	        try {
@@ -98,16 +98,16 @@ public class OrgCapabilityChecker {
 	        } finally  {
 	        	CommonMethods.safeCloseDatabaseConnection(dbConnection);
 	        }
-	        
+
 	        if (credList.length > 0) {
 	            UnitCredential cred = credList[0];
-	            
+
 	            HeaderVariables headerVar = new HeaderVariables(
 	                cred.getInstitutionCode(),
 	                cred.getPersonalIdCode(),
 	                "",
 	                (CommonMethods.personalIDCodeHasCountryCode(cred.getPersonalIdCode()) ? cred.getPersonalIdCode() : "EE"+cred.getPersonalIdCode()));
-	
+
 	            try {
 	            	result = dvkClient.getSendingOptions(headerVar, null, null, null, false, -1, -1, databases.get(0).getDvkSettings().getGetSendingOptionsRequestVersion());
 	            } catch (Exception ex) {
@@ -117,18 +117,18 @@ public class OrgCapabilityChecker {
 	                return;
 	            }
 	            System.out.println("    Got response from DVK server...");
-	
+
 	            // Kui andmete vahetamisel kasutatava DVK serveri versioon on vähemalt 1.5, siis
 	            // küsime andmed ka allüksuste ja ametikohtade kohta.
 	            if (CommonMethods.compareVersions(Settings.Client_SpecificationVersion,"1.5") >= 0) {
 	                if ((result.allyksused == null) || (result.allyksused.size() < 1)
 	                	|| (result.ametikohad == null) || (result.ametikohad.size() < 1)) {
-	            	
+
 		            	ArrayList<String> orgCodes = new ArrayList<String>();
 		                for (int i = 0; i < result.asutused.size(); ++i) {
 		                    orgCodes.add(result.asutused.get(i).getOrgCode());
 		                }
-		                
+
 		                if ((result.allyksused == null) || (result.allyksused.size() < 1)) {
 			                System.out.println("    Requesting subdivision data...");
 			                try {
@@ -139,7 +139,7 @@ public class OrgCapabilityChecker {
 			                    result.allyksused = new ArrayList<Subdivision>();
 			                }
 		                }
-		                
+
 		                if ((result.ametikohad == null) || (result.ametikohad.size() < 1)) {
 			                System.out.println("    Requesting occupation data...");
 			                try {
@@ -155,13 +155,13 @@ public class OrgCapabilityChecker {
 	        } else {
 	        	logger.warn("No credentials.");
 	        }
-	
+
 	        System.out.println("    Updating data in databases...");
 	        Runtime r = Runtime.getRuntime();
 	        for (int i = 0; i < databases.size(); ++i) {
 	            OrgSettings db = databases.get(i);
 	            logger.info("Updating data in database \"" + db.getDatabaseName() + "\".");
-	            
+
 	            try {
 	            	dbConnection = DBConnection.getConnection(db);
 		            if (dbConnection == null) {
@@ -169,10 +169,10 @@ public class OrgCapabilityChecker {
 		            } else {
 			            // Sync status classifier values from config file to database
 		            	Classifier.duplicateSettingsToDB(db, dbConnection);
-		            	
+
 		            	// Leiame asutuse seaded
 			            UnitCredential[] credentials = UnitCredential.getCredentials(db, dbConnection);
-			
+
 			            // Lisame asutuste andmed teadaolevate asutuste andmebaasidesse
 			            // või kui need seal juba olemas on, siis uuendame vajadusel.
 			            for (int a = 0; a < credentials.length; ++a) {
@@ -189,7 +189,7 @@ public class OrgCapabilityChecker {
 			                    } else {
 			                    	org.saveToDB(dbConnection, db);
 			                    }
-			                    
+
 			                    // Kui Amphora integratsioon on lubatud, siis lisame uue asutuse
 			                    // otse Amphora asutuste registrisse.
 			                    if (Settings.Client_IntegratedAmphoraFunctions) {
@@ -198,7 +198,7 @@ public class OrgCapabilityChecker {
 			                        }
 			                    }
 			                }
-			                
+
 			                // Eemaldame DVK-ühilduvuse märke nendelt asutustelt, mis andmebaasis on küll
 			                // olemas, aga mille kohta keskserverist mingit infot ei laekunud.
 			                ArrayList<DhlCapability> orgsInDB = DhlCapability.getList(db, dbConnection);
@@ -216,7 +216,7 @@ public class OrgCapabilityChecker {
 			                        tmpOrg.saveToDB(dbConnection, db);
 			                    }
 			                }
-			                
+
 			                // Allüksuste andmete kirjutamine andmebaasi
 			                if ((result.allyksused != null) && (result.allyksused.size() > 0)) {
 			                	List<Subdivision> existingSubdivisions = Subdivision.getList(db, dbConnection);
@@ -228,11 +228,11 @@ public class OrgCapabilityChecker {
 				                		}
 				                	}
 			                	}
-			                	
+
 				                for (int b = 0; b < result.allyksused.size(); ++b) {
 				                    Subdivision sub = result.allyksused.get(b);
 				                    sub.saveToDB(dbConnection, db);
-				                    
+
 				                    // Kui Amphora integratsioon on lubatud, siis lisame uue
 				                    // allüksuse otse Amphora asutuste registrisse.
 				                    // TODO: Remove Amphora integration after year 2011
@@ -243,7 +243,7 @@ public class OrgCapabilityChecker {
 				                    }
 				                }
 			                }
-			                
+
 			                // Ametikohtade andmete kirjutamine andmebaasi
 			                if ((result.ametikohad != null) && (result.ametikohad.size() > 0)) {
 			                	List<Occupation> existingOccupations = Occupation.getList(db, dbConnection);
@@ -255,13 +255,13 @@ public class OrgCapabilityChecker {
 				                		}
 				                	}
 			                	}
-			                
+
 				                for (int b = 0; b < result.ametikohad.size(); ++b) {
 				                    Occupation occ = result.ametikohad.get(b);
 				                    occ.saveToDB(dbConnection, db);
 				                }
 			                }
-			                
+
 			                // Kui Amphora integratsioon on lubatud, siis kontrollime, et
 			                // Amphora asutuste tabelis olev info oleks sünkroonis DVK-st
 			                // saadud infoga.
@@ -269,7 +269,7 @@ public class OrgCapabilityChecker {
 			                if (Settings.Client_IntegratedAmphoraFunctions) {
 			                    Organization.syncOrgDhlCapability(dbConnection);
 			                }
-		
+
 			                r.gc();
 			            }
 		            }
@@ -282,7 +282,7 @@ public class OrgCapabilityChecker {
         	System.out.println("    Exception occurred! " + ex.getMessage());
         	logger.error(ex);
         }
-        
+
         Date endDate = new Date();
         System.out.println("\nWork complete. Client shutting down.");
         System.out.println("Time elapsed: " + String.valueOf((double)(endDate.getTime() - startDate.getTime()) / 1000f) + " seconds.");

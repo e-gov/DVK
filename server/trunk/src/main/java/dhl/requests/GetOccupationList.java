@@ -1,5 +1,6 @@
 package dhl.requests;
 
+import dhl.exceptions.RequestProcessingException;
 import dhl.iostructures.getOccupationListRequestType;
 import dhl.iostructures.getOccupationListResponseType;
 import dhl.iostructures.getOccupationListV2RequestType;
@@ -18,8 +19,7 @@ public class GetOccupationList {
 
 	private static Logger logger = Logger.getLogger(GetOccupationList.class);
 
-	public static getOccupationListResponseType V1(org.apache.axis.MessageContext context, Connection conn) throws AxisFault {
-
+	public static getOccupationListResponseType V1(org.apache.axis.MessageContext context, Connection conn) throws AxisFault, RequestProcessingException {
 		logger.info("GetOccupationList.V1 invoked.");
 
 		getOccupationListResponseType result = new getOccupationListResponseType();
@@ -47,7 +47,6 @@ public class GetOccupationList {
     }
 
     public static getOccupationListV2ResponseType V2(org.apache.axis.MessageContext context, Connection conn, UserProfile user) throws Exception {
-
     	logger.info("GetOccupationList.V2 invoked.");
 
     	getOccupationListV2ResponseType result = new getOccupationListV2ResponseType();

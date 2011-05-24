@@ -1003,7 +1003,7 @@ public class CoreServices implements Dhl {
 	   	                a1.setContentType("{http://www.w3.org/2001/XMLSchema}base64Binary");
 	   	                a1.addMimeHeader("Content-Encoding", "gzip");
 	   	                response.addAttachmentPart(a1);
-	   	                ((getOccupationListV2ResponseType)result).ametikohadHref = a1.getContentId();
+	   	                ((getOccupationListV2ResponseType) result).ametikohadHref = a1.getContentId();
                     }
 
                     result.addToSOAPBody(response);
@@ -1012,10 +1012,10 @@ public class CoreServices implements Dhl {
                     throw new AxisFault("Süsteemi sisemine viga! Päringu konteksti laadimine ebaõnnestus!");
                 }
             } catch (AxisFault fault) {
-            	logger.error(fault);
+            	logger.error(fault.getMessage(), fault);
             	throw fault;
             } catch (Exception ex) {
-                logger.error(ex);
+                logger.error(ex.getMessage(), ex);
                 throw new AxisFault(ex.getMessage());
             } finally {
                 CommonMethods.safeCloseDatabaseConnection(conn);

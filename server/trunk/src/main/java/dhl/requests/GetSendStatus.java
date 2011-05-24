@@ -171,8 +171,8 @@ public class GetSendStatus {
                                     } else {
                                     	logger.debug("Recipient " + r.getOrganizationCode() + " status is stored in local server.");
 
-                                    	tmpEdastus = new dhl.iostructures.edastus( r, sendingData.getStartDate() );
-                                        resp.edastus.add( tmpEdastus );
+                                    	tmpEdastus = new dhl.iostructures.edastus(r, sendingData.getStartDate());
+                                        resp.edastus.add(tmpEdastus);
                                         isCanceled = isCanceled || (r.getSendStatusID() == CommonStructures.SendStatus_Canceled);
                                         isSent = isSent || (r.getSendStatusID() == CommonStructures.SendStatus_Sent);
                                         isSending = isSending || (r.getSendStatusID() == CommonStructures.SendStatus_Sending);
@@ -197,7 +197,7 @@ public class GetSendStatus {
                 	throw fault;
                 } catch (Exception ex) {
                     logger.error(ex.getMessage(), ex);
-                    throw new AxisFault( "Error composing response message: " +" ("+ ex.getClass().getName() +": "+ ex.getMessage() +")" );
+                    throw new AxisFault("Error composing response message: (" + ex.getClass().getName() + ": " + ex.getMessage() + ")");
                 } finally {
                     CommonMethods.safeCloseWriter(ow);
                     CommonMethods.safeCloseStream(out);
@@ -220,7 +220,7 @@ public class GetSendStatus {
 
     public static RequestInternalResult V2(MessageContext context,
     	Connection conn, UserProfile user, OrgSettings hostOrgSettings)
-    	throws AxisFault, Exception, IllegalArgumentException, IOException, SOAPException, SQLException {
+    	throws Exception {
 
     	logger.info("GetSendStatus.V2 invoked.");
 
@@ -272,7 +272,7 @@ public class GetSendStatus {
                     if (Settings.Server_RunOnClientDatabase) {
                     	logger.debug("Running on client database.");
                     	ArrayList<DhlMessage> msgList = null;
-                    	if(docID != 0) {
+                    	if (docID != 0) {
                     		logger.debug("Fetching messagelist. dhl_id: " + docID);
                     		msgList = DhlMessage.getByDhlID(docID, true, true, hostOrgSettings, conn);
                     	} else {
@@ -433,7 +433,7 @@ public class GetSendStatus {
             Settings.Client_DefaultOrganizationCode,
             Settings.Client_DefaultPersonCode,
             "",
-            (CommonMethods.personalIDCodeHasCountryCode(Settings.Client_DefaultPersonCode) ? Settings.Client_DefaultPersonCode : "EE"+Settings.Client_DefaultPersonCode));
+            (CommonMethods.personalIDCodeHasCountryCode(Settings.Client_DefaultPersonCode) ? Settings.Client_DefaultPersonCode : "EE" + Settings.Client_DefaultPersonCode));
 
         ArrayList<DhlMessage> msgArray = new ArrayList<DhlMessage>();
         DhlMessage dhlMessage = new DhlMessage();
@@ -461,18 +461,18 @@ public class GetSendStatus {
                 if (rec.getRecipientPersonCode() == null) {
                     rec.setRecipientPersonCode("");
                 }
-                if (rec.getRecipientOrgCode().equalsIgnoreCase(org.getRegistrikood()) &&
-                    rec.getRecipientPersonCode().equalsIgnoreCase(recipient.getPersonalIdCode())) {
+                if (rec.getRecipientOrgCode().equalsIgnoreCase(org.getRegistrikood())
+                    && rec.getRecipientPersonCode().equalsIgnoreCase(recipient.getPersonalIdCode())) {
                     recItem = rec;
                     break;
                 }
             }
             if (recItem != null) {
                 Fault f = null;
-                if (((recItem.getFaultActor() != null) && (!recItem.getFaultActor().equalsIgnoreCase(""))) ||
-                    ((recItem.getFaultCode() != null) && (!recItem.getFaultCode().equalsIgnoreCase(""))) ||
-                    ((recItem.getFaultDetail() != null) && (!recItem.getFaultDetail().equalsIgnoreCase(""))) ||
-                    ((recItem.getFaultString() != null) && (!recItem.getFaultString().equalsIgnoreCase("")))) {
+                if (!CommonMethods.isNullOrEmpty(recItem.getFaultActor())
+                    || !CommonMethods.isNullOrEmpty(recItem.getFaultCode())
+                    || !CommonMethods.isNullOrEmpty(recItem.getFaultDetail())
+                    || !CommonMethods.isNullOrEmpty(recItem.getFaultString())) {
                     f = new Fault(recItem.getFaultCode(), recItem.getFaultActor(), recItem.getFaultString(), recItem.getFaultDetail());
                 }
                 recipient.setFault(f);

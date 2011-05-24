@@ -1,5 +1,6 @@
 package dhl.requests;
 
+import dhl.exceptions.RequestProcessingException;
 import dhl.iostructures.getSubdivisionListResponseType;
 import dhl.iostructures.getSubdivisionListRequestType;
 import dhl.iostructures.getSubdivisionListV2RequestType;
@@ -19,7 +20,7 @@ public class GetSubdivisionList {
 
 	private static Logger logger = Logger.getLogger(GetSubdivisionList.class);
 
-    public static getSubdivisionListResponseType V1(org.apache.axis.MessageContext context, Connection conn) throws AxisFault {
+    public static getSubdivisionListResponseType V1(org.apache.axis.MessageContext context, Connection conn) throws AxisFault, RequestProcessingException {
 
     	logger.info("GetSubdivisionList.V1 invoked.");
 

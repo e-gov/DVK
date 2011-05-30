@@ -3,9 +3,9 @@
 -- Rollback DVK Client from version 1.6.2 to 1.6.1
 ----------------------------------------------------------------------
 
-drop procedure if exists "Update_DhlMessageMetaData";
+drop procedure "Update_DhlMessageMetaData";
 
-drop procedure if exists "Get_DhlMessageID";
+drop procedure "Get_DhlMessageID";
 create procedure "Get_DhlMessageID"
 (
 	in _dhl_id int,
@@ -39,7 +39,7 @@ begin
     set _dhl_message_id = isnull(_dhl_message_id, 0);
 end;
 
-drop procedure if exists "Get_DhlOccupationList";
-drop procedure if exists "Get_DhlSubdivisionList";
-drop procedure if exists "Delete_DhlOccupation";
-drop procedure if exists "Delete_DhlSubdivision";
+drop procedure "Get_DhlOccupationList";
+drop procedure "Get_DhlSubdivisionList";
+drop procedure "Delete_DhlOccupation";
+drop procedure "Delete_DhlSubdivision";

@@ -3,7 +3,6 @@
 -- Update DVK Client from version 1.6.1 to 1.6.2
 ----------------------------------------------------------------------
 
-drop procedure if exists "Update_DhlMessageMetaData";
 create procedure "Update_DhlMessageMetaData"
 (
 	in _id int,
@@ -93,7 +92,7 @@ begin
     where	"dhl_message_id" = _id;
 end;
 
-drop procedure if exists "Get_DhlMessageID";
+drop procedure "Get_DhlMessageID";
 create procedure "Get_DhlMessageID"
 (
 	in _dhl_id int,
@@ -130,21 +129,18 @@ begin
     set _dhl_message_id = isnull(_dhl_message_id, 0);
 end;
 
-drop procedure if exists "Get_DhlOccupationList";
 create procedure "Get_DhlOccupationList" ()
 begin
     select	*
     from	dhl_occupation;
 end;
 
-drop procedure if exists "Get_DhlSubdivisionList";
 create procedure "Get_DhlSubdivisionList" ()
 begin
     select	*
     from	dhl_subdivision;
 end;
 
-drop procedure if exists "Delete_DhlOccupation";
 create procedure "Delete_DhlOccupation"
 (
 	in _id int
@@ -155,7 +151,6 @@ begin
 	where	"occupation_code" = _id;
 end;
 
-drop procedure if exists "Delete_DhlSubdivision";
 create procedure "Delete_DhlSubdivision"
 (
 	in _id int

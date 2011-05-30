@@ -1,4 +1,4 @@
-﻿SET client_encoding = 'UTF8';
+SET client_encoding = 'UTF8';
 SET check_function_bodies = false;
 SET client_min_messages = warning;
 SET escape_string_warning = off;
@@ -253,7 +253,7 @@ BEGIN
     open RC1 for
     select  *
     from    dhl_settings;
-    
+
     RETURN RC1;
 END;$$
     LANGUAGE plpgsql;
@@ -273,7 +273,7 @@ begin
     perform *
     from    dhl_organization o
     where   o.org_code = p_org_code;
-    
+
     if (not found) then
         insert
         into    dhl_organization(
@@ -600,7 +600,7 @@ begin
                 and recipient_position_id = recipient_position_id_
                 and recipient_division_code = recipient_division_code_
                 and recipient_position_code = recipient_position_code_;
-        
+
         select
         into    p_id
                 dhl_message_recipient_id
@@ -614,7 +614,7 @@ begin
                 and recipient_position_code = recipient_position_code_;
     else
         p_id := nextval('sq_dhl_message_recipient_id');
-        
+
         insert
         into    dhl_message_recipient(
                 dhl_message_id,
@@ -684,8 +684,8 @@ begin
     -- salvestab vastuvõtja andmetesse vastuvõtja DVK serveri poolt antud sõnumi ID väärtuse
     update  dhl_message_recipient
     set     dhl_id = p_dhl_id,
-            query_id = p_query_id 
-    where   dhl_message_id = p_dhl_message_id 
+            query_id = p_query_id
+    where   dhl_message_id = p_dhl_message_id
             and recipient_org_code in
             (
                 select  org_code
@@ -852,7 +852,7 @@ begin
     select  *
     from    dhl_organization
     where   org_code = p_org_code;
-	
+
 	return  RC1;
 end; $$
 language plpgsql;
@@ -945,7 +945,7 @@ begin
     open RC1 for
     select  *
     from    dhl_organization;
-	
+
 	return RC1;
 end; $$
 language plpgsql;
@@ -960,7 +960,7 @@ begin
     open RC1 for
     select  *
     from    dhl_classifier;
-    
+
     return RC1;
 end; $$
 language plpgsql;
@@ -977,7 +977,7 @@ begin
     select  *
     from    dhl_classifier
     where   dhl_classifier_code = p_code;
-    
+
     return RC1;
 end; $$
 language plpgsql;
@@ -992,7 +992,7 @@ begin
     perform    *
     from    dhl_classifier
     where   dhl_classifier_code = p_code;
-            
+
     if not found then
         insert into dhl_classifier(dhl_classifier_code, dhl_classifier_id)
         values (p_code, p_id);
@@ -1001,7 +1001,7 @@ begin
         set     dhl_classifier_id = p_id
         where   dhl_classifier_code = p_code;
     end if;
-    
+
     return found;
 end; $$
 language plpgsql;
@@ -1191,7 +1191,7 @@ begin
                 and server_side_id = p_server_side_id;
     else
         p_id := nextval('sq_dhl_status_history_id');
-        
+
         insert
         into    dhl_status_history(
                 dhl_status_history_id,
@@ -1275,7 +1275,7 @@ begin
             dhl_guid
     from    dhl_message
     where   guid = p_guid;
-    
+
     return RC1;
 end; $$
 language plpgsql;
@@ -1296,7 +1296,7 @@ begin
 				and (current_date - received_date) >= p_doc_lifetime_days;
 		GET DIAGNOSTICS tmp_rc = ROW_COUNT;
 		result := result + tmp_rc;
-				
+
 		-- Delete old sent documents
 		delete
 		from	dhl_message
@@ -1305,7 +1305,7 @@ begin
 		GET DIAGNOSTICS tmp_rc = ROW_COUNT;
 		result := result + tmp_rc;
 	end if;
-    
+
     return  result;
 end; $$
 language plpgsql;
@@ -1412,7 +1412,7 @@ begin
     open RC1 for
     select  *
     from    dhl_occupation;
-	
+
 	return RC1;
 end; $$
 language plpgsql;
@@ -1427,7 +1427,7 @@ begin
     open RC1 for
     select  *
     from    dhl_subdivision;
-	
+
 	return RC1;
 end; $$
 language plpgsql;
@@ -1614,7 +1614,7 @@ create sequence sq_dhl_status_history_id
     increment by 1
     no maxvalue
     no minvalue
-    cache 1;    
+    cache 1;
 
 create table dhl_status_history(
     dhl_status_history_id int not null default nextval('sq_dhl_status_history_id'::regclass),
@@ -1632,10 +1632,6 @@ create table dhl_status_history(
 
 alter table only dhl_status_history
     add constraint dhl_status_history_pkey primary key (dhl_status_history_id);
-
-alter table only dhl_status_history
-    add constraint fk_dhl_status_history_1 foreign key (dhl_message_recipient_id) references dhl_message_recipient (dhl_message_recipient_id) on delete cascade;
-
 
 CREATE SEQUENCE dhl_settings_folders_id_seq
     START WITH 1
@@ -1669,6 +1665,9 @@ alter table only dhl_message_recipient
 
 ALTER TABLE dhl_message_recipient
     ADD CONSTRAINT fk_dhl_message_recipient_1 FOREIGN KEY (dhl_message_id) REFERENCES dhl_message (dhl_message_id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+alter table only dhl_status_history
+    add constraint fk_dhl_status_history_1 foreign key (dhl_message_recipient_id) references dhl_message_recipient (dhl_message_recipient_id) on delete cascade;
 
 CREATE INDEX ix_dhl_message_1 ON dhl_message USING btree (unit_id);
 CREATE INDEX ix_dhl_message_2 ON dhl_message USING btree (dhl_id);

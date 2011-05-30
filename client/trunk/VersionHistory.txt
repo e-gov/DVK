@@ -1,0 +1,15 @@
+1.6.2
+-------------------------------------------------------------------------------
+- Andmebaaside vahel otse saatmise korral ei saadeta enam ühelgi juhul dokumenti
+  tagasi samasse andmebaasi, kust see pärineb.
+- Andmebaaside vahel otse saatmise korral ei ole enam nõutav, et sama asutuse
+  erinevates andmebaasides oleks seadiostatud erinevad allüksused või
+  ametikohad. Nüüd piisab ka sellest, kui erinevate andmebaaside puhul on
+  seadistatud erinevad DVK kaustad.
+- Universaalkliendi asutuste ja allüksuste andmetabelitest eemaldatakse andmete
+  sünkroniseerimisel nüüd need kirjed, mis DVK serverist on kustutatud.
+- Õnnestunud saatmisel eemaldatakse nüüd DHL_MESSAGE tabelist veateated, mis
+  varasemate ebaõnnestunud saatmiskatsete käigus sinna on tekkinud.
+- Nüüd kirjutatakse DHL_MESSAGE_RECIPIENT andmetabelisse ka DVK keskserverist
+  allalaetud dokumentide adressaatide anmded (varem kirjutati nimetatud
+  tabelisse ainult väljasaadetavate dokumentide adressaatide andmed).

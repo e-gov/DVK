@@ -3,7 +3,7 @@
 - Andmebaaside vahel otse saatmise korral ei saadeta enam ühelgi juhul dokumenti
   tagasi samasse andmebaasi, kust see pärineb.
 - Andmebaaside vahel otse saatmise korral ei ole enam nõutav, et sama asutuse
-  erinevates andmebaasides oleks seadiostatud erinevad allüksused või
+  erinevates andmebaasides oleks seadistatud erinevad allüksused või
   ametikohad. Nüüd piisab ka sellest, kui erinevate andmebaaside puhul on
   seadistatud erinevad DVK kaustad.
 - Universaalkliendi asutuste ja allüksuste andmetabelitest eemaldatakse andmete
@@ -13,3 +13,5 @@
 - Nüüd kirjutatakse DHL_MESSAGE_RECIPIENT andmetabelisse ka DVK keskserverist
   allalaetud dokumentide adressaatide anmded (varem kirjutati nimetatud
   tabelisse ainult väljasaadetavate dokumentide adressaatide andmed).
+- Tabelisse DHL_MESSAGE lisatakse nüüd korrektselt saabunud dokumendi adressaadi
+  allüksuse ja ametikoha lühinimetused.

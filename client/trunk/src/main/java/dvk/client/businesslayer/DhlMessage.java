@@ -38,9 +38,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public class DhlMessage implements Cloneable {
-	
+
 	static Logger logger = Logger.getLogger(ClientAPI.class.getName());
-	
+
 	private int m_id;
     private boolean m_isIncoming;
     private String m_filePath;
@@ -72,7 +72,7 @@ public class DhlMessage implements Cloneable {
     private String m_faultString;
     private String m_faultDetail;
     private boolean m_statusUpdateNeeded;
-    private String m_metaXML;    
+    private String m_metaXML;
     private String m_queryID; // X-tee põringu põise ID
     private ArrayList<MessageRecipient> m_recipients; // sõnumi saajad
     private String m_recipientDepartmentNr;
@@ -84,22 +84,16 @@ public class DhlMessage implements Cloneable {
     private String m_recipientPositionName;
     private String m_recipientDivisionCode;
     private String m_recipientPositionCode;
-    
-    // ametikoha_lyhinimetus
-    private String m_recipientPositionShortName;
-    
-    // allyksuse_lyhinimetus
-    private String m_recipientDivisionShortName;
-    
+
     // teadmiseks
     private boolean m_fyi;
-    
+
     private int m_containerVersion;
-    
+
     // DeliveryChannel tõidetakse saatmisel ja seda infot
     // andmebaasi ei salvestata.
     private DeliveryChannel m_deliveryChannel;
-    
+
 
     public void setId(int id) {
         this.m_id = id;
@@ -140,7 +134,7 @@ public class DhlMessage implements Cloneable {
     public void setDhlGuid(String value) {
         this.m_dhlGuid = value;
     }
-    
+
     public void setTitle(String title) {
         this.m_title = title;
     }
@@ -357,7 +351,7 @@ public class DhlMessage implements Cloneable {
     public void  setRecipients(ArrayList<MessageRecipient> messageRecipients) {
         m_recipients = messageRecipients;
     }
-    
+
     public Fault getFault() {
         if (((m_faultCode == null) || (m_faultCode.trim().length() == 0)) && ((m_faultActor == null) || (m_faultActor.trim().length() == 0)) && ((m_faultString == null) || (m_faultString.trim().length() == 0)) && ((m_faultDetail == null) || (m_faultDetail.trim().length() == 0))) {
             return null;
@@ -453,7 +447,7 @@ public class DhlMessage implements Cloneable {
     public void setRecipientPositionCode(String value) {
         this.m_recipientPositionCode = value;
     }
-    
+
     public DeliveryChannel getDeliveryChannel() {
         return this.m_deliveryChannel;
     }
@@ -461,26 +455,10 @@ public class DhlMessage implements Cloneable {
     public void setDeliveryChannel(DeliveryChannel value) {
         this.m_deliveryChannel = value;
     }
-    
+
     public static String generateGUID() {
     	return java.util.UUID.randomUUID().toString();
     }
-
-	public String getRecipientPositionShortName() {
-		return m_recipientPositionShortName;
-	}
-
-	public void setRecipientPositionShortName(String positionShortName) {
-		m_recipientPositionShortName = positionShortName;
-	}
-
-	public String getRecipientDivisionShortName() {
-		return m_recipientDivisionShortName;
-	}
-
-	public void setRecipientDivisionShortName(String divisionShortName) {
-		m_recipientDivisionShortName = divisionShortName;
-	}
 
 	public boolean isFyi() {
 		return m_fyi;
@@ -497,11 +475,11 @@ public class DhlMessage implements Cloneable {
 	public void setContainerVersion(int version) {
 		m_containerVersion = version;
 	}
-    
+
     public DhlMessage() {
         clear();
     }
-    
+
     public DhlMessage(int id, boolean metadataOnly, OrgSettings db, Connection dbConnection) throws Exception {
         clear();
         this.getByID(id, metadataOnly, db, dbConnection);
@@ -573,16 +551,16 @@ public class DhlMessage implements Cloneable {
 	                CallableStatement cs = DBConnection.getStatementForResultSet("Get_DhlMessageByID", 3, db, dbConnection);
 	                cs.setInt(parNr++, id);
 	                cs.setInt(parNr++, (metadataOnly ? 1 : 0));
-	                
+
 	                ResultSet rs = DBConnection.getResultSet(cs, db, 2);
 	                while (rs.next()) {
 	                    this.setId(rs.getInt("dhl_message_id"));
-	                    this.setIsIncoming(rs.getBoolean("is_incoming"));                    
-	                    
+	                    this.setIsIncoming(rs.getBoolean("is_incoming"));
+
 	                    if (!metadataOnly) {
 	                    	String itemDataFile = CommonMethods.createPipelineFile(0);
 	                    	this.setFilePath(itemDataFile);
-	                    	
+
 	                    	if (CommonStructures.PROVIDER_TYPE_POSTGRE.equalsIgnoreCase(db.getDbProvider())
 	                        	|| CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
 	                    		byte[] containerData = rs.getString("data").getBytes("UTF-8");
@@ -611,7 +589,7 @@ public class DhlMessage implements Cloneable {
 		                        }
 	                    	}
 	                    }
-	                    
+
 	                    this.setTitle(rs.getString("title"));
 	                    this.setSenderOrgCode(rs.getString("sender_org_code"));
 	                    this.setSenderOrgName(rs.getString("sender_org_name"));
@@ -662,16 +640,16 @@ public class DhlMessage implements Cloneable {
             CommonMethods.logError(ex, this.getClass().getName(), "getByID");
         }
     }
-    
+
     public static ArrayList<DhlMessage> getList(boolean incoming, int statusID, int unitID, boolean statusUpdateNeeded, boolean metadataOnly, OrgSettings db, Connection dbConnection) {
-        
+
     	logger.debug("Getting messageList...");
     	logger.debug("incoming: " + incoming);
     	logger.debug("statusID: " + statusID);
     	logger.debug("unitID: " + unitID);
     	logger.debug("statusUpdateNeeded: " + statusUpdateNeeded);
     	logger.debug("metadataOnly: " + metadataOnly);
-		
+
 		try {
             if (dbConnection != null) {
             	ArrayList<DhlMessage> result = new ArrayList<DhlMessage>();
@@ -698,11 +676,11 @@ public class DhlMessage implements Cloneable {
 	                while (rs.next()) {
 	                    ++docCounter;
 	                    DhlMessage item = new DhlMessage();
-	                    
+
 	                    if (!metadataOnly){
 	                        String itemDataFile = CommonMethods.createPipelineFile(docCounter);
 	                        item.setFilePath(itemDataFile);
-	                    	
+
 	                    	if (CommonStructures.PROVIDER_TYPE_POSTGRE.equalsIgnoreCase(db.getDbProvider())
 	                    		|| CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
 	                    		byte[] containerData = rs.getString("data").getBytes("UTF-8");
@@ -731,10 +709,10 @@ public class DhlMessage implements Cloneable {
 		                        }
 	                    	}
 	                    }
-	                    
+
 	                    item.setId(rs.getInt("dhl_message_id"));
 	                    item.setDhlID(rs.getInt("dhl_id"));
-	                    item.setIsIncoming(rs.getBoolean("is_incoming"));                        
+	                    item.setIsIncoming(rs.getBoolean("is_incoming"));
 	                    item.setTitle(rs.getString("title"));
 	                    item.setSenderOrgCode(rs.getString("sender_org_code"));
 	                    item.setSenderOrgName(rs.getString("sender_org_name"));
@@ -789,7 +767,7 @@ public class DhlMessage implements Cloneable {
             return null;
         }
     }
-    
+
     public int addToDB(OrgSettings db, Connection dbConnection) throws Exception {
         FileInputStream inStream = null;
         InputStreamReader inReader = null;
@@ -799,26 +777,26 @@ public class DhlMessage implements Cloneable {
             // kindlasti teada, kui pikk on CLOB väljale kirjutatav stream.
             int fileCharsCount = CommonMethods.getCharacterCountInFile(m_filePath);
             logger.debug("Going to write container data to database. Container length: " + fileCharsCount + " characters.");
-            
+
             inStream = new FileInputStream(m_filePath);
             inReader = new InputStreamReader(inStream, "UTF-8");
             reader = new BufferedReader(inReader);
-            
+
             if (dbConnection != null) {
                 Calendar cal = Calendar.getInstance();
-                
+
                 int parNr = 1;
                 CallableStatement cs = dbConnection.prepareCall("{call Add_DhlMessage(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
                     cs = dbConnection.prepareCall("{? = call \"Add_DhlMessage\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 }
-                
+
                 // SQL Anywhere JDBC client requires that output parameters are supplied as last parameter(s).
                 // Otherwise all input parameters will be incorrectly moved down by one position in parameter list.
                 if (!CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
                 	parNr++;
                 }
-                
+
                 cs.setInt(parNr++, (m_isIncoming ? 1 : 0));
                 cs.setCharacterStream(parNr++, reader, fileCharsCount);
                 cs.setInt(parNr++, m_dhlID);
@@ -897,11 +875,11 @@ public class DhlMessage implements Cloneable {
             // kindlasti teada, kui pikk on CLOB väljale kirjutatav stream.
             int fileCharsCount = CommonMethods.getCharacterCountInFile(m_filePath);
             logger.debug("Going to write container data to database. Container length: " + fileCharsCount + " characters.");
-            
+
             inStream = new FileInputStream(m_filePath);
             inReader = new InputStreamReader(inStream, "UTF-8");
             reader = new BufferedReader(inReader);
-            
+
             if (dbConnection != null) {
                 Calendar cal = Calendar.getInstance();
 
@@ -974,7 +952,7 @@ public class DhlMessage implements Cloneable {
             reader = null;
         }
     }
-    
+
     public boolean updateMetaDataInDB(OrgSettings db, Connection dbConnection) {
         try {
             if (dbConnection != null) {
@@ -1055,13 +1033,13 @@ public class DhlMessage implements Cloneable {
                 if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
                     cs = dbConnection.prepareCall("{? = call \"Get_DhlMessageID\"(?,?,?,?)}");
                 }
-                
+
                 // SQL Anywhere JDBC client requires that output parameters are supplied as last parameter(s).
                 // Otherwise all input parameters will be incorrectly moved down by one position in parameter list.
                 if (!CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
                 	parNr++;
                 }
-                
+
                 cs.setInt(parNr++, dhlID);
                 cs.setString(parNr++, producerName);
                 cs.setString(parNr++, serviceURL);
@@ -1089,7 +1067,7 @@ public class DhlMessage implements Cloneable {
             return 0;
         }
     }
-    
+
     public static int getMessageID(String dhlGuid, String producerName, String serviceURL, boolean isIncoming, OrgSettings db, Connection dbConnection) {
         try {
             if (dbConnection != null) {
@@ -1098,13 +1076,13 @@ public class DhlMessage implements Cloneable {
                 if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
                     cs = dbConnection.prepareCall("{? = call \"Get_DhlMessageIDByGuid\"(?,?,?,?)}");
                 }
-                
+
                 // SQL Anywhere JDBC client requires that output parameters are supplied as last parameter(s).
                 // Otherwise all input parameters will be incorrectly moved down by one position in parameter list.
                 if (!CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
                 	parNr++;
                 }
-                
+
                 cs.setString(parNr++, dhlGuid);
                 cs.setString(parNr++, producerName);
                 cs.setString(parNr++, serviceURL);
@@ -1209,11 +1187,11 @@ public class DhlMessage implements Cloneable {
                     r.saveToDB(db, dbConnection);
                 }
             }
-            
+
             // Ajaloo salvestamine andmebaasi
             if ((item.getHistory() != null) && (item.getHistory().size() > 0)) {
             	for (int i = 0; i < item.getHistory().size(); i++) {
-            		DocumentStatusHistory historyItem = item.getHistory().get(i); 
+            		DocumentStatusHistory historyItem = item.getHistory().get(i);
 
             		// õritame nõõd adressaadi andmete mõõramata adressaadi ID ka tuvastada
 	                int recipientId = MessageRecipient.getId(messageID, historyItem.getOrgCode(), historyItem.getPersonCode(), historyItem.getSubdivisionShortName(), historyItem.getOccupationShortName(), db, dbConnection);
@@ -1316,7 +1294,7 @@ public class DhlMessage implements Cloneable {
             return false;
         }
     }
-    
+
     public static ArrayList<DhlMessage> getByDhlID(int dhlID, boolean incoming, boolean metadataOnly, OrgSettings db, Connection dbConnection) {
         try {
             if (dbConnection != null) {
@@ -1339,12 +1317,12 @@ public class DhlMessage implements Cloneable {
 	                    ++docCounter;
 	                    DhlMessage item = new DhlMessage();
 	                    item.setId(rs.getInt("dhl_message_id"));
-	                    item.setIsIncoming(rs.getBoolean("is_incoming"));                    
-	                    
+	                    item.setIsIncoming(rs.getBoolean("is_incoming"));
+
 	                    if (!metadataOnly) {
 	                        String itemDataFile = CommonMethods.createPipelineFile(docCounter);
 	                        item.setFilePath(itemDataFile);
-	                    	
+
 	                    	if (CommonStructures.PROVIDER_TYPE_POSTGRE.equalsIgnoreCase(db.getDbProvider())
 	                            || CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
 	                    		byte[] containerData = rs.getString("data").getBytes("UTF-8");
@@ -1373,7 +1351,7 @@ public class DhlMessage implements Cloneable {
 		                        }
 	                    	}
 	                    }
-	                    
+
 	                    item.setTitle(rs.getString("title"));
 	                    item.setSenderOrgCode(rs.getString("sender_org_code"));
 	                    item.setSenderOrgName(rs.getString("sender_org_name"));
@@ -1452,12 +1430,12 @@ public class DhlMessage implements Cloneable {
 	                    ++docCounter;
 	                    DhlMessage item = new DhlMessage();
 	                    item.setId(rs.getInt("dhl_message_id"));
-	                    item.setIsIncoming(rs.getBoolean("is_incoming"));                    
-	                    
+	                    item.setIsIncoming(rs.getBoolean("is_incoming"));
+
 	                    if (!metadataOnly) {
 	                        String itemDataFile = CommonMethods.createPipelineFile(docCounter);
 	                        item.setFilePath(itemDataFile);
-	                    	
+
 	                    	if (CommonStructures.PROVIDER_TYPE_POSTGRE.equalsIgnoreCase(db.getDbProvider())
 	                            || CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
 	                    		byte[] containerData = rs.getString("data").getBytes("UTF-8");
@@ -1486,7 +1464,7 @@ public class DhlMessage implements Cloneable {
 		                        }
 	                    	}
 	                    }
-	                    
+
 	                    item.setTitle(rs.getString("title"));
 	                    item.setSenderOrgCode(rs.getString("sender_org_code"));
 	                    item.setSenderOrgName(rs.getString("sender_org_name"));
@@ -1542,7 +1520,7 @@ public class DhlMessage implements Cloneable {
             return null;
         }
     }
-    
+
     public void loadFromXML(String dataFilePath, UnitCredential unit) throws Exception {
         UnitCredential[] units = new UnitCredential[] {unit};
         ArrayList<DhlMessage> messageList = getFromXML(dataFilePath, units);
@@ -1576,7 +1554,7 @@ public class DhlMessage implements Cloneable {
         messageList = null;
         units = null;
     }
-    
+
     // Lisab sõnumi XMLi transpordi saajate osasse etteantud saajad (eemaldab õleliigsed)
     // võljastab uue faili PATHi, eisalgne faile jõõb ka alles
     public String CreateNewFile(ArrayList<String> allowedOrgs, int containerVersion)throws Exception{
@@ -1585,7 +1563,7 @@ public class DhlMessage implements Cloneable {
         String simplifiedFile = CommonMethods.createPipelineFile(0);
         if (CommonMethods.copyFile(getFilePath(), simplifiedFile)) {
             newFile = CommonMethods.createPipelineFile(1);
-            
+
             FileSplitResult splitResult = null;
             if(containerVersion == 1) {
             	splitResult = CommonMethods.splitOutTags(simplifiedFile, "SignedDoc", false, false, false);
@@ -1605,29 +1583,29 @@ public class DhlMessage implements Cloneable {
                 CommonMethods.safeCloseWriter(bw);
                 CommonMethods.safeCloseWriter(ow);
                 CommonMethods.safeCloseStream(out);
-            }            
+            }
         } else {
             throw new Exception("Dokumendi faili kopeerimine edastamiseks ebaõnnestus!");
         }
         return newFile;
     }
-    
+
     public String createNewFile(ArrayList<MessageRecipient> allowedRecipients, int containerVersion) throws Exception{
         String newFile = "";
-        
+
         // Kopeerime dokumendi faili uueks tõõfailiks
         if (!CommonMethods.isNullOrEmpty(this.m_filePath) && (new File(this.m_filePath)).exists()) {
 	        String simplifiedFile = CommonMethods.createPipelineFile(0);
 	        if (CommonMethods.copyFile(this.m_filePath, simplifiedFile)) {
 	            newFile = CommonMethods.createPipelineFile(1);
-	            
+
 	            FileSplitResult splitResult = null;
 	            if(containerVersion == 1) {
 	            	splitResult = CommonMethods.splitOutTags(simplifiedFile, "SignedDoc", false, false, false);
 	            } else {
 	            	splitResult = CommonMethods.splitOutTags(simplifiedFile, "failid", false, false, false);
 	            }
-	           
+
 	            FileOutputStream out = null;
 	            OutputStreamWriter ow = null;
 	            BufferedWriter bw = null;
@@ -1641,15 +1619,15 @@ public class DhlMessage implements Cloneable {
 	                CommonMethods.safeCloseWriter(bw);
 	                CommonMethods.safeCloseWriter(ow);
 	                CommonMethods.safeCloseStream(out);
-	            }            
+	            }
 	        } else {
 	            throw new Exception("Dokumendi faili kopeerimine edastamiseks ebaõnnestus!");
 	        }
         }
-        
+
         return newFile;
     }
-    
+
     public static ArrayList<DhlMessage> getFromXML(String dataFilePath, UnitCredential[] units) throws Exception {
         String TAG_DOKUMENT = "dokument";
         String TAG_TRANSPORT = "transport";
@@ -1672,21 +1650,21 @@ public class DhlMessage implements Cloneable {
         String recipientPositionName = "";
         String recipientDivisionCode = "";
         String recipientPositionCode = "";
-        
+
         String recipientDivisionShortName = "";
         String recipientPositionShortName = "";
         boolean fyi = false;
         int containerVersion = 1;
-        
+
         String rkTitle = "";
         String rkType = "";
         Stack<String> hierarchy = new Stack<String>();
         ArrayList<SimpleAddressData> addr = new ArrayList<SimpleAddressData>();
-        
+
         DhlMessage templateMessage = new DhlMessage();
         templateMessage.setFilePath(dataFilePath);
         templateMessage.setContainerVersion(containerVersion);
-        
+
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         XMLStreamReader reader = inputFactory.createXMLStreamReader(new FileInputStream(dataFilePath), "UTF-8");
 
@@ -1762,10 +1740,10 @@ public class DhlMessage implements Cloneable {
                         recipientPositionName = "";
                         recipientDivisionCode = "";
                         recipientPositionCode = "";
-                        
+
                         recipientDivisionShortName = "";
                         recipientPositionShortName = "";
-                        
+
                     } else if (reader.getLocalName().equalsIgnoreCase(TAG_SAAJA) && reader.isEndElement() && (hierarchy.peek() == TAG_SAAJA)) {
                         if (hierarchy.peek() == TAG_SAAJA) {
                             hierarchy.pop();
@@ -1786,16 +1764,14 @@ public class DhlMessage implements Cloneable {
                                     a.setUnitID(units[i].getUnitID());
                                     a.setPositionName(recipientPositionName);
                                     a.setDivisionName(recipientDivisionName);
-                                    a.setPositionCode(recipientPositionCode);
-                                    a.setDivisionCode(recipientDivisionCode);
-                                    a.setDivisionShortName(recipientDivisionShortName);
-                                    a.setPositionShortName(recipientPositionShortName);
+                                    a.setPositionCode(CommonMethods.isNullOrEmpty(recipientPositionShortName) ? recipientPositionCode : recipientPositionShortName);
+                                    a.setDivisionCode(CommonMethods.isNullOrEmpty(recipientDivisionShortName) ? recipientDivisionCode : recipientDivisionShortName);
                                     a.setFyi(fyi);
                                     logger.debug("Adding address data to array.");
                                     addr.add(a);
-                                    
+
                                     // Kui tegemist on esimese leitud kohaliku adressaadiga, siis kirjutame
-                                    // selle andmed kohe ka sõnumi kõlge.
+                                    // selle andmed kohe ka sõnumi külge.
                                     if (addr.size() == 1) {
                                         templateMessage.m_recipientOrgCode = recipientOrgCode;
                                         templateMessage.m_recipientOrgName = recipientOrgName;
@@ -1805,13 +1781,11 @@ public class DhlMessage implements Cloneable {
                                         templateMessage.m_recipientDepartmentNr = recipientDepartmentNr;
                                         templateMessage.m_recipientDepartmentName = recipientDepartmentName;
                                         templateMessage.m_recipientDivisionID = recipientDivisionID;
-                                        templateMessage.m_recipientDivisionCode = recipientDivisionCode;
+                                        templateMessage.m_recipientDivisionCode = CommonMethods.isNullOrEmpty(recipientDivisionShortName) ? recipientDivisionCode : recipientDivisionShortName;
                                         templateMessage.m_recipientDivisionName = recipientDivisionName;
-                                        templateMessage.m_recipientDivisionShortName = recipientDivisionShortName;
                                         templateMessage.m_recipientPositionID = recipientPositionID;
-                                        templateMessage.m_recipientPositionCode = recipientPositionCode;
+                                        templateMessage.m_recipientPositionCode = CommonMethods.isNullOrEmpty(recipientPositionShortName) ? recipientPositionCode : recipientPositionShortName;
                                         templateMessage.m_recipientPositionName = recipientPositionName;
-                                        templateMessage.m_recipientDivisionShortName = recipientPositionShortName;
                                         templateMessage.setFyi(fyi);
                                         templateMessage.m_unitID = units[i].getUnitID();
                                     }
@@ -2007,7 +1981,7 @@ public class DhlMessage implements Cloneable {
                 }
             }
         }
-        
+
         ArrayList<DhlMessage> result = new ArrayList<DhlMessage>();
         result.add(templateMessage);
         if (addr.size() > 1) {
@@ -2023,22 +1997,22 @@ public class DhlMessage implements Cloneable {
         } else {
         	logger.debug("No addressee defined.");
         }
-        
+
         return result;
     }
-    
+
     public Object clone() throws CloneNotSupportedException {
         DhlMessage clone = (DhlMessage)super.clone();
         return clone;
     }
-    
+
     public void loadRecipientsFromXML() {
         if (this.m_recipients == null) {
         	this.m_recipients = new ArrayList<MessageRecipient>();
         } else {
         	this.m_recipients.clear();
         }
-    	
+
     	ArrayList<SimpleAddressData> recipients = null;
         try {
             recipients = extractRecipientData(this.m_filePath);
@@ -2046,7 +2020,7 @@ public class DhlMessage implements Cloneable {
             CommonMethods.logError(ex, "dvk.client.businesslayer.DhlMessage", "loadRecipientsFromXML");
             recipients = null;
         }
-        
+
         if ((recipients != null) && !recipients.isEmpty()) {
             for (int i = 0; i < recipients.size(); i++) {
                 SimpleAddressData xmlRec = recipients.get(i);
@@ -2067,27 +2041,27 @@ public class DhlMessage implements Cloneable {
             }
         }
     }
-    
+
     public static void prepareUnsentMessages(int unitID, OrgSettings db, Connection dbConnection) {
         ArrayList<DhlMessage> messages = DhlMessage.getList(false, Settings.Client_StatusWaiting, unitID, false, false, db, dbConnection);
         for (int i = 0; i < messages.size(); ++i) {
             DhlMessage msg = messages.get(i);
-            
+
             // Kui saadetava sõnumi GUID on mõõramata, siis anname sõnumile GUID-i
             // ja salvestame selle kohe ka andmebaasi.
             if ((msg.getDhlGuid() == null) || (msg.getDhlGuid().length() < 1)) {
             	msg.setDhlGuid(generateGUID());
             	msg.updateDhlID(db, dbConnection);
             }
-            
+
             extractAndSaveMessageRecipients(msg, db, dbConnection);
         }
     }
-    
+
     /**
      * Extracts message recipient list from DEC container and writes recipient
      * list to database (table DHL_MESSAGE_RECIPIENT).
-     * 
+     *
      * @param message
      *     DEC message
      * @param db
@@ -2097,7 +2071,7 @@ public class DhlMessage implements Cloneable {
      */
     public static void extractAndSaveMessageRecipients(DhlMessage message,
     	OrgSettings db, Connection dbConnection) {
-    	
+
         ArrayList<MessageRecipient> msgRec = MessageRecipient.getList(message.getId(), db, dbConnection);
         ArrayList<SimpleAddressData> recipients = null;
         try {
@@ -2106,7 +2080,7 @@ public class DhlMessage implements Cloneable {
         	logger.error(ex);
             recipients = null;
         }
-        
+
         if ((recipients != null) && !recipients.isEmpty()) {
             for (int k = 0; k < recipients.size(); ++k) {
                 SimpleAddressData xmlRec = recipients.get(k);
@@ -2150,7 +2124,7 @@ public class DhlMessage implements Cloneable {
             }
         }
     }
-    
+
     public static ArrayList<SimpleAddressData> extractRecipientData(String xmlFilePath) throws Exception {
         String TAG_DOKUMENT = "dokument";
         String TAG_TRANSPORT = "transport";
@@ -2158,14 +2132,14 @@ public class DhlMessage implements Cloneable {
         Stack<String> hierarchy = new Stack<String>();
         ArrayList<SimpleAddressData> result = new ArrayList<SimpleAddressData>();
         SimpleAddressData item = null;
-        
+
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         XMLStreamReader reader = inputFactory.createXMLStreamReader(new FileInputStream(xmlFilePath), "UTF-8");
 
         logger.debug("Starting to read XML.");
-        
+
         try {
-            while (reader.hasNext()) {            	
+            while (reader.hasNext()) {
                 reader.next();
 
                 if (reader.hasName()) {
@@ -2256,7 +2230,7 @@ public class DhlMessage implements Cloneable {
                             item.setDivisionName(reader.getText().trim());
                         }
                     }
-                    
+
                 }
             }
         } finally {
@@ -2264,7 +2238,7 @@ public class DhlMessage implements Cloneable {
         }
         return result;
     }
-    
+
     /**
      *  Eemaldab DVK konteineri <transport> plokist need asutused, kellele pole
      *  antud dokumenti enam vaja edastada.
@@ -2281,19 +2255,19 @@ public class DhlMessage implements Cloneable {
         	namespaceUri = CommonStructures.DhlNamespaceV2;
             foundNodes = currentXmlContent.getDocumentElement().getElementsByTagNameNS(namespaceUri, "transport");
         }
-        
+
         if (foundNodes.getLength() > 0) {
             transportNode = (Element)foundNodes.item(0);
             foundNodes = transportNode.getElementsByTagNameNS(namespaceUri, "saaja");
-            
+
             logger.info("Leitud adressaate: " + String.valueOf(foundNodes.getLength()));
-            
+
             // Eemaldame saajate hulgast nende asutuste/isikute andmed,
             // kellele on dokument antud serveri piires juba kohale toimetatud
             int recipientIndex = 0;
             while (recipientIndex < foundNodes.getLength()) {
             	Element recipientRoot = (Element)foundNodes.item(recipientIndex);
-            	
+
             	logger.info("Adressaat nr " + String.valueOf(recipientIndex));
             	String regNr = "";
             	String personalIdCode = "";
@@ -2301,19 +2275,19 @@ public class DhlMessage implements Cloneable {
             	int occupationId = 0;
             	String subdivisionShortName = "";
             	String occupationShortName = "";
-            	
+
             	// Adressaadi asutuse registrikood XML konteineris
             	NodeList regNrNodes = recipientRoot.getElementsByTagNameNS(namespaceUri, "regnr");
                 if (regNrNodes.getLength() > 0) {
                     regNr = CommonMethods.getNodeText(regNrNodes.item(0));
                 }
-                
+
                 // Adressaadi isikukood XML konteineris
             	NodeList personalIdNodes = recipientRoot.getElementsByTagNameNS(namespaceUri, "isikukood");
                 if (personalIdNodes.getLength() > 0) {
                 	personalIdCode = CommonMethods.getNodeText(personalIdNodes.item(0));
                 }
-                
+
                 // Adressaadi allõksuse kood XML konteineris
             	NodeList subdivisionNodes = recipientRoot.getElementsByTagNameNS(namespaceUri, "allyksuse_kood");
                 if (subdivisionNodes.getLength() > 0) {
@@ -2324,7 +2298,7 @@ public class DhlMessage implements Cloneable {
                 		subdivisionId = 0;
                 	}
                 }
-                
+
                 // Adressaadi ametikoha kood XML konteineris
             	NodeList occupationNodes = recipientRoot.getElementsByTagNameNS(namespaceUri, "ametikoha_kood");
                 if (occupationNodes.getLength() > 0) {
@@ -2335,19 +2309,19 @@ public class DhlMessage implements Cloneable {
                 		occupationId = 0;
                 	}
                 }
-                
+
                 // Adressaadi allõksuse lõhinimetus XML konteineris
             	NodeList subdivisionSnNodes = recipientRoot.getElementsByTagNameNS(namespaceUri, "allyksuse_lyhinimetus");
                 if (subdivisionSnNodes.getLength() > 0) {
                 	subdivisionShortName = CommonMethods.getNodeText(subdivisionSnNodes.item(0));
                 }
-                
+
                 // Adressaadi ametikoha lõhinimetus XML konteineris
             	NodeList occupationSnNodes = recipientRoot.getElementsByTagNameNS(namespaceUri, "ametikoha_lyhinimetus");
                 if (occupationSnNodes.getLength() > 0) {
                 	occupationShortName = CommonMethods.getNodeText(occupationSnNodes.item(0));
                 }
-                
+
                 boolean recipientFound = false;
                 for (MessageRecipient recipient : allowedRecipients) {
                 	if (recipient.getRecipientOrgCode().equalsIgnoreCase(regNr)
@@ -2359,7 +2333,7 @@ public class DhlMessage implements Cloneable {
                 		recipientFound = true;
                 	}
                 }
-                
+
                 if (!recipientFound) {
                     transportNode.removeChild(recipientRoot);
                     logger.info("");
@@ -2382,7 +2356,7 @@ public class DhlMessage implements Cloneable {
                 	logger.info("Ametikoha lõhinimetus: " + occupationShortName);
                 }
             }
-            
+
             // Tuvastame DHL nimeruumi prefiksi
             String defaultPrefix = currentXmlContent.lookupPrefix(namespaceUri);
             if (defaultPrefix == null) {
@@ -2393,7 +2367,7 @@ public class DhlMessage implements Cloneable {
                     defaultPrefix = "dhl" + String.valueOf(prefixCounter);
                 }
             }
-            
+
             // Mõrgime antud DVK serveri sõnumi vahendajaks
             if (addProxy){
                 Element elProxy = currentXmlContent.createElementNS(namespaceUri, defaultPrefix + ":vahendaja");
@@ -2406,33 +2380,33 @@ public class DhlMessage implements Cloneable {
         // Salvestame muudetud XML andmed faili
         CommonMethods.xmlElementToFile(currentXmlContent.getDocumentElement(), filePath);
     }
-    
+
     /**
      * Jaotab sõnumi iga erineva edastuskanali jaoks omaette alamsõnumiteks.
      * Alamsõnumid erinevad õksteisest DVK konteineri <transport> elemendis
      * asuvate adressaatide poolest.
-     * 
+     *
      * @return		Alamsõnumite nimekiri
      */
     public ArrayList<DhlMessage> splitMessageByDeliveryChannel(OrgSettings myDatabase, ArrayList<OrgSettings> allKnownDatabases, int containerVersion, Connection dbConnection) throws Exception {
-    	
+
 		logger.debug("Splitting messages by delivery channel.");
-		
+
 		ArrayList<DhlMessage> result = new ArrayList<DhlMessage>();
-    	
+
     	if ((this.m_recipients == null) || (this.m_recipients.size() < 1)) {
     		this.m_recipients = MessageRecipient.getList(this.m_id, myDatabase, dbConnection);
     	}
-    	
+
 		// Kontrollime, kas mõnedele adressaatidele saaks otse andmebaasist
     	// andmebaasi saata.
-    	// 
+    	//
     	// Esmalt eraldame adressaatide hulgast need adressaadid, kes
     	// on saatjaga samas asutuses.
     	String senderOrgCode = this.m_senderOrgCode;
     	ArrayList<MessageRecipient> allRecipients = this.getRecipients();
-    	ArrayList<MessageRecipient> centralServerRecipients = allRecipients;	    	
-    	ArrayList<MessageRecipient> myOrgRecipients = new ArrayList<MessageRecipient>(); 
+    	ArrayList<MessageRecipient> centralServerRecipients = allRecipients;
+    	ArrayList<MessageRecipient> myOrgRecipients = new ArrayList<MessageRecipient>();
     	if ((allRecipients.size() == 1) && (allRecipients.get(0).getRecipientOrgCode().equalsIgnoreCase(senderOrgCode))) {
     		myOrgRecipients = allRecipients;
     	} else if (allRecipients.size() > 1) {
@@ -2443,7 +2417,7 @@ public class DhlMessage implements Cloneable {
     		}
     	}
     	logger.info("Minuga samas asutuses on " + String.valueOf(myOrgRecipients.size()) + " adressaati.");
-    	
+
     	// Kui mõni adressaat on saatjaga samas asutuses, siis tuvastame,
     	// kas meil on teada andmebaasiõhendus dokumendi otse saatmiseks.
     	//
@@ -2470,10 +2444,10 @@ public class DhlMessage implements Cloneable {
 								addressFilter.setSubdivisionCode(cred.getDivisionShortName());
 								addressFilter.setOccupationCode(cred.getOccupationShortName());
 								ArrayList<MessageRecipient> directSendRecipients = addressFilter.getMatchingRecipients(myOrgRecipients);
-								
+
 								for (int k = 0; k < directSendRecipients.size(); k++) {
 									MessageRecipient rec = directSendRecipients.get(k);
-		
+
 									DhlMessage newMessage = (DhlMessage)this.clone();
 									newMessage.m_deliveryChannel = new DeliveryChannel();
 									newMessage.m_deliveryChannel.setDatabase(db);
@@ -2481,7 +2455,7 @@ public class DhlMessage implements Cloneable {
 									newMessage.m_deliveryChannel.setRecipient(rec);
 									result.add(newMessage);
 									logger.info("Added message clone for direct copy delivery");
-									
+
 									if (centralServerRecipients.contains(rec)) {
 										centralServerRecipients.remove(rec);
 									}
@@ -2494,24 +2468,24 @@ public class DhlMessage implements Cloneable {
 				}
 			}
 		}
-    	
+
     	// Tuvastame, kas mõnele adressaadile tuleks ka DVK keskserveri kaudu saata.
     	if ((centralServerRecipients != null) && (centralServerRecipients.size() > 0)) {
     		DhlMessage centralServerMessage = (DhlMessage)this.clone();
     		String centralServerFilePath = centralServerMessage.createNewFile(centralServerRecipients, containerVersion);
     		centralServerMessage.setFilePath(centralServerFilePath);
-    		
+
     		// Uuendame objektis olevat adressaatide nimekirja vastavalt
     		// XML konteineris tehtud muudatustele.
     		centralServerMessage.loadRecipientsFromXML();
-    		
+
         	// Leiame nimekirja erinevatest serveritest, kuhu antud dokument tuleks saata.
         	// S.t. kui dokument peab jõudma erinevatele adressaatidele erinevate serverite kaudu
         	ArrayList<DhlCapability> destinationServers = DhlCapability.getListByMessageID(centralServerMessage.getId(), myDatabase, dbConnection);
-            
+
         	// Võtame filtreerimiseks võlja kõigi teadaolevate asutuste nimekirja
         	ArrayList<DhlCapability> allKnownOrgs = DhlCapability.getList(myDatabase, dbConnection);
-        	
+
         	// Kui serverite massiiv on tõhi, siis lisame sinna
             // õhe tõhja võõrtuse DVK keskserveri jaoks
             if (destinationServers == null) {
@@ -2525,7 +2499,7 @@ public class DhlMessage implements Cloneable {
                 defaultServer.setDhlDirectServiceUrl("");
                 destinationServers.add(defaultServer);
             }
-            
+
             // Komplekteerime erinevate serverite jaoks omaette alamsõnumid
             for (int i = 0; i < destinationServers.size(); i++){
                 // Paneme kokku konkreetsesse serverisse saadetavate saajate sõnumi,
@@ -2538,12 +2512,12 @@ public class DhlMessage implements Cloneable {
                 if ((currentProducer == null) || (currentProducer.length() == 0)) {
                     currentProducer = Settings.Client_ProducerName;
                 }
-                
+
                 // Filtreerime võlja asutused, kes saavad sõnumit aktiivse (indexiga i) DVK serveri kaudu
                 ArrayList<String> orgs = DhlCapability.getOrgsByCapability(destinationServers.get(i), myDatabase, dbConnection); // nimekiri asutuse koodidest
                 if ((orgs != null) && (orgs.size() > 0)) {
                 	DhlMessage newMessage = (DhlMessage)centralServerMessage.clone();
-                	
+
                 	ArrayList<String> allowedOrgs = new ArrayList<String>();
                     for(MessageRecipient mr : newMessage.getRecipients()){
                     	if (orgs.contains(mr.getRecipientOrgCode())){
@@ -2563,13 +2537,13 @@ public class DhlMessage implements Cloneable {
                         	}
                         }
                     }
-                    
+
                     String newFilePath = newMessage.CreateNewFile(allowedOrgs, containerVersion); // eemldada sõnumi XMList need saajad, kes aktiivse serveri kaudu kirja ei saa
                     newMessage.setFilePath(newFilePath);
-                    
+
                     newMessage.getDeliveryChannel().setServiceUrl(currentServiceUrl);
                     newMessage.getDeliveryChannel().setProducerName(currentProducer);
-                    
+
                     // Paneme keskserveri kaudu saadetavad sõnumid ettepoole,
                     // et saatmisel saaks keskserveri ID võimalikult kiiresti kõtte.
                     result.add(0, newMessage);
@@ -2577,26 +2551,26 @@ public class DhlMessage implements Cloneable {
                 }
             }
     	}
-    	
+
     	return result;
     }
 
-    
+
     /**
      * Arvutab adressaadipõhiste staatuse koodide alusel võlja kogu sõnumi
      * staatuse ja uuendab seda andmebaasis.
-     * 
+     *
      * @param messageId		sõnumi kohalik ID
      * @param db			Andmebaasiühenduse seaded
      */
     public static void calculateAndUpdateMessageStatus(int messageId, OrgSettings db, Connection dbConnection) {
     	ArrayList<MessageRecipient> recipients = MessageRecipient.getList(messageId, db, dbConnection);
-    	
+
     	int totalStatusId = Settings.Client_StatusSent;
     	Calendar cal = Calendar.getInstance();
     	cal.set(1900, 0, 1, 0, 0);
     	Date dateSent = cal.getTime();
-    	
+
     	if (recipients != null) {
     		for (MessageRecipient rec : recipients) {
     			if (rec.getSendingStatusID() == Settings.Client_StatusCanceled) {
@@ -2606,17 +2580,17 @@ public class DhlMessage implements Cloneable {
     			} else if (rec.getSendingStatusID() == Settings.Client_StatusSending) {
     				totalStatusId = Settings.Client_StatusSending;
     			}
-    			
+
     			if ((rec.getSendingStatusID() == Settings.Client_StatusSent) || (rec.getSendingStatusID() == Settings.Client_StatusSending) || (rec.getSendingStatusID() == Settings.Client_StatusCanceled)) {
     				if ((rec.getSendingDate() != null) && rec.getSendingDate().after(dateSent)) {
-    					dateSent = rec.getSendingDate(); 
+    					dateSent = rec.getSendingDate();
     				}
     			}
     		}
     	}
     	updateStatus(messageId, totalStatusId, dateSent, false, db, dbConnection);
     }
-    
+
     public static int deleteOldDocuments(int documentLifetimeInDays, OrgSettings db, Connection dbConnection) throws Exception {
         int result = 0;
     	try {
@@ -2630,9 +2604,9 @@ public class DhlMessage implements Cloneable {
                 if (!CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
                 	parNr++;
                 }
-                
+
                 cs.setInt(parNr++, documentLifetimeInDays);
-                
+
                 if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
                 	cs.registerOutParameter(parNr, Types.INTEGER);
                 } else {
@@ -2644,7 +2618,7 @@ public class DhlMessage implements Cloneable {
                 } else {
                 	result = cs.getInt(1);
                 }
-                
+
                 cs.execute();
                 cs.close();
             } else {

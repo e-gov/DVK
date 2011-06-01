@@ -15,11 +15,8 @@ public class SimpleAddressData {
     private String m_positionCode;
     private String m_positionName;
     private int m_unitID;
-
-    private String m_divisionShortName;
-    private String m_positionShortName;
     private boolean m_fyi;
-    
+
     public String getOrgCode() {
         return m_orgCode;
     }
@@ -91,7 +88,7 @@ public class SimpleAddressData {
     public void setDivisionCode(String value) {
         this.m_divisionCode = value;
     }
-    
+
     public String getDivisionName() {
         return m_divisionName;
     }
@@ -111,7 +108,7 @@ public class SimpleAddressData {
     public void setPositionCode(String value) {
         this.m_positionCode = value;
     }
-    
+
     public void setPositionID(int value) {
         m_positionID = value;
     }
@@ -135,7 +132,7 @@ public class SimpleAddressData {
     public SimpleAddressData() {
         clear();
     }
-    
+
     public void clear() {
         m_orgCode = "";
         m_orgName = "";
@@ -152,22 +149,6 @@ public class SimpleAddressData {
         m_positionName = "";
         m_unitID = 0;
     }
-
-	public String getDivisionShortName() {
-		return m_divisionShortName;
-	}
-
-	public void setDivisionShortName(String shortName) {
-		m_divisionShortName = shortName;
-	}
-
-	public String getPositionShortName() {
-		return m_positionShortName;
-	}
-
-	public void setPositionShortName(String shortName) {
-		m_positionShortName = shortName;
-	}
 
 	public boolean isFyi() {
 		return m_fyi;

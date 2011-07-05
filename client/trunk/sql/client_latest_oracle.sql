@@ -1,4 +1,4 @@
-CREATE OR REPLACE 
+CREATE OR REPLACE
 PACKAGE globalPkg AUTHID CURRENT_USER AS
     identity number(38,0);
     log_identity number(38,0);
@@ -287,7 +287,7 @@ primary key (subdivision_code)
 
 create
 table   dhl_classifier
-(    
+(
     dhl_classifier_code varchar2(20) not null,
     dhl_classifier_id int null
 )
@@ -369,7 +369,7 @@ begin
     into    cnt
     from    dhl_organization o
     where   o.org_code = Save_DhlOrganization.org_code;
-    
+
     if (cnt = 0) then
         insert
         into    dhl_organization(
@@ -769,7 +769,7 @@ begin
         into    Get_DhlMessageID.dhl_message_id
         from    dhl_message_recipient r
         inner join
-                dhl_message m on m.dhl_message_id = r.dhl_message_id 
+                dhl_message m on m.dhl_message_id = r.dhl_message_id
         where   m.is_incoming = 0
                 and r.dhl_id = Get_DhlMessageID.dhl_id
                 and nvl(r.producer_name,' ') = nvl(Get_DhlMessageID.producer_name,' ')
@@ -865,7 +865,7 @@ begin
                 and recipient_position_id = recipient_position_id_
                 and recipient_division_code = recipient_division_code_
                 and recipient_position_code = recipient_position_code_;
-        
+
         select    dhl_message_recipient_id
         into    Save_DhlMessageRecipient.dhl_message_recipient_id
         from    dhl_message_recipient
@@ -927,7 +927,7 @@ begin
                 recipient_division_code_,
                 recipient_position_code_,
                 0);
-        
+
         Save_DhlMessageRecipient.dhl_message_recipient_id := globalPkg.identity;
     end if;
 end;
@@ -967,8 +967,8 @@ begin
     -- salvestab vastuvõtja andmetesse vastuvõtja DVK serveri poolt antud sõnumi ID väärtuse
     update  dhl_message_recipient
     set     dhl_id = Update_DhlMessageRecipDhlID.dhl_id,
-            query_id = Update_DhlMessageRecipDhlID.query_id 
-    where   dhl_message_id = Update_DhlMessageRecipDhlID.dhl_message_id 
+            query_id = Update_DhlMessageRecipDhlID.query_id
+    where   dhl_message_id = Update_DhlMessageRecipDhlID.dhl_message_id
             and recipient_org_code in
             (
                 select  org_code
@@ -1227,7 +1227,7 @@ begin
     into    cnt
     from    dhl_classifier
     where   dhl_classifier_code = Save_DhlClassifier.code;
-            
+
     if (cnt < 1) then
         insert into dhl_classifier(dhl_classifier_code, dhl_classifier_id)
         values (Save_DhlClassifier.code, Save_DhlClassifier.id);
@@ -1423,9 +1423,63 @@ begin
                 Save_DhlStatusHistory.fault_detail,
                 Save_DhlStatusHistory.recipient_status_id,
                 Save_DhlStatusHistory.metaxml);
-                
+
         Save_DhlStatusHistory.dhl_status_history_id := globalPkg.identity;
     end if;
+end;
+/
+
+create procedure Get_DhlMessageByGUID(
+    guid in varchar,
+    metadata_only in number,
+    RC1 in out globalPkg.RCT1)
+as
+begin
+    open RC1 for
+    select  dhl_message_id,
+            is_incoming,
+            (case when Get_DhlMessageByGUID.metadata_only=0 then data else null end) as data,
+            title,
+            sender_org_code,
+            sender_org_name,
+            sender_person_code,
+            sender_name,
+            recipient_org_code,
+            recipient_org_name,
+            recipient_person_code,
+            recipient_name,
+            case_name,
+            dhl_folder_name,
+            sending_status_id,
+            unit_id,
+            dhl_id,
+            sending_date,
+            received_date,
+            local_item_id,
+            recipient_status_id,
+            fault_code,
+            fault_actor,
+            fault_string,
+            fault_detail,
+            status_update_needed,
+            metaxml,
+            query_id,
+            proxy_org_code,
+            proxy_org_name,
+            proxy_person_code,
+            proxy_name,
+            recipient_department_nr,
+            recipient_department_name,
+            recipient_email,
+            recipient_division_id,
+            recipient_division_name,
+            recipient_position_id,
+            recipient_position_name,
+            recipient_division_code,
+            recipient_position_code,
+            dhl_guid
+    from    dhl_message
+    where   guid = Get_DhlMessageByGUID.guid;
 end;
 /
 
@@ -1435,7 +1489,7 @@ create procedure Delete_OldDhlMessages(
 as
 begin
     Delete_OldDhlMessages.deleted_doc_count := 0;
-	
+
 	if (Delete_OldDhlMessages.doc_lifetime_days is not null) and (Delete_OldDhlMessages.doc_lifetime_days > 0) then
 		-- Delete old received documents
 		delete
@@ -1443,7 +1497,7 @@ begin
 		where	is_incoming = 1
 				and (sysdate - received_date) >= Delete_OldDhlMessages.doc_lifetime_days;
 		Delete_OldDhlMessages.deleted_doc_count := Delete_OldDhlMessages.deleted_doc_count + sql%rowcount;
-				
+
 		-- Delete old sent documents
 		delete
 		from	dhl_message

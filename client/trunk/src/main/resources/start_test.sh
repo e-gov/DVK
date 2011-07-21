@@ -1,4 +1,4 @@
-﻿#!/bin/sh
+#!/bin/sh
 
 DVK_CLIENT_DIR=.
 

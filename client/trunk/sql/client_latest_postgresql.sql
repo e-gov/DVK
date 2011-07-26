@@ -794,7 +794,7 @@ begin
         dhl_message_recipient r on r.recipient_org_code = o.org_code
     where   r.dhl_message_id = p_dhl_message_id
     order by
-            o.direct_service_url desc;
+            o.dhl_direct_service_url desc;
 
     return  RC1;
 end; $$

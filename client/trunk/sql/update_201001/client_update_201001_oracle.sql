@@ -1010,7 +1010,7 @@ begin
         dhl_message_recipient r on r.recipient_org_code = o.org_code
     where   r.dhl_message_id = Get_DhlCapabilityByMessageID.dhl_message_id
     order by
-            o.direct_service_url desc;
+            o.dhl_direct_service_url desc;
 end;
 /
 

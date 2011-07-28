@@ -58,3 +58,10 @@ käivitama jaanuaris 2010 tehtud muudatuste skriptid, mis asuvad kaustas update_
 Kui olete DVK andmebaasiobjektid loonud enne veebruari 2011 ning soovite
 kasutusele võtta DVK uuendatud versiooni, siis peate andmebaasis
 käivitama veebruaris 2011 tehtud muudatuste skriptid, mis asuvad kaustas update_201102
+
+
+[ Mai 2011 ]
+
+Kui olete DVK andmebaasiobjektid loonud enne maid 2011 ning soovite
+kasutusele võtta DVK uuendatud versiooni, siis peate andmebaasis
+käivitama mais 2011 tehtud muudatuste skriptid, mis asuvad kaustas update_201105

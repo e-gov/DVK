@@ -25,15 +25,18 @@ nomaxvalue
 nocache
 /
 
-create trigger tr_dhl_setfldr_id
+create or replace
+trigger tr_dhl_setfldr_id
     before insert
     on dhl_settings_folders
     for each row
 begin
-    select  sq_dhl_setfldr_id.nextval
-    into    globalPkg.identity
-    from    dual;
-    :new.id := globalPkg.identity;
+    if (:new.id < 1) then
+        select  sq_dhl_setfldr_id.nextval
+        into    globalPkg.identity
+        from    dual;
+        :new.id := globalPkg.identity;
+    end if;
 end;
 /
 

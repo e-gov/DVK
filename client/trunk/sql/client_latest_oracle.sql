@@ -61,15 +61,18 @@ nomaxvalue
 nocache
 /
 
-create trigger tr_dhl_message_id
+create or replace
+trigger tr_dhl_message_id
     before insert
     on dhl_message
     for each row
 begin
-    select  sq_dhl_message_id.nextval
-    into    globalPkg.identity
-    from    dual;
-    :new.dhl_message_id := globalPkg.identity;
+    if (:new.dhl_message_id < 1) then
+        select  sq_dhl_message_id.nextval
+        into    globalPkg.identity
+        from    dual;
+        :new.dhl_message_id := globalPkg.identity;
+    end if;
 end;
 /
 
@@ -171,15 +174,18 @@ nomaxvalue
 nocache
 /
 
-create trigger tr_dhl_setfldr_id
+create or replace
+trigger tr_dhl_setfldr_id
     before insert
     on dhl_settings_folders
     for each row
 begin
-    select  sq_dhl_setfldr_id.nextval
-    into    globalPkg.identity
-    from    dual;
-    :new.id := globalPkg.identity;
+    if (:new.id < 1) then
+        select  sq_dhl_setfldr_id.nextval
+        into    globalPkg.identity
+        from    dual;
+        :new.id := globalPkg.identity;
+    end if;
 end;
 /
 
@@ -222,15 +228,18 @@ nomaxvalue
 nocache
 /
 
-create trigger tr_dhl_message_recipient_id
+create or replace
+trigger tr_dhl_message_recipient_id
     before insert
     on dhl_message_recipient
     for each row
 begin
-    select  sq_dhl_message_recipient_id.nextval
-    into    globalPkg.identity
-    from    dual;
-    :new.dhl_message_recipient_id := globalPkg.identity;
+    if (:new.dhl_message_recipient_id < 1) then
+        select  sq_dhl_message_recipient_id.nextval
+        into    globalPkg.identity
+        from    dual;
+        :new.dhl_message_recipient_id := globalPkg.identity;
+    end if;
 end;
 /
 
@@ -341,15 +350,18 @@ nomaxvalue
 nocache
 /
 
-create trigger tr_dhl_status_history_id
+create or replace
+trigger tr_dhl_status_history_id
     before insert
     on dhl_status_history
     for each row
 begin
-    select  sq_dhl_status_history_id.nextval
-    into    globalPkg.identity
-    from    dual;
-    :new.dhl_status_history_id := globalPkg.identity;
+    if (:new.dhl_status_history_id < 1) then
+        select  sq_dhl_status_history_id.nextval
+        into    globalPkg.identity
+        from    dual;
+        :new.dhl_status_history_id := globalPkg.identity;
+    end if;
 end;
 /
 

@@ -39,10 +39,12 @@ trigger tr_dhl_message_recipient_id
     on dhl_message_recipient
     for each row
 begin
-    select  sq_dhl_message_recipient_id.nextval
-    into    globalPkg.identity
-    from    dual;
-    :new.dhl_message_recipient_id := globalPkg.identity;
+    if (:new.dhl_message_recipient_id < 1) then
+        select  sq_dhl_message_recipient_id.nextval
+        into    globalPkg.identity
+        from    dual;
+        :new.dhl_message_recipient_id := globalPkg.identity;
+    end if;
 end;
 /
 
@@ -168,15 +170,18 @@ nomaxvalue
 nocache
 /
 
-create trigger tr_dhl_status_history_id
+create or replace
+trigger tr_dhl_status_history_id
     before insert
     on dhl_status_history
     for each row
 begin
-    select  sq_dhl_status_history_id.nextval
-    into    globalPkg.identity
-    from    dual;
-    :new.dhl_status_history_id := globalPkg.identity;
+    if (:new.dhl_status_history_id < 1) then
+        select  sq_dhl_status_history_id.nextval
+        into    globalPkg.identity
+        from    dual;
+        :new.dhl_status_history_id := globalPkg.identity;
+    end if;
 end;
 /
 

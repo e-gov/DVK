@@ -1678,7 +1678,9 @@ public class DhlMessage implements Cloneable {
                     } else if (reader.getLocalName().equalsIgnoreCase(TAG_DOKUMENT) && reader.isEndElement()) {
                         if (hierarchy.peek() == TAG_DOKUMENT) {
                             hierarchy.pop();
-                            break;
+                            if (hierarchy.empty()) {
+                            	break;
+                            }
                         }
                     } else if (reader.getLocalName().equalsIgnoreCase(TAG_METAINFO) && reader.isStartElement() && (hierarchy.peek() == TAG_DOKUMENT)) {
                         hierarchy.push(TAG_METAINFO);
@@ -2148,7 +2150,9 @@ public class DhlMessage implements Cloneable {
                     } else if (reader.getLocalName().equalsIgnoreCase(TAG_DOKUMENT) && reader.isEndElement()) {
                         if (TAG_DOKUMENT.equalsIgnoreCase(hierarchy.peek())) {
                             hierarchy.pop();
-                            break;
+                            if (hierarchy.empty()) {
+                            	break;
+                            }
                         }
                     } else if (reader.getLocalName().equalsIgnoreCase(TAG_TRANSPORT) && reader.isStartElement() && TAG_DOKUMENT.equalsIgnoreCase(hierarchy.peek())) {
                         hierarchy.push(TAG_TRANSPORT);

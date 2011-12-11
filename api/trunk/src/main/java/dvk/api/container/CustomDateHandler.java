@@ -13,7 +13,7 @@ import java.util.Properties;
 
 /**
  * The FieldHandler for the Date class
- * 
+ *
  */
 public class CustomDateHandler implements FieldHandler, ConfigurableFieldHandler
 {
@@ -43,7 +43,7 @@ public class CustomDateHandler implements FieldHandler, ConfigurableFieldHandler
 
 	/**
 	 * Returns the value of the field from the object.
-	 * 
+	 *
 	 * @param object
 	 *          The object
 	 * @return The value of the field
@@ -60,7 +60,7 @@ public class CustomDateHandler implements FieldHandler, ConfigurableFieldHandler
 		} catch (SecurityException e) {
 			throw e;
 		} catch (NoSuchFieldException e) {
-			String msg = "CustomDateHandler did not found field \"" + fieldName + "\" in class \"" + clazz.getName() + "\"";
+			String msg = "CustomDateHandler did not find field \"" + fieldName + "\" in class \"" + clazz.getName() + "\"";
 			throwException(msg, e);
 		}
 
@@ -83,7 +83,7 @@ public class CustomDateHandler implements FieldHandler, ConfigurableFieldHandler
 
 	/**
 	 * Sets the value of the field on the object.
-	 * 
+	 *
 	 * @param object
 	 *          The object
 	 * @param value
@@ -103,7 +103,7 @@ public class CustomDateHandler implements FieldHandler, ConfigurableFieldHandler
 		} catch (SecurityException e) {
 			throw e;
 		} catch (NoSuchFieldException e) {
-			String msg = "CustomDateHandler did not found field \"" + fieldName + "\" in class \"" + clazz.getName() + "\"";
+			String msg = "CustomDateHandler did not find field \"" + fieldName + "\" in class \"" + clazz.getName() + "\"";
 			throwException(msg, e);
 		}
 
@@ -127,7 +127,7 @@ public class CustomDateHandler implements FieldHandler, ConfigurableFieldHandler
 
 	/**
 	 * Creates a new instance of the object described by this field.
-	 * 
+	 *
 	 * @param parent
 	 *          The object for which the field is created
 	 * @return A new instance of the field's value
@@ -142,10 +142,10 @@ public class CustomDateHandler implements FieldHandler, ConfigurableFieldHandler
 
 	/**
 	 * Sets the value of the field to a default value.
-	 * 
+	 *
 	 * Reference fields are set to null, primitive fields are set to their default value, collection
 	 * fields are emptied of all elements.
-	 * 
+	 *
 	 * @param object
 	 *          The object
 	 * @throws IllegalStateException

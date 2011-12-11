@@ -2,17 +2,16 @@ package dvk.api.container;
 
 import java.util.Date;
 
-public class SignatureInfo
-{
-	private Date sigantureDate;
+public class SignatureInfo {
+	private Date signatureDate;
 	private Date signatureTime;
 
-	public Date getSigantureDate() {
-		return sigantureDate;
+	public Date getSignatureDate() {
+		return signatureDate;
 	}
 
-	public void setSigantureDate(Date sigantureDate) {
-		this.sigantureDate = sigantureDate;
+	public void setSignatureDate(Date signatureDate) {
+		this.signatureDate = signatureDate;
 	}
 
 	public Date getSignatureTime() {

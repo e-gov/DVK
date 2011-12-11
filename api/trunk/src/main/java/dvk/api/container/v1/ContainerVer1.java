@@ -117,7 +117,7 @@ public class ContainerVer1 extends Container
 			//
 			if (indx1 > -1 && indx2 > -1) {
 				final String xmlBlockStartWithDHL = "<dhl:metainfo " + Xmlns_DHL + " ";
-				indx2 = indx2 + endTag.length() + 1;
+				indx2 = indx2 + endTag.length();
 				String metainfoXml = xml.substring(indx1, indx2).replace(xmlBlockStart, xmlBlockStartWithDHL);
 				String metainfo = transformMetainfo(metainfoXml);
 

@@ -3,12 +3,12 @@ package dvk.api.container;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Metaxml
-{
+public class Metaxml {
 	private List<AddresseeInfo> addressees;
 	private AuthorInfo authorInfo;
 	private List<Compilator> compilators;
 	private LetterMetaData letterMetaData;
+	private ArrayOfSignature signatures;
 
 	public List<AddresseeInfo> getAddressees() {
 		return addressees;
@@ -85,7 +85,24 @@ public class Metaxml
 		}
 	}
 
-	public void createDescendants(boolean addressees, boolean authorInfo, boolean compilators, boolean letterMetaData) {
+    public ArrayOfSignature getSignatures() {
+        return signatures;
+    }
+
+    public void setSignatures(ArrayOfSignature signatures) {
+        this.signatures = signatures;
+    }
+
+    public boolean hasSignatures() {
+        return signatures != null && signatures.getSignature().size() > 0;
+    }
+
+    public void createDescendants(boolean addressees, boolean authorInfo, boolean compilators, boolean letterMetaData) {
+        createDescendants(addressees, authorInfo, compilators, letterMetaData, false);
+    }
+
+	public void createDescendants(boolean addressees, boolean authorInfo,
+	    boolean compilators, boolean letterMetaData, boolean signatures) {
 		if (addressees) {
 			if (this.addressees == null) {
 				this.addressees = new ArrayList<AddresseeInfo>();
@@ -109,5 +126,11 @@ public class Metaxml
 				this.letterMetaData = new LetterMetaData();
 			}
 		}
+
+        if (signatures) {
+            if (this.signatures == null) {
+                this.signatures = new ArrayOfSignature();
+            }
+        }
 	}
 }

@@ -16,8 +16,7 @@ import dvk.api.container.v1.ContainerVer1;
 import dvk.api.container.v2.ContainerVer2;
 import dvk.api.ml.Util;
 
-public abstract class Container
-{
+public abstract class Container {
 	public enum Version {
 		Ver1, Ver2
 	}
@@ -60,23 +59,23 @@ public abstract class Container
 
 	protected Marshaller createMarshaller(Writer out) throws MappingException, IOException {
 		Marshaller marshaller = new Marshaller(out);
-		Version version = getInternalVersion();
+		Version containerVersion = getInternalVersion();
 
-		prepareVersion(version);
+		prepareVersion(containerVersion);
 
-		switch (version)
-			{
+		switch (containerVersion) {
 			case Ver1:
-				marshaller.setNamespaceMapping("mm", "http://www.riik.ee/schemas/dhl-meta-manual");
-				marshaller.setNamespaceMapping("", "http://www.sk.ee/DigiDoc/v1.3.0#");
-				marshaller.setNamespaceMapping("dhl", "http://www.riik.ee/schemas/dhl");
+			    marshaller.setNamespaceMapping("dhl", "http://www.riik.ee/schemas/dhl");
+			    marshaller.setNamespaceMapping("mm", "http://www.riik.ee/schemas/dhl-meta-manual");
+				marshaller.setNamespaceMapping("ma", "http://www.riik.ee/schemas/dhl-meta-automatic");
 				marshaller.setNamespaceMapping("rkel", "http://www.riik.ee/schemas/dhl/rkel_letter");
+				marshaller.setNamespaceMapping("", "http://www.sk.ee/DigiDoc/v1.3.0#");
 				break;
 
 			case Ver2:
-				marshaller.setNamespaceMapping("mm", "http://www.riik.ee/schemas/dhl-meta-manual/2010/2");
+			    marshaller.setNamespaceMapping("dhl", "http://www.riik.ee/schemas/dhl/2010/2");
+			    marshaller.setNamespaceMapping("mm", "http://www.riik.ee/schemas/dhl-meta-manual/2010/2");
 				marshaller.setNamespaceMapping("ma", "http://www.riik.ee/schemas/dhl-meta-automatic");
-				marshaller.setNamespaceMapping("dhl", "http://www.riik.ee/schemas/dhl/2010/2");
 				marshaller.setNamespaceMapping("rkel", "http://www.riik.ee/schemas/dhl/rkel_letter");
 				break;
 			default:
@@ -91,8 +90,7 @@ public abstract class Container
 	protected static Unmarshaller createUnmarshaller(Version version) throws MappingException, IOException {
 		Unmarshaller unmarshaller = null;
 
-		switch (version)
-			{
+		switch (version) {
 			case Ver1:
 				unmarshaller = new Unmarshaller(ContainerVer1.class);
 				break;

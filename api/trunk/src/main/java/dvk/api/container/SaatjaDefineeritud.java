@@ -1,9 +1,16 @@
 package dvk.api.container;
 
-public class SaatjaDefineeritud
-{
+public class SaatjaDefineeritud {
 	private String saatjaDefineeritud;
 	private String valjanimi;
+
+	public SaatjaDefineeritud() {
+	}
+
+    public SaatjaDefineeritud(String name, String value) {
+        this.valjanimi = name;
+        this.saatjaDefineeritud = value;
+    }
 
 	public String getSaatjaDefineeritud() {
 		return saatjaDefineeritud;

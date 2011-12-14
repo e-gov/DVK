@@ -1565,10 +1565,10 @@ public class DhlMessage implements Cloneable {
             newFile = CommonMethods.createPipelineFile(1);
 
             FileSplitResult splitResult = null;
-            if(containerVersion == 1) {
-            	splitResult = CommonMethods.splitOutTags(simplifiedFile, "SignedDoc", false, false, false);
-            } else {
+            if(containerVersion == 2) {
             	splitResult = CommonMethods.splitOutTags(simplifiedFile, "failid", false, false, false);
+            } else {
+            	splitResult = CommonMethods.splitOutTags(simplifiedFile, "SignedDoc", false, false, false);
             }
             FileOutputStream out = null;
             OutputStreamWriter ow = null;
@@ -1600,10 +1600,10 @@ public class DhlMessage implements Cloneable {
 	            newFile = CommonMethods.createPipelineFile(1);
 
 	            FileSplitResult splitResult = null;
-	            if(containerVersion == 1) {
-	            	splitResult = CommonMethods.splitOutTags(simplifiedFile, "SignedDoc", false, false, false);
-	            } else {
+	            if(containerVersion == 2) {
 	            	splitResult = CommonMethods.splitOutTags(simplifiedFile, "failid", false, false, false);
+	            } else {
+	            	splitResult = CommonMethods.splitOutTags(simplifiedFile, "SignedDoc", false, false, false);
 	            }
 
 	            FileOutputStream out = null;

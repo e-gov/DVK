@@ -4,17 +4,17 @@
   <artifactId>client</artifactId>
   <packaging>jar</packaging>
   <name>dvk-client</name>
-  <version>1.6.2</version>  
-  
+  <version>1.6.3</version>
+
   <!-- Properties -->
   <properties>
   	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  	
+
   	<!-- Change this! -->
   	<!-- This variable should contain the root path of DVK "core" project -->
   	<dvkCoreDir>P:\ria\dvk\workspace\dvk_core</dvkCoreDir>
   </properties>
-  
+
   <!-- Dependencies -->
   <dependencies>
   	<dependency>
@@ -83,11 +83,11 @@
 	<dependency>
 	  	<groupId>ria</groupId>
 	  	<artifactId>dvk-core</artifactId>
-	  	<version>1.6.2</version>
+	  	<version>1.6.3</version>
 	  	<scope>system</scope>
 	  	<systemPath>${dvkCoreDir}/target/dvk-core.jar</systemPath>
 	</dependency>
-	
+
 	<!-- dvk-core dependencies -->
 	<dependency>
 	  	<groupId>java</groupId>
@@ -173,7 +173,7 @@
 	  	<scope>system</scope>
 	  	<systemPath>${dvkCoreDir}/lib/wstx-lgpl-3.9.2.jar</systemPath>
 	  </dependency>
-	  
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -183,7 +183,7 @@
       <optional>true</optional>
     </dependency>
   </dependencies>
-  
+
   <!-- Build -->
 	<build>
 		<finalName>dvk-client</finalName>
@@ -203,14 +203,14 @@
 				<targetPath>lib/</targetPath>
 				<includes>
 					<include>*.*</include>
-				</includes>		
+				</includes>
 			</resource>
 			<resource>
 				<directory>${dvkCoreDir}/target</directory>
 				<targetPath>lib/</targetPath>
 				<includes>
 					<include>dvk-core.jar</include>
-				</includes>		
+				</includes>
 			</resource>
 			<resource>
 				<directory>${basedir}/src/main/resources</directory>
@@ -249,5 +249,5 @@
       		</plugin>
 		</plugins>
 	</build>
-  
+
 </project>

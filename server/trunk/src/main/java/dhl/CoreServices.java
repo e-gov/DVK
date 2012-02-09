@@ -34,7 +34,6 @@ import dhl.requests.RequestInternalResult;
 import dhl.requests.SendDocuments;
 import dhl.sys.TempCleaner;
 import dhl.sys.Timer;
-import dhl.users.Asutus;
 import dhl.users.UserProfile;
 import dvk.client.conf.OrgSettings;
 import dvk.client.db.DBConnection;
@@ -67,7 +66,6 @@ import org.apache.log4j.Logger;
 
 public class CoreServices implements Dhl {
     public static String XTEE_URI = "http://x-tee.riik.ee/xsd/xtee.xsd";
-    private String tmpFile = "";
     static Logger logger = Logger.getLogger(CoreServices.class.getName());
 
     public CoreServices() throws AxisFault {
@@ -105,7 +103,7 @@ public class CoreServices implements Dhl {
                 // Opened database connection will be closed by AarSyncronizer thread when it finishes
             }
         } catch (Exception ex) {
-            logger.fatal(ex);
+            logger.fatal(ex.getMessage(), ex);
             throw new AxisFault(ex.getMessage());
         }
     }
@@ -119,11 +117,11 @@ public class CoreServices implements Dhl {
     private Connection getConnection() throws AxisFault {
         try {
             Context initContext = new InitialContext();
-            Context envContext = (Context)initContext.lookup("java:/comp/env");
-            javax.sql.DataSource ds = (javax.sql.DataSource)envContext.lookup(Settings.Server_DatabaseEnvironmentVariable);
+            Context envContext = (Context) initContext.lookup("java:/comp/env");
+            javax.sql.DataSource ds = (javax.sql.DataSource) envContext.lookup(Settings.Server_DatabaseEnvironmentVariable);
             return ds.getConnection();
         } catch (Exception ex) {
-        	logger.fatal(ex);
+        	logger.fatal(ex.getMessage(), ex);
             throw new AxisFault("DVK Internal error. Error connecting to database: " + ex.getMessage());
         }
     }
@@ -180,7 +178,7 @@ public class CoreServices implements Dhl {
             body.addToSOAPBody(response);
             response.saveChanges();
         } catch (Exception ex) {
-        	logger.error(ex);
+        	logger.error(ex.getMessage(), ex);
             throw new AxisFault(ex.getMessage());
         }
     }
@@ -235,7 +233,7 @@ public class CoreServices implements Dhl {
                     orgs.add("70006317");
                     aarClient.asutusedRequest(orgs, null);
                 } catch (Exception ex) {
-                	logger.error(ex);
+                	logger.error(ex.getMessage(), ex);
                     throw new AxisFault("DVK tarkvaraline viga: Keskse õiguste andmekoguga ühendamine ebaõnnestus!");
                 }
             }
@@ -298,14 +296,14 @@ public class CoreServices implements Dhl {
                 response.getSOAPEnvelope().removeHeaders();
                 Vector headers = context.getRequestMessage().getSOAPEnvelope().getHeaders();
                 for (int i = 0; i < headers.size(); ++i) {
-                    response.getSOAPEnvelope().addHeader((SOAPHeaderElement)headers.get(i));
+                    response.getSOAPEnvelope().addHeader((SOAPHeaderElement) headers.get(i));
                 }
                 response.getSOAPEnvelope().removeBody();
                 response.getSOAPEnvelope().addBody();
                 body.addToSOAPBody(response);
                 response.saveChanges();
             } catch (Exception ex) {
-            	logger.error(ex);
+            	logger.error(ex.getMessage(), ex);
                 throw new AxisFault(ex.getMessage());
             } finally {
             	CommonMethods.safeCloseDatabaseConnection(conn);
@@ -346,7 +344,7 @@ public class CoreServices implements Dhl {
                     response.getSOAPEnvelope().removeHeaders();
                     Vector headers = context.getRequestMessage().getSOAPEnvelope().getHeaders();
                     for (int i = 0; i < headers.size(); ++i) {
-                        response.getSOAPEnvelope().addHeader((SOAPHeaderElement)headers.get(i));
+                        response.getSOAPEnvelope().addHeader((SOAPHeaderElement) headers.get(i));
                     }
                     response.getSOAPEnvelope().removeBody();
                     response.getSOAPEnvelope().addBody();
@@ -354,10 +352,10 @@ public class CoreServices implements Dhl {
                     response.saveChanges();
                 }
             } catch (AxisFault fault) {
-            	logger.error(fault);
+            	logger.error(fault.getMessage(), fault);
             	throw fault;
             } catch (Exception ex) {
-            	logger.error(ex);
+            	logger.error(ex.getMessage(), ex);
                 throw new AxisFault(ex.getMessage());
             } finally {
             	CommonMethods.safeCloseDatabaseConnection(conn);
@@ -461,7 +459,7 @@ public class CoreServices implements Dhl {
                 throw new AxisFault("Süsteemi sisemine viga! Päringu konteksti laadimine ebaõnnestus!");
             }
         } catch (AxisFault fault) {
-        	logger.error(fault);
+        	logger.error(fault.getMessage(), fault);
         	throw fault;
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
@@ -550,7 +548,6 @@ public class CoreServices implements Dhl {
                     // Unknown request version
                     throw new IncorrectRequestVersionException("Vigane päringu versioon \""+ ver +"\"! Lubatud versioonid on \"v1\", \"v2\" ja \"v3\".");
                 }
-                tmpFile = result.responseFile;
                 t.markElapsed("Executing Query body");
 
                 try {
@@ -563,12 +560,12 @@ public class CoreServices implements Dhl {
                     response.getSOAPEnvelope().removeHeaders();
                     Vector headers = context.getRequestMessage().getSOAPEnvelope().getHeaders();
                     for (int i = 0; i < headers.size(); ++i) {
-                        response.getSOAPEnvelope().addHeader((SOAPHeaderElement)headers.get(i));
+                        response.getSOAPEnvelope().addHeader((SOAPHeaderElement) headers.get(i));
                     }
                     response.getSOAPEnvelope().removeBody();
                     response.getSOAPEnvelope().addBody();
 
-                    FileDataSource ds = new FileDataSource(tmpFile);
+                    FileDataSource ds = new FileDataSource(result.responseFile);
                     DataHandler d1 = new DataHandler(ds);
                     org.apache.axis.attachments.AttachmentPart a1 = new org.apache.axis.attachments.AttachmentPart(d1);
                     a1.setMimeHeader("Content-Transfer-Encoding", "base64");
@@ -585,16 +582,18 @@ public class CoreServices implements Dhl {
                     response.saveChanges();
                     t.markElapsed("Creating response message");
                 } catch (Exception ex) {
+                	logger.error(ex.getMessage(), ex);
+                	logResponseFileProblems(result);
                     throw new ResponseProcessingException(CommonStructures.VIGA_VASTUSSONUMI_KOOSTAMISEL, ex);
                 }
             } else {
                 throw new AxisFault("Süsteemi sisemine viga! Päringu konteksti laadimine ebaõnnestus!");
             }
         } catch (AxisFault fault) {
-        	logger.error(fault);
+        	logger.error(fault.getMessage(), fault);
             throw fault;
         } catch (Exception ex) {
-        	logger.error(ex);
+        	logger.error(ex.getMessage(), ex);
             throw new AxisFault(ex.getMessage());
         } finally {
         	CommonMethods.safeCloseDatabaseConnection(conn);
@@ -659,7 +658,6 @@ public class CoreServices implements Dhl {
                         // Vale versioon
                         throw new AxisFault(CommonStructures.VIGA_PARINGU_VERSIOONIS);
                     }
-                    tmpFile = result.responseFile;
                     t.markElapsed("Executing Query body");
 
                     try {
@@ -677,7 +675,7 @@ public class CoreServices implements Dhl {
                         response.getSOAPEnvelope().removeBody();
                         response.getSOAPEnvelope().addBody();
 
-                        FileDataSource ds = new FileDataSource(tmpFile);
+                        FileDataSource ds = new FileDataSource(result.responseFile);
                         DataHandler d1 = new DataHandler(ds);
                         org.apache.axis.attachments.AttachmentPart a1 = new org.apache.axis.attachments.AttachmentPart(d1);
                         a1.setMimeHeader("Content-Transfer-Encoding", "base64");
@@ -724,17 +722,18 @@ public class CoreServices implements Dhl {
                         response.saveChanges();
                         t.markElapsed("Creating response message");
                     } catch (Exception ex) {
-                    	logger.error(ex);
+                    	logger.error(ex.getMessage(), ex);
+                    	logResponseFileProblems(result);
                         throw new AxisFault(CommonStructures.VIGA_VASTUSSONUMI_KOOSTAMISEL);
                     }
                 } else {
                     throw new AxisFault("Süsteemi sisemine viga! Päringu konteksti laadimine ebaõnnestus!");
                 }
             } catch (AxisFault fault) {
-            	logger.error(fault);
+            	logger.error(fault.getMessage(), fault);
                 throw fault;
             } catch (Exception ex) {
-            	logger.error(ex);
+            	logger.error(ex.getMessage(), ex);
                 throw new AxisFault(ex.getMessage());
             } finally {
             	CommonMethods.safeCloseDatabaseConnection(conn);
@@ -810,17 +809,18 @@ public class CoreServices implements Dhl {
                         }
                         response.saveChanges();
                     } catch (Exception ex) {
-                    	logger.error(ex);
+                    	logger.error(ex.getMessage(), ex);
+                    	logResponseFileProblems(result);
                         throw new AxisFault(CommonStructures.VIGA_VASTUSSONUMI_KOOSTAMISEL);
                     }
                 } else {
                     throw new AxisFault("Süsteemi sisemine viga! Päringu konteksti laadimine ebaõnnestus!");
                 }
             } catch (AxisFault fault) {
-                logger.error(fault);
+                logger.error(fault.getMessage(), fault);
                 throw fault;
             } catch (Exception ex) {
-                logger.error(ex);
+                logger.error(ex.getMessage(), ex);
                 throw new AxisFault(ex.getMessage());
             } finally {
                 CommonMethods.safeCloseDatabaseConnection(conn);
@@ -891,7 +891,6 @@ public class CoreServices implements Dhl {
                     // Vale versioon
                     throw new AxisFault(CommonStructures.VIGA_PARINGU_VERSIOONIS);
                 }
-                tmpFile = result.responseFile;
 
                 try {
                     org.apache.axis.Message response = context.getResponseMessage();
@@ -907,7 +906,7 @@ public class CoreServices implements Dhl {
                     response.getSOAPEnvelope().removeBody();
                     response.getSOAPEnvelope().addBody();
 
-                    FileDataSource ds = new FileDataSource(tmpFile);
+                    FileDataSource ds = new FileDataSource(result.responseFile);
                     DataHandler d1 = new DataHandler(ds);
                     AttachmentPart a1 = response.createAttachmentPart(d1);
                     a1.setMimeHeader("Content-Transfer-Encoding", "base64");
@@ -930,17 +929,18 @@ public class CoreServices implements Dhl {
 
                     response.saveChanges();
                 } catch (Exception ex) {
-                	logger.error(ex);
+                	logger.error(ex.getMessage(), ex);
+                	logResponseFileProblems(result);
                     throw new AxisFault(CommonStructures.VIGA_VASTUSSONUMI_KOOSTAMISEL);
                 }
             } else {
                 throw new AxisFault("Süsteemi sisemine viga! Päringu konteksti laadimine ebaõnnestus!");
             }
         } catch (AxisFault fault) {
-            logger.error(fault);
+            logger.error(fault.getMessage(), fault);
             throw fault;
         } catch (Exception ex) {
-            logger.error(ex);
+            logger.error(ex.getMessage(), ex);
             throw new AxisFault(ex.getMessage());
         } finally {
         	CommonMethods.safeCloseDatabaseConnection(conn);
@@ -1088,10 +1088,10 @@ public class CoreServices implements Dhl {
                     throw new AxisFault("Süsteemi sisemine viga! Päringu konteksti laadimine ebaõnnestus!");
                 }
             } catch (AxisFault fault) {
-            	logger.error(fault);
+            	logger.error(fault.getMessage(), fault);
             	throw fault;
             } catch (Exception ex) {
-                logger.error(ex);
+                logger.error(ex.getMessage(), ex);
                 throw new AxisFault(ex.getMessage());
             } finally {
                 CommonMethods.safeCloseDatabaseConnection(conn);
@@ -1133,5 +1133,27 @@ public class CoreServices implements Dhl {
         } catch (Exception ex) {
             return "";
         }
+    }
+
+    /**
+     * Writes detailed information about a response file to error log.
+     * Should be used when creating the response message fails.
+     *
+     * @param result
+     * 		Result of DVK request.
+     */
+    private void logResponseFileProblems(RequestInternalResult result) {
+    	if (result != null) {
+	    	String errorMessage = "Failed to create response message based on file: \"" + result.responseFile + "\".";
+	    	if (!CommonMethods.isNullOrEmpty(result.responseFile)) {
+	    		File responseFile = new File(result.responseFile);
+	    		if (!responseFile.exists()) {
+	    			errorMessage += " File does not exist!";
+	    		} else {
+	    			errorMessage += " File size " + String.valueOf(responseFile.length()) + " bytes.";
+	    		}
+	    	}
+	    	logger.error(errorMessage);
+    	}
     }
 }

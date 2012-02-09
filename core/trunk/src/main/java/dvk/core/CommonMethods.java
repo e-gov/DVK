@@ -274,34 +274,6 @@ public class CommonMethods {
         return base64OutFileName;
     }
 
-    public static String base64EncodeFile(String filePath, String orgCode, String requestName) {
-        if (!(new File(filePath)).exists()) {
-        	logger.error("Data file does not exist!");
-            return null;
-        }
-
-        try {
-            String tmpDir = System.getProperty("java.io.tmpdir", "");
-
-            // Kodeerime pakitud andmed base64 kujule
-            String base64OutFileName = tmpDir + File.separator + "dhl_" + requestName + "_" + orgCode + "_" + String.valueOf((new Date()).getTime()) + "_base64OutBuffer.dat";
-            FileInputStream in = new FileInputStream(filePath);
-            FileOutputStream b64out = new FileOutputStream(base64OutFileName, false);
-            byte[] buf = new byte[66000];  // Puhvri pikkus peaks jaguma 3-ga
-            int len;
-            while ((len = in.read(buf)) > 0) {
-                b64out.write(Base64.encode(buf, 0, len).getBytes());
-            }
-            in.close();
-            b64out.close();
-
-            return base64OutFileName;
-        } catch (Exception ex) {
-        	logger.error(ex.getMessage(), ex);
-            return null;
-        }
-    }
-
     public static byte[] xmlElementToBinary(Element xmlElement) {
         try {
             return xmlElementToString(xmlElement).getBytes("UTF-8");
@@ -391,7 +363,6 @@ public class CommonMethods {
             }
             return result;
         } catch (Exception ex) {
-            //CommonMethods.logError(ex, "CommonMethods", "xmlDocumentFromFile");
             logger.error(ex.getMessage(), ex);
             return null;
         }
@@ -589,14 +560,17 @@ public class CommonMethods {
     private static final char kHexChars[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
     public static boolean writeToFile(String fileName, byte[] data) {
-        try {
-            FileOutputStream fs = new FileOutputStream(fileName, true);
+    	boolean result = true;
+    	FileOutputStream fs = null;
+    	try {
+            fs = new FileOutputStream(fileName, true);
             fs.write(data);
-            fs.close();
-            return true;
         } catch (Exception ex) {
-            return false;
+            result = false;
+        } finally {
+        	safeCloseStream(fs);
         }
+        return result;
     }
 
     public static void writeLog(String data) {
@@ -1198,7 +1172,7 @@ public class CommonMethods {
         int len = 0;
         int readLen = 0;
         long fileSize = (new File(filePath)).length();
-        int fragmentCount = (int)Math.floor((double) (fileSize / maxSizeBytes)) + 1;
+        int fragmentCount = (int) Math.floor((double) (fileSize / maxSizeBytes)) + 1;
 
         try {
             sourceStream = new FileInputStream(filePath);
@@ -1442,16 +1416,17 @@ public class CommonMethods {
                 InternetAddress fromAddress = new InternetAddress(Settings.currentProperties.getProperty("mail.from"));
                 fromAddress.setPersonal("DVK klient");
 
-                Session session = Session.getDefaultInstance( mailServerConfig, null );
-                MimeMessage message = new MimeMessage( session );
+                Session session = Session.getDefaultInstance(mailServerConfig, null);
+                MimeMessage message = new MimeMessage(session);
 
-                message.addRecipient( Message.RecipientType.TO, new InternetAddress(emailTo) );
-                message.addFrom( new InternetAddress[]{fromAddress} );
-                message.setSubject( "DVK client error!" );
-                message.setText( emailBody );
-                Transport.send( message );
-            }
-        } catch( Exception ex ){}
+				message.addRecipient(Message.RecipientType.TO, new InternetAddress(emailTo));
+				message.addFrom(new InternetAddress[] { fromAddress });
+				message.setSubject("DVK client error!");
+				message.setText(emailBody);
+				Transport.send(message);
+			}
+		} catch (Exception ex) {
+		}
     }
 
     public static String TruncateString(final String text, final int len) {
@@ -1475,6 +1450,17 @@ public class CommonMethods {
         return result;
     }
 
+    /**
+     * Detects if two Strings have equal value.
+     * Ignores case and treats empty string and null as equal.
+     *
+     * @param s1
+     * 		First string to compare.
+     * @param s2
+     * 		Second string to compare.
+     * @return
+     * 		{@code true} if both strings have the same value.
+     */
     public static boolean stringsEqualIgnoreNull(final String s1, final String s2) {
     	if (s1 == null) {
     		return ((s2 == null) || (s2.length() < 1));

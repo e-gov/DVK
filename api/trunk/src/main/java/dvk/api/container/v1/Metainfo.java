@@ -9,6 +9,7 @@ import dvk.api.container.SaatjaDefineeritud;
 
 public class Metainfo {
     // Meta-automatic
+    private int dhlId;
     private String dhlSaabumisviis;
     private Date dhlSaabumisaeg;
     private String dhlSaatmisviis;
@@ -55,6 +56,14 @@ public class Metainfo {
 
 
     // Meta-automatic
+    public int getDhlId() {
+        return dhlId;
+    }
+
+    public void setDhlId(int dhlId) {
+        this.dhlId = dhlId;
+    }
+
     public String getDhlSaabumisviis() {
         return dhlSaabumisviis;
     }

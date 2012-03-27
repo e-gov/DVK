@@ -32,6 +32,10 @@ public class MetaxmlTest {
             marshaller.setMapping(mapping);
 
             Metaxml metaxml = new Metaxml();
+
+            metaxml.setLetterMetaData(new LetterMetaData());
+            metaxml.getLetterMetaData().setSignDate(new Date());
+
             metaxml.setSignatures(new ArrayOfSignature());
 
             Signature s1 = new Signature();

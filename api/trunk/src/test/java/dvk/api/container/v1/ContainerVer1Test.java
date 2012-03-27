@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 import junit.framework.Assert;
@@ -151,6 +152,61 @@ public class ContainerVer1Test {
         try {
             ContainerVer1 actual = ContainerVer1.parse(containerXml);
             Assert.assertNotNull(actual);
+
+            Assert.assertEquals(9270, actual.getMetainfo().getDhlId());
+            Assert.assertEquals("xtee", actual.getMetainfo().getDhlSaabumisviis());
+
+            Calendar cal = Calendar.getInstance();
+            cal.set(2011, 10, 28, 17, 41, 47);
+            cal.set(Calendar.MILLISECOND, 0);
+            Assert.assertEquals(cal.getTimeInMillis(), actual.getMetainfo().getDhlSaabumisaeg().getTime());
+
+            Assert.assertEquals("xtee", actual.getMetainfo().getDhlSaatmisviis());
+
+            cal.set(2011, 10, 28, 17, 45, 8);
+            cal.set(Calendar.MILLISECOND, 0);
+            Assert.assertEquals(cal.getTimeInMillis(), actual.getMetainfo().getDhlSaatmisaeg().getTime());
+
+            Assert.assertEquals("11181967", actual.getMetainfo().getDhlSaatjaAsutuseNr());
+            Assert.assertEquals("Carlsman OÜ", actual.getMetainfo().getDhlSaatjaAsutuseNimi());
+            Assert.assertEquals("38005130332", actual.getMetainfo().getDhlSaatjaIsikukood());
+            Assert.assertEquals("adit", actual.getMetainfo().getDhlSaajaAsutuseNr());
+            Assert.assertEquals("Ametlike Dokumentide Infrastruktuuri Teenus", actual.getMetainfo().getDhlSaajaAsutuseNimi());
+            Assert.assertEquals("38005130332", actual.getMetainfo().getDhlSaajaIsikukood());
+            Assert.assertEquals("jaak@interinx.com", actual.getMetainfo().getDhlSaatjaEpost());
+            Assert.assertEquals("jaak@interinx.com", actual.getMetainfo().getDhlSaajaEpost());
+            Assert.assertEquals("/", actual.getMetainfo().getDhlKaust());
+            Assert.assertEquals("adit", actual.getMetainfo().getKoostajaAsutuseNr());
+            Assert.assertEquals("adit", actual.getMetainfo().getSaajaAsutuseNr());
+            Assert.assertEquals("Testkiri Amphorast riigiportaali", actual.getMetainfo().getKoostajaDokumendinimi());
+            Assert.assertEquals("dokument", actual.getMetainfo().getKoostajaDokumendityyp());
+            Assert.assertNull(actual.getMetainfo().getKoostajaVotmesona());
+            Assert.assertNull(actual.getMetainfo().getKoostajaDokumendinr());
+            Assert.assertEquals("2011-11-26T00:00:00+02:00", actual.getMetainfo().getKoostajaKuupaev());
+            Assert.assertEquals("Ametlike Dokumentide Infrastruktuuri Teenus", actual.getMetainfo().getKoostajaAsutuseNimi());
+            Assert.assertEquals("Tel: 6 654 253 E-mail: jaak@interinx.com", actual.getMetainfo().getKoostajaAsutuseKontakt());
+            Assert.assertNull(actual.getMetainfo().getAutoriOsakond());
+            Assert.assertEquals("38005130332", actual.getMetainfo().getAutoriIsikukood());
+            Assert.assertEquals("Jaak Lember", actual.getMetainfo().getAutoriNimi());
+            Assert.assertEquals("Tel: 6 654 253 E-mail: jaak@interinx.com", actual.getMetainfo().getAutoriKontakt());
+            Assert.assertNull(actual.getMetainfo().getSeotudDhlId());
+            Assert.assertNull(actual.getMetainfo().getSeotudDokumendiNrKoostajal());
+            Assert.assertNull(actual.getMetainfo().getSeotudDokumendinrSaajal());
+            Assert.assertNull(actual.getMetainfo().getSaatjaDokumendinr());
+            Assert.assertNull(actual.getMetainfo().getSaatjaAsutuseKontakt());
+            Assert.assertEquals("38005130332", actual.getMetainfo().getSaajaIsikukood());
+            Assert.assertEquals("Jaak Lember", actual.getMetainfo().getSaajaNimi());
+            Assert.assertNull(actual.getMetainfo().getSaajaOsakond());
+            Assert.assertNull(actual.getMetainfo().getKoostajaFailinimi());
+            Assert.assertNull(actual.getMetainfo().getKoostajaKataloog());
+            Assert.assertNull(actual.getMetainfo().getKoostajaKokkuvote());
+            Assert.assertEquals("D0", actual.getMetainfo().getSisuId());
+
+            cal.set(2011, 10, 26, 0, 0, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            Assert.assertEquals(cal.getTimeInMillis(), actual.getMetainfo().getSaatjaKuupaev().getTime());
+
+            System.out.println(actual.getMetaxml().getLetterMetaData().getSignDate());
         } catch (Exception ex) {
             ex.printStackTrace();
             Assert.assertTrue(true);

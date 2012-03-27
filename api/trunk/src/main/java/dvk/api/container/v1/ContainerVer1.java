@@ -89,6 +89,7 @@ public class ContainerVer1 extends Container
 			return null;
 		}
 
+		/*
 		int indx1 = xml.indexOf("?>");
 		if (indx1 < 0) {
 		    Pattern documentRootPattern = Pattern.compile("<([\\w]+:)?dokument", Pattern.DOTALL | Pattern.CANON_EQ | Pattern.CASE_INSENSITIVE);
@@ -128,7 +129,7 @@ public class ContainerVer1 extends Container
 				}
 			}
 		}
-
+        */
 		StringReader in = new StringReader(xml);
 
 		try {

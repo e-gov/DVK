@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>dvk</groupId>
   <artifactId>api</artifactId>
-  <version>1.0.3</version>
+  <version>1.0.4</version>
   <packaging>jar</packaging>
   <name>dvkapi</name>
 
@@ -210,5 +210,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

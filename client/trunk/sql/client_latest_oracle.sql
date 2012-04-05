@@ -67,7 +67,7 @@ trigger tr_dhl_message_id
     on dhl_message
     for each row
 begin
-    if (:new.dhl_message_id < 1) then
+    if (nvl(:new.dhl_message_id, 0) < 1) then
         select  sq_dhl_message_id.nextval
         into    globalPkg.identity
         from    dual;

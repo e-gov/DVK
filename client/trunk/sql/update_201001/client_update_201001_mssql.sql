@@ -218,7 +218,7 @@ if @recipient_division_code is null
 	set @recipient_division_code = ''
 if @recipient_position_code is null
 	set @recipient_position_code = ''
-	
+
 if exists (select * from dhl_message_recipient where dhl_message_id = @dhl_message_id and recipient_org_code = @recipient_org_code and recipient_person_code = @recipient_person_code and recipient_division_id=@recipient_division_id and recipient_position_id=@recipient_position_id and recipient_division_code = @recipient_division_code and recipient_position_code = @recipient_position_code)
 begin
 	update	dhl_message_recipient
@@ -245,7 +245,7 @@ begin
 		and recipient_position_id = @recipient_position_id
 		and recipient_division_code = @recipient_division_code
 		and recipient_position_code = @recipient_position_code
-	
+
 	select	@dhl_message_recipient_id = dhl_message_recipient_id
 	from	dhl_message_recipient
 	where	dhl_message_id = @dhl_message_id
@@ -306,7 +306,7 @@ begin
 		@recipient_position_name,
 		@recipient_division_code,
 		@recipient_position_code)
-	
+
 	set @dhl_message_recipient_id = scope_identity()
 end
 GO
@@ -1034,7 +1034,7 @@ end
 GO
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Update_DhlMessageRecipDhlID]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
-drop procedure [dbo].[Save_DhlStatusHistory]
+drop procedure [dbo].[Update_DhlMessageRecipDhlID]
 GO
 create procedure [Update_DhlMessageRecipDhlID]
 	@dhl_message_id int,
@@ -1050,7 +1050,7 @@ set	dhl_id = @dhl_id,
 	query_id = @query_id,
 	producer_name = @dhl_direct_producer_name,
 	service_url = @dhl_direct_service_url
-where	dhl_message_id = @dhl_message_id 
+where	dhl_message_id = @dhl_message_id
 	and recipient_org_code in
 	(
 		select	org_code
@@ -1113,5 +1113,4 @@ as
             dhl_guid
     from    dhl_message
     where   dhl_guid = @guid
-    )
 GO

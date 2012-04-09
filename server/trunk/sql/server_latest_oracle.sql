@@ -216,7 +216,7 @@ CREATE TABLE asutus
     nimetus varchar2(1000) NOT NULL,
     lnimi varchar2(20),
     liik1 varchar2(20),
-    liik2 varchar2(20),
+    liik2 varchar2(50),
     tegevusala varchar2(20),
     tegevuspiirkond varchar2(1000),
     maakond varchar2(20),

@@ -105,3 +105,5 @@ begin
             and a3.vanem_id = ksa3.id;
 end;
 /
+ALTER TABLE DVK.ASUTUS MODIFY LIIK2 VARCHAR2(50);
+/

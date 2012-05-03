@@ -13,7 +13,7 @@ begin
     select  *
     from    dokument d,
     (
-        -- Dokumendid, mis adresseeriti p‰ringu teostanud isikule
+        -- Dokumendid, mis adresseeriti p√§ringu teostanud isikule
         select  t1.dokument_id
         from    transport t1, vastuvotja v1, isik i1
         where   t1.transport_id = v1.transport_id
@@ -23,8 +23,8 @@ begin
                 and v1.staatus_id = 101
                 and nvl(Get_DocumentsSentTo.division_id, nvl(v1.allyksus_id,0)) = nvl(v1.allyksus_id,0)
                 and nvl(Get_DocumentsSentTo.occupation_id, nvl(v1.ametikoht_id,0)) = nvl(v1.ametikoht_id,0)
-                
-        -- Dokumendid, mis adresseeriti p‰ringu teostaja ametikohale
+
+        -- Dokumendid, mis adresseeriti p√§ringu teostaja ametikohale
         union
         select  t2.dokument_id
         from    transport t2, vastuvotja v2
@@ -50,8 +50,8 @@ begin
                 )
                 and nvl(Get_DocumentsSentTo.division_id, nvl(v2.allyksus_id,0)) = nvl(v2.allyksus_id,0)
                 and nvl(Get_DocumentsSentTo.occupation_id, nvl(v2.ametikoht_id,0)) = nvl(v2.ametikoht_id,0)
-        
-        -- Dokumendid, mis adresseeriti p‰ringu teostaja all¸ksusele
+
+        -- Dokumendid, mis adresseeriti p√§ringu teostaja all√ºksusele
         union
         select  t3.dokument_id
         from    transport t3, vastuvotja v3
@@ -77,10 +77,10 @@ begin
                 )
                 and nvl(Get_DocumentsSentTo.division_id, nvl(v3.allyksus_id,0)) = nvl(v3.allyksus_id,0)
                 and nvl(Get_DocumentsSentTo.occupation_id, nvl(v3.ametikoht_id,0)) = nvl(v3.ametikoht_id,0)
-        
-        -- Dokumendid, mis adresseeriti p‰ringu teostaja ametikohale
-        -- p‰ringu teostaja all¸ksuses (vastupidine juhtum oleks, et
-        -- dokument saadeti mınele teisele ametikohale samas all¸ksuses).
+
+        -- Dokumendid, mis adresseeriti p√§ringu teostaja ametikohale
+        -- p√§ringu teostaja all√ºksuses (vastupidine juhtum oleks, et
+        -- dokument saadeti m√µnele teisele ametikohale samas all√ºksuses).
         union
         select  t4.dokument_id
         from    transport t4, vastuvotja v4
@@ -106,7 +106,7 @@ begin
                 )
                 and nvl(Get_DocumentsSentTo.division_id, nvl(v4.allyksus_id,0)) = nvl(v4.allyksus_id,0)
                 and nvl(Get_DocumentsSentTo.occupation_id, nvl(v4.ametikoht_id,0)) = nvl(v4.ametikoht_id,0)
-        
+
         -- Juhul kui tegemist on asutuse administraatoriga
         union
         select  t5.dokument_id

@@ -42,31 +42,31 @@ DROP PROCEDURE add_recipient
 DROP PROCEDURE update_recipient
 /
 
-/* Vastuvõtja staatuse võimalike väärtuste sisestamine */
+/* VastuvÃµtja staatuse vÃµimalike vÃ¤Ã¤rtuste sisestamine */
 INSERT
 INTO    VASTUVOTJA_STAATUS(VASTUVOTJA_STAATUS_ID, NIMETUS)
 VALUES  (1, 'Dokumente on puudu (Pooleli)');
 INSERT
 INTO    VASTUVOTJA_STAATUS(VASTUVOTJA_STAATUS_ID, NIMETUS)
-VALUES  (2, 'Järjekorras');
+VALUES  (2, 'JÃ¤rjekorras');
 INSERT
 INTO    VASTUVOTJA_STAATUS(VASTUVOTJA_STAATUS_ID, NIMETUS)
 VALUES  (3, 'Ootel');
 INSERT
 INTO    VASTUVOTJA_STAATUS(VASTUVOTJA_STAATUS_ID, NIMETUS)
-VALUES  (4, 'Lõpetatud');
+VALUES  (4, 'LÃµpetatud');
 INSERT
 INTO    VASTUVOTJA_STAATUS(VASTUVOTJA_STAATUS_ID, NIMETUS)
-VALUES  (5, 'Tagasi lükatud');
+VALUES  (5, 'Tagasi lÃ¼katud');
 INSERT
 INTO    VASTUVOTJA_STAATUS(VASTUVOTJA_STAATUS_ID, NIMETUS)
 VALUES  (6, 'Teha');
 INSERT
 INTO    VASTUVOTJA_STAATUS(VASTUVOTJA_STAATUS_ID, NIMETUS)
-VALUES  (7, 'Töötlemisel');
+VALUES  (7, 'TÃ¶Ã¶tlemisel');
 INSERT
 INTO    VASTUVOTJA_STAATUS(VASTUVOTJA_STAATUS_ID, NIMETUS)
-VALUES  (8, 'Aktsepteeritud (Võetud töösse)');
+VALUES  (8, 'Aktsepteeritud (VÃµetud tÃ¶Ã¶sse)');
 INSERT
 INTO    VASTUVOTJA_STAATUS(VASTUVOTJA_STAATUS_ID, NIMETUS)
 VALUES  (9, 'Salvestatud');

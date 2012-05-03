@@ -72,7 +72,7 @@ table   vastuvotja_mall
     osakonna_nr varchar2(100),
     osakonna_nimi varchar2(500),
     saatmisviis_id number(38,0) not null,
-    asutuse_nimi varchar2(500), 
+    asutuse_nimi varchar2(500),
     allyksus_id number(38,0),
     tingimus_xpath varchar2(4000),
     primary key (vastuvotja_mall_id),
@@ -347,7 +347,7 @@ begin
             Add_Sender.email,
             Add_Sender.department_nr,
             Add_Sender.department_name);
-    
+
     Add_Sender.sender_id := globalPkg.identity;
 end;
 /
@@ -400,7 +400,7 @@ begin
     from    asutus a
     where   a.asutus_id = Get_AsutusByID.id
             and rownum < 2;
-    
+
     if cnt > 0 then
         select  a.registrikood,
                 a.e_registrikood,
@@ -569,7 +569,7 @@ begin
     from    asutus a
     where   a.registrikood = Get_AsutusByRegNr.registrikood
             and rownum < 2;
-    
+
     if cnt > 0 then
         select  a.asutus_id,
                 a.e_registrikood,
@@ -751,7 +751,7 @@ begin
     from    asutus a
     where   a.registrikood = Add_Asutus.registrikood
             and rownum < 2;
-    
+
     if cnt < 1 then
         insert
         into    asutus(
@@ -831,7 +831,7 @@ begin
                 Add_Asutus.toetatav_dvk_versioon,
                 Add_Asutus.server_id,
                 Add_Asutus.aar_id);
-        
+
         Add_Asutus.id := globalPkg.identity;
     else
         select  a.asutus_id
@@ -981,7 +981,7 @@ begin
     from    vastuvotja
     where   asutus_id = Get_AsutusStat.asutus_id
             and staatus_id = 101;
-    
+
     select  (
                 select  count(*)
                 from    vastuvotja
@@ -1022,7 +1022,7 @@ begin
     from    server s
     where   s.server_id = Get_ServerByID.server_id
             and rownum < 2;
-    
+
     if cnt > 0 then
         select  s.andmekogu_nimi,
                 s.aadress
@@ -1090,7 +1090,7 @@ begin
             Add_Proxy.email,
             Add_Proxy.department_nr,
             Add_Proxy.department_name);
-    
+
     Add_Proxy.proxy_id := globalPkg.identity;
 end;
 /
@@ -1116,7 +1116,7 @@ begin
     from    vahendaja v
     where   v.transport_id = Get_ProxyBySendingID.sending_id
             and rownum < 2;
-    
+
     if cnt > 0 then
         select  v.vahendaja_id,
                 v.asutus_id,
@@ -1221,7 +1221,7 @@ begin
     into    cnt
     from    asutus a
     where   a.aar_id = Get_AsutusIDByAarID.aar_id;
-    
+
     if cnt > 0 then
         select  a.asutus_id
         into    Get_AsutusIDByAarID.id
@@ -1253,7 +1253,7 @@ begin
     from    allyksus a
     where   a.aar_id = Get_AllyksusByAarID.aar_id
             and rownum < 2;
-    
+
     if cnt > 0 then
         select  a.id,
                 a.asutus_id,
@@ -1299,7 +1299,7 @@ begin
     from    allyksus a
     where   a.aar_id = Get_AllyksusIdByAarID.aar_id
             and rownum < 2;
-    
+
     if cnt > 0 then
         select  a.id
         into    Get_AllyksusIdByAarID.id
@@ -1378,7 +1378,7 @@ begin
             Add_Allyksus.username,
             Add_Allyksus.muutmiste_arv,
             Add_Allyksus.aar_id_);
-    
+
     Add_Allyksus.id := globalPkg.identity;
 end;
 /
@@ -1443,7 +1443,7 @@ begin
     from    ametikoht_taitmine a
     where   a.aar_id = Get_AmetikohaTaitmineByAarID.aar_id
             and rownum < 2;
-    
+
     if cnt > 0 then
         select  a.taitmine_id,
                 a.ametikoht_id,
@@ -1552,7 +1552,7 @@ begin
             Add_AmetikohaTaitmine.username,
             Add_AmetikohaTaitmine.peatatud,
             Add_AmetikohaTaitmine.aar_id_);
-    
+
     Add_AmetikohaTaitmine.id := globalPkg.identity;
 end;
 /
@@ -1622,7 +1622,7 @@ begin
     from    ametikoht a
     where   a.aar_id = Get_AmetikohtByAarID.aar_id
             and rownum < 2;
-    
+
     if cnt > 0 then
         select  a.ametikoht_id,
                 a.ks_ametikoht_id,
@@ -1677,7 +1677,7 @@ begin
     from    ametikoht a
     where   a.aar_id = Get_AmetikohtIdByAarID.aar_id
             and rownum < 2;
-    
+
     if cnt > 0 then
         select  a.ametikoht_id
         into    Get_AmetikohtIdByAarID.id
@@ -1769,7 +1769,7 @@ begin
             Add_Ametikoht.allyksus_id_,
             Add_Ametikoht.params,
             Add_Ametikoht.aar_id_);
-    
+
     Add_Ametikoht.id := globalPkg.identity;
 end;
 /
@@ -1847,7 +1847,7 @@ begin
     from    isik i
     where   i.kood = Get_IsikByCode.isikukood
             and rownum < 2;
-    
+
     if cnt > 0 then
         select  i.i_id,
                 i.perenimi,
@@ -1944,7 +1944,7 @@ begin
             Add_Isik.created,
             Add_Isik.last_modified,
             Add_Isik.username);
-    
+
     Add_Isik.id := globalPkg.identity;
 end;
 /
@@ -1998,7 +1998,7 @@ begin
     from    asutus a
     where   a.registrikood = Get_AsutusIDByRegNr.registrikood
             and (Get_AsutusIDByRegNr.dvk_voimeline < 1 or a.dhl_saatmine = 1);
-    
+
     if cnt > 0 then
         select  a.asutus_id
         into    Get_AsutusIDByRegNr.id
@@ -2025,7 +2025,7 @@ begin
     select  *
     from    dokument d,
     (
-        -- Dokumendid, mis adresseeriti p‰ringu teostanud isikule
+        -- Dokumendid, mis adresseeriti p√§ringu teostanud isikule
         select  t1.dokument_id
         from    transport t1, vastuvotja v1, isik i1
         where   t1.transport_id = v1.transport_id
@@ -2033,8 +2033,8 @@ begin
                 and i1.kood = v1.isikukood
                 and i1.i_id = Get_DocumentsSentTo.user_id
                 and v1.staatus_id = 101
-                
-        -- Dokumendid, mis adresseeriti p‰ringu teostaja ametikohale
+
+        -- Dokumendid, mis adresseeriti p√§ringu teostaja ametikohale
         union
         select  t2.dokument_id
         from    transport t2, vastuvotja v2
@@ -2058,8 +2058,8 @@ begin
                             and nvl(ak2.alates, add_months(sysdate, -1)) < sysdate
                             and nvl(ak2.kuni, add_months(sysdate, 1)) > sysdate
                 )
-        
-        -- Dokumendid, mis adresseeriti p‰ringu teostaja all¸ksusele
+
+        -- Dokumendid, mis adresseeriti p√§ringu teostaja all√ºksusele
         union
         select  t3.dokument_id
         from    transport t3, vastuvotja v3
@@ -2083,10 +2083,10 @@ begin
                             and nvl(ak3.alates, add_months(sysdate, -1)) < sysdate
                             and nvl(ak3.kuni, add_months(sysdate, 1)) > sysdate
                 )
-        
-        -- Dokumendid, mis adresseeriti p‰ringu teostaja ametikohale
-        -- p‰ringu teostaja all¸ksuses (vastupidine juhtum oleks, et
-        -- dokument saadeti mınele teisele ametikohale samas all¸ksuses).
+
+        -- Dokumendid, mis adresseeriti p√§ringu teostaja ametikohale
+        -- p√§ringu teostaja all√ºksuses (vastupidine juhtum oleks, et
+        -- dokument saadeti m√µnele teisele ametikohale samas all√ºksuses).
         union
         select  t4.dokument_id
         from    transport t4, vastuvotja v4
@@ -2110,7 +2110,7 @@ begin
                             and nvl(ak4.alates, add_months(sysdate, -1)) < sysdate
                             and nvl(ak4.kuni, add_months(sysdate, 1)) > sysdate
                 )
-        
+
         -- Juhul kui tegemist on asutuse administraatoriga
         union
         select  t5.dokument_id

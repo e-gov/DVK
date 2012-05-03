@@ -11,7 +11,7 @@ begin
     select  *
     from    dokument d,
     (
-        -- Dokumendid, mis adresseeriti p‰ringu teostanud isikule
+        -- Dokumendid, mis adresseeriti p√§ringu teostanud isikule
         select  t1.dokument_id
         from    transport t1, vastuvotja v1, isik i1
         where   t1.transport_id = v1.transport_id
@@ -19,8 +19,8 @@ begin
                 and i1.kood = v1.isikukood
                 and i1.i_id = Get_DocumentsSentTo.user_id
                 and v1.staatus_id = 101
-                
-        -- Dokumendid, mis adresseeriti p‰ringu teostaja ametikohale
+
+        -- Dokumendid, mis adresseeriti p√§ringu teostaja ametikohale
         union
         select  t2.dokument_id
         from    transport t2, vastuvotja v2
@@ -44,8 +44,8 @@ begin
                             and nvl(ak2.alates, add_months(sysdate, -1)) < sysdate
                             and nvl(ak2.kuni, add_months(sysdate, 1)) > sysdate
                 )
-        
-        -- Dokumendid, mis adresseeriti p‰ringu teostaja all¸ksusele
+
+        -- Dokumendid, mis adresseeriti p√§ringu teostaja all√ºksusele
         union
         select  t3.dokument_id
         from    transport t3, vastuvotja v3
@@ -69,10 +69,10 @@ begin
                             and nvl(ak3.alates, add_months(sysdate, -1)) < sysdate
                             and nvl(ak3.kuni, add_months(sysdate, 1)) > sysdate
                 )
-        
-        -- Dokumendid, mis adresseeriti p‰ringu teostaja ametikohale
-        -- p‰ringu teostaja all¸ksuses (vastupidine juhtum oleks, et
-        -- dokument saadeti mınele teisele ametikohale samas all¸ksuses).
+
+        -- Dokumendid, mis adresseeriti p√§ringu teostaja ametikohale
+        -- p√§ringu teostaja all√ºksuses (vastupidine juhtum oleks, et
+        -- dokument saadeti m√µnele teisele ametikohale samas all√ºksuses).
         union
         select  t4.dokument_id
         from    transport t4, vastuvotja v4
@@ -96,7 +96,7 @@ begin
                             and nvl(ak4.alates, add_months(sysdate, -1)) < sysdate
                             and nvl(ak4.kuni, add_months(sysdate, 1)) > sysdate
                 )
-        
+
         -- Juhul kui tegemist on asutuse administraatoriga
         union
         select  t5.dokument_id

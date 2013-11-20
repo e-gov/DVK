@@ -41,7 +41,7 @@ public class TestClient {
                 }
             }
             Settings.loadProperties(propertiesFile);
-            
+
             // Loome proksiklassi objekti
             Service service;
             Call call;

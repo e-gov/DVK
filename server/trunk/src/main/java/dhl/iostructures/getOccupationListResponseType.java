@@ -2,18 +2,20 @@ package dhl.iostructures;
 
 import dhl.users.Ametikoht;
 import dvk.core.CommonStructures;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPBodyElement;
 import javax.xml.soap.SOAPElement;
+
 import org.apache.log4j.Logger;
 
 public class getOccupationListResponseType implements SOAPOutputBodyRepresentation {
-	static Logger logger = Logger.getLogger(getOccupationListResponseType.class.getName());
-	public getOccupationListRequestType paring;
+    static Logger logger = Logger.getLogger(getOccupationListResponseType.class.getName());
+    public getOccupationListRequestType paring;
     public ArrayList<Ametikoht> ametikohad;
-    
+
     public getOccupationListResponseType() {
         ametikohad = null;
         paring = null;
@@ -65,22 +67,22 @@ public class getOccupationListResponseType implements SOAPOutputBodyRepresentati
 
                 SOAPElement elName = elOccupation.addChildElement("nimetus");
                 elName.addTextNode(occupation.getNimetus());
-                
+
                 SOAPElement elOrg = elOccupation.addChildElement("asutuse_kood");
                 elOrg.addTextNode(occupation.getAsutusKood());
-                
+
                 if ((occupation.getLyhinimetus() != null) && (occupation.getLyhinimetus().length() > 0)) {
-                	SOAPElement elShortName = elOccupation.addChildElement("lyhinimetus");
-                	elShortName.addTextNode(occupation.getLyhinimetus());
+                    SOAPElement elShortName = elOccupation.addChildElement("lyhinimetus");
+                    elShortName.addTextNode(occupation.getLyhinimetus());
                 }
-                
+
                 if ((occupation.getAllyksuseLyhinimetus() != null) && (occupation.getAllyksuseLyhinimetus().length() > 0)) {
-	                SOAPElement elParent = elOccupation.addChildElement("ks_allyksuse_lyhinimetus");
-	                elParent.addTextNode(occupation.getAllyksuseLyhinimetus());
+                    SOAPElement elParent = elOccupation.addChildElement("ks_allyksuse_lyhinimetus");
+                    elParent.addTextNode(occupation.getAllyksuseLyhinimetus());
                 }
             }
         } catch (Exception ex) {
-        	logger.error(ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
         }
     }
 }

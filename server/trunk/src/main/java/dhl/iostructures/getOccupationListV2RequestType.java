@@ -13,18 +13,18 @@ import dhl.exceptions.RequestProcessingException;
 import dvk.core.CommonMethods;
 
 public class getOccupationListV2RequestType {
-	static Logger logger = Logger.getLogger(getOccupationListV2RequestType.class.getName());
-	public String asutusedHref;
+    static Logger logger = Logger.getLogger(getOccupationListV2RequestType.class.getName());
+    public String asutusedHref;
     public String[] asutused;
 
     public getOccupationListV2RequestType() {
         asutusedHref = "";
-        asutused = new String[] {};
+        asutused = new String[]{};
     }
 
     public static getOccupationListV2RequestType getFromSOAPBody(
-        org.apache.axis.MessageContext context)
-        throws RequestProcessingException {
+            org.apache.axis.MessageContext context)
+            throws RequestProcessingException {
         try {
             org.apache.axis.Message msg = context.getRequestMessage();
             SOAPBody body = msg.getSOAPBody();
@@ -44,13 +44,13 @@ public class getOccupationListV2RequestType {
                         }
                         return result;
                     } else {
-                    	throw new RequestProcessingException("Viga päringu keha töötlemisel. Puudub kohustuslik element /getOccupationList/keha/asutused.");
+                        throw new RequestProcessingException("Viga päringu keha töötlemisel. Puudub kohustuslik element /getOccupationList/keha/asutused.");
                     }
                 } else {
-                	throw new RequestProcessingException("Viga päringu keha töötlemisel. Puudub kohustuslik element /getOccupationList/keha.");
+                    throw new RequestProcessingException("Viga päringu keha töötlemisel. Puudub kohustuslik element /getOccupationList/keha.");
                 }
             } else {
-            	throw new RequestProcessingException("Viga päringu keha töötlemisel. Puudub kohustuslik element /getOccupationList.");
+                throw new RequestProcessingException("Viga päringu keha töötlemisel. Puudub kohustuslik element /getOccupationList.");
             }
         } catch (SOAPException ex) {
             logger.error(ex.getMessage(), ex);
@@ -59,11 +59,11 @@ public class getOccupationListV2RequestType {
     }
 
     public void loadParametersFromXML(String xmlFile) {
-    	if ((xmlFile != null) && (xmlFile.length() > 0) && (new File(xmlFile)).exists()) {
-    		Document xmlDoc = CommonMethods.xmlDocumentFromFile(xmlFile, true);
+        if ((xmlFile != null) && (xmlFile.length() > 0) && (new File(xmlFile)).exists()) {
+            Document xmlDoc = CommonMethods.xmlDocumentFromFile(xmlFile, true);
             NodeList nodes = xmlDoc.getElementsByTagName("asutused");
             if (nodes.getLength() > 0) {
-                Element el1 = (Element)nodes.item(0);
+                Element el1 = (Element) nodes.item(0);
                 nodes = el1.getElementsByTagName("asutus");
                 if (nodes.getLength() > 0) {
                     this.asutused = new String[nodes.getLength()];
@@ -72,6 +72,6 @@ public class getOccupationListV2RequestType {
                     }
                 }
             }
-    	}
+        }
     }
 }

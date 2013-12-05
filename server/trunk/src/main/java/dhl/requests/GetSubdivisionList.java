@@ -13,18 +13,20 @@ import dvk.core.CommonMethods;
 
 import java.sql.Connection;
 import java.util.ArrayList;
+
 import org.apache.axis.AxisFault;
 import org.apache.log4j.Logger;
 
 public class GetSubdivisionList {
 
-	private static Logger logger = Logger.getLogger(GetSubdivisionList.class);
+    private static Logger logger = Logger.getLogger(GetSubdivisionList.class);
 
-    public static getSubdivisionListResponseType V1(org.apache.axis.MessageContext context, Connection conn) throws AxisFault, RequestProcessingException {
+    public static getSubdivisionListResponseType V1(
+            org.apache.axis.MessageContext context, Connection conn) throws AxisFault, RequestProcessingException {
 
-    	logger.info("GetSubdivisionList.V1 invoked.");
+        logger.info("GetSubdivisionList.V1 invoked.");
 
-    	getSubdivisionListResponseType result = new getSubdivisionListResponseType();
+        getSubdivisionListResponseType result = new getSubdivisionListResponseType();
 
         // Laeme päringu keha endale sobivasse andmestruktuuri
         getSubdivisionListRequestType bodyData = getSubdivisionListRequestType.getFromSOAPBody(context);
@@ -48,11 +50,12 @@ public class GetSubdivisionList {
         return result;
     }
 
-    public static getSubdivisionListV2ResponseType V2(org.apache.axis.MessageContext context, Connection conn, UserProfile user) throws Exception {
+    public static getSubdivisionListV2ResponseType V2(
+            org.apache.axis.MessageContext context, Connection conn, UserProfile user) throws Exception {
 
-    	logger.info("GetSubdivisionList.V2 invoked.");
+        logger.info("GetSubdivisionList.V2 invoked.");
 
-    	getSubdivisionListV2ResponseType result = new getSubdivisionListV2ResponseType();
+        getSubdivisionListV2ResponseType result = new getSubdivisionListV2ResponseType();
 
         // Laeme päringu keha endale sobivasse andmestruktuuri
         getSubdivisionListV2RequestType bodyData = getSubdivisionListV2RequestType.getFromSOAPBody(context);

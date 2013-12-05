@@ -3,6 +3,7 @@ package dhl.users;
 import dhl.aar.iostructures.AarAmetikoht;
 import dvk.core.CommonMethods;
 import dvk.core.Settings;
+
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -29,6 +30,10 @@ public class Ametikoht {
     // Abimuutuja, mida andmebaasi pole vaja salvestada
     private String m_asutusKood;
     private String m_allyksuseLyhinimetus;
+
+    public Ametikoht() {
+        clear();
+    }
 
     public int getID() {
         return m_id;
@@ -150,10 +155,6 @@ public class Ametikoht {
         this.m_allyksuseLyhinimetus = value;
     }
 
-    public Ametikoht() {
-        clear();
-    }
-
     public void clear() {
         m_id = 0;
         m_ksAmetikohtID = 0;
@@ -267,14 +268,14 @@ public class Ametikoht {
                 Calendar cal = Calendar.getInstance();
                 CallableStatement cs = conn.prepareCall("{call GET_AMETIKOHTLIST(?,?,?)}");
                 if (orgID > 0) {
-                	cs.setInt("asutus_id", orgID);
+                    cs.setInt("asutus_id", orgID);
                 } else {
-                	cs.setNull("asutus_id", Types.INTEGER);
+                    cs.setNull("asutus_id", Types.INTEGER);
                 }
                 if ((name != null) && (name.length() > 0)) {
-                	cs.setString("nimetus", name);
+                    cs.setString("nimetus", name);
                 } else {
-                	cs.setNull("nimetus", Types.VARCHAR);
+                    cs.setNull("nimetus", Types.VARCHAR);
                 }
                 cs.registerOutParameter("RC1", oracle.jdbc.OracleTypes.CURSOR);
                 cs.execute();

@@ -3,6 +3,7 @@ package dhl;
 import dhl.users.Asutus;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
+
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -19,7 +20,7 @@ import org.w3c.dom.NodeList;
 
 public class RecipientTemplate {
 
-	private static Logger logger = Logger.getLogger(RecipientTemplate.class);
+    private static Logger logger = Logger.getLogger(RecipientTemplate.class);
 
     private int m_id;
     private int m_organizationID;
@@ -218,7 +219,7 @@ public class RecipientTemplate {
 
                         if (doc.getDvkContainerVersion() == 1) {
 
-                        	// XML konteineri transport ploki täiendamine
+                            // XML konteineri transport ploki täiendamine
                             nodes = xmlDocNS.getDocumentElement().getElementsByTagNameNS(CommonStructures.DhlNamespace, "transport");
                             if (nodes.getLength() > 0) {
                                 el = (Element) nodes.item(0);
@@ -277,7 +278,7 @@ public class RecipientTemplate {
 
                         } else if (doc.getDvkContainerVersion() == 2) {
 
-                        	// XML konteineri transport ploki täiendamine
+                            // XML konteineri transport ploki täiendamine
                             nodes = xmlDocNS.getDocumentElement().getElementsByTagNameNS(CommonStructures.DhlNamespaceV2, "transport");
                             if (nodes.getLength() > 0) {
                                 el = (Element) nodes.item(0);
@@ -336,7 +337,7 @@ public class RecipientTemplate {
                             }
 
                         } else {
-                        	logger.error("Unknown document container version: " + doc.getDvkContainerVersion());
+                            logger.error("Unknown document container version: " + doc.getDvkContainerVersion());
                         }
 
 

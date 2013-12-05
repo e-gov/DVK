@@ -1,10 +1,12 @@
 package dhl.aar.iostructures;
 
 import dvk.core.CommonMethods;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import javax.xml.namespace.QName;
+
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPBody;
 
@@ -21,6 +23,21 @@ public class AarOigus {
     private Date m_ametikohtAlates;
     private Date m_ametikohtKuni;
     private int m_allyksusID;
+
+    public AarOigus() {
+        m_oigusNimi = "";
+        m_oigusAlates = null;
+        m_oigusKuni = null;
+        m_grupp = "";
+        m_registrikood = "";
+        m_ametikohtID = 0;
+        m_isikukood = "";
+        m_ksAmetikohtID = 0;
+        m_ametikohtNimetus = "";
+        m_ametikohtAlates = null;
+        m_ametikohtKuni = null;
+        m_allyksusID = 0;
+    }
 
     public String getOigusNimi() {
         return m_oigusNimi;
@@ -118,31 +135,16 @@ public class AarOigus {
         m_allyksusID = value;
     }
 
-    public AarOigus() {
-        m_oigusNimi = "";
-        m_oigusAlates = null;
-        m_oigusKuni = null;
-        m_grupp = "";
-        m_registrikood = "";
-        m_ametikohtID = 0;
-        m_isikukood = "";
-        m_ksAmetikohtID = 0;
-        m_ametikohtNimetus = "";
-        m_ametikohtAlates = null;
-        m_ametikohtKuni = null;
-        m_allyksusID = 0;
-    }
-    
     public static ArrayList<AarOigus> getListFromSOAP(SOAPBody body) {
         ArrayList<AarOigus> result = new ArrayList<AarOigus>();
-        
+
         OMElement elKeha = body.getFirstChildWithName(new QName("keha"));
         if (elKeha != null) {
             OMElement elOigused = elKeha.getFirstChildWithName(new QName("oigused"));
             if (elOigused != null) {
                 Iterator rightNodes = elOigused.getChildrenWithLocalName("oigus");
                 while (rightNodes.hasNext()) {
-                    OMElement oigus = (OMElement)rightNodes.next();
+                    OMElement oigus = (OMElement) rightNodes.next();
                     if (oigus != null) {
                         AarOigus item = AarOigus.getFromSOAP(oigus);
                         if (item != null) {
@@ -152,19 +154,19 @@ public class AarOigus {
                 }
             }
         }
-        
+
         return result;
     }
-    
+
     private static AarOigus getFromSOAP(OMElement rootElement) {
         if (rootElement == null) {
             return null;
         }
-        
+
         AarOigus result = new AarOigus();
         Iterator dataFields = rootElement.getChildElements();
         while (dataFields.hasNext()) {
-            OMElement el = (OMElement)dataFields.next();
+            OMElement el = (OMElement) dataFields.next();
             if (el.getLocalName().equalsIgnoreCase("oigusNimi")) {
                 result.setOigusNimi(el.getText());
             } else if (el.getLocalName().equalsIgnoreCase("oigusAlates")) {

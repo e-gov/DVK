@@ -3,6 +3,7 @@ package dhl.users;
 import dhl.aar.iostructures.AarOigus;
 import dvk.core.CommonMethods;
 import dvk.core.Settings;
+
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -24,6 +25,10 @@ public class Kasutusoigus {
     private String m_muutja;
     private boolean m_peatatud;
     private int m_allyksusID;
+
+    public Kasutusoigus() {
+        clear();
+    }
 
     public int getID() {
         return m_id;
@@ -119,10 +124,6 @@ public class Kasutusoigus {
 
     public void setAllyksusID(int value) {
         m_allyksusID = value;
-    }
-
-    public Kasutusoigus() {
-        clear();
     }
 
     public void clear() {
@@ -225,7 +226,7 @@ public class Kasutusoigus {
                 cs.setTimestamp("created", CommonMethods.sqlDateFromDate(m_loodud), cal);
                 cs.setTimestamp("last_modified", CommonMethods.sqlDateFromDate(m_muudetud), cal);
                 cs.setString("username", m_muutja);
-                cs.setInt("peatatud", (m_peatatud ? 1 : 0));
+                cs.setInt("peatatud", m_peatatud ? 1 : 0);
                 CommonMethods.setNullableIntParam(cs, "allyksus_id", m_allyksusID);
                 cs.executeUpdate();
                 m_id = cs.getInt("id");
@@ -255,7 +256,7 @@ public class Kasutusoigus {
                 cs.setTimestamp("created", CommonMethods.sqlDateFromDate(m_loodud), cal);
                 cs.setTimestamp("last_modified", CommonMethods.sqlDateFromDate(m_muudetud), cal);
                 cs.setString("username", m_muutja);
-                cs.setInt("peatatud", (m_peatatud ? 1 : 0));
+                cs.setInt("peatatud", m_peatatud ? 1 : 0);
                 CommonMethods.setNullableIntParam(cs, "allyksus_id", m_allyksusID);
                 cs.executeUpdate();
                 cs.close();

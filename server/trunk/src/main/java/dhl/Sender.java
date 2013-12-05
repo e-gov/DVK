@@ -16,13 +16,14 @@ import java.util.Date;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+
 import org.apache.axis.AxisFault;
 import org.apache.log4j.Logger;
 
 public class Sender {
-	static Logger logger = Logger.getLogger(Sender.class.getName());
+    static Logger logger = Logger.getLogger(Sender.class.getName());
 
-	private int m_id;
+    private int m_id;
     private int m_sendingID;
     private int m_organizationID;
     private int m_positionID;
@@ -41,19 +42,19 @@ public class Sender {
     }
 
     public Sender(
-        int id,
-        int sendingID,
-        int organizationID,
-        int positionID,
-        int divisionID,
-        String positionShortName,
-        String divisionShortName,
-        String personalIdCode,
-        String name,
-        String organizationName,
-        String email,
-        String departmentNumber,
-        String departmentName) {
+            int id,
+            int sendingID,
+            int organizationID,
+            int positionID,
+            int divisionID,
+            String positionShortName,
+            String divisionShortName,
+            String personalIdCode,
+            String name,
+            String organizationName,
+            String email,
+            String departmentNumber,
+            String departmentName) {
         m_id = id;
         m_sendingID = sendingID;
         m_organizationID = organizationID;
@@ -195,10 +196,8 @@ public class Sender {
     /**
      * Gets from database sender data belonging to given sending record.
      *
-     * @param sendingID
-     * 		ID of sending record
-     * @param conn
-     * 		Database connection
+     * @param sendingID ID of sending record
+     * @param conn      Database connection
      * @throws Exception
      */
     public void getBySendingID(int sendingID, Connection conn) throws Exception {
@@ -233,7 +232,7 @@ public class Sender {
             m_divisionShortName = cs.getString("division_short_name");
             cs.close();
         } else {
-        	throw new Exception("Database connection is NULL!");
+            throw new Exception("Database connection is NULL!");
         }
     }
 
@@ -255,19 +254,19 @@ public class Sender {
             cs.setString("division_short_name", m_divisionShortName);
 
             if (xTeePais != null) {
-    			cs.setString("xtee_isikukood", xTeePais.isikukood);
-    			cs.setString("xtee_asutus", xTeePais.asutus);
-    		} else {
-    			cs.setString("xtee_isikukood", null);
-    			cs.setString("xtee_asutus", null);
-    		}
+                cs.setString("xtee_isikukood", xTeePais.isikukood);
+                cs.setString("xtee_asutus", xTeePais.asutus);
+            } else {
+                cs.setString("xtee_isikukood", null);
+                cs.setString("xtee_asutus", null);
+            }
 
             cs.executeUpdate();
             m_id = cs.getInt("sender_id");
             cs.close();
             return m_id;
         } else {
-        	throw new IllegalArgumentException("Database connection is NULL!");
+            throw new IllegalArgumentException("Database connection is NULL!");
         }
     }
 
@@ -300,7 +299,7 @@ public class Sender {
                         xmlReader.next();
                         if (xmlReader.isCharacters()) {
                             // Attempt to find sender organization from database
-                        	orgCode = xmlReader.getText().trim();
+                            orgCode = xmlReader.getText().trim();
                             orgID = Asutus.getIDByRegNr(orgCode, false, conn);
 
                             // Attempt to find sender organization from other known servers.
@@ -334,13 +333,13 @@ public class Sender {
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("ametikoha_lyhinimetus") && xmlReader.isStartElement()) {
                         xmlReader.next();
                         if (xmlReader.isCharacters()) {
-                             occupationShortName = xmlReader.getText().trim();
-                             result.setPositionShortName(occupationShortName);
+                            occupationShortName = xmlReader.getText().trim();
+                            result.setPositionShortName(occupationShortName);
                         }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("ametikoha_nimetus") && xmlReader.isStartElement()) {
                         xmlReader.next();
                         if (xmlReader.isCharacters()) {
-                             occupationName = xmlReader.getText().trim();
+                            occupationName = xmlReader.getText().trim();
                         }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("allyksuse_kood") && xmlReader.isStartElement()) {
                         xmlReader.next();
@@ -352,22 +351,22 @@ public class Sender {
                                     divisionID = Integer.parseInt(divisionIDText);
                                     result.setDivisionID(divisionID);
                                 } catch (Exception ex) {
-                                	logger.warn(ex.getMessage(), ex);
+                                    logger.warn(ex.getMessage(), ex);
                                 }
                             }
                         }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("allyksuse_lyhinimetus") && xmlReader.isStartElement()) {
                         xmlReader.next();
                         if (xmlReader.isCharacters()) {
-                             subdivisionShortName = xmlReader.getText().trim();
-                             result.setDivisionShortName(subdivisionShortName);
+                            subdivisionShortName = xmlReader.getText().trim();
+                            result.setDivisionShortName(subdivisionShortName);
                         }
                     } else if ((xmlReader.getLocalName().equalsIgnoreCase("allyksuse_nimetus")
                             || xmlReader.getLocalName().equalsIgnoreCase("StructuralUnit"))
                             && xmlReader.isStartElement()) {
                         xmlReader.next();
                         if (xmlReader.isCharacters()) {
-                             subdivisionName = xmlReader.getText().trim();
+                            subdivisionName = xmlReader.getText().trim();
                         }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("epost") && xmlReader.isStartElement()) {
                         xmlReader.next();
@@ -407,27 +406,27 @@ public class Sender {
 
             // Automatically register unknown sender organization
             if ((orgID <= 0) && Settings.Server_AutoRegisterUnknownSenders && !CommonMethods.isNullOrEmpty(orgCode)) {
-            	Asutus newOrg = new Asutus();
-            	newOrg.setDvkSaatmine(false);
-            	newOrg.setRegistrikood(orgCode);
+                Asutus newOrg = new Asutus();
+                newOrg.setDvkSaatmine(false);
+                newOrg.setRegistrikood(orgCode);
 
-            	// Determine organization name
-            	if (!CommonMethods.isNullOrEmpty(result.getOrganizationName())) {
-            		newOrg.setNimetus(result.getOrganizationName());
-            	} else if (!CommonMethods.isNullOrEmpty(result.getName()) && CommonMethods.isNullOrEmpty(result.getPersonalIdCode())) {
-            		// It may happen that organization name is placed into sender name field.
-            		newOrg.setNimetus(result.getName());
-            	}
+                // Determine organization name
+                if (!CommonMethods.isNullOrEmpty(result.getOrganizationName())) {
+                    newOrg.setNimetus(result.getOrganizationName());
+                } else if (!CommonMethods.isNullOrEmpty(result.getName()) && CommonMethods.isNullOrEmpty(result.getPersonalIdCode())) {
+                    // It may happen that organization name is placed into sender name field.
+                    newOrg.setNimetus(result.getName());
+                }
 
-            	newOrg.addToDB(conn, xTeePais);
-            	orgID = newOrg.getId();
-            	result.setOrganizationID(orgID);
+                newOrg.addToDB(conn, xTeePais);
+                orgID = newOrg.getId();
+                result.setOrganizationID(orgID);
 
-        		if (orgID > 0) {
-        			logger.info("Organization \"" + orgCode + "\" was automatically added (based on document sender data)");
-        		} else {
-        			logger.warn("Failed adding organization \"" + orgCode + "\" (based on document sender data)");
-        		}
+                if (orgID > 0) {
+                    logger.info("Organization \"" + orgCode + "\" was automatically added (based on document sender data)");
+                } else {
+                    logger.warn("Failed adding organization \"" + orgCode + "\" (based on document sender data)");
+                }
             }
 
             // If sender is unknown to DEC server (and automatic registration of senders is not enabled)
@@ -441,28 +440,28 @@ public class Sender {
             // Otherwise we would not know organization ID, which is required
             // to find the correct occupation ID.
             if (!CommonMethods.isNullOrEmpty(occupationShortName)) {
-            	int occupationId = Ametikoht.getIdByShortName(orgID, occupationShortName, conn);
+                int occupationId = Ametikoht.getIdByShortName(orgID, occupationShortName, conn);
 
-            	// If an unknown occupation is found, attempt to register it automatically
-            	if ((occupationId <= 0) && Settings.Server_AutoRegisterUnknownSenders) {
-            		Ametikoht newOccupation = new Ametikoht();
-            		newOccupation.setAsutusID(orgID);
-            		newOccupation.setAsutusKood(orgCode);
-            		newOccupation.setLyhinimetus(occupationShortName);
-            		newOccupation.setNimetus(occupationName);
-            		newOccupation.setCreated(new Date());
-            		newOccupation.addToDB(conn);
-            		occupationId = newOccupation.getID();
-            		if (occupationId > 0) {
-            			logger.info("Occupation \"" + occupationShortName + "\" was automatically added to organization " + orgCode + " (based on document sender data)");
-            		} else {
-            			logger.warn("Failed adding occupation \"" + occupationShortName + "\" to organization " + orgCode + " (based on document sender data)");
-            		}
-            	}
+                // If an unknown occupation is found, attempt to register it automatically
+                if ((occupationId <= 0) && Settings.Server_AutoRegisterUnknownSenders) {
+                    Ametikoht newOccupation = new Ametikoht();
+                    newOccupation.setAsutusID(orgID);
+                    newOccupation.setAsutusKood(orgCode);
+                    newOccupation.setLyhinimetus(occupationShortName);
+                    newOccupation.setNimetus(occupationName);
+                    newOccupation.setCreated(new Date());
+                    newOccupation.addToDB(conn);
+                    occupationId = newOccupation.getID();
+                    if (occupationId > 0) {
+                        logger.info("Occupation \"" + occupationShortName + "\" was automatically added to organization " + orgCode + " (based on document sender data)");
+                    } else {
+                        logger.warn("Failed adding occupation \"" + occupationShortName + "\" to organization " + orgCode + " (based on document sender data)");
+                    }
+                }
 
-            	if (occupationId > 0) {
-            		result.setPositionID(occupationId);
-            	}
+                if (occupationId > 0) {
+                    result.setPositionID(occupationId);
+                }
             }
 
             // Find subdivision ID using occupation short name.
@@ -470,33 +469,33 @@ public class Sender {
             // Otherwise we would not know organization ID, which is required
             // to find the correct subdivision ID.
             if (!CommonMethods.isNullOrEmpty(subdivisionShortName)) {
-            	int subdivisionId = Allyksus.getIdByShortName(orgID, subdivisionShortName, conn);
+                int subdivisionId = Allyksus.getIdByShortName(orgID, subdivisionShortName, conn);
 
-            	// If an unknown subdivision is found, attempt to register it automatically
-            	if ((subdivisionId <= 0) && Settings.Server_AutoRegisterUnknownSenders) {
-            		Allyksus newSubdivision = new Allyksus();
-            		newSubdivision.setAsutusID(orgID);
-            		newSubdivision.setAsutusKood(orgCode);
-            		newSubdivision.setLyhinimetus(subdivisionShortName);
-            		newSubdivision.setNimetus(subdivisionName);
-            		newSubdivision.setLoodud(new Date());
-            		newSubdivision.addToDB(conn);
-            		subdivisionId = newSubdivision.getID();
-            		if (subdivisionId > 0) {
-            			logger.info("Subdivision \"" + subdivisionShortName + "\" was automatically added to organization " + orgCode + " (based on document sender data)");
-            		} else {
-            			logger.warn("Failed adding subdivision \"" + subdivisionShortName + "\" to organization " + orgCode + " (based on document sender data)");
-            		}
-            	}
+                // If an unknown subdivision is found, attempt to register it automatically
+                if ((subdivisionId <= 0) && Settings.Server_AutoRegisterUnknownSenders) {
+                    Allyksus newSubdivision = new Allyksus();
+                    newSubdivision.setAsutusID(orgID);
+                    newSubdivision.setAsutusKood(orgCode);
+                    newSubdivision.setLyhinimetus(subdivisionShortName);
+                    newSubdivision.setNimetus(subdivisionName);
+                    newSubdivision.setLoodud(new Date());
+                    newSubdivision.addToDB(conn);
+                    subdivisionId = newSubdivision.getID();
+                    if (subdivisionId > 0) {
+                        logger.info("Subdivision \"" + subdivisionShortName + "\" was automatically added to organization " + orgCode + " (based on document sender data)");
+                    } else {
+                        logger.warn("Failed adding subdivision \"" + subdivisionShortName + "\" to organization " + orgCode + " (based on document sender data)");
+                    }
+                }
 
-            	if (subdivisionId > 0) {
-            		result.setDivisionID(subdivisionId);
-            	}
+                if (subdivisionId > 0) {
+                    result.setDivisionID(subdivisionId);
+                }
             }
 
             return result;
         } catch (XMLStreamException ex) {
-        	logger.error(ex);
+            logger.error(ex);
             throw new AxisFault("Exception parsing DVK message sender section: " + ex.getMessage(), ex);
         }
     }

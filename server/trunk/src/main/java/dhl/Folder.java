@@ -2,6 +2,7 @@ package dhl;
 
 import dhl.iostructures.XHeader;
 import dvk.core.CommonMethods;
+
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Types;
@@ -18,6 +19,10 @@ public class Folder {
     private int m_organizationID;
     private String m_folderNumber;
     private int m_positionID;
+
+    public Folder() {
+        clear();
+    }
 
     public void setId(int id) {
         this.m_id = id;
@@ -76,11 +81,8 @@ public class Folder {
         m_positionID = 0;
     }
 
-    public Folder() {
-        clear();
-    }
-
-    public static int getFolderIdByPath(String path, int organizationID, Connection conn, boolean allowUnspecified, boolean allowNew, XHeader xTeePais) {
+    public static int getFolderIdByPath(String path, int organizationID, Connection conn,
+                                        boolean allowUnspecified, boolean allowNew, XHeader xTeePais) {
         if ((path == null) || (path.length() < 1)) {
             return allowUnspecified ? UNSPECIFIED_FOLDER : GLOBAL_ROOT_FOLDER;
         }
@@ -115,11 +117,11 @@ public class Folder {
     /**
      * Leiab kausta nime alusel kausta ID.
      *
-     * @param folderName        kausta nimi
-     * @param organizationID    asutuse ID
-     * @param parentID          otsitava kausta ülemkausta ID
-     * @param conn              andmebaasiühenduse objekt
-     * @return                  kausta ID
+     * @param folderName     kausta nimi
+     * @param organizationID asutuse ID
+     * @param parentID       otsitava kausta ülemkausta ID
+     * @param conn           andmebaasiühenduse objekt
+     * @return kausta ID
      */
     public static int getFolderIdByName(String folderName, int organizationID, int parentID, Connection conn) {
         if ((folderName == null) || (folderName.length() < 1)) {
@@ -152,9 +154,9 @@ public class Folder {
     /**
      * Leiab kataloogi ID järgi kausta täisnime (täisteekonna alustades juurkaustast).
      *
-     * @param folderID  Kausta ID
-     * @param conn      Andmebaasiühenduse objekt
-     * @return          Kausta täisnimi
+     * @param folderID Kausta ID
+     * @param conn     Andmebaasiühenduse objekt
+     * @return Kausta täisnimi
      */
     public static String getFolderFullPath(int folderID, Connection conn) {
         try {
@@ -206,13 +208,13 @@ public class Folder {
                             cs.setNull("folder_number", Types.VARCHAR);
                         }
 
-                        if(xTeePais != null) {
-    		    			cs.setString("xtee_isikukood", xTeePais.isikukood);
-    		    			cs.setString("xtee_asutus", xTeePais.asutus);
-    		    		} else {
-    		    			cs.setString("xtee_isikukood", null);
-    		    			cs.setString("xtee_asutus", null);
-    		    		}
+                        if (xTeePais != null) {
+                            cs.setString("xtee_isikukood", xTeePais.isikukood);
+                            cs.setString("xtee_asutus", xTeePais.asutus);
+                        } else {
+                            cs.setString("xtee_isikukood", null);
+                            cs.setString("xtee_asutus", null);
+                        }
 
 
                         cs.registerOutParameter("folder_id", Types.INTEGER);
@@ -247,8 +249,8 @@ public class Folder {
      * Muudab etteantud kausta nimetust nii, et see sisaldaks ainult ASCII sümboleid
      * A-Z, 0-9, /, _.
      *
-     * @param initialName   Kliendi poolt etteantud kausta nimetus
-     * @return              DVK jaoks sobilikule kujule viidud kausta nimetus
+     * @param initialName Kliendi poolt etteantud kausta nimetus
+     * @return DVK jaoks sobilikule kujule viidud kausta nimetus
      */
     public String correctFolderName(String initialName) {
         if ((initialName == null) || (initialName.length() < 1)) {

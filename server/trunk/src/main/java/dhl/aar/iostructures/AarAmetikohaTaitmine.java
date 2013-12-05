@@ -1,12 +1,14 @@
 package dhl.aar.iostructures;
 
 import dvk.core.CommonMethods;
+
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+
 import org.apache.axis.AxisFault;
 
 public class AarAmetikohaTaitmine {
@@ -30,6 +32,29 @@ public class AarAmetikohaTaitmine {
     private Date m_pkKuni;
     private AarIsik m_pkIsik;
     private AarTaitmineOigus m_oigused;
+
+    public AarAmetikohaTaitmine() {
+        m_taitmineID = 0;
+        m_asutusID = 0;
+        m_asutusRegistrikood = "";
+        m_asutusNimetus = "";
+        m_asutusNimetusEn = "";
+        m_asutusNimetusRu = "";
+        m_ametikohtID = 0;
+        m_ametikohtNimetus = "";
+        m_ametikohtNimetusEn = "";
+        m_ametikohtNimetusRu = "";
+        m_alates = null;
+        m_kuni = null;
+        m_roll = "";
+        m_isik = null;
+        m_pkTaitmineID = 0;
+        m_pkRoll = null;
+        m_pkAlates = null;
+        m_pkKuni = null;
+        m_pkIsik = null;
+        m_oigused = null;
+    }
 
     public int getTaitmineID() {
         return m_taitmineID;
@@ -191,29 +216,6 @@ public class AarAmetikohaTaitmine {
         m_oigused = value;
     }
 
-    public AarAmetikohaTaitmine() {
-        m_taitmineID = 0;
-        m_asutusID = 0;
-        m_asutusRegistrikood = "";
-        m_asutusNimetus = "";
-        m_asutusNimetusEn = "";
-        m_asutusNimetusRu = "";
-        m_ametikohtID = 0;
-        m_ametikohtNimetus = "";
-        m_ametikohtNimetusEn = "";
-        m_ametikohtNimetusRu = "";
-        m_alates = null;
-        m_kuni = null;
-        m_roll = "";
-        m_isik = null;
-        m_pkTaitmineID = 0;
-        m_pkRoll = null;
-        m_pkAlates = null;
-        m_pkKuni = null;
-        m_pkIsik = null;
-        m_oigused = null;
-    }
-
     public static AarAmetikohaTaitmine fromXML(XMLStreamReader xmlReader) throws AxisFault {
         try {
             AarAmetikohaTaitmine result = new AarAmetikohaTaitmine();
@@ -250,25 +252,25 @@ public class AarAmetikohaTaitmine {
                             }
                         }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("asutus_registrikood") && xmlReader.isStartElement()) {
-                         xmlReader.next();
-                         if (xmlReader.isCharacters()) {
-                             result.setAsutusRegistrikood(xmlReader.getText().trim());
-                         }
+                        xmlReader.next();
+                        if (xmlReader.isCharacters()) {
+                            result.setAsutusRegistrikood(xmlReader.getText().trim());
+                        }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("asutus_nimetus") && xmlReader.isStartElement()) {
-                         xmlReader.next();
-                         if (xmlReader.isCharacters()) {
-                             result.setAsutusNimetus(xmlReader.getText().trim());
-                         }
+                        xmlReader.next();
+                        if (xmlReader.isCharacters()) {
+                            result.setAsutusNimetus(xmlReader.getText().trim());
+                        }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("asutus_nimetus_en") && xmlReader.isStartElement()) {
-                         xmlReader.next();
-                         if (xmlReader.isCharacters()) {
-                             result.setAsutusNimetusEn(xmlReader.getText().trim());
-                         }
+                        xmlReader.next();
+                        if (xmlReader.isCharacters()) {
+                            result.setAsutusNimetusEn(xmlReader.getText().trim());
+                        }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("asutus_nimetus_ru") && xmlReader.isStartElement()) {
-                         xmlReader.next();
-                         if (xmlReader.isCharacters()) {
-                             result.setAsutusNimetusRu(xmlReader.getText().trim());
-                         }
+                        xmlReader.next();
+                        if (xmlReader.isCharacters()) {
+                            result.setAsutusNimetusRu(xmlReader.getText().trim());
+                        }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("ametikoht_id") && xmlReader.isStartElement()) {
                         xmlReader.next();
                         if (xmlReader.isCharacters()) {
@@ -282,37 +284,37 @@ public class AarAmetikohaTaitmine {
                             }
                         }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("ametikoht_nimetus") && xmlReader.isStartElement()) {
-                         xmlReader.next();
-                         if (xmlReader.isCharacters()) {
-                             result.setAmetikohtNimetus(xmlReader.getText().trim());
-                         }
+                        xmlReader.next();
+                        if (xmlReader.isCharacters()) {
+                            result.setAmetikohtNimetus(xmlReader.getText().trim());
+                        }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("ametikoht_nimetus_en") && xmlReader.isStartElement()) {
-                         xmlReader.next();
-                         if (xmlReader.isCharacters()) {
-                             result.setAmetikohtNimetusEn(xmlReader.getText().trim());
-                         }
+                        xmlReader.next();
+                        if (xmlReader.isCharacters()) {
+                            result.setAmetikohtNimetusEn(xmlReader.getText().trim());
+                        }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("ametikoht_nimetus_ru") && xmlReader.isStartElement()) {
-                         xmlReader.next();
-                         if (xmlReader.isCharacters()) {
-                             result.setAmetikohtNimetusRu(xmlReader.getText().trim());
-                         }
+                        xmlReader.next();
+                        if (xmlReader.isCharacters()) {
+                            result.setAmetikohtNimetusRu(xmlReader.getText().trim());
+                        }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("alates") && xmlReader.isStartElement()) {
-                         xmlReader.next();
-                         if (xmlReader.isCharacters()) {
-                             result.setAlates(CommonMethods.getDateFromXML(xmlReader.getText().trim()));
-                         }
+                        xmlReader.next();
+                        if (xmlReader.isCharacters()) {
+                            result.setAlates(CommonMethods.getDateFromXML(xmlReader.getText().trim()));
+                        }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("kuni") && xmlReader.isStartElement()) {
-                         xmlReader.next();
-                         if (xmlReader.isCharacters()) {
-                             result.setKuni(CommonMethods.getDateFromXML(xmlReader.getText().trim()));
-                         }
+                        xmlReader.next();
+                        if (xmlReader.isCharacters()) {
+                            result.setKuni(CommonMethods.getDateFromXML(xmlReader.getText().trim()));
+                        }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("roll") && xmlReader.isStartElement()) {
-                         xmlReader.next();
-                         if (xmlReader.isCharacters()) {
-                             result.setRoll(xmlReader.getText().trim());
-                         }
+                        xmlReader.next();
+                        if (xmlReader.isCharacters()) {
+                            result.setRoll(xmlReader.getText().trim());
+                        }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("isik") && xmlReader.isStartElement()) {
-                         result.setIsik(AarIsik.fromXML(xmlReader, "isik"));
+                        result.setIsik(AarIsik.fromXML(xmlReader, "isik"));
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("pk_taitmine_id") && xmlReader.isStartElement()) {
                         xmlReader.next();
                         if (xmlReader.isCharacters()) {
@@ -326,24 +328,24 @@ public class AarAmetikohaTaitmine {
                             }
                         }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("pk_roll") && xmlReader.isStartElement()) {
-                         xmlReader.next();
-                         if (xmlReader.isCharacters()) {
-                             result.setPkRoll(CommonMethods.getDateFromXML(xmlReader.getText().trim()));
-                         }
+                        xmlReader.next();
+                        if (xmlReader.isCharacters()) {
+                            result.setPkRoll(CommonMethods.getDateFromXML(xmlReader.getText().trim()));
+                        }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("pk_alates") && xmlReader.isStartElement()) {
-                         xmlReader.next();
-                         if (xmlReader.isCharacters()) {
-                             result.setPkAlates(CommonMethods.getDateFromXML(xmlReader.getText().trim()));
-                         }
+                        xmlReader.next();
+                        if (xmlReader.isCharacters()) {
+                            result.setPkAlates(CommonMethods.getDateFromXML(xmlReader.getText().trim()));
+                        }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("pk_kuni") && xmlReader.isStartElement()) {
-                         xmlReader.next();
-                         if (xmlReader.isCharacters()) {
-                             result.setPkKuni(CommonMethods.getDateFromXML(xmlReader.getText().trim()));
-                         }
+                        xmlReader.next();
+                        if (xmlReader.isCharacters()) {
+                            result.setPkKuni(CommonMethods.getDateFromXML(xmlReader.getText().trim()));
+                        }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("pk_isik") && xmlReader.isStartElement()) {
-                         result.setPkIsik(AarIsik.fromXML(xmlReader, "pk_isik"));
+                        result.setPkIsik(AarIsik.fromXML(xmlReader, "pk_isik"));
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("oigused") && xmlReader.isStartElement()) {
-                         result.setOigused(AarTaitmineOigus.fromXML(xmlReader, "oigused"));
+                        result.setOigused(AarTaitmineOigus.fromXML(xmlReader, "oigused"));
                     }
                 }
             }

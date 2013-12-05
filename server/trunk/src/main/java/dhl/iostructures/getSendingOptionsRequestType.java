@@ -11,7 +11,7 @@ public class getSendingOptionsRequestType {
     public String[] asutused;
 
     public getSendingOptionsRequestType() {
-        asutused = new String[] { };
+        asutused = new String[]{};
     }
 
     public static getSendingOptionsRequestType getFromSOAPBody(org.apache.axis.MessageContext context) {
@@ -20,10 +20,10 @@ public class getSendingOptionsRequestType {
             SOAPBody body = msg.getSOAPBody();
             NodeList msgNodes = body.getElementsByTagName("getSendingOptions");
             if (msgNodes.getLength() > 0) {
-                Element msgNode = (Element)msgNodes.item(0);
+                Element msgNode = (Element) msgNodes.item(0);
                 NodeList bodyNodes = msgNode.getElementsByTagName("keha");
                 if (bodyNodes.getLength() > 0) {
-                    Element bodyNode = (Element)bodyNodes.item(0);
+                    Element bodyNode = (Element) bodyNodes.item(0);
                     NodeList orgNodes = bodyNode.getElementsByTagName("asutus");
                     if (orgNodes.getLength() > 0) {
                         getSendingOptionsRequestType result = new getSendingOptionsRequestType();

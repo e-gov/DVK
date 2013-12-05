@@ -12,8 +12,8 @@ import org.w3c.dom.NodeList;
 import dvk.core.CommonMethods;
 
 public class markDocumentsReceivedV3RequestType {
-	static Logger logger = Logger.getLogger(markDocumentsReceivedV3RequestType.class.getName());
-	public ArrayList<markDocumentsReceivedV2Item> dokumendid;
+    static Logger logger = Logger.getLogger(markDocumentsReceivedV3RequestType.class.getName());
+    public ArrayList<markDocumentsReceivedV2Item> dokumendid;
     public String kaust;
     public String edastusID;
     public String allyksuseLyhinimetus;
@@ -33,18 +33,18 @@ public class markDocumentsReceivedV3RequestType {
             SOAPBody body = msg.getSOAPBody();
             NodeList msgNodes = body.getElementsByTagName("markDocumentsReceived");
             if (msgNodes.getLength() > 0) {
-                Element msgNode = (Element)msgNodes.item(0);
+                Element msgNode = (Element) msgNodes.item(0);
                 NodeList bodyNodes = msgNode.getElementsByTagName("keha");
                 if (bodyNodes.getLength() > 0) {
-                    Element bodyNode = (Element)bodyNodes.item(0);
+                    Element bodyNode = (Element) bodyNodes.item(0);
                     NodeList docRefNodes = bodyNode.getElementsByTagName("dokumendid");
                     if (docRefNodes.getLength() > 0) {
-                    	markDocumentsReceivedV3RequestType result = new markDocumentsReceivedV3RequestType();
-                    	Element docRefNode = (Element)docRefNodes.item(0);
+                        markDocumentsReceivedV3RequestType result = new markDocumentsReceivedV3RequestType();
+                        Element docRefNode = (Element) docRefNodes.item(0);
 
-                    	NodeList foundNodes = docRefNode.getElementsByTagName("item");
+                        NodeList foundNodes = docRefNode.getElementsByTagName("item");
 
-                    	// Kontrollime, et sisendis sisalduks vähemalt 1 dokumendi andmed
+                        // Kontrollime, et sisendis sisalduks vähemalt 1 dokumendi andmed
                         if (foundNodes == null) {
                             throw new AxisFault("Dokumentide nimekiri on tühi või vigase XML struktuuriga!");
                         }
@@ -52,8 +52,8 @@ public class markDocumentsReceivedV3RequestType {
                             throw new AxisFault("Dokumentide nimekiri on tühi või vigase XML struktuuriga!");
                         }
                         for (int i = 0; i < foundNodes.getLength(); ++i) {
-                        	markDocumentsReceivedV2Item item = markDocumentsReceivedV2Item.getFromXML((Element)foundNodes.item(i));
-                        	result.dokumendid.add(item);
+                            markDocumentsReceivedV2Item item = markDocumentsReceivedV2Item.getFromXML((Element) foundNodes.item(i));
+                            result.dokumendid.add(item);
                         }
 
                         NodeList folderNodes = bodyNode.getElementsByTagName("kaust");
@@ -78,7 +78,7 @@ public class markDocumentsReceivedV3RequestType {
             }
             return null;
         } catch (Exception ex) {
-        	logger.error(ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
             return null;
         }
     }

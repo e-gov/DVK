@@ -7,11 +7,16 @@ import java.sql.Types;
 import org.apache.log4j.Logger;
 
 public class AsutuseStatistika {
-	
-	private static Logger logger = Logger.getLogger(AsutuseStatistika.class);
-	
+
+    private static Logger logger = Logger.getLogger(AsutuseStatistika.class);
+
     private int m_vastuvotmataDokumente;
     private int m_vahetatudDokumente;
+
+    public AsutuseStatistika() {
+        m_vastuvotmataDokumente = 0;
+        m_vahetatudDokumente = 0;
+    }
 
     public int getVastuvotmataDokumente() {
         return m_vastuvotmataDokumente;
@@ -29,16 +34,11 @@ public class AsutuseStatistika {
         m_vahetatudDokumente = value;
     }
 
-    public AsutuseStatistika() {
-        m_vastuvotmataDokumente = 0;
-        m_vahetatudDokumente = 0;
-    }
-    
     public static AsutuseStatistika getByOrgID(int orgID, Connection conn) throws Exception {
-    	
-    	logger.debug("AsutuseStatistika.getByOrgID invoked. Parameters: ");
-    	logger.debug("orgID: " + orgID);
-    	
+
+        logger.debug("AsutuseStatistika.getByOrgID invoked. Parameters: ");
+        logger.debug("orgID: " + orgID);
+
         AsutuseStatistika stat = null;
         if (conn != null) {
             CallableStatement cs = conn.prepareCall("{call GET_ASUTUSSTAT(?,?,?)}");
@@ -55,7 +55,7 @@ public class AsutuseStatistika {
             throw new Exception("DB Connection is NULL!");
         }
     }
-    
+
     public static AsutuseStatistika getBySubdivisionId(int orgId, int subdivisionId, Connection conn) throws Exception {
         AsutuseStatistika stat = null;
         if (conn != null) {
@@ -71,10 +71,10 @@ public class AsutuseStatistika {
             cs.close();
             return stat;
         } else {
-        	throw new Exception("DB Connection is NULL!");
+            throw new Exception("DB Connection is NULL!");
         }
     }
-    
+
     public static AsutuseStatistika getByOccupationId(int orgId, int occupationId, Connection conn) throws Exception {
         AsutuseStatistika stat = null;
         if (conn != null) {
@@ -90,7 +90,7 @@ public class AsutuseStatistika {
             cs.close();
             return stat;
         } else {
-        	throw new Exception("DB Connection is NULL!");
+            throw new Exception("DB Connection is NULL!");
         }
     }
 }

@@ -3,6 +3,7 @@ package dhl.iostructures;
 import dhl.users.Allyksus;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import javax.xml.soap.SOAPBody;
@@ -12,7 +13,7 @@ import javax.xml.soap.SOAPElement;
 public class getSubdivisionListResponseType implements SOAPOutputBodyRepresentation {
     public getSubdivisionListRequestType paring;
     public ArrayList<Allyksus> allyksused;
-    
+
     public getSubdivisionListResponseType() {
         allyksused = null;
         paring = null;
@@ -64,18 +65,18 @@ public class getSubdivisionListResponseType implements SOAPOutputBodyRepresentat
 
                 SOAPElement elName = elSub.addChildElement("nimetus");
                 elName.addTextNode(sub.getNimetus());
-                
+
                 SOAPElement elOrg = elSub.addChildElement("asutuse_kood");
                 elOrg.addTextNode(sub.getAsutusKood());
-                
+
                 if ((sub.getLyhinimetus() != null) && (sub.getLyhinimetus().length() > 0)) {
-                	SOAPElement elShortName = elSub.addChildElement("lyhinimetus");
-                	elShortName.addTextNode(sub.getLyhinimetus());
+                    SOAPElement elShortName = elSub.addChildElement("lyhinimetus");
+                    elShortName.addTextNode(sub.getLyhinimetus());
                 }
-                
+
                 if ((sub.getKsAllyksuseLyhinimetus() != null) && (sub.getKsAllyksuseLyhinimetus().length() > 0)) {
-	                SOAPElement elParent = elSub.addChildElement("ks_allyksuse_lyhinimetus");
-	                elParent.addTextNode(sub.getKsAllyksuseLyhinimetus());
+                    SOAPElement elParent = elSub.addChildElement("ks_allyksuse_lyhinimetus");
+                    elParent.addTextNode(sub.getKsAllyksuseLyhinimetus());
                 }
             }
         } catch (Exception ex) {

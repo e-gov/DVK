@@ -2,6 +2,7 @@ package dhl.users;
 
 import dhl.aar.iostructures.AarIsik;
 import dvk.core.CommonMethods;
+
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Types;
@@ -23,6 +24,10 @@ public class Isik {
     private Date m_loodud;
     private Date m_muudetud;
     private String m_muutja;
+
+    public Isik() {
+        clear();
+    }
 
     public void setId(int id) {
         this.m_id = id;
@@ -134,10 +139,6 @@ public class Isik {
 
     public String getMuutja() {
         return m_muutja;
-    }
-
-    public Isik() {
-        clear();
     }
 
     public void clear() {

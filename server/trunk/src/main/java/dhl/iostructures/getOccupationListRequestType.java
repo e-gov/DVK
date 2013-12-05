@@ -2,6 +2,7 @@ package dhl.iostructures;
 
 import dhl.exceptions.RequestProcessingException;
 import dvk.core.CommonMethods;
+
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPException;
 
@@ -10,15 +11,15 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public class getOccupationListRequestType {
-	static Logger logger = Logger.getLogger(getOccupationListRequestType.class.getName());
-	public String[] asutused;
+    static Logger logger = Logger.getLogger(getOccupationListRequestType.class.getName());
+    public String[] asutused;
 
     public getOccupationListRequestType() {
-        asutused = new String[] {};
+        asutused = new String[]{};
     }
 
     public static getOccupationListRequestType getFromSOAPBody(
-        org.apache.axis.MessageContext context) throws RequestProcessingException {
+            org.apache.axis.MessageContext context) throws RequestProcessingException {
         try {
             org.apache.axis.Message msg = context.getRequestMessage();
             SOAPBody body = msg.getSOAPBody();
@@ -37,13 +38,13 @@ public class getOccupationListRequestType {
                         }
                         return result;
                     } else {
-                    	throw new RequestProcessingException("Viga päringu keha töötlemisel. Puudub kohustuslik element /getOccupationList/keha/asutus.");
+                        throw new RequestProcessingException("Viga päringu keha töötlemisel. Puudub kohustuslik element /getOccupationList/keha/asutus.");
                     }
                 } else {
-                	throw new RequestProcessingException("Viga päringu keha töötlemisel. Puudub kohustuslik element /getOccupationList/keha.");
+                    throw new RequestProcessingException("Viga päringu keha töötlemisel. Puudub kohustuslik element /getOccupationList/keha.");
                 }
             } else {
-            	throw new RequestProcessingException("Viga päringu keha töötlemisel. Puudub kohustuslik element /getOccupationList.");
+                throw new RequestProcessingException("Viga päringu keha töötlemisel. Puudub kohustuslik element /getOccupationList.");
             }
         } catch (SOAPException ex) {
             logger.error(ex.getMessage(), ex);

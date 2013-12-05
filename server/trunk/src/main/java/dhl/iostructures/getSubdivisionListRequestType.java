@@ -2,6 +2,7 @@ package dhl.iostructures;
 
 import dhl.exceptions.RequestProcessingException;
 import dvk.core.CommonMethods;
+
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPException;
 
@@ -10,11 +11,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public class getSubdivisionListRequestType {
-	static Logger logger = Logger.getLogger(getSubdivisionListRequestType.class.getName());
-	public String[] asutused;
+    static Logger logger = Logger.getLogger(getSubdivisionListRequestType.class.getName());
+    public String[] asutused;
 
     public getSubdivisionListRequestType() {
-        asutused = new String[] {};
+        asutused = new String[]{};
     }
 
     public static getSubdivisionListRequestType getFromSOAPBody(org.apache.axis.MessageContext context) throws RequestProcessingException {
@@ -36,16 +37,16 @@ public class getSubdivisionListRequestType {
                         }
                         return result;
                     } else {
-                    	throw new RequestProcessingException("Viga päringu keha töötlemisel. Puudub kohustuslik element /getSubdivisionList/keha/asutus.");
+                        throw new RequestProcessingException("Viga päringu keha töötlemisel. Puudub kohustuslik element /getSubdivisionList/keha/asutus.");
                     }
                 } else {
-                	throw new RequestProcessingException("Viga päringu keha töötlemisel. Puudub kohustuslik element /getSubdivisionList/keha.");
+                    throw new RequestProcessingException("Viga päringu keha töötlemisel. Puudub kohustuslik element /getSubdivisionList/keha.");
                 }
             } else {
-            	throw new RequestProcessingException("Viga päringu keha töötlemisel. Puudub kohustuslik element /getSubdivisionList.");
+                throw new RequestProcessingException("Viga päringu keha töötlemisel. Puudub kohustuslik element /getSubdivisionList.");
             }
         } catch (SOAPException ex) {
-        	logger.error(ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
             throw new RequestProcessingException("Viga päringu keha töötlemisel. Sõnumi SOAP keha laadimine ebaõnnestus.");
         }
     }

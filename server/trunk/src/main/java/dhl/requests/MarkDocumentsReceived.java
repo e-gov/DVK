@@ -10,23 +10,26 @@ import dhl.iostructures.markDocumentsReceivedRequestType;
 import dhl.iostructures.markDocumentsReceivedV2Item;
 import dhl.iostructures.markDocumentsReceivedV3RequestType;
 import dhl.users.UserProfile;
+
 import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Date;
 import javax.activation.DataSource;
+
 import org.apache.axis.AxisFault;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-public class MarkDocumentsReceived{
-	private static Logger logger = Logger.getLogger(MarkDocumentsReceived.class);
+public class MarkDocumentsReceived {
+    private static Logger logger = Logger.getLogger(MarkDocumentsReceived.class);
 
-    public static RequestInternalResult V1( org.apache.axis.MessageContext context, Connection conn, UserProfile user ) throws SQLException, AxisFault {
+    public static RequestInternalResult V1(
+            org.apache.axis.MessageContext context, Connection conn, UserProfile user) throws SQLException, AxisFault {
         logger.info("MarkDocumentsReceived.V1 invoked.");
 
-		RequestInternalResult result = new RequestInternalResult();
+        RequestInternalResult result = new RequestInternalResult();
         String pipelineDataFile = CommonMethods.createPipelineFile(0);
 
         try {
@@ -37,7 +40,9 @@ public class MarkDocumentsReceived{
             }
             result.folder = bodyData.kaust;
 
-            org.apache.axis.attachments.AttachmentPart px = (org.apache.axis.attachments.AttachmentPart) context.getCurrentMessage().getAttachmentsImpl().getAttachmentByReference(bodyData.dokumendidHref);
+            org.apache.axis.attachments.AttachmentPart px =
+                    (org.apache.axis.attachments.AttachmentPart) context.getCurrentMessage().
+                            getAttachmentsImpl().getAttachmentByReference(bodyData.dokumendidHref);
             DataSource attachmentSource = px.getActivationDataHandler().getDataSource();
             if (attachmentSource == null) {
                 throw new AxisFault(CommonStructures.VIGA_PUUDUV_MIME_LISA);
@@ -91,22 +96,23 @@ public class MarkDocumentsReceived{
                         tmpRecipient = tmpSending.getRecipients().get(j);
                         if (tmpRecipient.getOrganizationID() == user.getOrganizationID()) {
 
-                        	// Kui päringus on täpsustatud, millise allüksuse ja/või ametikoha
-                        	// dokumendid tuleb vastuvõetuks märkida, siis kontrollime, et
-                        	// ametikoha ja/või allüksuse ID adressaadi andmetes
-                        	// vastaks päringu parameetritele.
-                        	// Vastasel juhul märgiks rakendus dokumendi vastuvõetuks kõigi
-                        	// adressaatide poolt, kes kuuluvad päringu teinud asutuse alla.
-                        	if (((bodyData.allyksusId <= 0) || (tmpRecipient.getDivisionID() == bodyData.allyksusId))
-                            	&& ((bodyData.ametikohtId <= 0) || (tmpRecipient.getPositionID() == bodyData.ametikohtId))) {
+                            // Kui päringus on täpsustatud, millise allüksuse ja/või ametikoha
+                            // dokumendid tuleb vastuvõetuks märkida, siis kontrollime, et
+                            // ametikoha ja/või allüksuse ID adressaadi andmetes
+                            // vastaks päringu parameetritele.
+                            // Vastasel juhul märgiks rakendus dokumendi vastuvõetuks kõigi
+                            // adressaatide poolt, kes kuuluvad päringu teinud asutuse alla.
+                            if (((bodyData.allyksusId <= 0) || (tmpRecipient.getDivisionID() == bodyData.allyksusId))
+                                    && ((bodyData.ametikohtId <= 0) || (tmpRecipient.getPositionID() == bodyData.ametikohtId))) {
 
-	                            recipientFound = true;
-	                            tmpRecipient.setSendStatusID(CommonStructures.SendStatus_Sent);
-	                            tmpRecipient.setSendingEndDate(new Date());
-	                            tmpRecipient.setStatusDate(new Date());
-	                            XHeader xTeePais = new XHeader(user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
-	                            tmpRecipient.update(conn, xTeePais);
-                        	}
+                                recipientFound = true;
+                                tmpRecipient.setSendStatusID(CommonStructures.SendStatus_Sent);
+                                tmpRecipient.setSendingEndDate(new Date());
+                                tmpRecipient.setStatusDate(new Date());
+                                XHeader xTeePais = new XHeader(
+                                        user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
+                                tmpRecipient.update(conn, xTeePais);
+                            }
                         }
                         if (tmpRecipient.getSendStatusID() != CommonStructures.SendStatus_Sent) {
                             allSent = false;
@@ -114,17 +120,22 @@ public class MarkDocumentsReceived{
                     }
 
                     if (!recipientFound) {
-                    	throw new AxisFault(createRecipientNotFoundMessage(docID, user.getOrganizationCode(), bodyData.allyksusId, bodyData.ametikohtId, "", ""));
+                        throw new AxisFault(createRecipientNotFoundMessage(
+                                docID, user.getOrganizationCode(), bodyData.allyksusId, bodyData.ametikohtId, "", ""));
                     }
 
                     if (allSent && (tmpSending.getSendStatusID() != CommonStructures.SendStatus_Sent)) {
                         tmpSending.setSendStatusID(CommonStructures.SendStatus_Sent);
                         tmpSending.setEndDate(new Date());
-                        XHeader xTeePais = new XHeader(user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
+                        XHeader xTeePais = new XHeader(
+                                user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
                         tmpSending.update(false, conn, xTeePais);
                     }
                 } else {
-                	throw new AxisFault(createRecipientNotFoundMessage(docID, user.getOrganizationCode(), bodyData.allyksusId, bodyData.ametikohtId, "", ""));
+                    throw new AxisFault(
+                            createRecipientNotFoundMessage(
+                                    docID, user.getOrganizationCode(),
+                                    bodyData.allyksusId, bodyData.ametikohtId, "", ""));
                 }
             }
 
@@ -138,10 +149,11 @@ public class MarkDocumentsReceived{
         return result;
     }
 
-    public static RequestInternalResult V2( org.apache.axis.MessageContext context, Connection conn, UserProfile user ) throws SQLException, AxisFault {
+    public static RequestInternalResult V2(
+            org.apache.axis.MessageContext context, Connection conn, UserProfile user) throws SQLException, AxisFault {
         logger.info("MarkDocumentsReceived.V2 invoked.");
 
-		RequestInternalResult result = new RequestInternalResult();
+        RequestInternalResult result = new RequestInternalResult();
         String pipelineDataFile = CommonMethods.createPipelineFile(0);
 
         try {
@@ -152,7 +164,9 @@ public class MarkDocumentsReceived{
             }
             result.folder = bodyData.kaust;
 
-            org.apache.axis.attachments.AttachmentPart px = (org.apache.axis.attachments.AttachmentPart) context.getCurrentMessage().getAttachmentsImpl().getAttachmentByReference(bodyData.dokumendidHref);
+            org.apache.axis.attachments.AttachmentPart px =
+                    (org.apache.axis.attachments.AttachmentPart) context.getCurrentMessage().
+                            getAttachmentsImpl().getAttachmentByReference(bodyData.dokumendidHref);
             DataSource attachmentSource = px.getActivationDataHandler().getDataSource();
             if (attachmentSource == null) {
                 throw new AxisFault(CommonStructures.VIGA_PUUDUV_MIME_LISA);
@@ -195,7 +209,7 @@ public class MarkDocumentsReceived{
             int nodeCount = foundNodes.getLength();
             Recipient tmpRecipient = null;
             for (int i = 0; i < nodeCount; ++i) {
-                markDocumentsReceivedV2Item item = markDocumentsReceivedV2Item.getFromXML((org.w3c.dom.Element)foundNodes.item(i));
+                markDocumentsReceivedV2Item item = markDocumentsReceivedV2Item.getFromXML((org.w3c.dom.Element) foundNodes.item(i));
 
                 // Kontrollime olulisemad sisendandmed üle
                 if (item == null) {
@@ -213,40 +227,41 @@ public class MarkDocumentsReceived{
                         tmpRecipient = tmpSending.getRecipients().get(j);
                         if (tmpRecipient.getOrganizationID() == user.getOrganizationID()) {
 
-                        	// Kui päringus on täpsustatud, millise allüksuse ja/või ametikoha
-                        	// dokumendid tuleb vastuvõetuks märkida, siis kontrollime, et
-                        	// ametikoha ja/või allüksuse ID adressaadi andmetes
-                        	// vastaks päringu parameetritele.
-                        	// Vastasel juhul märgiks rakendus dokumendi vastuvõetuks kõigi
-                        	// adressaatide poolt, kes kuuluvad päringu teinud asutuse alla.
-                        	if (((bodyData.allyksusId <= 0) || (tmpRecipient.getDivisionID() == bodyData.allyksusId))
-                            	&& ((bodyData.ametikohtId <= 0) || (tmpRecipient.getPositionID() == bodyData.ametikohtId))) {
+                            // Kui päringus on täpsustatud, millise allüksuse ja/või ametikoha
+                            // dokumendid tuleb vastuvõetuks märkida, siis kontrollime, et
+                            // ametikoha ja/või allüksuse ID adressaadi andmetes
+                            // vastaks päringu parameetritele.
+                            // Vastasel juhul märgiks rakendus dokumendi vastuvõetuks kõigi
+                            // adressaatide poolt, kes kuuluvad päringu teinud asutuse alla.
+                            if (((bodyData.allyksusId <= 0) || (tmpRecipient.getDivisionID() == bodyData.allyksusId))
+                                    && ((bodyData.ametikohtId <= 0) || (tmpRecipient.getPositionID() == bodyData.ametikohtId))) {
 
-                        		recipientFound = true;
-	                            if (item.recipientFault == null) {
-	                                // Kui veateadet ei saadetud, siis järeldame, et dokument
-	                                // võeti edukalt vastu.
-	                                tmpRecipient.setSendStatusID(CommonStructures.SendStatus_Sent);
-	                            } else {
-	                                // Kui saadeti veateade, siis märgime saatmise ebaõnnestunuks.
-	                                tmpRecipient.setSendStatusID(CommonStructures.SendStatus_Canceled);
-	                            }
-	                            tmpRecipient.setFault(item.recipientFault);
-	                            tmpRecipient.setSendingEndDate(new Date());
-	                            tmpRecipient.setRecipientStatusId(item.recipientStatusID);
-	                            tmpRecipient.setMetaXML(item.metaXML);
+                                recipientFound = true;
+                                if (item.recipientFault == null) {
+                                    // Kui veateadet ei saadetud, siis järeldame, et dokument
+                                    // võeti edukalt vastu.
+                                    tmpRecipient.setSendStatusID(CommonStructures.SendStatus_Sent);
+                                } else {
+                                    // Kui saadeti veateade, siis märgime saatmise ebaõnnestunuks.
+                                    tmpRecipient.setSendStatusID(CommonStructures.SendStatus_Canceled);
+                                }
+                                tmpRecipient.setFault(item.recipientFault);
+                                tmpRecipient.setSendingEndDate(new Date());
+                                tmpRecipient.setRecipientStatusId(item.recipientStatusID);
+                                tmpRecipient.setMetaXML(item.metaXML);
 
-	                            // Praegusest kuupäevast ja kellaajast hilisemaid staatuse
-	                            // muutumise aegu ei saa ette anda.
-	                            if (item.staatuseMuutmiseAeg.after(new Date())) {
-	                            	tmpRecipient.setStatusDate(new Date());
-	                            } else {
-	                            	tmpRecipient.setStatusDate(item.staatuseMuutmiseAeg);
-	                            }
+                                // Praegusest kuupäevast ja kellaajast hilisemaid staatuse
+                                // muutumise aegu ei saa ette anda.
+                                if (item.staatuseMuutmiseAeg.after(new Date())) {
+                                    tmpRecipient.setStatusDate(new Date());
+                                } else {
+                                    tmpRecipient.setStatusDate(item.staatuseMuutmiseAeg);
+                                }
 
-	                            XHeader xTeePais = new XHeader(user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
-	                            tmpRecipient.update(conn, xTeePais);
-                        	}
+                                XHeader xTeePais = new XHeader(
+                                        user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
+                                tmpRecipient.update(conn, xTeePais);
+                            }
                         }
                         if (tmpRecipient.getSendStatusID() != CommonStructures.SendStatus_Sent) {
                             allSent = false;
@@ -254,17 +269,22 @@ public class MarkDocumentsReceived{
                     }
 
                     if (!recipientFound) {
-                        throw new AxisFault(createRecipientNotFoundMessage(item.documentID, user.getOrganizationCode(), bodyData.allyksusId, bodyData.ametikohtId, "", ""));
+                        throw new AxisFault(
+                                createRecipientNotFoundMessage(item.documentID, user.getOrganizationCode(),
+                                        bodyData.allyksusId, bodyData.ametikohtId, "", ""));
                     }
 
                     if (allSent && (tmpSending.getSendStatusID() != CommonStructures.SendStatus_Sent)) {
                         tmpSending.setSendStatusID(CommonStructures.SendStatus_Sent);
                         tmpSending.setEndDate(new Date());
-                        XHeader xTeePais = new XHeader(user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
+                        XHeader xTeePais = new XHeader(
+                                user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
                         tmpSending.update(false, conn, xTeePais);
                     }
                 } else {
-                	throw new AxisFault(createRecipientNotFoundMessage(item.documentID, user.getOrganizationCode(), bodyData.allyksusId, bodyData.ametikohtId, "", ""));
+                    throw new AxisFault(
+                            createRecipientNotFoundMessage(item.documentID, user.getOrganizationCode(),
+                                    bodyData.allyksusId, bodyData.ametikohtId, "", ""));
                 }
             }
 
@@ -278,10 +298,11 @@ public class MarkDocumentsReceived{
         return result;
     }
 
-    public static RequestInternalResult V3(org.apache.axis.MessageContext context, Connection conn, UserProfile user) throws SQLException, AxisFault {
+    public static RequestInternalResult V3(
+            org.apache.axis.MessageContext context, Connection conn, UserProfile user) throws SQLException, AxisFault {
         logger.info("MarkDocumentsReceived.V3 invoked.");
 
-		RequestInternalResult result = new RequestInternalResult();
+        RequestInternalResult result = new RequestInternalResult();
         result.requestElement = CommonMethods.getXRoadRequestBodyElement(context, "markDocumentsReceived");
 
         // Lame SOAP keha endale sobivasse andmestruktuuri
@@ -310,11 +331,11 @@ public class MarkDocumentsReceived{
             boolean documentLoadResult = false;
 
             if (item.documentID > 0) {
-            	logger.debug("Loading document by document ID.");
-            	documentLoadResult = tmpSending.loadByDocumentID(item.documentID, conn);
+                logger.debug("Loading document by document ID.");
+                documentLoadResult = tmpSending.loadByDocumentID(item.documentID, conn);
             } else if (!CommonMethods.isNullOrEmpty(item.guid)) {
-            	logger.debug("Loading document by document GUID.");
-            	documentLoadResult = tmpSending.loadByDocumentGUID(item.guid, conn);
+                logger.debug("Loading document by document GUID.");
+                documentLoadResult = tmpSending.loadByDocumentGUID(item.guid, conn);
             }
 
             if (documentLoadResult) {
@@ -324,40 +345,45 @@ public class MarkDocumentsReceived{
                     tmpRecipient = tmpSending.getRecipients().get(j);
                     if (tmpRecipient.getOrganizationID() == user.getOrganizationID()) {
 
-                    	// Kui päringus on täpsustatud, millise allüksuse ja/või ametikoha
-                    	// dokumendid tuleb vastuvõetuks märkida, siis kontrollime, et
-                    	// ametikoha ja/või allüksuse lühinimetus adressaadi andmetes
-                    	// vastaks päringu parameetritele.
-                    	// Vastasel juhul märgiks rakendus dokumendi vastuvõetuks kõigi
-                    	// adressaatide poolt, kes kuuluvad päringu teinud asutuse alla.
-                    	if (((bodyData.allyksuseLyhinimetus == null) || (bodyData.allyksuseLyhinimetus.length() < 1) || CommonMethods.stringsEqualIgnoreNull(tmpRecipient.getDivisionShortName(), bodyData.allyksuseLyhinimetus))
-                        	&& ((bodyData.ametikohaLyhinimetus == null) || (bodyData.ametikohaLyhinimetus.length() < 1) || CommonMethods.stringsEqualIgnoreNull(tmpRecipient.getPositionShortName(), bodyData.ametikohaLyhinimetus))) {
+                        // Kui päringus on täpsustatud, millise allüksuse ja/või ametikoha
+                        // dokumendid tuleb vastuvõetuks märkida, siis kontrollime, et
+                        // ametikoha ja/või allüksuse lühinimetus adressaadi andmetes
+                        // vastaks päringu parameetritele.
+                        // Vastasel juhul märgiks rakendus dokumendi vastuvõetuks kõigi
+                        // adressaatide poolt, kes kuuluvad päringu teinud asutuse alla.
+                        if (((bodyData.allyksuseLyhinimetus == null)
+                                || (bodyData.allyksuseLyhinimetus.length() < 1)
+                                || CommonMethods.stringsEqualIgnoreNull(tmpRecipient.getDivisionShortName(), bodyData.allyksuseLyhinimetus))
+                                && ((bodyData.ametikohaLyhinimetus == null)
+                                || (bodyData.ametikohaLyhinimetus.length() < 1)
+                                || CommonMethods.stringsEqualIgnoreNull(
+                                        tmpRecipient.getPositionShortName(), bodyData.ametikohaLyhinimetus))) {
 
-                        	recipientFound = true;
-	                        if (item.recipientFault == null) {
-	                            // Kui veateadet ei saadetud, siis järeldame, et dokument
-	                            // võeti edukalt vastu.
-	                            tmpRecipient.setSendStatusID(CommonStructures.SendStatus_Sent);
-	                        }
-	                        else {
-	                            // Kui saadeti veateade, siis märgime saatmise ebaõnnestunuks.
-	                            tmpRecipient.setSendStatusID(CommonStructures.SendStatus_Canceled);
-	                        }
-	                        tmpRecipient.setFault(item.recipientFault);
-	                        tmpRecipient.setSendingEndDate(new Date());
-	                        tmpRecipient.setRecipientStatusId(item.recipientStatusID);
-	                        tmpRecipient.setMetaXML(item.metaXML);
+                            recipientFound = true;
+                            if (item.recipientFault == null) {
+                                // Kui veateadet ei saadetud, siis järeldame, et dokument
+                                // võeti edukalt vastu.
+                                tmpRecipient.setSendStatusID(CommonStructures.SendStatus_Sent);
+                            } else {
+                                // Kui saadeti veateade, siis märgime saatmise ebaõnnestunuks.
+                                tmpRecipient.setSendStatusID(CommonStructures.SendStatus_Canceled);
+                            }
+                            tmpRecipient.setFault(item.recipientFault);
+                            tmpRecipient.setSendingEndDate(new Date());
+                            tmpRecipient.setRecipientStatusId(item.recipientStatusID);
+                            tmpRecipient.setMetaXML(item.metaXML);
 
                             // Praegusest kuupäevast ja kellaajast hilisemaid staatuse
                             // muutumise aegu ei saa ette anda.
                             if (item.staatuseMuutmiseAeg.after(new Date())) {
-                            	tmpRecipient.setStatusDate(new Date());
+                                tmpRecipient.setStatusDate(new Date());
                             } else {
-                            	tmpRecipient.setStatusDate(item.staatuseMuutmiseAeg);
+                                tmpRecipient.setStatusDate(item.staatuseMuutmiseAeg);
                             }
 
-                            XHeader xTeePais = new XHeader(user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
-	                        tmpRecipient.update(conn, xTeePais);
+                            XHeader xTeePais = new XHeader(
+                                    user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
+                            tmpRecipient.update(conn, xTeePais);
                         }
                     }
                     if (tmpRecipient.getSendStatusID() != CommonStructures.SendStatus_Sent) {
@@ -366,17 +392,22 @@ public class MarkDocumentsReceived{
                 }
 
                 if (!recipientFound) {
-                	throw new AxisFault(createRecipientNotFoundMessage(item.documentID, user.getOrganizationCode(), 0, 0, bodyData.allyksuseLyhinimetus, bodyData.ametikohaLyhinimetus));
+                    throw new AxisFault(
+                            createRecipientNotFoundMessage(item.documentID, user.getOrganizationCode(), 0, 0,
+                                    bodyData.allyksuseLyhinimetus, bodyData.ametikohaLyhinimetus));
                 }
 
                 if (allSent && (tmpSending.getSendStatusID() != CommonStructures.SendStatus_Sent)) {
                     tmpSending.setSendStatusID(CommonStructures.SendStatus_Sent);
                     tmpSending.setEndDate(new Date());
-                    XHeader xTeePais = new XHeader(user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
+                    XHeader xTeePais = new XHeader(
+                            user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
                     tmpSending.update(false, conn, xTeePais);
                 }
             } else {
-                throw new AxisFault(createRecipientNotFoundMessage(item.documentID, user.getOrganizationCode(), 0, 0, bodyData.allyksuseLyhinimetus, bodyData.ametikohaLyhinimetus));
+                throw new AxisFault(
+                        createRecipientNotFoundMessage(item.documentID, user.getOrganizationCode(), 0, 0,
+                                bodyData.allyksuseLyhinimetus, bodyData.ametikohaLyhinimetus));
             }
         }
 
@@ -387,21 +418,24 @@ public class MarkDocumentsReceived{
         return result;
     }
 
-    private static String createRecipientNotFoundMessage(int docId, String orgCode, int subdivisionId, int occupationId, String subdivisionShortName, String occupationShortName) {
-    	StringBuilder sb = new StringBuilder(1000);
-    	sb.append("Dokumendi vastuvõetuks märkimine ebaõnnestus! Etteantud ID-le (").append(docId).append(") vastavat dokumenti ei ole antud asutusele");
+    private static String createRecipientNotFoundMessage(
+            int docId, String orgCode, int subdivisionId, int occupationId,
+            String subdivisionShortName, String occupationShortName) {
+        StringBuilder sb = new StringBuilder(1000);
+        sb.append("Dokumendi vastuvõetuks märkimine ebaõnnestus! Etteantud ID-le (")
+                            .append(docId).append(") vastavat dokumenti ei ole antud asutusele");
         sb.append(orgCode);
 
         if ((subdivisionShortName != null) && (subdivisionShortName.length() > 1)) {
-        	sb.append(", allüksusele \"").append(subdivisionShortName).append("\"");
+            sb.append(", allüksusele \"").append(subdivisionShortName).append("\"");
         } else if (subdivisionId > 0) {
-        	sb.append(", allüksusele ").append(subdivisionId);
+            sb.append(", allüksusele ").append(subdivisionId);
         }
 
         if ((occupationShortName != null) && (occupationShortName.length() > 0)) {
-        	sb.append(", ametikohale \"").append(occupationShortName).append("\"");
+            sb.append(", ametikohale \"").append(occupationShortName).append("\"");
         } else if (occupationId > 0) {
-        	sb.append(", ametikohale ").append(occupationId);
+            sb.append(", ametikohale ").append(occupationId);
         }
 
         sb.append(" saadetud.");

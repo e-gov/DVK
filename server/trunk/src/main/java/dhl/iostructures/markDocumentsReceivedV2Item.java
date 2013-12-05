@@ -16,10 +16,10 @@ public class markDocumentsReceivedV2Item {
     public String guid;
 
     public markDocumentsReceivedV2Item() {
-    	this.documentID = 0;
-    	this.recipientStatusID = 0;
-    	this.recipientFault = null;
-    	this.metaXML = "";
+        this.documentID = 0;
+        this.recipientStatusID = 0;
+        this.recipientFault = null;
+        this.metaXML = "";
         this.staatuseMuutmiseAeg = null;
     }
 
@@ -30,14 +30,14 @@ public class markDocumentsReceivedV2Item {
             // Dokumendi DVK ID
             NodeList nodes = root.getElementsByTagName("dhl_id");
             if ((nodes != null) && (nodes.getLength() > 0)) {
-                e = (Element)nodes.item(0);
+                e = (Element) nodes.item(0);
                 result.documentID = Integer.parseInt(CommonMethods.getNodeText(e));
             }
 
             // Dokumendi GUID
             nodes = root.getElementsByTagName("dokument_guid");
             if ((nodes != null) && (nodes.getLength() > 0)) {
-                e = (Element)nodes.item(0);
+                e = (Element) nodes.item(0);
                 result.guid = CommonMethods.getNodeText(e);
             }
 
@@ -45,23 +45,22 @@ public class markDocumentsReceivedV2Item {
             // (vanas versioonis ja kliendis toimis valesti ja jätame ka praegu sisse, et vanad asjad kohe katki ei läheks)
             // TODO: Eemaldada see koodilõik
             nodes = root.getElementsByTagName("staatus_id");
-            if((nodes != null) && (nodes.getLength() > 0))
-            {
-                e = (Element)nodes.item(0);
-                result.recipientStatusID = Integer.parseInt( CommonMethods.getNodeText(e) );
+            if ((nodes != null) && (nodes.getLength() > 0)) {
+                e = (Element) nodes.item(0);
+                result.recipientStatusID = Integer.parseInt(CommonMethods.getNodeText(e));
             }
 
             // Vastuvõtja staatuse ID
             nodes = root.getElementsByTagName("vastuvotja_staatus_id");
             if ((nodes != null) && (nodes.getLength() > 0)) {
-                e = (Element)nodes.item(0);
+                e = (Element) nodes.item(0);
                 result.recipientStatusID = Integer.parseInt(CommonMethods.getNodeText(e));
             }
 
             // Vastuvõtja edastatud viga
             nodes = root.getElementsByTagName("fault");
             if ((nodes != null) && (nodes.getLength() > 0)) {
-                e = (Element)nodes.item(0);
+                e = (Element) nodes.item(0);
                 result.recipientFault = Fault.getFromXML(e);
             }
 
@@ -69,20 +68,20 @@ public class markDocumentsReceivedV2Item {
             NodeList statusDateNodes = root.getElementsByTagName("staatuse_muutmise_aeg");
             if (statusDateNodes.getLength() > 0) {
                 String tmp = CommonMethods.getNodeText(statusDateNodes.item(0));
-                if ((tmp !=  null) && (tmp.length() > 0)) {
-                	result.staatuseMuutmiseAeg = CommonMethods.getDateFromXML(tmp);
+                if ((tmp != null) && (tmp.length() > 0)) {
+                    result.staatuseMuutmiseAeg = CommonMethods.getDateFromXML(tmp);
                 } else {
-                	result.staatuseMuutmiseAeg = new Date();
+                    result.staatuseMuutmiseAeg = new Date();
                 }
             }
             if (result.staatuseMuutmiseAeg == null) {
-            	result.staatuseMuutmiseAeg = new Date();
+                result.staatuseMuutmiseAeg = new Date();
             }
 
             // Mistahes muud metaandmed
             nodes = root.getElementsByTagName("metaxml");
             if ((nodes != null) && (nodes.getLength() > 0)) {
-                e = (Element)nodes.item(0);
+                e = (Element) nodes.item(0);
                 String meta = new String(CommonMethods.xmlElementToBinary(e), "UTF-8");
                 if (meta != null) {
                     if (meta.equalsIgnoreCase("<metaxml/>") || meta.equalsIgnoreCase("<metaxml />")) {

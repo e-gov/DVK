@@ -1,10 +1,12 @@
 package dhl.iostructures;
 
 import dvk.core.CommonMethods;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.soap.SOAPBody;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -24,12 +26,12 @@ public class receiveDocumentsRequestType {
             SOAPBody body = msg.getSOAPBody();
             NodeList nodes = body.getElementsByTagName("receiveDocuments");
             if (nodes.getLength() > 0) {
-                Element el = (Element)nodes.item(0);
+                Element el = (Element) nodes.item(0);
                 nodes = el.getElementsByTagName("keha");
                 if (nodes.getLength() > 0) {
                     receiveDocumentsRequestType result = new receiveDocumentsRequestType();
-                    Element bodyNode = (Element)nodes.item(0);
-                    
+                    Element bodyNode = (Element) nodes.item(0);
+
                     // Arv
                     nodes = bodyNode.getElementsByTagName("arv");
                     if (nodes.getLength() > 0) {
@@ -40,12 +42,12 @@ public class receiveDocumentsRequestType {
                             result.arv = 1;
                         }
                     }
-                    
+
                     // Kaust
                     nodes = bodyNode.getElementsByTagName("kaust");
                     if (nodes.getLength() > 0) {
                         for (int i = 0; i < nodes.getLength(); ++i) {
-                            Element folderNode = (Element)nodes.item(i);
+                            Element folderNode = (Element) nodes.item(i);
                             result.kaust.add(CommonMethods.getNodeText(folderNode));
                         }
                     }

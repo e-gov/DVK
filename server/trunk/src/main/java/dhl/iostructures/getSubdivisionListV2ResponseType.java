@@ -9,6 +9,7 @@ import java.util.Iterator;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPBodyElement;
 import javax.xml.soap.SOAPElement;
+
 import org.apache.axis.AxisFault;
 import dhl.users.Allyksus;
 import dvk.core.CommonMethods;
@@ -19,7 +20,7 @@ public class getSubdivisionListV2ResponseType implements SOAPOutputBodyRepresent
     public String allyksusedHref;
     public String responseFile;
     public String dataMd5Hash;
-    
+
     public getSubdivisionListV2ResponseType() {
         paring = null;
         allyksusedHref = "";
@@ -42,7 +43,7 @@ public class getSubdivisionListV2ResponseType implements SOAPOutputBodyRepresent
             SOAPElement elParing = element.addChildElement(se.createName("paring"));
             SOAPElement elHash = elParing.addChildElement("asutused");
             elHash.addTextNode(this.dataMd5Hash);
-            
+
             // Sõnumi keha osa
             SOAPElement elKeha = element.addChildElement(se.createName("keha"));
             SOAPElement elDokument = elKeha.addChildElement(se.createName("allyksused"));
@@ -51,11 +52,11 @@ public class getSubdivisionListV2ResponseType implements SOAPOutputBodyRepresent
             CommonMethods.logError(ex, this.getClass().getName(), "addToSOAPBody");
         }
     }
-    
+
     public void createResponseFile(ArrayList<Allyksus> subdivisionList, String orgCode) throws Exception {
-    	String xmlFile = CommonMethods.createPipelineFile(0);
-        
-    	FileOutputStream out = null;
+        String xmlFile = CommonMethods.createPipelineFile(0);
+
+        FileOutputStream out = null;
         OutputStreamWriter ow = null;
         BufferedWriter bw = null;
         try {
@@ -64,28 +65,26 @@ public class getSubdivisionListV2ResponseType implements SOAPOutputBodyRepresent
             bw = new BufferedWriter(ow);
 
             if (subdivisionList != null) {
-            	bw.write("<allyksused>");
-            	for (Allyksus sub : subdivisionList) {
-            		bw.write("<allyksus>");
-            		bw.write("<kood>" + String.valueOf(sub.getID()) + "</kood>");
-            		bw.write("<nimetus>" + sub.getNimetus() + "</nimetus>");
-            		bw.write("<asutuse_kood>" + sub.getAsutusKood() + "</asutuse_kood>");
-            		if ((sub.getLyhinimetus() != null) && (sub.getLyhinimetus().length() > 0)) {
-            			bw.write("<lyhinimetus>" + sub.getLyhinimetus() + "</lyhinimetus>");
-            		}
-            		if ((sub.getKsAllyksuseLyhinimetus() != null) && (sub.getKsAllyksuseLyhinimetus().length() > 0)) {
-            			bw.write("<ks_allyksuse_lyhinimetus>" + sub.getKsAllyksuseLyhinimetus() + "</ks_allyksuse_lyhinimetus>");
-            		}
+                bw.write("<allyksused>");
+                for (Allyksus sub : subdivisionList) {
+                    bw.write("<allyksus>");
+                    bw.write("<kood>" + String.valueOf(sub.getID()) + "</kood>");
+                    bw.write("<nimetus>" + sub.getNimetus() + "</nimetus>");
+                    bw.write("<asutuse_kood>" + sub.getAsutusKood() + "</asutuse_kood>");
+                    if ((sub.getLyhinimetus() != null) && (sub.getLyhinimetus().length() > 0)) {
+                        bw.write("<lyhinimetus>" + sub.getLyhinimetus() + "</lyhinimetus>");
+                    }
+                    if ((sub.getKsAllyksuseLyhinimetus() != null) && (sub.getKsAllyksuseLyhinimetus().length() > 0)) {
+                        bw.write("<ks_allyksuse_lyhinimetus>" + sub.getKsAllyksuseLyhinimetus() + "</ks_allyksuse_lyhinimetus>");
+                    }
                     bw.write("</allyksus>");
                 }
-            	bw.write("</allyksused>");
-            }            
-        }
-        catch (Exception ex) {
-            CommonMethods.logError( ex, this.getClass().getName(), "createResponseFile" );
-            throw new AxisFault( "Error composing response message: " +" ("+ ex.getClass().getName() +": "+ ex.getMessage() +")" );
-        }
-        finally {
+                bw.write("</allyksused>");
+            }
+        } catch (Exception ex) {
+            CommonMethods.logError(ex, this.getClass().getName(), "createResponseFile");
+            throw new AxisFault("Error composing response message: " + " (" + ex.getClass().getName() + ": " + ex.getMessage() + ")");
+        } finally {
             CommonMethods.safeCloseWriter(bw);
             CommonMethods.safeCloseWriter(ow);
             CommonMethods.safeCloseStream(out);
@@ -93,7 +92,7 @@ public class getSubdivisionListV2ResponseType implements SOAPOutputBodyRepresent
             ow = null;
             out = null;
         }
-        
+
         this.responseFile = CommonMethods.gzipPackXML(xmlFile, orgCode, "getSubdivisionList");
     }
 }

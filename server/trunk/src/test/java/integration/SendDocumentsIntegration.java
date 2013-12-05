@@ -36,8 +36,6 @@ import java.util.List;
  * @since 2.12.13
  */
 public class SendDocumentsIntegration {
-    private static Logger LOG = Logger.getLogger(SendDocumentsIntegration.class);
-
     private static Options options;
     private static XHeaderBuilder xHeaderBuilder;
 
@@ -80,12 +78,6 @@ public class SendDocumentsIntegration {
     public void whenContainer_V1_isSentTo_sendDocuments_V3_serviceShouldRespondWithCID() throws Exception {
         sendMessageWithAttachment(
                 "testcontainers/v1_0/dvk_konteiner_v1.xml.gz", xHeaderBuilder.setNimi("dhl.sendDocuments.v3").build());
-    }
-
-    @Test
-    public void whenContainer_V1_isSentTo_sendDocuments_V4_serviceShouldRespondWithCID() throws Exception {
-        sendMessageWithAttachment(
-                "testcontainers/v1_0/dvk_konteiner_v1.xml.gz", xHeaderBuilder.setNimi("dhl.sendDocuments.v4").build());
     }
 
     @Test

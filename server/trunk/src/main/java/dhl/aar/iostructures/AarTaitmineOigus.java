@@ -1,15 +1,23 @@
 package dhl.aar.iostructures;
 
 import dvk.core.CommonMethods;
+
 import java.util.Date;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+
 import org.apache.axis.AxisFault;
 
 public class AarTaitmineOigus {
     private String m_nimetus;
     private Date m_alates;
     private Date m_kuni;
+
+    public AarTaitmineOigus() {
+        m_nimetus = "";
+        m_alates = null;
+        m_kuni = null;
+    }
 
     public String getNimetus() {
         return m_nimetus;
@@ -35,12 +43,6 @@ public class AarTaitmineOigus {
         m_kuni = value;
     }
 
-    public AarTaitmineOigus() {
-        m_nimetus = "";
-        m_alates = null;
-        m_kuni = null;
-    }
-
     public static AarTaitmineOigus fromXML(XMLStreamReader xmlReader, String rootTagName) throws AxisFault {
         try {
             AarTaitmineOigus result = new AarTaitmineOigus();
@@ -53,20 +55,20 @@ public class AarTaitmineOigus {
                         // Kui oleme jõudnud asutuse elemendi lõppu, siis katkestame tsükli
                         break;
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("nimetus") && xmlReader.isStartElement()) {
-                         xmlReader.next();
-                         if (xmlReader.isCharacters()) {
-                             result.setNimetus(xmlReader.getText().trim());
-                         }
+                        xmlReader.next();
+                        if (xmlReader.isCharacters()) {
+                            result.setNimetus(xmlReader.getText().trim());
+                        }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("alates") && xmlReader.isStartElement()) {
-                         xmlReader.next();
-                         if (xmlReader.isCharacters()) {
-                             result.setAlates(CommonMethods.getDateFromXML(xmlReader.getText().trim()));
-                         }
+                        xmlReader.next();
+                        if (xmlReader.isCharacters()) {
+                            result.setAlates(CommonMethods.getDateFromXML(xmlReader.getText().trim()));
+                        }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("kuni") && xmlReader.isStartElement()) {
-                         xmlReader.next();
-                         if (xmlReader.isCharacters()) {
-                             result.setKuni(CommonMethods.getDateFromXML(xmlReader.getText().trim()));
-                         }
+                        xmlReader.next();
+                        if (xmlReader.isCharacters()) {
+                            result.setKuni(CommonMethods.getDateFromXML(xmlReader.getText().trim()));
+                        }
                     }
                 }
             }

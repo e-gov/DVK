@@ -4,6 +4,7 @@ import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import dvk.core.Fault;
 import dhl.Recipient;
+
 import java.io.OutputStreamWriter;
 import java.sql.Connection;
 import java.util.Date;
@@ -48,14 +49,14 @@ public class edastus {
             // Meetod
             String methodOut = "";
             switch (m_saaja.getSendingMethodID()) {
-            case CommonStructures.SendingMethod_XTee:
-                methodOut = CommonStructures.SendingMethod_XTee_Name;
-                break;
-            case CommonStructures.SendingMethod_EMail:
-                methodOut = CommonStructures.SendingMethod_EMail_Name;
-                break;
-            default:
-                break;
+                case CommonStructures.SendingMethod_XTee:
+                    methodOut = CommonStructures.SendingMethod_XTee_Name;
+                    break;
+                case CommonStructures.SendingMethod_EMail:
+                    methodOut = CommonStructures.SendingMethod_EMail_Name;
+                    break;
+                default:
+                    break;
             }
             xmlWriter.write("<meetod>" + methodOut + "</meetod>");
 

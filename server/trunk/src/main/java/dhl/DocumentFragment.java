@@ -23,6 +23,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+
 import org.apache.axis.AxisFault;
 
 public class DocumentFragment {
@@ -34,6 +35,15 @@ public class DocumentFragment {
     private int m_fragmentCount;
     private Date m_dateCreated;
     private String m_fileName;
+
+    public DocumentFragment() {
+        clear();
+    }
+
+    public DocumentFragment(int orgID, String deliverySessionID, int fragmentNr, Connection conn) throws AxisFault {
+        clear();
+        loadFromDB(orgID, deliverySessionID, fragmentNr, conn);
+    }
 
     public void setID(int id) {
         this.m_id = id;
@@ -99,15 +109,6 @@ public class DocumentFragment {
         return m_fileName;
     }
 
-    public DocumentFragment() {
-        clear();
-    }
-
-    public DocumentFragment(int orgID, String deliverySessionID, int fragmentNr, Connection conn) throws AxisFault {
-        clear();
-        loadFromDB(orgID, deliverySessionID, fragmentNr, conn);
-    }
-
     public void clear() {
         m_id = 0;
         m_isIncoming = true;
@@ -137,14 +138,18 @@ public class DocumentFragment {
         }
     }
 
-    public void loadFromDB (int orgID, String deliverySessionID, int fragmentNr, Connection conn) throws AxisFault {
+    public void loadFromDB(int orgID, String deliverySessionID, int fragmentNr, Connection conn) throws AxisFault {
         try {
             Calendar cal = Calendar.getInstance();
             Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT fragment_id, sissetulev, asutus_id, edastus_id, fragment_nr, fragmente_kokku, loodud, sisu FROM dokumendi_fragment WHERE asutus_id="+ String.valueOf(orgID) +" AND edastus_id='"+ deliverySessionID.replace("'","''") +"' AND fragment_nr=" + String.valueOf(fragmentNr));
+            ResultSet rs = stmt.executeQuery(
+                    "SELECT fragment_id, sissetulev, asutus_id, edastus_id, fragment_nr, fragmente_kokku, "
+                            + "loodud, sisu FROM dokumendi_fragment WHERE asutus_id="
+                            + String.valueOf(orgID) + " AND edastus_id='"
+                            + deliverySessionID.replace("'", "''") + "' AND fragment_nr=" + String.valueOf(fragmentNr));
             if (rs.next()) {
                 m_id = rs.getInt("fragment_id");
-                m_isIncoming = (rs.getInt("sissetulev") > 0);
+                m_isIncoming = rs.getInt("sissetulev") > 0;
                 m_organizationID = rs.getInt("asutus_id");
                 m_deliverySessionID = rs.getString("edastus_id").trim();
                 m_fragmentNr = rs.getInt("fragment_nr");
@@ -180,8 +185,8 @@ public class DocumentFragment {
     }
 
     public int addToDBProc(Connection conn, XHeader xTeePais) throws AxisFault {
-    	try {
-    		FileInputStream inStream = null;
+        try {
+            FileInputStream inStream = null;
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
                 boolean defaultAutoCommit = conn.getAutoCommit();
@@ -191,36 +196,36 @@ public class DocumentFragment {
                     m_id = getNextID(conn);
 
                     CallableStatement cs = conn.prepareCall("{call ADD_DOKUMENT_FRAGMENT(?,?,?,?,?,?,?,?,?,?)}");
-		    		cs.setInt(1, m_id);
-		    		if (m_isIncoming) {
-		    			cs.setInt(2, 1);
-		    		} else {
-		    			cs.setInt(2, 0);
-		    		}
-		    		cs.setInt(3, m_organizationID);
-		    		cs.setString(4, m_deliverySessionID);
-		    		cs.setInt(5, m_fragmentNr);
-		    		cs.setInt(6, m_fragmentCount);
-		    		cs.setTimestamp(7, CommonMethods.sqlDateFromDate(m_dateCreated), cal);
-		    		if (xTeePais != null) {
-		    			cs.setString(9, xTeePais.isikukood);
-		    			cs.setString(10, xTeePais.asutus);
-		    		} else {
-		    			cs.setString(9, null);
-		    			cs.setString(10, null);
-		    		}
+                    cs.setInt(1, m_id);
+                    if (m_isIncoming) {
+                        cs.setInt(2, 1);
+                    } else {
+                        cs.setInt(2, 0);
+                    }
+                    cs.setInt(3, m_organizationID);
+                    cs.setString(4, m_deliverySessionID);
+                    cs.setInt(5, m_fragmentNr);
+                    cs.setInt(6, m_fragmentCount);
+                    cs.setTimestamp(7, CommonMethods.sqlDateFromDate(m_dateCreated), cal);
+                    if (xTeePais != null) {
+                        cs.setString(9, xTeePais.isikukood);
+                        cs.setString(10, xTeePais.asutus);
+                    } else {
+                        cs.setString(9, null);
+                        cs.setString(10, null);
+                    }
 
-		    		// BINARY TO BLOB
-		    		if ((new File(m_fileName)).exists()) {
-			    		int fileCharsCount = CommonMethods.getCharacterCountInFile(m_fileName);
-			    		inStream = new FileInputStream(m_fileName);
-			    		cs.setBlob(8, inStream, fileCharsCount);
-		    		}
+                    // BINARY TO BLOB
+                    if ((new File(m_fileName)).exists()) {
+                        int fileCharsCount = CommonMethods.getCharacterCountInFile(m_fileName);
+                        inStream = new FileInputStream(m_fileName);
+                        cs.setBlob(8, inStream, fileCharsCount);
+                    }
 
-		    		// Execute
-		    		cs.execute();
-		    		cs.close();
-		    		conn.commit();
+                    // Execute
+                    cs.execute();
+                    cs.close();
+                    conn.commit();
                 } catch (Exception ex) {
                     conn.rollback();
                     CommonMethods.logError(ex, this.getClass().getName(), "addToDB");
@@ -253,7 +258,9 @@ public class DocumentFragment {
                 FileInputStream fis = null;
                 try {
                     m_id = getNextID(conn);
-                    String sql = "INSERT INTO dokumendi_fragment(fragment_id, sissetulev, asutus_id, edastus_id, fragment_nr, fragmente_kokku, loodud, sisu) VALUES(?,?,?,?,?,?,?,EMPTY_BLOB())";
+                    String sql = "INSERT INTO dokumendi_fragment("
+                            + "fragment_id, sissetulev, asutus_id, edastus_id, "
+                            + "fragment_nr, fragmente_kokku, loodud, sisu) VALUES(?,?,?,?,?,?,?,EMPTY_BLOB())";
                     PreparedStatement pstmt = conn.prepareStatement(sql);
                     pstmt.setInt(1, m_id);
                     pstmt.setInt(2, m_isIncoming ? 1 : 0);
@@ -267,7 +274,9 @@ public class DocumentFragment {
 
                     if ((new File(m_fileName)).exists()) {
                         Statement stmt = conn.createStatement();
-                        ResultSet rs = stmt.executeQuery("SELECT sisu FROM dokumendi_fragment WHERE fragment_id=" + String.valueOf(m_id) + " FOR UPDATE");
+                        ResultSet rs = stmt.executeQuery(
+                                "SELECT sisu FROM dokumendi_fragment WHERE fragment_id="
+                                        + String.valueOf(m_id) + " FOR UPDATE");
                         if (rs.next()) {
                             Blob sisu = rs.getBlob(1);
                             OutputStream blobStream = sisu.setBinaryStream(0);
@@ -359,7 +368,7 @@ public class DocumentFragment {
     public static boolean deleteFragments(int orgID, String deliverySessionID, boolean isIncoming, Connection conn) {
         try {
             if (conn != null) {
-                CallableStatement cs =  conn.prepareCall("{call DELETE_DOCUMENTFRAGMENTS(?,?,?)}");
+                CallableStatement cs = conn.prepareCall("{call DELETE_DOCUMENTFRAGMENTS(?,?,?)}");
                 cs.setInt(1, orgID);
                 cs.setString(2, deliverySessionID);
                 cs.setInt(3, isIncoming ? 1 : 0);
@@ -370,12 +379,14 @@ public class DocumentFragment {
                 return false;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dhl.DocumentFragment",  "deleteFragments");
+            CommonMethods.logError(ex, "dhl.DocumentFragment", "deleteFragments");
             return false;
         }
     }
 
-    public static FragmentationResult getFragments(String fileName, long fragmentMaxSize, int orgID, String deliverySessionID, boolean isIncoming, Connection conn, XHeader xTeePais) throws AxisFault {
+    public static FragmentationResult getFragments(String fileName, long fragmentMaxSize, int orgID,
+                                                   String deliverySessionID, boolean isIncoming,
+                                                   Connection conn, XHeader xTeePais) throws AxisFault {
         String firstFragment = null;
         FragmentationResult result = new FragmentationResult();
         try {

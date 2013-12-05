@@ -2,6 +2,7 @@ package dhl.iostructures;
 
 import java.util.ArrayList;
 import javax.xml.soap.SOAPBody;
+
 import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -9,8 +10,8 @@ import dvk.core.CommonMethods;
 import dvk.core.Settings;
 
 public class receiveDocumentsV4RequestType {
-	static Logger logger = Logger.getLogger(receiveDocumentsV4RequestType.class.getName());
-	public int arv;
+    static Logger logger = Logger.getLogger(receiveDocumentsV4RequestType.class.getName());
+    public int arv;
     public String allyksuseLyhinimetus;
     public String ametikohaLyhinimetus;
     public ArrayList<String> kaust;
@@ -36,11 +37,11 @@ public class receiveDocumentsV4RequestType {
             SOAPBody body = msg.getSOAPBody();
             NodeList nodes = body.getElementsByTagName("receiveDocuments");
             if (nodes.getLength() > 0) {
-                Element el = (Element)nodes.item(0);
+                Element el = (Element) nodes.item(0);
                 nodes = el.getElementsByTagName("keha");
                 if (nodes.getLength() > 0) {
-                	receiveDocumentsV4RequestType result = new receiveDocumentsV4RequestType();
-                    Element bodyNode = (Element)nodes.item(0);
+                    receiveDocumentsV4RequestType result = new receiveDocumentsV4RequestType();
+                    Element bodyNode = (Element) nodes.item(0);
 
                     // Arv
                     result.arv = CommonMethods.getNumberFromChildNode(bodyNode, "arv", 10);
@@ -53,20 +54,20 @@ public class receiveDocumentsV4RequestType {
                     // Allüksus
                     nodes = bodyNode.getElementsByTagName("allyksuse_lyhinimetus");
                     if (nodes.getLength() > 0) {
-                        result.allyksuseLyhinimetus = CommonMethods.getNodeText((Element)nodes.item(0)).trim();
+                        result.allyksuseLyhinimetus = CommonMethods.getNodeText((Element) nodes.item(0)).trim();
                     }
 
                     // Ametikoht
                     nodes = bodyNode.getElementsByTagName("ametikoha_lyhinimetus");
                     if (nodes.getLength() > 0) {
-                        result.ametikohaLyhinimetus = CommonMethods.getNodeText((Element)nodes.item(0)).trim();
+                        result.ametikohaLyhinimetus = CommonMethods.getNodeText((Element) nodes.item(0)).trim();
                     }
 
                     // Kaust
                     nodes = bodyNode.getElementsByTagName("kaust");
                     if (nodes.getLength() > 0) {
                         for (int i = 0; i < nodes.getLength(); ++i) {
-                            Element folderNode = (Element)nodes.item(i);
+                            Element folderNode = (Element) nodes.item(i);
                             result.kaust.add(CommonMethods.getNodeText(folderNode));
                         }
                     }
@@ -74,14 +75,14 @@ public class receiveDocumentsV4RequestType {
                     // Edastus ID
                     nodes = bodyNode.getElementsByTagName("edastus_id");
                     if (nodes.getLength() > 0) {
-                        result.edastusID = CommonMethods.getNodeText((Element)nodes.item(0)).trim();
+                        result.edastusID = CommonMethods.getNodeText((Element) nodes.item(0)).trim();
                     }
 
                     // Fragmendi nr
                     nodes = bodyNode.getElementsByTagName("fragment_nr");
                     if (nodes.getLength() > 0) {
                         try {
-                            result.fragmentNr = Integer.parseInt(CommonMethods.getNodeText((Element)nodes.item(0)));
+                            result.fragmentNr = Integer.parseInt(CommonMethods.getNodeText((Element) nodes.item(0)));
                         } catch (Exception ex) {
                             CommonMethods.logError(ex, "dhl.iostructures.receiveDocumentsV2RequestType", "getFromSOAPBody");
                         }
@@ -91,7 +92,7 @@ public class receiveDocumentsV4RequestType {
                     nodes = bodyNode.getElementsByTagName("fragmendi_suurus_baitides");
                     if (nodes.getLength() > 0) {
                         try {
-                            result.fragmentSizeBytesOrig = Long.parseLong(CommonMethods.getNodeText((Element)nodes.item(0)));
+                            result.fragmentSizeBytesOrig = Long.parseLong(CommonMethods.getNodeText((Element) nodes.item(0)));
                         } catch (Exception ex) {
                             result.fragmentSizeBytesOrig = 0;
                         }
@@ -108,7 +109,7 @@ public class receiveDocumentsV4RequestType {
             }
             return null;
         } catch (Exception ex) {
-        	logger.error(ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
             return null;
         }
     }

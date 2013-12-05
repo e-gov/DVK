@@ -24,6 +24,7 @@ import dvk.core.AttachmentExtractionResult;
 import dvk.core.Fault;
 import dvk.core.HeaderVariables;
 import dvk.core.Settings;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -38,20 +39,20 @@ import org.apache.axis.MessageContext;
 import org.apache.log4j.Logger;
 
 public class GetSendStatus {
-	static Logger logger = Logger.getLogger(GetSendStatus.class.getName());
+    static Logger logger = Logger.getLogger(GetSendStatus.class.getName());
 
     public static RequestInternalResult V1(MessageContext context,
-    	Connection conn, UserProfile user, OrgSettings hostOrgSettings)
-        throws AxisFault, IllegalArgumentException, IOException, SOAPException {
+                                           Connection conn, UserProfile user, OrgSettings hostOrgSettings)
+            throws IllegalArgumentException, IOException, SOAPException {
 
-    	logger.info("GetSendStatus.V1 invoked.");
+        logger.info("GetSendStatus.V1 invoked.");
 
         RequestInternalResult result = new RequestInternalResult();
         String pipelineDataFile = CommonMethods.createPipelineFile(0);
 
         try {
             // Lame SOAP keha endale sobivasse andmestruktuuri
-            getSendStatusRequestType bodyData = getSendStatusRequestType.getFromSOAPBody( context );
+            getSendStatusRequestType bodyData = getSendStatusRequestType.getFromSOAPBody(context);
             if (bodyData == null) {
                 throw new AxisFault(CommonStructures.VIGA_VIGANE_KEHA);
             }
@@ -78,7 +79,7 @@ public class GetSendStatus {
                     boolean isSending = false;
                     int docID = 0;
                     for (int i = 0; i < docIDs.size(); ++i) {
-                    	Document doc = docIDs.get(i);
+                        Document doc = docIDs.get(i);
                         docID = doc.getId();
                         logger.info("Getting status information of document: id: " + String.valueOf(docID) + ", guid: " + doc.getGuid());
 
@@ -94,7 +95,9 @@ public class GetSendStatus {
                                 boolean senderOK = false;
                                 for (int j = 0; j < msgList.size(); ++j) {
                                     DhlMessage msg = msgList.get(j);
-                                    senderOK = ((!Settings.Server_DocumentSenderMustMatchXroadHeader) || user.getOrganizationCode().equalsIgnoreCase(msg.getSenderOrgCode()) || user.getOrganizationCode().equalsIgnoreCase(msg.getProxyOrgCode()));
+                                    senderOK = (!Settings.Server_DocumentSenderMustMatchXroadHeader)
+                                            || user.getOrganizationCode().equalsIgnoreCase(msg.getSenderOrgCode())
+                                            || user.getOrganizationCode().equalsIgnoreCase(msg.getProxyOrgCode());
                                     isCanceled = isCanceled || (msg.getSendingStatusID() == Settings.Client_StatusCanceled);
 
                                     Recipient r = new Recipient();
@@ -108,9 +111,9 @@ public class GetSendStatus {
                                     f.setFaultDetail(msg.getFaultDetail());
                                     f.setFaultString(msg.getFaultString());
                                     if (((f.getFaultCode() == null) || (f.getFaultCode().trim().length() == 0))
-                                        && ((f.getFaultActor() == null) || (f.getFaultActor().trim().length() == 0))
-                                        && ((f.getFaultString() == null) || (f.getFaultString().trim().length() == 0))
-                                        && ((f.getFaultDetail() == null) || (f.getFaultDetail().trim().length() == 0))) {
+                                            && ((f.getFaultActor() == null) || (f.getFaultActor().trim().length() == 0))
+                                            && ((f.getFaultString() == null) || (f.getFaultString().trim().length() == 0))
+                                            && ((f.getFaultDetail() == null) || (f.getFaultDetail().trim().length() == 0))) {
                                         f = null;
                                     }
                                     r.setFault(f);
@@ -126,7 +129,8 @@ public class GetSendStatus {
                                     r.setRecipientStatusId(msg.getRecipientStatusID());
                                     r.setSendingEndDate(msg.getReceivedDate());
                                     r.setSendingStartDate(msg.getReceivedDate());
-                                    r.setSendStatusID((msg.getSendingStatusID() == Settings.Client_StatusCanceled) ? CommonStructures.SendStatus_Canceled : CommonStructures.SendStatus_Sent);
+                                    r.setSendStatusID((msg.getSendingStatusID() == Settings.Client_StatusCanceled)
+                                            ? CommonStructures.SendStatus_Canceled : CommonStructures.SendStatus_Sent);
                                     tmpEdastus = new dhl.iostructures.edastus(r, msg.getReceivedDate());
                                     resp.edastus.add(tmpEdastus);
                                 }
@@ -144,7 +148,7 @@ public class GetSendStatus {
                                 }
                             }
                         } else {
-                        	sendingData = new Sending();
+                            sendingData = new Sending();
                             sendingData.loadByDocumentID(docID, conn);
 
                             // Kontrollime, et sisseloginud kasutajal on õigus antud dokumentide
@@ -155,23 +159,28 @@ public class GetSendStatus {
                                     if (r.getIdInRemoteServer() > 0) {
                                         logger.debug("Recipient " + r.getOrganizationCode() + " status is stored in remote server.");
 
-                                    	// Teeme staatuse päringu välisesse serverisse
+                                        // Teeme staatuse päringu välisesse serverisse
                                         tmpEdastus = getSendStatusFromRemoteServer(r, conn);
                                         if (tmpEdastus != null) {
                                             // Save status information to local server
-                                        	r.copyStatusInformationFromAnotherInstance(tmpEdastus.getSaaja());
-                                        	XHeader xTeePais = new XHeader(user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
-                                        	r.update(conn, xTeePais);
+                                            r.copyStatusInformationFromAnotherInstance(tmpEdastus.getSaaja());
+                                            XHeader xTeePais = new XHeader(
+                                                    user.getOrganizationCode(), null, null,
+                                                    null, null, null, user.getPersonCode());
+                                            r.update(conn, xTeePais);
 
-                                        	resp.edastus.add(tmpEdastus);
-                                            isCanceled = isCanceled || (tmpEdastus.getSaaja().getSendStatusID() == CommonStructures.SendStatus_Canceled);
-                                            isSent = isSent || (tmpEdastus.getSaaja().getSendStatusID() == CommonStructures.SendStatus_Sent);
-                                            isSending = isSending || (tmpEdastus.getSaaja().getSendStatusID() == CommonStructures.SendStatus_Sending);
+                                            resp.edastus.add(tmpEdastus);
+                                            isCanceled = isCanceled
+                                                    || (tmpEdastus.getSaaja().getSendStatusID() == CommonStructures.SendStatus_Canceled);
+                                            isSent = isSent
+                                                    || (tmpEdastus.getSaaja().getSendStatusID() == CommonStructures.SendStatus_Sent);
+                                            isSending = isSending
+                                                    || (tmpEdastus.getSaaja().getSendStatusID() == CommonStructures.SendStatus_Sending);
                                         }
                                     } else {
-                                    	logger.debug("Recipient " + r.getOrganizationCode() + " status is stored in local server.");
+                                        logger.debug("Recipient " + r.getOrganizationCode() + " status is stored in local server.");
 
-                                    	tmpEdastus = new dhl.iostructures.edastus(r, sendingData.getStartDate());
+                                        tmpEdastus = new dhl.iostructures.edastus(r, sendingData.getStartDate());
                                         resp.edastus.add(tmpEdastus);
                                         isCanceled = isCanceled || (r.getSendStatusID() == CommonStructures.SendStatus_Canceled);
                                         isSent = isSent || (r.getSendStatusID() == CommonStructures.SendStatus_Sent);
@@ -188,16 +197,18 @@ public class GetSendStatus {
 
                                 resp.appendObjectXML(ow, conn);
                             } else {
-                                logger.info("Current user does not have rights to get sending status of document: " + String.valueOf(docID));
+                                logger.info("Current user does not have rights to get sending status of document: "
+                                                + String.valueOf(docID));
                             }
                         }
                     }
                     ow.write("</keha>");
                 } catch (AxisFault fault) {
-                	throw fault;
+                    throw fault;
                 } catch (Exception ex) {
                     logger.error(ex.getMessage(), ex);
-                    throw new AxisFault("Error composing response message: (" + ex.getClass().getName() + ": " + ex.getMessage() + ")");
+                    throw new AxisFault("Error composing response message: ("
+                            + ex.getClass().getName() + ": " + ex.getMessage() + ")");
                 } finally {
                     CommonMethods.safeCloseWriter(ow);
                     CommonMethods.safeCloseStream(out);
@@ -207,7 +218,7 @@ public class GetSendStatus {
             } catch (AxisFault fault) {
                 throw fault;
             } catch (Exception ex) {
-            	logger.error(ex.getMessage(), ex);
+                logger.error(ex.getMessage(), ex);
                 throw new AxisFault(ex.getMessage());
             }
 
@@ -219,12 +230,12 @@ public class GetSendStatus {
     }
 
     public static RequestInternalResult V2(MessageContext context,
-    	Connection conn, UserProfile user, OrgSettings hostOrgSettings)
-    	throws Exception {
+                                           Connection conn, UserProfile user, OrgSettings hostOrgSettings)
+            throws Exception {
 
-    	logger.info("GetSendStatus.V2 invoked.");
+        logger.info("GetSendStatus.V2 invoked.");
 
-    	RequestInternalResult result = new RequestInternalResult();
+        RequestInternalResult result = new RequestInternalResult();
         String pipelineDataFile = CommonMethods.createPipelineFile(0);
 
         try {
@@ -239,7 +250,6 @@ public class GetSendStatus {
 
             // Leiame kõik XML elemendid, mille nimi on "dhl_id"
             ArrayList<Document> docIDs = dhl.Document.sendingStatusFromXML(attachment.getExtractedFileName(), 2);
-
 
 
             FileOutputStream out = null;
@@ -257,8 +267,8 @@ public class GetSendStatus {
                 boolean isSending = false;
 
                 for (int i = 0; i < docIDs.size(); ++i) {
-                	int docID = 0;
-                	Document doc = docIDs.get(i);
+                    int docID = 0;
+                    Document doc = docIDs.get(i);
                     docID = doc.getId();
                     logger.info("Getting status information of document: id: " + String.valueOf(docID) + ", guid: " + doc.getGuid());
 
@@ -270,21 +280,23 @@ public class GetSendStatus {
                     isSending = false;
 
                     if (Settings.Server_RunOnClientDatabase) {
-                    	logger.debug("Running on client database.");
-                    	ArrayList<DhlMessage> msgList = null;
-                    	if (docID != 0) {
-                    		logger.debug("Fetching messagelist. dhl_id: " + docID);
-                    		msgList = DhlMessage.getByDhlID(docID, true, true, hostOrgSettings, conn);
-                    	} else {
-                    		logger.debug("Fetching messagelist. GUID: " + doc.getGuid());
-                    		msgList = DhlMessage.getByGUID(doc.getGuid(), true, true, hostOrgSettings, conn);
-                    	}
+                        logger.debug("Running on client database.");
+                        ArrayList<DhlMessage> msgList = null;
+                        if (docID != 0) {
+                            logger.debug("Fetching messagelist. dhl_id: " + docID);
+                            msgList = DhlMessage.getByDhlID(docID, true, true, hostOrgSettings, conn);
+                        } else {
+                            logger.debug("Fetching messagelist. GUID: " + doc.getGuid());
+                            msgList = DhlMessage.getByGUID(doc.getGuid(), true, true, hostOrgSettings, conn);
+                        }
 
                         if ((msgList != null) && !msgList.isEmpty()) {
                             boolean senderOK = false;
                             for (int j = 0; j < msgList.size(); ++j) {
                                 DhlMessage msg = msgList.get(j);
-                                senderOK = ((!Settings.Server_DocumentSenderMustMatchXroadHeader) || user.getOrganizationCode().equalsIgnoreCase(msg.getSenderOrgCode()) || user.getOrganizationCode().equalsIgnoreCase(msg.getProxyOrgCode()));
+                                senderOK = (!Settings.Server_DocumentSenderMustMatchXroadHeader)
+                                        || user.getOrganizationCode().equalsIgnoreCase(msg.getSenderOrgCode())
+                                        || user.getOrganizationCode().equalsIgnoreCase(msg.getProxyOrgCode());
                                 isCanceled = isCanceled || (msg.getSendingStatusID() == Settings.Client_StatusCanceled);
 
                                 Recipient r = new Recipient();
@@ -298,9 +310,9 @@ public class GetSendStatus {
                                 f.setFaultDetail(msg.getFaultDetail());
                                 f.setFaultString(msg.getFaultString());
                                 if (((f.getFaultCode() == null) || (f.getFaultCode().trim().length() == 0))
-                                    && ((f.getFaultActor() == null) || (f.getFaultActor().trim().length() == 0))
-                                    && ((f.getFaultString() == null) || (f.getFaultString().trim().length() == 0))
-                                    && ((f.getFaultDetail() == null) || (f.getFaultDetail().trim().length() == 0))) {
+                                        && ((f.getFaultActor() == null) || (f.getFaultActor().trim().length() == 0))
+                                        && ((f.getFaultString() == null) || (f.getFaultString().trim().length() == 0))
+                                        && ((f.getFaultDetail() == null) || (f.getFaultDetail().trim().length() == 0))) {
                                     f = null;
                                 }
                                 r.setFault(f);
@@ -316,14 +328,15 @@ public class GetSendStatus {
                                 r.setRecipientStatusId(msg.getRecipientStatusID());
                                 r.setSendingEndDate(msg.getReceivedDate());
                                 r.setSendingStartDate(msg.getReceivedDate());
-                                r.setSendStatusID((msg.getSendingStatusID() == Settings.Client_StatusCanceled) ? CommonStructures.SendStatus_Canceled : CommonStructures.SendStatus_Sent);
+                                r.setSendStatusID((msg.getSendingStatusID() == Settings.Client_StatusCanceled)
+                                        ? CommonStructures.SendStatus_Canceled : CommonStructures.SendStatus_Sent);
                                 tmpEdastus = new dhl.iostructures.edastus(r, msg.getReceivedDate());
                                 edastusList.add(tmpEdastus);
                             }
                             if (isCanceled) {
-                            	totalStatus = CommonStructures.SendStatus_Canceled_Name;
+                                totalStatus = CommonStructures.SendStatus_Canceled_Name;
                             } else {
-                            	totalStatus = CommonStructures.SendStatus_Sent_Name;
+                                totalStatus = CommonStructures.SendStatus_Sent_Name;
                             }
 
                             // Kui rakendus töötab kliendi andmetabelite peal, siis
@@ -334,47 +347,54 @@ public class GetSendStatus {
                             // staatust päriv asutus, siis lisame antud dokumendi
                             // andmed vastuse XML-i.
                             if (senderOK) {
-                            	getSendStatusV2ResponseType.appendObjectXML(docID, doc.getGuid(), edastusList, historyList, totalStatus, ow, conn);
+                                getSendStatusV2ResponseType.appendObjectXML(
+                                        docID, doc.getGuid(), edastusList, historyList, totalStatus, ow, conn);
                             }
                         }
                     } else {
-                    	logger.debug("Running on server database.");
+                        logger.debug("Running on server database.");
                         sendingData = new Sending();
 
                         if (docID != 0) {
-                        	logger.debug("Fetching sendingData. dhl_id: " + docID);
-                        	sendingData.loadByDocumentID(docID, conn);
+                            logger.debug("Fetching sendingData. dhl_id: " + docID);
+                            sendingData.loadByDocumentID(docID, conn);
                         } else if (!CommonMethods.isNullOrEmpty(doc.getGuid())) {
-                        	logger.debug("Fetching sendingData. GUID: " + doc.getGuid());
-                        	sendingData.loadByDocumentGUID(doc.getGuid(), conn);
-                        	docID = sendingData.getDocumentID();
+                            logger.debug("Fetching sendingData. GUID: " + doc.getGuid());
+                            sendingData.loadByDocumentGUID(doc.getGuid(), conn);
+                            docID = sendingData.getDocumentID();
                         }
 
                         // Kontrollime, et sisseloginud kasutajal on õigus antud dokumentide
                         // kohta infot saada
                         if (sendingData.isStatusAccessibleToUser(user)) {
-                        	logger.debug("Document recipient count: " + sendingData.getRecipients().size());
-                        	for (Recipient r : sendingData.getRecipients()) {
+                            logger.debug("Document recipient count: " + sendingData.getRecipients().size());
+                            for (Recipient r : sendingData.getRecipients()) {
                                 if (r.getIdInRemoteServer() > 0) {
                                     // Teeme staatuse päringu välisesse serverisse
                                     tmpEdastus = getSendStatusFromRemoteServer(r, conn);
                                     if (tmpEdastus != null) {
-                                    	logger.debug("Recipient " + r.getOrganizationCode() + " status is stored in remote server.");
+                                        logger.debug("Recipient " + r.getOrganizationCode()
+                                                + " status is stored in remote server.");
 
-                                    	// Save status information to local server
-                                    	r.copyStatusInformationFromAnotherInstance(tmpEdastus.getSaaja());
-                                    	XHeader xTeePais = new XHeader(user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
-                                    	r.update(conn, xTeePais);
+                                        // Save status information to local server
+                                        r.copyStatusInformationFromAnotherInstance(tmpEdastus.getSaaja());
+                                        XHeader xTeePais = new XHeader(
+                                                user.getOrganizationCode(), null, null, null,
+                                                null, null, user.getPersonCode());
+                                        r.update(conn, xTeePais);
 
-                                    	edastusList.add(tmpEdastus);
-                                        isCanceled = isCanceled || (tmpEdastus.getSaaja().getSendStatusID() == CommonStructures.SendStatus_Canceled);
-                                        isSent = isSent || (tmpEdastus.getSaaja().getSendStatusID() == CommonStructures.SendStatus_Sent);
-                                        isSending = isSending || (tmpEdastus.getSaaja().getSendStatusID() == CommonStructures.SendStatus_Sending);
-                                     }
+                                        edastusList.add(tmpEdastus);
+                                        isCanceled = isCanceled
+                                                || (tmpEdastus.getSaaja().getSendStatusID() == CommonStructures.SendStatus_Canceled);
+                                        isSent = isSent
+                                                || (tmpEdastus.getSaaja().getSendStatusID() == CommonStructures.SendStatus_Sent);
+                                        isSending = isSending
+                                                || (tmpEdastus.getSaaja().getSendStatusID() == CommonStructures.SendStatus_Sending);
+                                    }
                                 } else {
-                                	logger.debug("Recipient " + r.getOrganizationCode() + " status is stored in local server.");
+                                    logger.debug("Recipient " + r.getOrganizationCode() + " status is stored in local server.");
 
-                                	tmpEdastus = new dhl.iostructures.edastus(r, sendingData.getStartDate());
+                                    tmpEdastus = new dhl.iostructures.edastus(r, sendingData.getStartDate());
                                     edastusList.add(tmpEdastus);
                                     isCanceled = isCanceled || (r.getSendStatusID() == CommonStructures.SendStatus_Canceled);
                                     isSent = isSent || (r.getSendStatusID() == CommonStructures.SendStatus_Sent);
@@ -382,22 +402,24 @@ public class GetSendStatus {
                                 }
                             }
                             if (isCanceled) {
-                            	totalStatus = CommonStructures.SendStatus_Canceled_Name;
+                                totalStatus = CommonStructures.SendStatus_Canceled_Name;
                             } else if (isSending) {
-                            	totalStatus = CommonStructures.SendStatus_Sending_Name;
+                                totalStatus = CommonStructures.SendStatus_Sending_Name;
                             } else if (isSent) {
-                            	totalStatus = CommonStructures.SendStatus_Sent_Name;
+                                totalStatus = CommonStructures.SendStatus_Sent_Name;
                             }
 
                             // Kui küsiti ka ajalugu, siis võtame andmebaasist välja
                             // antud dokumendi staatuse ajaloo.
                             if (bodyData.staatuseAjalugu) {
-                            	historyList = DocumentStatusHistory.getList(docID, conn);
+                                historyList = DocumentStatusHistory.getList(docID, conn);
                             }
 
-                            getSendStatusV2ResponseType.appendObjectXML(docID, doc.getGuid(), edastusList, historyList, totalStatus, ow, conn);
+                            getSendStatusV2ResponseType.appendObjectXML(
+                                    docID, doc.getGuid(), edastusList, historyList, totalStatus, ow, conn);
                         } else {
-                            logger.info("Current user does not have rights to get sending status of document: " + String.valueOf(docID));
+                            logger.info("Current user does not have rights to get sending status of document: "
+                                    + String.valueOf(docID));
                         }
                     }
                 }
@@ -416,7 +438,7 @@ public class GetSendStatus {
         return result;
     }
 
-    public static edastus getSendStatusFromRemoteServer(Recipient recipient, Connection conn) throws Exception, IOException, SOAPException {
+    public static edastus getSendStatusFromRemoteServer(Recipient recipient, Connection conn) throws Exception {
         edastus result = null;
         Asutus org = new Asutus(recipient.getOrganizationID(), conn);
         RemoteServer server = new RemoteServer(org.getServerID(), conn);
@@ -430,10 +452,11 @@ public class GetSendStatus {
         ClientAPI dvkClient = new ClientAPI();
         dvkClient.initClient(server.getAddress(), server.getProducerName());
         HeaderVariables header = new HeaderVariables(
-            Settings.Client_DefaultOrganizationCode,
-            Settings.Client_DefaultPersonCode,
-            "",
-            (CommonMethods.personalIDCodeHasCountryCode(Settings.Client_DefaultPersonCode) ? Settings.Client_DefaultPersonCode : "EE" + Settings.Client_DefaultPersonCode));
+                Settings.Client_DefaultOrganizationCode,
+                Settings.Client_DefaultPersonCode,
+                "",
+                CommonMethods.personalIDCodeHasCountryCode(Settings.Client_DefaultPersonCode)
+                        ? Settings.Client_DefaultPersonCode : "EE" + Settings.Client_DefaultPersonCode);
 
         ArrayList<DhlMessage> msgArray = new ArrayList<DhlMessage>();
         DhlMessage dhlMessage = new DhlMessage();
@@ -442,10 +465,10 @@ public class GetSendStatus {
         msgArray.add(dhlMessage);
 
 
-
         // TODO: Kas siin peaks vajadusel ka ajaloo välja küsima?
 
-        logger.debug("Requesting status of " + msgArray.size() + " documents from server: " + server.getProducerName() + "(" + server.getAddress() + ")");
+        logger.debug("Requesting status of " + msgArray.size() + " documents from server: "
+                + server.getProducerName() + "(" + server.getAddress() + ")");
         ArrayList<GetSendStatusResponseItem> statusResponse = dvkClient.getSendStatus(header, msgArray, 1, false);
         logger.debug("Remote server returned status information about " + statusResponse.size() + " documents.");
 
@@ -462,7 +485,7 @@ public class GetSendStatus {
                     rec.setRecipientPersonCode("");
                 }
                 if (rec.getRecipientOrgCode().equalsIgnoreCase(org.getRegistrikood())
-                    && rec.getRecipientPersonCode().equalsIgnoreCase(recipient.getPersonalIdCode())) {
+                        && rec.getRecipientPersonCode().equalsIgnoreCase(recipient.getPersonalIdCode())) {
                     recItem = rec;
                     break;
                 }
@@ -470,9 +493,9 @@ public class GetSendStatus {
             if (recItem != null) {
                 Fault f = null;
                 if (!CommonMethods.isNullOrEmpty(recItem.getFaultActor())
-                    || !CommonMethods.isNullOrEmpty(recItem.getFaultCode())
-                    || !CommonMethods.isNullOrEmpty(recItem.getFaultDetail())
-                    || !CommonMethods.isNullOrEmpty(recItem.getFaultString())) {
+                        || !CommonMethods.isNullOrEmpty(recItem.getFaultCode())
+                        || !CommonMethods.isNullOrEmpty(recItem.getFaultDetail())
+                        || !CommonMethods.isNullOrEmpty(recItem.getFaultString())) {
                     f = new Fault(recItem.getFaultCode(), recItem.getFaultActor(), recItem.getFaultString(), recItem.getFaultDetail());
                 }
                 recipient.setFault(f);

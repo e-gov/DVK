@@ -8,6 +8,7 @@ import java.util.Iterator;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPBodyElement;
 import javax.xml.soap.SOAPElement;
+
 import org.apache.axis.AxisFault;
 import org.apache.log4j.Logger;
 import dhl.users.Ametikoht;
@@ -15,12 +16,12 @@ import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 
 public class getOccupationListV2ResponseType implements SOAPOutputBodyRepresentation {
-	static Logger logger = Logger.getLogger(getOccupationListV2ResponseType.class.getName());
-	public getOccupationListV2RequestType paring;
+    static Logger logger = Logger.getLogger(getOccupationListV2ResponseType.class.getName());
+    public getOccupationListV2RequestType paring;
     public String ametikohadHref;
     public String responseFile;
     public String dataMd5Hash;
-    
+
     public getOccupationListV2ResponseType() {
         paring = null;
         ametikohadHref = "";
@@ -43,20 +44,20 @@ public class getOccupationListV2ResponseType implements SOAPOutputBodyRepresenta
             SOAPElement elParing = element.addChildElement(se.createName("paring"));
             SOAPElement elHash = elParing.addChildElement("asutused");
             elHash.addTextNode(this.dataMd5Hash);
-            
+
             // Sõnumi keha osa
             SOAPElement elKeha = element.addChildElement(se.createName("keha"));
             SOAPElement elDokument = elKeha.addChildElement(se.createName("ametikohad"));
             elDokument.addAttribute(se.createName("href"), "cid:" + this.ametikohadHref);
         } catch (Exception ex) {
-        	logger.error(ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
         }
     }
-    
+
     public void createResponseFile(ArrayList<Ametikoht> occupationList, String orgCode) throws Exception {
-    	String xmlFile = CommonMethods.createPipelineFile(0);
-        
-    	FileOutputStream out = null;
+        String xmlFile = CommonMethods.createPipelineFile(0);
+
+        FileOutputStream out = null;
         OutputStreamWriter ow = null;
         BufferedWriter bw = null;
         try {
@@ -65,28 +66,26 @@ public class getOccupationListV2ResponseType implements SOAPOutputBodyRepresenta
             bw = new BufferedWriter(ow);
 
             if (occupationList != null) {
-            	bw.write("<ametikohad>");
-            	for (Ametikoht occupation : occupationList) {
-            		bw.write("<ametikoht>");
-            		bw.write("<kood>" + String.valueOf(occupation.getID()) + "</kood>");
-            		bw.write("<nimetus>" + occupation.getNimetus() + "</nimetus>");
-            		bw.write("<asutuse_kood>" + occupation.getAsutusKood() + "</asutuse_kood>");
-            		if ((occupation.getLyhinimetus() != null) && (occupation.getLyhinimetus().length() > 0)) {
-            			bw.write("<lyhinimetus>" + occupation.getLyhinimetus() + "</lyhinimetus>");
-            		}
-            		if ((occupation.getAllyksuseLyhinimetus() != null) && (occupation.getAllyksuseLyhinimetus().length() > 0)) {
-            			bw.write("<ks_allyksuse_lyhinimetus>" + occupation.getAllyksuseLyhinimetus() + "</ks_allyksuse_lyhinimetus>");
-            		}
+                bw.write("<ametikohad>");
+                for (Ametikoht occupation : occupationList) {
+                    bw.write("<ametikoht>");
+                    bw.write("<kood>" + String.valueOf(occupation.getID()) + "</kood>");
+                    bw.write("<nimetus>" + occupation.getNimetus() + "</nimetus>");
+                    bw.write("<asutuse_kood>" + occupation.getAsutusKood() + "</asutuse_kood>");
+                    if ((occupation.getLyhinimetus() != null) && (occupation.getLyhinimetus().length() > 0)) {
+                        bw.write("<lyhinimetus>" + occupation.getLyhinimetus() + "</lyhinimetus>");
+                    }
+                    if ((occupation.getAllyksuseLyhinimetus() != null) && (occupation.getAllyksuseLyhinimetus().length() > 0)) {
+                        bw.write("<ks_allyksuse_lyhinimetus>" + occupation.getAllyksuseLyhinimetus() + "</ks_allyksuse_lyhinimetus>");
+                    }
                     bw.write("</ametikoht>");
                 }
-            	bw.write("</ametikohad>");
+                bw.write("</ametikohad>");
             }
-        }
-        catch (Exception ex) {
-        	logger.error(ex.getMessage(), ex);
-            throw new AxisFault( "Error composing response message: " +" ("+ ex.getClass().getName() +": "+ ex.getMessage() +")" );
-        }
-        finally {
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            throw new AxisFault("Error composing response message: " + " (" + ex.getClass().getName() + ": " + ex.getMessage() + ")");
+        } finally {
             CommonMethods.safeCloseWriter(bw);
             CommonMethods.safeCloseWriter(ow);
             CommonMethods.safeCloseStream(out);
@@ -94,7 +93,7 @@ public class getOccupationListV2ResponseType implements SOAPOutputBodyRepresenta
             ow = null;
             out = null;
         }
-        
+
         this.responseFile = CommonMethods.gzipPackXML(xmlFile, orgCode, "getOccupationList");
     }
 }

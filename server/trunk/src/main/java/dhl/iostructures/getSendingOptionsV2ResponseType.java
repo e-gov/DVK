@@ -19,7 +19,7 @@ import javax.xml.soap.SOAPElement;
 public class getSendingOptionsV2ResponseType implements SOAPOutputBodyRepresentation {
     public getSendingOptionsV2RequestType paring;
     public ArrayList<Asutus> asutused;
-    
+
     public getSendingOptionsV2ResponseType() {
         asutused = null;
         paring = null;
@@ -50,7 +50,7 @@ public class getSendingOptionsV2ResponseType implements SOAPOutputBodyRepresenta
                 elVahDokVahemalt.addTextNode(paring.vahetatudDokumenteVahemaltStr);
                 SOAPElement elVahDokKuni = elParing.addChildElement("vahetatud_dokumente_kuni", "");
                 elVahDokKuni.addTextNode(paring.vahetatudDokumenteKuniStr);
-                
+
                 SOAPElement elAsutused = elParing.addChildElement("asutused", "");
                 elAsutused.addAttribute(se.createName("type", CommonStructures.NS_XSI_PREFIX, CommonStructures.NS_XSI_URI), "SOAP-ENC:Array");
                 elAsutused.addAttribute(se.createName("arrayType", CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI), "xsd:string[" + String.valueOf(paring.asutused.length) + "]");
@@ -84,10 +84,10 @@ public class getSendingOptionsV2ResponseType implements SOAPOutputBodyRepresenta
                     SOAPElement elSendingDhl = elSending.addChildElement("saatmisviis");
                     elSendingDhl.addTextNode(CommonStructures.SENDING_DHL_DIRECT);
                 }
-                
+
                 if ((org.getKsAsutuseKood() != null) && (org.getKsAsutuseKood().length() > 0)) {
-                	SOAPElement elParentOrg = elOrg.addChildElement("ks_asutuse_regnr");
-                	elParentOrg.addTextNode(org.getKsAsutuseKood());
+                    SOAPElement elParentOrg = elOrg.addChildElement("ks_asutuse_regnr");
+                    elParentOrg.addTextNode(org.getKsAsutuseKood());
                 }
             }
         } catch (Exception ex) {

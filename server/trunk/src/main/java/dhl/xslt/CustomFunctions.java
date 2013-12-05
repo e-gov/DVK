@@ -33,288 +33,287 @@ import dvk.core.Settings;
 
 public class CustomFunctions {
 
-	private static Logger logger = Logger.getLogger(CustomFunctions.class);
+    private static Logger logger = Logger.getLogger(CustomFunctions.class);
 
-	private Connection connection;
+    private Connection connection;
 
-	@Override
-	protected void finalize() throws Throwable {
+    @Override
+    protected void finalize() throws Throwable {
 
-		if (this.getConnection() != null) {
-			this.getConnection().close();
-		}
+        if (this.getConnection() != null) {
+            this.getConnection().close();
+        }
 
-		super.finalize();
-	}
+        super.finalize();
+    }
 
-	/**
-	 * Converts position short name to position code by querying the database.
-	 * 
-	 * @param positionShortName
-	 * @return positionCode
-	 * @throws AxisFault
-	 * @throws SQLException
-	 * @throws ClassNotFoundException
-	 */
-	public String getPositionCodeByShortName(String positionShortName)
-			throws AxisFault, SQLException, ClassNotFoundException {
-		String result = null;
+    /**
+     * Converts position short name to position code by querying the database.
+     *
+     * @param positionShortName
+     * @return positionCode
+     * @throws AxisFault
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public String getPositionCodeByShortName(String positionShortName)
+            throws AxisFault, SQLException, ClassNotFoundException {
+        String result = null;
 
-		try {
+        try {
 
-			// Check if the connection is established
-			if (this.getConnection() == null) {
-				// this.setConnection(initConnection());
-				this.setConnection(initTestConnection());
-			}
+            // Check if the connection is established
+            if (this.getConnection() == null) {
+                // this.setConnection(initConnection());
+                this.setConnection(initTestConnection());
+            }
 
-			result = getPositionCodeByShortNameFromDB(positionShortName);
+            result = getPositionCodeByShortNameFromDB(positionShortName);
 
-		} catch (SQLException e) {
-			logger.error("Error querying database: ", e);
-		}
+        } catch (SQLException e) {
+            logger.error("Error querying database: ", e);
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	public String getDivisionCodeByShortName(String divisionShortName)
-			throws ClassNotFoundException {
-		String result = null;
+    public String getDivisionCodeByShortName(String divisionShortName)
+            throws ClassNotFoundException {
+        String result = null;
 
-		try {
+        try {
 
-			// Check if the connection is established
-			if (this.getConnection() == null) {
-				// this.setConnection(initConnection());
-				this.setConnection(initTestConnection());
-			}
+            // Check if the connection is established
+            if (this.getConnection() == null) {
+                // this.setConnection(initConnection());
+                this.setConnection(initTestConnection());
+            }
 
-			result = getDivisionCodeByShortNameFromDB(divisionShortName);
+            result = getDivisionCodeByShortNameFromDB(divisionShortName);
 
-		} catch (SQLException e) {
-			logger.error("Error querying database: ", e);
-		}
+        } catch (SQLException e) {
+            logger.error("Error querying database: ", e);
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	/**
-	 * 
-	 * 1. Dekodeeritakse Base64 string
-	 * 2. Pakitakse lahti
-	 * 3. Kodeeritakse Base64 stringiks
-	 * 
-	 * @param base64ZippedValue
-	 * @return
-	 * @throws DOMException
-	 * @throws IOException
-	 */
-	public String unzip(Object base64ZippedValue) throws DOMException,
-			IOException {
-		String result = null;
-		logger.debug("Unzipping...");
+    /**
+     * 1. Dekodeeritakse Base64 string
+     * 2. Pakitakse lahti
+     * 3. Kodeeritakse Base64 stringiks
+     *
+     * @param base64ZippedValue
+     * @return
+     * @throws DOMException
+     * @throws IOException
+     */
+    public String unzip(Object base64ZippedValue) throws DOMException,
+            IOException {
+        String result = null;
+        logger.debug("Unzipping...");
 
-		String tmpDir = System.getProperty("java.io.tmpdir");
-		
-		try {
-			DTMNodeIterator nodeIterator = (DTMNodeIterator) base64ZippedValue;
+        String tmpDir = System.getProperty("java.io.tmpdir");
 
-			byte[] buf = new byte[Settings.getBinaryBufferSize()];
-			int len;
-			Node n = nodeIterator.nextNode();
-			NodeList nl = n.getChildNodes();
+        try {
+            DTMNodeIterator nodeIterator = (DTMNodeIterator) base64ZippedValue;
 
-			if (nl.getLength() > 0) {
-				Node contentNode = nl.item(0);
-				if (contentNode != null) {
-					
-					// Generate file names
-					String decodedZipFileName = tmpDir + generateRandomFileName();
-					String unzippedDataFileName = tmpDir + generateRandomFileName();
-					logger.debug("decodedZipFileName: " + decodedZipFileName);
-					logger.debug("unzippedDataFileName: " + unzippedDataFileName);
-					
-					// Open a stream to the text node in the XSLT
-					ByteArrayInputStream xsltContentInputStream = new ByteArrayInputStream(
-							contentNode.getTextContent().getBytes("UTF-8"));
-					
-					// Open an outputStream to the decoded file
-					FileOutputStream decodedFileOutputStream = new FileOutputStream(
-							decodedZipFileName);
-					decodeBase64(xsltContentInputStream, decodedFileOutputStream);
+            byte[] buf = new byte[Settings.getBinaryBufferSize()];
+            int len;
+            Node n = nodeIterator.nextNode();
+            NodeList nl = n.getChildNodes();
 
-					// Open an inputStream to the decoded file
-					FileInputStream decodedFileInputSream = new FileInputStream(
-							decodedZipFileName);
+            if (nl.getLength() > 0) {
+                Node contentNode = nl.item(0);
+                if (contentNode != null) {
 
-					// Open an outputStream to the unzipped datafile
-					FileOutputStream unzippedDataFileOutputStream = new FileOutputStream(
-							unzippedDataFileName);
+                    // Generate file names
+                    String decodedZipFileName = tmpDir + generateRandomFileName();
+                    String unzippedDataFileName = tmpDir + generateRandomFileName();
+                    logger.debug("decodedZipFileName: " + decodedZipFileName);
+                    logger.debug("unzippedDataFileName: " + unzippedDataFileName);
 
-					// Open a ZipInputStream (Unzips)
-					GZIPInputStream gzipInputStream = new GZIPInputStream(decodedFileInputSream);
+                    // Open a stream to the text node in the XSLT
+                    ByteArrayInputStream xsltContentInputStream = new ByteArrayInputStream(
+                            contentNode.getTextContent().getBytes("UTF-8"));
 
-					// Unzip dataFile
-					while ((len = gzipInputStream.read(buf)) > 0) {
-						unzippedDataFileOutputStream.write(buf, 0, len);
-					}
+                    // Open an outputStream to the decoded file
+                    FileOutputStream decodedFileOutputStream = new FileOutputStream(
+                            decodedZipFileName);
+                    decodeBase64(xsltContentInputStream, decodedFileOutputStream);
 
-					// Open an inputStream for the base64 encoding
-					FileInputStream unzippedDataFileInputStream = new FileInputStream(
-							unzippedDataFileName);
+                    // Open an inputStream to the decoded file
+                    FileInputStream decodedFileInputSream = new FileInputStream(
+                            decodedZipFileName);
 
-					// Open an outputStream for base64 encoding
-					ByteArrayOutputStream encodedByteArrayOutputStream = new ByteArrayOutputStream();
-					// Base64 encode
-					encodeBase64(unzippedDataFileInputStream, encodedByteArrayOutputStream);
-					
-					// Close the streams
-					encodedByteArrayOutputStream.close();
-					unzippedDataFileInputStream.close();
-					gzipInputStream.close();
-					unzippedDataFileOutputStream.close();
-					decodedFileInputSream.close();
-					decodedFileOutputStream.close();
-					xsltContentInputStream.close();
-					
-					// Write the result back to the XSLT
-					return encodedByteArrayOutputStream.toString("UTF-8");
-				}
-			}			
+                    // Open an outputStream to the unzipped datafile
+                    FileOutputStream unzippedDataFileOutputStream = new FileOutputStream(
+                            unzippedDataFileName);
 
-		} catch (Exception e) {
-			logger.error("Error unzipping file data: ", e);
-		}
-		return result;
-	}
-	
-	public static String generateRandomFileName() {
-		StringBuffer result = new StringBuffer();
-		Random r = new Random();
-		for(int i = 0; i < 30; i++) {
-			result.append(r.nextInt(10));
-		}
-		result.append(".dat");
-		return result.toString();
-	}
+                    // Open a ZipInputStream (Unzips)
+                    GZIPInputStream gzipInputStream = new GZIPInputStream(decodedFileInputSream);
 
-	public void decodeBase64(InputStream is, OutputStream os)
-			throws IOException {
-		StringBuffer sb = new StringBuffer();
-		byte[] buf = new byte[66000]; // Puhvri pikkus peaks jaguma 3-ga
-		int len;
-		String base64String = null;
-		while ((len = is.read(buf)) > 0) {
-			base64String = new String(buf, 0, len);
-			os.write(Base64.decode(base64String));
-		}
-	}
+                    // Unzip dataFile
+                    while ((len = gzipInputStream.read(buf)) > 0) {
+                        unzippedDataFileOutputStream.write(buf, 0, len);
+                    }
 
-	public void encodeBase64(InputStream is, OutputStream os)
-			throws IOException {
-		byte[] buf = new byte[66000]; // Puhvri pikkus peaks jaguma 3-ga
-		int len;
-		while ((len = is.read(buf)) > 0) {
-			os.write(Base64.encode(buf, 0, len).getBytes());
-		}
-		is.close();
-		os.close();
-	}
+                    // Open an inputStream for the base64 encoding
+                    FileInputStream unzippedDataFileInputStream = new FileInputStream(
+                            unzippedDataFileName);
 
-	public String getDataFileID(String jrkNr) throws Exception {
-		String result = null;
+                    // Open an outputStream for base64 encoding
+                    ByteArrayOutputStream encodedByteArrayOutputStream = new ByteArrayOutputStream();
+                    // Base64 encode
+                    encodeBase64(unzippedDataFileInputStream, encodedByteArrayOutputStream);
 
-		try {
-			int jrknr = Integer.parseInt(jrkNr);
-			result = "D" + (new Integer(jrknr - 1)).toString();
-		} catch (Exception e) {
-			logger.error("Error generating DataFile ID. jrkNr: " + jrkNr, e);
-			throw e;
-		}
+                    // Close the streams
+                    encodedByteArrayOutputStream.close();
+                    unzippedDataFileInputStream.close();
+                    gzipInputStream.close();
+                    unzippedDataFileOutputStream.close();
+                    decodedFileInputSream.close();
+                    decodedFileOutputStream.close();
+                    xsltContentInputStream.close();
 
-		return result;
-	}
+                    // Write the result back to the XSLT
+                    return encodedByteArrayOutputStream.toString("UTF-8");
+                }
+            }
 
-	private String getPositionCodeByShortNameFromDB(String positionShortName)
-			throws SQLException {
-		String result = null;
+        } catch (Exception e) {
+            logger.error("Error unzipping file data: ", e);
+        }
+        return result;
+    }
 
-		String sql = "SELECT ametikoht_id FROM ametikoht WHERE UPPER(lyhinimetus) = UPPER(?)";
-		PreparedStatement preparedStatement = this.getConnection()
-				.prepareStatement(sql);
-		preparedStatement.setString(1, positionShortName);
+    public static String generateRandomFileName() {
+        StringBuffer result = new StringBuffer();
+        Random r = new Random();
+        for (int i = 0; i < 30; i++) {
+            result.append(r.nextInt(10));
+        }
+        result.append(".dat");
+        return result.toString();
+    }
 
-		ResultSet resultSet = preparedStatement.executeQuery();
+    public void decodeBase64(InputStream is, OutputStream os)
+            throws IOException {
+        StringBuffer sb = new StringBuffer();
+        byte[] buf = new byte[66000]; // Puhvri pikkus peaks jaguma 3-ga
+        int len;
+        String base64String = null;
+        while ((len = is.read(buf)) > 0) {
+            base64String = new String(buf, 0, len);
+            os.write(Base64.decode(base64String));
+        }
+    }
 
-		if (resultSet.next()) {
-			result = (new Integer(resultSet.getInt("ametikoht_id"))).toString();
-		}
+    public void encodeBase64(InputStream is, OutputStream os)
+            throws IOException {
+        byte[] buf = new byte[66000]; // Puhvri pikkus peaks jaguma 3-ga
+        int len;
+        while ((len = is.read(buf)) > 0) {
+            os.write(Base64.encode(buf, 0, len).getBytes());
+        }
+        is.close();
+        os.close();
+    }
 
-		preparedStatement.close();
+    public String getDataFileID(String jrkNr) throws Exception {
+        String result = null;
 
-		return result;
-	}
+        try {
+            int jrknr = Integer.parseInt(jrkNr);
+            result = "D" + (new Integer(jrknr - 1)).toString();
+        } catch (Exception e) {
+            logger.error("Error generating DataFile ID. jrkNr: " + jrkNr, e);
+            throw e;
+        }
 
-	private String getDivisionCodeByShortNameFromDB(String divisionShortName)
-			throws SQLException {
-		String result = null;
+        return result;
+    }
 
-		String sql = "SELECT id FROM allyksus WHERE UPPER(lyhinimetus) = UPPER(?)";
-		PreparedStatement preparedStatement = this.getConnection()
-				.prepareStatement(sql);
-		preparedStatement.setString(1, divisionShortName);
+    private String getPositionCodeByShortNameFromDB(String positionShortName)
+            throws SQLException {
+        String result = null;
 
-		ResultSet resultSet = preparedStatement.executeQuery();
+        String sql = "SELECT ametikoht_id FROM ametikoht WHERE UPPER(lyhinimetus) = UPPER(?)";
+        PreparedStatement preparedStatement = this.getConnection()
+                .prepareStatement(sql);
+        preparedStatement.setString(1, positionShortName);
 
-		if (resultSet.next()) {
-			result = (new Integer(resultSet.getInt("id"))).toString();
-		}
+        ResultSet resultSet = preparedStatement.executeQuery();
 
-		preparedStatement.close();
+        if (resultSet.next()) {
+            result = (new Integer(resultSet.getInt("ametikoht_id"))).toString();
+        }
 
-		return result;
-	}
+        preparedStatement.close();
 
-	private Connection initTestConnection() throws ClassNotFoundException,
-			SQLException {
-		// Load the JDBC driver
-		String driverName = "oracle.jdbc.driver.OracleDriver";
-		Class.forName(driverName);
+        return result;
+    }
 
-		// Create a connection to the database
-		String serverName = "127.0.0.1";
-		String portNumber = "1521";
-		String sid = "XE";
-		String url = "jdbc:oracle:thin:@" + serverName + ":" + portNumber + ":"
-				+ sid;
-		String username = "dvk";
-		String password = "dvk123";
+    private String getDivisionCodeByShortNameFromDB(String divisionShortName)
+            throws SQLException {
+        String result = null;
 
-		return DriverManager.getConnection(url, username, password);
-	}
+        String sql = "SELECT id FROM allyksus WHERE UPPER(lyhinimetus) = UPPER(?)";
+        PreparedStatement preparedStatement = this.getConnection()
+                .prepareStatement(sql);
+        preparedStatement.setString(1, divisionShortName);
 
-	private Connection initConnection() throws AxisFault {
-		try {
-			Context initContext = new InitialContext();
-			Context envContext = (Context) initContext.lookup("java:/comp/env");
-			javax.sql.DataSource ds = (javax.sql.DataSource) envContext
-					.lookup(Settings.Server_DatabaseEnvironmentVariable);
-			return ds.getConnection();
-		} catch (Exception e) {
-			logger.error("DVK Internal error. Error connecting to database: ",
-					e);
-			throw new AxisFault(
-					"DVK Internal error. Error connecting to database: "
-							+ e.getMessage());
-		}
-	}
+        ResultSet resultSet = preparedStatement.executeQuery();
 
-	public Connection getConnection() {
-		return this.connection;
-	}
+        if (resultSet.next()) {
+            result = (new Integer(resultSet.getInt("id"))).toString();
+        }
 
-	public void setConnection(Connection connection) {
-		this.connection = connection;
-	}
+        preparedStatement.close();
+
+        return result;
+    }
+
+    private Connection initTestConnection() throws ClassNotFoundException,
+            SQLException {
+        // Load the JDBC driver
+        String driverName = "oracle.jdbc.driver.OracleDriver";
+        Class.forName(driverName);
+
+        // Create a connection to the database
+        String serverName = "127.0.0.1";
+        String portNumber = "1521";
+        String sid = "XE";
+        String url = "jdbc:oracle:thin:@" + serverName + ":" + portNumber + ":"
+                + sid;
+        String username = "dvk";
+        String password = "dvk123";
+
+        return DriverManager.getConnection(url, username, password);
+    }
+
+    private Connection initConnection() throws AxisFault {
+        try {
+            Context initContext = new InitialContext();
+            Context envContext = (Context) initContext.lookup("java:/comp/env");
+            javax.sql.DataSource ds = (javax.sql.DataSource) envContext
+                    .lookup(Settings.Server_DatabaseEnvironmentVariable);
+            return ds.getConnection();
+        } catch (Exception e) {
+            logger.error("DVK Internal error. Error connecting to database: ",
+                    e);
+            throw new AxisFault(
+                    "DVK Internal error. Error connecting to database: "
+                            + e.getMessage());
+        }
+    }
+
+    public Connection getConnection() {
+        return this.connection;
+    }
+
+    public void setConnection(Connection connection) {
+        this.connection = connection;
+    }
 
 }

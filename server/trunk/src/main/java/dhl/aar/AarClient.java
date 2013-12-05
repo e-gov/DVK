@@ -12,12 +12,14 @@ import dhl.aar.iostructures.taitmisedRequestType;
 import dhl.iostructures.XHeader;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
+
 import org.apache.axiom.attachments.ConfigurableDataHandler;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
@@ -79,7 +81,9 @@ public class AarClient {
         String queryId = "aar" + orgCode + String.valueOf((new Date()).getTime());
 
         // Saadetava sõnumi päisesse kantavad parameetrid
-        XHeader header = new XHeader(orgCode, "aar", personCode, queryId, requestName, "", (CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE"+this.personCode));
+        XHeader header = new XHeader(
+                orgCode, "aar", personCode, queryId, requestName, "",
+                CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode);
 
         // Koodtame päringu faili
         String requestFile = asutusedRequestType.createRequestFile(orgCodes, orgIDs, false);
@@ -149,7 +153,9 @@ public class AarClient {
         String queryId = "aar" + orgCode + String.valueOf((new Date()).getTime());
 
         // Saadetava sõnumi päisesse kantavad parameetrid
-        XHeader header = new XHeader(orgCode, "aar", personCode, queryId, requestName, "", (CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE"+this.personCode));
+        XHeader header = new XHeader(
+                orgCode, "aar", personCode, queryId, requestName, "",
+                CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode);
 
         // Koodtame päringu faili
         String requestFile = ametikohadRequestType.createRequestFile();
@@ -218,7 +224,9 @@ public class AarClient {
         String queryId = "aar" + orgCode + String.valueOf((new Date()).getTime());
 
         // Saadetava sõnumi päisesse kantavad parameetrid
-        XHeader header = new XHeader(orgCode, "aar", personCode, queryId, requestName, "", (CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE"+this.personCode));
+        XHeader header = new XHeader(
+                orgCode, "aar", personCode, queryId, requestName, "",
+                CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode);
 
         // Koodtame päringu faili
         String requestFile = isikudRequestType.createRequestFile();
@@ -287,7 +295,9 @@ public class AarClient {
         String queryId = "aar" + orgCode + String.valueOf((new Date()).getTime());
 
         // Saadetava sõnumi päisesse kantavad parameetrid
-        XHeader header = new XHeader(orgCode, "aar", personCode, queryId, requestName, "", (CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE"+this.personCode));
+        XHeader header = new XHeader(
+                orgCode, "aar", personCode, queryId, requestName, "",
+                CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode);
 
         // Koodtame päringu faili
         String requestFile = taitmisedRequestType.createRequestFile();
@@ -353,7 +363,9 @@ public class AarClient {
         String queryId = "aar" + this.orgCode + String.valueOf((new Date()).getTime());
 
         // Saadetava sõnumi päisesse kantavad parameetrid
-        XHeader header = new XHeader(this.orgCode, "aar", this.personCode, queryId, requestName, "", (CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE"+this.personCode));
+        XHeader header = new XHeader(
+                this.orgCode, "aar", this.personCode, queryId, requestName, "",
+                CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode);
 
         // SOAP sõnumi saatmine
         serviceClient.getOptions().setProperty(Constants.Configuration.ENABLE_SWA, Constants.VALUE_FALSE);

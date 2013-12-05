@@ -13,17 +13,17 @@ import dhl.exceptions.RequestProcessingException;
 import dvk.core.CommonMethods;
 
 public class getSubdivisionListV2RequestType {
-	static Logger logger = Logger.getLogger(getSubdivisionListV2RequestType.class.getName());
-	public String asutusedHref;
+    static Logger logger = Logger.getLogger(getSubdivisionListV2RequestType.class.getName());
+    public String asutusedHref;
     public String[] asutused;
 
     public getSubdivisionListV2RequestType() {
         asutusedHref = "";
-        asutused = new String[] {};
+        asutused = new String[]{};
     }
 
     public static getSubdivisionListV2RequestType getFromSOAPBody(
-        org.apache.axis.MessageContext context) throws RequestProcessingException {
+            org.apache.axis.MessageContext context) throws RequestProcessingException {
         try {
             org.apache.axis.Message msg = context.getRequestMessage();
             SOAPBody body = msg.getSOAPBody();
@@ -43,13 +43,13 @@ public class getSubdivisionListV2RequestType {
                         }
                         return result;
                     } else {
-                    	throw new RequestProcessingException("Viga päringu keha töötlemisel. Puudub kohustuslik element /getSubdivisionList/keha/asutused.");
+                        throw new RequestProcessingException("Viga päringu keha töötlemisel. Puudub kohustuslik element /getSubdivisionList/keha/asutused.");
                     }
                 } else {
-                	throw new RequestProcessingException("Viga päringu keha töötlemisel. Puudub kohustuslik element /getSubdivisionList/keha.");
+                    throw new RequestProcessingException("Viga päringu keha töötlemisel. Puudub kohustuslik element /getSubdivisionList/keha.");
                 }
             } else {
-            	throw new RequestProcessingException("Viga päringu keha töötlemisel. Puudub kohustuslik element /getSubdivisionList.");
+                throw new RequestProcessingException("Viga päringu keha töötlemisel. Puudub kohustuslik element /getSubdivisionList.");
             }
         } catch (SOAPException ex) {
             logger.error(ex.getMessage(), ex);
@@ -58,8 +58,8 @@ public class getSubdivisionListV2RequestType {
     }
 
     public void loadParametersFromXML(String xmlFile) {
-    	if ((xmlFile != null) && (xmlFile.length() > 0) && (new File(xmlFile)).exists()) {
-    		Document xmlDoc = CommonMethods.xmlDocumentFromFile(xmlFile, true);
+        if ((xmlFile != null) && (xmlFile.length() > 0) && (new File(xmlFile)).exists()) {
+            Document xmlDoc = CommonMethods.xmlDocumentFromFile(xmlFile, true);
             NodeList nodes = xmlDoc.getElementsByTagName("asutused");
             if (nodes.getLength() > 0) {
                 Element el1 = (Element) nodes.item(0);
@@ -71,6 +71,6 @@ public class getSubdivisionListV2RequestType {
                     }
                 }
             }
-    	}
+        }
     }
 }

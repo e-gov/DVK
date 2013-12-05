@@ -1,6 +1,7 @@
 package dhl.sys;
 
 import dvk.core.CommonMethods;
+
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Types;
@@ -10,6 +11,10 @@ import java.util.Date;
 public class ApplicationParams {
     private Date m_lastAarSync;
 
+    public ApplicationParams() {
+        clear();
+    }
+
     public Date getLastAarSync() {
         return m_lastAarSync;
     }
@@ -17,20 +22,16 @@ public class ApplicationParams {
     public void setLastAarSync(Date value) {
         m_lastAarSync = value;
     }
-    
-    public ApplicationParams() {
-        clear();
-    }
-    
+
     public ApplicationParams(Connection conn) {
         clear();
         loadFromDB(conn);
     }
-    
+
     public void clear() {
         m_lastAarSync = null;
     }
-    
+
     public void loadFromDB(Connection conn) {
         try {
             if (conn != null) {
@@ -48,7 +49,7 @@ public class ApplicationParams {
             clear();
         }
     }
-    
+
     public boolean saveToDB(Connection conn) {
         try {
             if (conn != null) {

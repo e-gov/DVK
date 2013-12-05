@@ -2,6 +2,7 @@ package dhl.iostructures;
 
 import dvk.core.CommonMethods;
 import dvk.core.Settings;
+
 import java.util.ArrayList;
 import javax.xml.soap.SOAPBody;
 
@@ -10,7 +11,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public class receiveDocumentsV3RequestType {
-	static Logger logger = Logger.getLogger(receiveDocumentsV3RequestType.class.getName());
+    static Logger logger = Logger.getLogger(receiveDocumentsV3RequestType.class.getName());
     public int arv;
     public int allyksus;
     public int ametikoht;
@@ -37,11 +38,11 @@ public class receiveDocumentsV3RequestType {
             SOAPBody body = msg.getSOAPBody();
             NodeList nodes = body.getElementsByTagName("receiveDocuments");
             if (nodes.getLength() > 0) {
-                Element el = (Element)nodes.item(0);
+                Element el = (Element) nodes.item(0);
                 nodes = el.getElementsByTagName("keha");
                 if (nodes.getLength() > 0) {
                     receiveDocumentsV3RequestType result = new receiveDocumentsV3RequestType();
-                    Element bodyNode = (Element)nodes.item(0);
+                    Element bodyNode = (Element) nodes.item(0);
 
                     // Arv
                     result.arv = CommonMethods.getNumberFromChildNode(bodyNode, "arv", 10);
@@ -61,7 +62,7 @@ public class receiveDocumentsV3RequestType {
                     nodes = bodyNode.getElementsByTagName("kaust");
                     if (nodes.getLength() > 0) {
                         for (int i = 0; i < nodes.getLength(); ++i) {
-                            Element folderNode = (Element)nodes.item(i);
+                            Element folderNode = (Element) nodes.item(i);
                             result.kaust.add(CommonMethods.getNodeText(folderNode));
                         }
                     }
@@ -69,14 +70,14 @@ public class receiveDocumentsV3RequestType {
                     // Edastus ID
                     nodes = bodyNode.getElementsByTagName("edastus_id");
                     if (nodes.getLength() > 0) {
-                        result.edastusID = CommonMethods.getNodeText((Element)nodes.item(0)).trim();
+                        result.edastusID = CommonMethods.getNodeText((Element) nodes.item(0)).trim();
                     }
 
                     // Fragmendi nr
                     nodes = bodyNode.getElementsByTagName("fragment_nr");
                     if (nodes.getLength() > 0) {
                         try {
-                            result.fragmentNr = Integer.parseInt(CommonMethods.getNodeText((Element)nodes.item(0)));
+                            result.fragmentNr = Integer.parseInt(CommonMethods.getNodeText((Element) nodes.item(0)));
                         } catch (Exception ex) {
                             CommonMethods.logError(ex, "dhl.iostructures.receiveDocumentsV2RequestType", "getFromSOAPBody");
                         }
@@ -86,7 +87,7 @@ public class receiveDocumentsV3RequestType {
                     nodes = bodyNode.getElementsByTagName("fragmendi_suurus_baitides");
                     if (nodes.getLength() > 0) {
                         try {
-                            result.fragmentSizeBytesOrig = Long.parseLong(CommonMethods.getNodeText((Element)nodes.item(0)));
+                            result.fragmentSizeBytesOrig = Long.parseLong(CommonMethods.getNodeText((Element) nodes.item(0)));
                         } catch (Exception ex) {
                             result.fragmentSizeBytesOrig = 0;
                         }
@@ -103,7 +104,7 @@ public class receiveDocumentsV3RequestType {
             }
             return null;
         } catch (Exception ex) {
-        	logger.error(ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
             return null;
         }
     }

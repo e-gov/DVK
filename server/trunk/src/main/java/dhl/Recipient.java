@@ -8,6 +8,7 @@ import dhl.iostructures.XHeader;
 import dhl.users.Allyksus;
 import dhl.users.Ametikoht;
 import dhl.users.Asutus;
+
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringReader;
@@ -22,13 +23,14 @@ import java.util.Date;
 import java.util.Calendar;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+
 import org.apache.axis.AxisFault;
 import org.apache.log4j.Logger;
 
 public class Recipient {
-	private static Logger logger = Logger.getLogger(Recipient.class);
+    private static Logger logger = Logger.getLogger(Recipient.class);
 
-	private int m_id;
+    private int m_id;
     private int m_sendingID;
     private int m_organizationID;
     private int m_positionID;
@@ -214,29 +216,29 @@ public class Recipient {
         m_organizationCode = value;
     }
 
-	public String getPositionShortName() {
-		return m_positionShortName;
-	}
+    public String getPositionShortName() {
+        return m_positionShortName;
+    }
 
-	public void setPositionShortName(String shortName) {
-		m_positionShortName = shortName;
-	}
+    public void setPositionShortName(String shortName) {
+        m_positionShortName = shortName;
+    }
 
-	public String getDivisionShortName() {
-		return m_divisionShortName;
-	}
+    public String getDivisionShortName() {
+        return m_divisionShortName;
+    }
 
-	public void setDivisionShortName(String shortName) {
-		m_divisionShortName = shortName;
-	}
+    public void setDivisionShortName(String shortName) {
+        m_divisionShortName = shortName;
+    }
 
-	public boolean isCc() {
-		return m_cc;
-	}
+    public boolean isCc() {
+        return m_cc;
+    }
 
-	public void setCc(boolean cc) {
-		this.m_cc = cc;
-	}
+    public void setCc(boolean cc) {
+        this.m_cc = cc;
+    }
 
     public Date getStatusDate() {
         return this.m_statusDate;
@@ -339,216 +341,227 @@ public class Recipient {
             cs.close();
             return result;
         } else {
-        	throw new Exception("Database connection is NULL!");
+            throw new Exception("Database connection is NULL!");
         }
     }
 
     public int addToDB(Connection conn, XHeader xTeePais) throws SQLException, IllegalArgumentException {
         if (conn != null) {
-        	Calendar cal = Calendar.getInstance();
-        	boolean defaultAutoCommit = conn.getAutoCommit();
-        	conn.setAutoCommit(false);
+            Calendar cal = Calendar.getInstance();
+            boolean defaultAutoCommit = conn.getAutoCommit();
+            conn.setAutoCommit(false);
 
-        	try {
-	            m_id = getNextID(conn);
-	            StringReader r = new StringReader(m_metaXML);
+            try {
+                m_id = getNextID(conn);
+                StringReader r = new StringReader(m_metaXML);
 
-	            CallableStatement cs = conn.prepareCall("{call ADD_VASTUVOTJA(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
-	            cs.setInt(1, m_id);
-	            cs.setInt(2, m_sendingID);
-	            cs = CommonMethods.setNullableIntParam(cs, 3, m_organizationID);
-	            cs = CommonMethods.setNullableIntParam(cs, 4, m_positionID);
-	            cs = CommonMethods.setNullableIntParam(cs, 5, m_divisionID);
-	            cs.setString(6, m_personalIdCode);
-	            cs.setString(7, m_name);
-	            cs.setString(8, m_organizationName);
-	            cs.setString(9, m_email);
-	            cs.setString(10, m_departmentNumber);
-	            cs.setString(11, m_departmentName);
-	            cs.setInt(12, m_sendingMethodID);
-	            cs.setInt(13, m_sendStatusID);
-	            cs.setTimestamp(14, CommonMethods.sqlDateFromDate(m_sendingStartDate), cal);
-	            cs.setTimestamp(15, CommonMethods.sqlDateFromDate(m_sendingEndDate), cal);
-	            if (m_fault != null) {
-	                cs.setString(16, CommonMethods.TruncateString(m_fault.getFaultCode(), 50));
-	                cs.setString(17, CommonMethods.TruncateString(m_fault.getFaultActor(), 250));
-	                cs.setString(18, CommonMethods.TruncateString(m_fault.getFaultString(), 500));
-	                cs.setString(19, CommonMethods.TruncateString(m_fault.getFaultDetail(), 2000));
-	            } else {
-	                cs.setString(16, "");
-	                cs.setString(17, "");
-	                cs.setString(18, "");
-	                cs.setString(19, "");
-	            }
-	            cs = CommonMethods.setNullableIntParam(cs, 20, m_recipientStatusID);
-	            cs.setCharacterStream(21, r, m_metaXML.length());
-	            cs = CommonMethods.setNullableIntParam(cs, 22, m_idInRemoteServer);
-	            cs.setString(23, m_divisionShortName);
-	            cs.setString(24, m_positionShortName);
+                CallableStatement cs = conn.prepareCall("{call ADD_VASTUVOTJA(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                cs.setInt(1, m_id);
+                cs.setInt(2, m_sendingID);
+                cs = CommonMethods.setNullableIntParam(cs, 3, m_organizationID);
+                cs = CommonMethods.setNullableIntParam(cs, 4, m_positionID);
+                cs = CommonMethods.setNullableIntParam(cs, 5, m_divisionID);
+                cs.setString(6, m_personalIdCode);
+                cs.setString(7, m_name);
+                cs.setString(8, m_organizationName);
+                cs.setString(9, m_email);
+                cs.setString(10, m_departmentNumber);
+                cs.setString(11, m_departmentName);
+                cs.setInt(12, m_sendingMethodID);
+                cs.setInt(13, m_sendStatusID);
+                cs.setTimestamp(14, CommonMethods.sqlDateFromDate(m_sendingStartDate), cal);
+                cs.setTimestamp(15, CommonMethods.sqlDateFromDate(m_sendingEndDate), cal);
+                if (m_fault != null) {
+                    cs.setString(16, CommonMethods.TruncateString(m_fault.getFaultCode(), 50));
+                    cs.setString(17, CommonMethods.TruncateString(m_fault.getFaultActor(), 250));
+                    cs.setString(18, CommonMethods.TruncateString(m_fault.getFaultString(), 500));
+                    cs.setString(19, CommonMethods.TruncateString(m_fault.getFaultDetail(), 2000));
+                } else {
+                    cs.setString(16, "");
+                    cs.setString(17, "");
+                    cs.setString(18, "");
+                    cs.setString(19, "");
+                }
+                cs = CommonMethods.setNullableIntParam(cs, 20, m_recipientStatusID);
+                cs.setCharacterStream(21, r, m_metaXML.length());
+                cs = CommonMethods.setNullableIntParam(cs, 22, m_idInRemoteServer);
+                cs.setString(23, m_divisionShortName);
+                cs.setString(24, m_positionShortName);
 
-	            if (xTeePais != null) {
-	            	cs.setString(25, xTeePais.isikukood);
-	                cs.setString(26, xTeePais.asutus);
-	    		} else {
-	    			cs.setString(25, "");
-	                cs.setString(26, "");
-	    		}
+                if (xTeePais != null) {
+                    cs.setString(25, xTeePais.isikukood);
+                    cs.setString(26, xTeePais.asutus);
+                } else {
+                    cs.setString(25, "");
+                    cs.setString(26, "");
+                }
 
-	            cs.executeUpdate();
-	            cs.close();
+                cs.executeUpdate();
+                cs.close();
 
-	            // Lisame staatuse ajaloo kirje
-	            DocumentStatusHistory historyEntry = new DocumentStatusHistory(0, m_id, m_sendStatusID, m_statusDate, m_fault, m_recipientStatusID, m_metaXML);
-	            historyEntry.addToDB(conn, xTeePais);
+                // Lisame staatuse ajaloo kirje
+                DocumentStatusHistory historyEntry = new DocumentStatusHistory(
+                        0, m_id, m_sendStatusID, m_statusDate, m_fault, m_recipientStatusID, m_metaXML);
+                historyEntry.addToDB(conn, xTeePais);
 
-	            conn.commit();
-        	} catch (SQLException ex) {
-        		logger.error("Error while saving recipient data: ", ex);
-        		conn.rollback();
-        		throw ex;
-        	} finally {
-        		conn.setAutoCommit(defaultAutoCommit);
-        	}
+                conn.commit();
+            } catch (SQLException ex) {
+                logger.error("Error while saving recipient data: ", ex);
+                conn.rollback();
+                throw ex;
+            } finally {
+                conn.setAutoCommit(defaultAutoCommit);
+            }
             return m_id;
         } else {
-        	throw new IllegalArgumentException("Database connection is NULL!");
+            throw new IllegalArgumentException("Database connection is NULL!");
         }
     }
 
     public boolean updateProc(Connection conn, XHeader xTeePais) throws SQLException, IllegalArgumentException {
         if (conn != null) {
             Calendar cal = Calendar.getInstance();
-        	boolean defaultAutoCommit = conn.getAutoCommit();
-        	conn.setAutoCommit(false);
+            boolean defaultAutoCommit = conn.getAutoCommit();
+            conn.setAutoCommit(false);
 
-        	try {
-	            StringReader r = new StringReader(m_metaXML);
-	            CallableStatement cs = conn.prepareCall("{call UPDATE_VASTUVOTJA(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+            try {
+                StringReader r = new StringReader(m_metaXML);
+                CallableStatement cs = conn.prepareCall("{call UPDATE_VASTUVOTJA(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
 
-	            cs.setInt(2, m_sendingID);
-	            cs = CommonMethods.setNullableIntParam(cs, 3, m_organizationID);
-	            cs = CommonMethods.setNullableIntParam(cs, 4, m_positionID);
-	            cs = CommonMethods.setNullableIntParam(cs, 5, m_divisionID);
-	            cs.setString(6, m_personalIdCode);
-	            cs.setString(7, m_email);
-	            cs.setString(8, m_name);
-	            cs.setString(9, m_organizationName);
-	            cs.setString(10, m_departmentNumber);
-	            cs.setString(11, m_departmentName);
-	            cs.setInt(12, m_sendingMethodID);
-	            cs.setInt(13, m_sendStatusID);
-	            cs.setTimestamp(14, CommonMethods.sqlDateFromDate(m_sendingStartDate), cal);
-	            cs.setTimestamp(15, CommonMethods.sqlDateFromDate(m_sendingEndDate), cal);
+                cs.setInt(2, m_sendingID);
+                cs = CommonMethods.setNullableIntParam(cs, 3, m_organizationID);
+                cs = CommonMethods.setNullableIntParam(cs, 4, m_positionID);
+                cs = CommonMethods.setNullableIntParam(cs, 5, m_divisionID);
+                cs.setString(6, m_personalIdCode);
+                cs.setString(7, m_email);
+                cs.setString(8, m_name);
+                cs.setString(9, m_organizationName);
+                cs.setString(10, m_departmentNumber);
+                cs.setString(11, m_departmentName);
+                cs.setInt(12, m_sendingMethodID);
+                cs.setInt(13, m_sendStatusID);
+                cs.setTimestamp(14, CommonMethods.sqlDateFromDate(m_sendingStartDate), cal);
+                cs.setTimestamp(15, CommonMethods.sqlDateFromDate(m_sendingEndDate), cal);
 
-	            if (m_fault != null) {
-	                cs.setString(16, CommonMethods.TruncateString(m_fault.getFaultCode(), 50));
-	                cs.setString(17, CommonMethods.TruncateString(m_fault.getFaultActor(), 250));
-	                cs.setString(18, CommonMethods.TruncateString(m_fault.getFaultString(), 500));
-	                cs.setString(19, CommonMethods.TruncateString(m_fault.getFaultDetail(), 2000));
-	            } else {
-	                cs.setString(16, "");
-	                cs.setString(17, "");
-	                cs.setString(18, "");
-	                cs.setString(19, "");
-	            }
+                if (m_fault != null) {
+                    cs.setString(16, CommonMethods.TruncateString(m_fault.getFaultCode(), 50));
+                    cs.setString(17, CommonMethods.TruncateString(m_fault.getFaultActor(), 250));
+                    cs.setString(18, CommonMethods.TruncateString(m_fault.getFaultString(), 500));
+                    cs.setString(19, CommonMethods.TruncateString(m_fault.getFaultDetail(), 2000));
+                } else {
+                    cs.setString(16, "");
+                    cs.setString(17, "");
+                    cs.setString(18, "");
+                    cs.setString(19, "");
+                }
 
-	            cs = CommonMethods.setNullableIntParam(cs, 20, m_recipientStatusID);
-	            cs.setCharacterStream(21, r, m_metaXML.length());
-	            cs = CommonMethods.setNullableIntParam(cs, 22, m_idInRemoteServer);
-	            cs.setString(23, m_divisionShortName);
-	            cs.setString(24, m_positionShortName);
+                cs = CommonMethods.setNullableIntParam(cs, 20, m_recipientStatusID);
+                cs.setCharacterStream(21, r, m_metaXML.length());
+                cs = CommonMethods.setNullableIntParam(cs, 22, m_idInRemoteServer);
+                cs.setString(23, m_divisionShortName);
+                cs.setString(24, m_positionShortName);
 
-	            if (xTeePais != null) {
-	            	cs.setString("xtee_isikukood", xTeePais.isikukood);
-	                cs.setString("xtee_asutus", xTeePais.asutus);
-	    		} else {
-	    			cs.setString("xtee_isikukood", "");
-	                cs.setString("xtee_asutus", "");
-	    		}
+                if (xTeePais != null) {
+                    cs.setString("xtee_isikukood", xTeePais.isikukood);
+                    cs.setString("xtee_asutus", xTeePais.asutus);
+                } else {
+                    cs.setString("xtee_isikukood", "");
+                    cs.setString("xtee_asutus", "");
+                }
 
-	            cs.executeUpdate();
-	            cs.close();
+                cs.executeUpdate();
+                cs.close();
 
-	            // Lisame staatuse ajaloo kirje
-	            DocumentStatusHistory historyEntry = new DocumentStatusHistory(0, m_id, m_sendStatusID, m_statusDate, m_fault, m_recipientStatusID, m_metaXML);
-	            historyEntry.addToDB(conn, xTeePais);
+                // Lisame staatuse ajaloo kirje
+                DocumentStatusHistory historyEntry = new DocumentStatusHistory(
+                        0, m_id, m_sendStatusID, m_statusDate, m_fault, m_recipientStatusID, m_metaXML);
+                historyEntry.addToDB(conn, xTeePais);
 
-	            conn.commit();
-        	} catch (SQLException ex) {
-        		conn.rollback();
-        		throw ex;
-        	} finally {
-        		conn.setAutoCommit(defaultAutoCommit);
-        	}
+                conn.commit();
+            } catch (SQLException ex) {
+                conn.rollback();
+                throw ex;
+            } finally {
+                conn.setAutoCommit(defaultAutoCommit);
+            }
 
             return true;
         } else {
-        	throw new IllegalArgumentException("Database connection is NULL!");
+            throw new IllegalArgumentException("Database connection is NULL!");
         }
     }
 
     public boolean update(Connection conn, XHeader xTeePais) throws SQLException, IllegalArgumentException {
         if (conn != null) {
             Calendar cal = Calendar.getInstance();
-        	boolean defaultAutoCommit = conn.getAutoCommit();
-        	conn.setAutoCommit(false);
+            boolean defaultAutoCommit = conn.getAutoCommit();
+            conn.setAutoCommit(false);
 
-        	try {
-	            StringReader r = new StringReader(m_metaXML);
-	            CallableStatement cs = conn.prepareCall("UPDATE vastuvotja SET transport_id=?, asutus_id=?, ametikoht_id=?, allyksus_id=?, isikukood=?, email=?, nimi=?, asutuse_nimi=?, osakonna_nr=?, osakonna_nimi=?, saatmisviis_id=?, staatus_id=?, saatmise_algus=?, saatmise_lopp=?, fault_code=?, fault_actor=?, fault_string=?, fault_detail=?, vastuvotja_staatus_id=?, metaxml=?, dok_id_teises_serveris=?, allyksuse_lyhinimetus=?, ametikoha_lyhinimetus=? WHERE vastuvotja_id=?");
-	            cs.setInt(1, m_sendingID);
-	            cs = CommonMethods.setNullableIntParam(cs, 2, m_organizationID);
-	            cs = CommonMethods.setNullableIntParam(cs, 3, m_positionID);
-	            cs = CommonMethods.setNullableIntParam(cs, 4, m_divisionID);
-	            cs.setString(5, m_personalIdCode);
-	            cs.setString(6, m_email);
-	            cs.setString(7, m_name);
-	            cs.setString(8, m_organizationName);
-	            cs.setString(9, m_departmentNumber);
-	            cs.setString(10, m_departmentName);
-	            cs.setInt(11, m_sendingMethodID);
-	            cs.setInt(12, m_sendStatusID);
-	            cs.setTimestamp(13, CommonMethods.sqlDateFromDate(m_sendingStartDate), cal);
-	            cs.setTimestamp(14, CommonMethods.sqlDateFromDate(m_sendingEndDate), cal);
+            try {
+                StringReader r = new StringReader(m_metaXML);
+                CallableStatement cs = conn.prepareCall(
+                        "UPDATE vastuvotja SET transport_id=?, "
+                                + "asutus_id=?, ametikoht_id=?, allyksus_id=?, "
+                                + "isikukood=?, email=?, nimi=?, asutuse_nimi=?, "
+                                + "osakonna_nr=?, osakonna_nimi=?, saatmisviis_id=?, "
+                                + "staatus_id=?, saatmise_algus=?, saatmise_lopp=?, fault_code=?, "
+                                + "fault_actor=?, fault_string=?, fault_detail=?, vastuvotja_staatus_id=?, "
+                                + "metaxml=?, dok_id_teises_serveris=?, allyksuse_lyhinimetus=?, "
+                                + "ametikoha_lyhinimetus=? WHERE vastuvotja_id=?");
+                cs.setInt(1, m_sendingID);
+                cs = CommonMethods.setNullableIntParam(cs, 2, m_organizationID);
+                cs = CommonMethods.setNullableIntParam(cs, 3, m_positionID);
+                cs = CommonMethods.setNullableIntParam(cs, 4, m_divisionID);
+                cs.setString(5, m_personalIdCode);
+                cs.setString(6, m_email);
+                cs.setString(7, m_name);
+                cs.setString(8, m_organizationName);
+                cs.setString(9, m_departmentNumber);
+                cs.setString(10, m_departmentName);
+                cs.setInt(11, m_sendingMethodID);
+                cs.setInt(12, m_sendStatusID);
+                cs.setTimestamp(13, CommonMethods.sqlDateFromDate(m_sendingStartDate), cal);
+                cs.setTimestamp(14, CommonMethods.sqlDateFromDate(m_sendingEndDate), cal);
 
-	            if (m_fault != null) {
-	                cs.setString(15, CommonMethods.TruncateString(m_fault.getFaultCode(), 50));
-	                cs.setString(16, CommonMethods.TruncateString(m_fault.getFaultActor(), 250));
-	                cs.setString(17, CommonMethods.TruncateString(m_fault.getFaultString(), 500));
-	                cs.setString(18, CommonMethods.TruncateString(m_fault.getFaultDetail(), 2000));
-	            } else {
-	                cs.setString(15, "");
-	                cs.setString(16, "");
-	                cs.setString(17, "");
-	                cs.setString(18, "");
-	            }
+                if (m_fault != null) {
+                    cs.setString(15, CommonMethods.TruncateString(m_fault.getFaultCode(), 50));
+                    cs.setString(16, CommonMethods.TruncateString(m_fault.getFaultActor(), 250));
+                    cs.setString(17, CommonMethods.TruncateString(m_fault.getFaultString(), 500));
+                    cs.setString(18, CommonMethods.TruncateString(m_fault.getFaultDetail(), 2000));
+                } else {
+                    cs.setString(15, "");
+                    cs.setString(16, "");
+                    cs.setString(17, "");
+                    cs.setString(18, "");
+                }
 
-	            cs = CommonMethods.setNullableIntParam(cs, 19, m_recipientStatusID);
-	            cs.setCharacterStream(20, r, m_metaXML.length());
-	            cs = CommonMethods.setNullableIntParam(cs, 21, m_idInRemoteServer);
-	            cs.setString(22, m_divisionShortName);
-	            cs.setString(23, m_positionShortName);
+                cs = CommonMethods.setNullableIntParam(cs, 19, m_recipientStatusID);
+                cs.setCharacterStream(20, r, m_metaXML.length());
+                cs = CommonMethods.setNullableIntParam(cs, 21, m_idInRemoteServer);
+                cs.setString(22, m_divisionShortName);
+                cs.setString(23, m_positionShortName);
 
-	            cs.setInt(24, m_id);
+                cs.setInt(24, m_id);
 
-	            cs.executeUpdate();
-	            cs.close();
+                cs.executeUpdate();
+                cs.close();
 
-	            // Lisame staatuse ajaloo kirje
-	            DocumentStatusHistory historyEntry = new DocumentStatusHistory(0, m_id, m_sendStatusID, m_statusDate, m_fault, m_recipientStatusID, m_metaXML);
-	            historyEntry.addToDB(conn, xTeePais);
+                // Lisame staatuse ajaloo kirje
+                DocumentStatusHistory historyEntry = new DocumentStatusHistory(
+                        0, m_id, m_sendStatusID, m_statusDate, m_fault, m_recipientStatusID, m_metaXML);
+                historyEntry.addToDB(conn, xTeePais);
 
-	            conn.commit();
-        	} catch (SQLException ex) {
-        		conn.rollback();
-        		throw ex;
-        	} finally {
-        		conn.setAutoCommit(defaultAutoCommit);
-        	}
+                conn.commit();
+            } catch (SQLException ex) {
+                conn.rollback();
+                throw ex;
+            } finally {
+                conn.setAutoCommit(defaultAutoCommit);
+            }
 
             return true;
         } else {
-        	throw new IllegalArgumentException("Database connection is NULL!");
+            throw new IllegalArgumentException("Database connection is NULL!");
         }
     }
 
@@ -561,7 +574,7 @@ public class Recipient {
             cs.close();
             return result;
         } else {
-        	throw new IllegalArgumentException("Database connection is NULL!");
+            throw new IllegalArgumentException("Database connection is NULL!");
         }
     }
 
@@ -622,7 +635,7 @@ public class Recipient {
             xmlWriter.write("</saaja>");
             return true;
         } catch (Exception ex) {
-        	logger.error(ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
             return false;
         }
     }
@@ -650,7 +663,7 @@ public class Recipient {
                 xmlReader.next();
 
                 if (xmlReader.hasName()) {
-                	if ((xmlReader.getLocalName().equalsIgnoreCase("saaja")
+                    if ((xmlReader.getLocalName().equalsIgnoreCase("saaja")
                             || xmlReader.getLocalName().equalsIgnoreCase("DecRecipient"))
                             && xmlReader.isEndElement()) {
                         // Kui oleme jõudnud saaja elemendi lõppu, siis katkestame tsükli
@@ -688,15 +701,15 @@ public class Recipient {
                                     positionID = Integer.parseInt(positionIDText);
                                     result.setPositionID(positionID);
                                 } catch (Exception ex) {
-                                	logger.error(ex.getMessage(), ex);
+                                    logger.error(ex.getMessage(), ex);
                                 }
                             }
                         }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("ametikoha_lyhinimetus") && xmlReader.isStartElement()) {
                         xmlReader.next();
                         if (xmlReader.isCharacters()) {
-                             occupationShortName = xmlReader.getText().trim();
-                             result.setPositionShortName(occupationShortName);
+                            occupationShortName = xmlReader.getText().trim();
+                            result.setPositionShortName(occupationShortName);
                         }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("allyksuse_kood") && xmlReader.isStartElement()) {
                         xmlReader.next();
@@ -708,7 +721,7 @@ public class Recipient {
                                     divisionID = Integer.parseInt(divisionIDText);
                                     result.setDivisionID(divisionID);
                                 } catch (Exception ex) {
-                                	logger.error(ex.getMessage(), ex);
+                                    logger.error(ex.getMessage(), ex);
                                 }
                             }
                         }
@@ -717,8 +730,8 @@ public class Recipient {
                             && xmlReader.isStartElement()) {
                         xmlReader.next();
                         if (xmlReader.isCharacters()) {
-                             subdivisionShortName = xmlReader.getText().trim();
-                             result.setDivisionShortName(subdivisionShortName);
+                            subdivisionShortName = xmlReader.getText().trim();
+                            result.setDivisionShortName(subdivisionShortName);
                         }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("epost") && xmlReader.isStartElement()) {
                         xmlReader.next();
@@ -768,27 +781,27 @@ public class Recipient {
             // siis peab asutus kindlasti määratud ja DHL-võimeline olema!
             if ((orgID < 1)) {
                 throw new AxisFault(CommonStructures.VIGA_PUUDULIKUD_VASTUVOTJA_KONTAKTID
-                	.replaceFirst("#1", orgCode));
+                        .replaceFirst("#1", orgCode));
             }
 
             // Tuvastame osakonna lühinime järgi osakonna ID
             // Seda ei saa enne teha, kui kogu XML on läbi käidud, kuna ametikoha
             // leidmiseks peab lisaks lühinimele tedma ka asutuse ID-d.
             if ((occupationShortName != null) && (occupationShortName.length() > 0)) {
-            	int occupationId = Ametikoht.getIdByShortName(orgID, occupationShortName, conn);
-            	if (occupationId > 0) {
-            		result.setPositionID(occupationId);
-            	}
+                int occupationId = Ametikoht.getIdByShortName(orgID, occupationShortName, conn);
+                if (occupationId > 0) {
+                    result.setPositionID(occupationId);
+                }
             }
 
             // Tuvastame allüksuse lühinime järgi allüksuse ID
             // Seda ei saa enne teha, kui kogu XML on läbi käidud, kuna allüksuse
             // leidmiseks peab lisaks lühinimele tedma ka asutuse ID-d.
             if ((subdivisionShortName != null) && (subdivisionShortName.length() > 0)) {
-            	int subdivisionId = Allyksus.getIdByShortName(orgID, subdivisionShortName, conn);
-            	if (subdivisionId > 0) {
-            		result.setDivisionID(subdivisionId);
-            	}
+                int subdivisionId = Allyksus.getIdByShortName(orgID, subdivisionShortName, conn);
+                if (subdivisionId > 0) {
+                    result.setDivisionID(subdivisionId);
+                }
             }
 
             // Kui asutusele on võimalik saata X-Tee kaudu, siis saadame X-Tee kaudu.
@@ -801,7 +814,7 @@ public class Recipient {
             result.setSendingMethodID(sendingMethod);
             return result;
         } catch (XMLStreamException ex) {
-        	logger.error(ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
             throw new AxisFault("Exception parsing DVK message recipient section: " + ex.getMessage());
         }
     }
@@ -810,21 +823,20 @@ public class Recipient {
      * Copies DVK-specific and recipient-specific information
      * from another recipient instance to this recipient instance.
      *
-     * @param anotherRecipient
-     * 		Recipient to copy sending status data from
+     * @param anotherRecipient Recipient to copy sending status data from
      */
     public void copyStatusInformationFromAnotherInstance(Recipient anotherRecipient) {
-    	if (anotherRecipient != null) {
-	    	// DVK status ID and sending end date
-	    	this.setSendStatusID(anotherRecipient.getSendStatusID());
-	    	this.setSendingEndDate(anotherRecipient.getSendingEndDate());
+        if (anotherRecipient != null) {
+            // DVK status ID and sending end date
+            this.setSendStatusID(anotherRecipient.getSendStatusID());
+            this.setSendingEndDate(anotherRecipient.getSendingEndDate());
 
-	    	// Recipient-specific status information
-	    	this.setRecipientStatusId(anotherRecipient.getRecipientStatusId());
-	    	this.setMetaXML(anotherRecipient.getMetaXML());
-	    	this.setFault(anotherRecipient.getFault());
-    	} else {
-    		logger.warn("Unable to copy recipient status from another recipient instance because the other instance is NULL!");
-    	}
+            // Recipient-specific status information
+            this.setRecipientStatusId(anotherRecipient.getRecipientStatusId());
+            this.setMetaXML(anotherRecipient.getMetaXML());
+            this.setFault(anotherRecipient.getFault());
+        } else {
+            logger.warn("Unable to copy recipient status from another recipient instance because the other instance is NULL!");
+        }
     }
 }

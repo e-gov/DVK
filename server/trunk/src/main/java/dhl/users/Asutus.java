@@ -12,6 +12,7 @@ import dvk.client.iostructures.GetSendingOptionsV3ResponseType;
 import dvk.core.CommonMethods;
 import dvk.core.HeaderVariables;
 import dvk.core.Settings;
+
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -19,6 +20,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+
 import org.apache.axis.AxisFault;
 
 public class Asutus {
@@ -60,6 +62,14 @@ public class Asutus {
     private String m_toetatavDVKVersioon;
     private int m_serverID;
     private int m_aarID;
+
+    public Asutus() {
+        clear();
+    }
+
+    public Asutus(int id, Connection conn) {
+        loadByID(id, conn);
+    }
 
     public void setId(int id) {
         this.m_id = id;
@@ -349,10 +359,6 @@ public class Asutus {
         return m_toetatavDVKVersioon;
     }
 
-    public Asutus(int id, Connection conn) {
-        loadByID(id, conn);
-    }
-
     public int getServerID() {
         return m_serverID;
     }
@@ -367,10 +373,6 @@ public class Asutus {
 
     public void setAarID(int value) {
         m_aarID = value;
-    }
-
-    public Asutus() {
-        clear();
     }
 
     public void clear() {
@@ -418,7 +420,8 @@ public class Asutus {
         try {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
-                CallableStatement cs = conn.prepareCall("{call GET_ASUTUSBYID(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                CallableStatement cs = conn.prepareCall(
+                        "{call GET_ASUTUSBYID(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 cs.setInt("id", id);
                 cs.registerOutParameter("registrikood", Types.VARCHAR);
                 cs.registerOutParameter("registrikood_vana", Types.VARCHAR);
@@ -490,8 +493,8 @@ public class Asutus {
                 m_muudetud = cs.getTimestamp("muudetud", cal);
                 m_muutja = cs.getString("muutja");
                 m_parameetrid = cs.getString("parameetrid");
-                m_dvkSaatmine = (cs.getInt("dhl_saatmine") > 0);
-                m_dvkOtseSaatmine = (cs.getInt("dhl_otse_saatmine") > 0);
+                m_dvkSaatmine = cs.getInt("dhl_saatmine") > 0;
+                m_dvkOtseSaatmine = cs.getInt("dhl_otse_saatmine") > 0;
                 m_dhsNimetus = cs.getString("dhs_nimetus");
                 m_toetatavDVKVersioon = cs.getString("toetatav_dvk_versioon");
                 m_serverID = cs.getInt("server_id");
@@ -510,7 +513,8 @@ public class Asutus {
         try {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
-                CallableStatement cs = conn.prepareCall("{call GET_ASUTUSBYREGNR(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                CallableStatement cs = conn.prepareCall(
+                        "{call GET_ASUTUSBYREGNR(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 cs.setString("registrikood", registrikood);
                 cs.registerOutParameter("id", Types.INTEGER);
                 cs.registerOutParameter("registrikood_vana", Types.VARCHAR);
@@ -582,8 +586,8 @@ public class Asutus {
                 m_muudetud = cs.getTimestamp("muudetud", cal);
                 m_muutja = cs.getString("muutja");
                 m_parameetrid = cs.getString("parameetrid");
-                m_dvkSaatmine = (cs.getInt("dhl_saatmine") > 0);
-                m_dvkOtseSaatmine = (cs.getInt("dhl_otse_saatmine") > 0);
+                m_dvkSaatmine = cs.getInt("dhl_saatmine") > 0;
+                m_dvkOtseSaatmine = cs.getInt("dhl_otse_saatmine") > 0;
                 m_dhsNimetus = cs.getString("dhs_nimetus");
                 m_toetatavDVKVersioon = cs.getString("toetatav_dvk_versioon");
                 m_serverID = cs.getInt("server_id");
@@ -603,7 +607,7 @@ public class Asutus {
             if (conn != null) {
                 CallableStatement cs = conn.prepareCall("{call GET_ASUTUSIDBYREGNR(?,?,?)}");
                 cs.setString("registrikood", registrikood);
-                cs.setInt("dvk_voimeline", (ainultDvkVoimelised ? 1 : 0));
+                cs.setInt("dvk_voimeline", ainultDvkVoimelised ? 1 : 0);
                 cs.registerOutParameter("id", Types.INTEGER);
                 cs.executeUpdate();
                 int result = cs.getInt("id");
@@ -644,7 +648,7 @@ public class Asutus {
                 CallableStatement cs = conn.prepareCall("{call GET_ASUTUSLIST(?)}");
                 cs.registerOutParameter("RC1", oracle.jdbc.OracleTypes.CURSOR);
                 cs.execute();
-                ResultSet rs = (ResultSet)cs.getObject("RC1");
+                ResultSet rs = (ResultSet) cs.getObject("RC1");
                 ArrayList<Asutus> result = new ArrayList<Asutus>();
                 while (rs.next()) {
                     Asutus item = new Asutus();
@@ -680,8 +684,8 @@ public class Asutus {
                     item.setMuudetud(rs.getTimestamp("last_modified", cal));
                     item.setMuutja(rs.getString("username"));
                     item.setParameetrid(rs.getString("params"));
-                    item.setDvkSaatmine((rs.getInt("dhl_saatmine") > 0));
-                    item.setDvkOtseSaatmine((rs.getInt("dhl_otse_saatmine") > 0));
+                    item.setDvkSaatmine(rs.getInt("dhl_saatmine") > 0);
+                    item.setDvkOtseSaatmine(rs.getInt("dhl_otse_saatmine") > 0);
                     item.setDHSNimetus(rs.getString("dhs_nimetus"));
                     item.setToetatavDVKVersioon(rs.getString("toetatav_dvk_versioon"));
                     item.setServerID(rs.getInt("server_id"));
@@ -704,7 +708,8 @@ public class Asutus {
         try {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
-                CallableStatement cs = conn.prepareCall("{call ADD_ASUTUS(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                CallableStatement cs = conn.prepareCall(
+                        "{call ADD_ASUTUS(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 cs.registerOutParameter("id", Types.INTEGER);
                 cs.setString("registrikood", m_registrikood);
                 cs.setString("registrikood_vana", m_registrikoodVana);
@@ -737,17 +742,17 @@ public class Asutus {
                 cs.setTimestamp("muudetud", CommonMethods.sqlDateFromDate(m_muudetud), cal);
                 cs.setString("muutja", m_muutja);
                 cs.setString("parameetrid", m_parameetrid);
-                cs.setInt("dhl_saatmine", (m_dvkSaatmine ? 1 : 0));
-                cs.setInt("dhl_otse_saatmine", (m_dvkOtseSaatmine ? 1 : 0));
+                cs.setInt("dhl_saatmine", m_dvkSaatmine ? 1 : 0);
+                cs.setInt("dhl_otse_saatmine", m_dvkOtseSaatmine ? 1 : 0);
                 cs.setString("dhs_nimetus", m_dhsNimetus);
                 cs.setString("toetatav_dvk_versioon", m_toetatavDVKVersioon);
 
-                if(xTeePais != null) {
-                	cs.setString("xtee_isikukood", xTeePais.isikukood);
-                	cs.setString("xtee_asutus", xTeePais.asutus);
+                if (xTeePais != null) {
+                    cs.setString("xtee_isikukood", xTeePais.isikukood);
+                    cs.setString("xtee_asutus", xTeePais.asutus);
                 } else {
-                	cs.setString("xtee_isikukood", null);
-                	cs.setString("xtee_asutus", null);
+                    cs.setString("xtee_isikukood", null);
+                    cs.setString("xtee_asutus", null);
                 }
 
                 CommonMethods.setNullableIntParam(cs, "server_id", m_serverID);
@@ -766,7 +771,8 @@ public class Asutus {
         try {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
-                CallableStatement cs = conn.prepareCall("{call UPDATE_ASUTUS(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                CallableStatement cs = conn.prepareCall(
+                        "{call UPDATE_ASUTUS(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 cs.setInt("id", m_id);
                 cs.setString("registrikood", m_registrikood);
                 cs.setString("registrikood_vana", m_registrikoodVana);
@@ -799,17 +805,17 @@ public class Asutus {
                 cs.setTimestamp("muudetud", CommonMethods.sqlDateFromDate(m_muudetud), cal);
                 cs.setString("muutja", m_muutja);
                 cs.setString("parameetrid", m_parameetrid);
-                cs.setInt("dhl_saatmine", (m_dvkSaatmine ? 1 : 0));
-                cs.setInt("dhl_otse_saatmine", (m_dvkOtseSaatmine ? 1 : 0));
+                cs.setInt("dhl_saatmine", m_dvkSaatmine ? 1 : 0);
+                cs.setInt("dhl_otse_saatmine", m_dvkOtseSaatmine ? 1 : 0);
                 cs.setString("dhs_nimetus", m_dhsNimetus);
                 cs.setString("toetatav_dvk_versioon", m_toetatavDVKVersioon);
 
-                if(xTeePais != null) {
-                	cs.setString("xtee_isikukood", xTeePais.isikukood);
-                	cs.setString("xtee_asutus", xTeePais.asutus);
+                if (xTeePais != null) {
+                    cs.setString("xtee_isikukood", xTeePais.isikukood);
+                    cs.setString("xtee_asutus", xTeePais.asutus);
                 } else {
-                	cs.setString("xtee_isikukood", null);
-                	cs.setString("xtee_asutus", null);
+                    cs.setString("xtee_isikukood", null);
+                    cs.setString("xtee_asutus", null);
                 }
 
                 CommonMethods.setNullableIntParam(cs, "server_id", m_serverID);
@@ -844,33 +850,35 @@ public class Asutus {
                 RemoteServer server = servers.get(i);
                 dvkClient.initClient(server.getAddress(), server.getProducerName());
                 HeaderVariables header = new HeaderVariables(
-                    Settings.Client_DefaultOrganizationCode,
-                    Settings.Client_DefaultPersonCode,
-                    "",
-                    (CommonMethods.personalIDCodeHasCountryCode(Settings.Client_DefaultPersonCode) ? Settings.Client_DefaultPersonCode : "EE"+Settings.Client_DefaultPersonCode));
+                        Settings.Client_DefaultOrganizationCode,
+                        Settings.Client_DefaultPersonCode,
+                        "",
+                        CommonMethods.personalIDCodeHasCountryCode(Settings.Client_DefaultPersonCode)
+                                ? Settings.Client_DefaultPersonCode : "EE" + Settings.Client_DefaultPersonCode);
 
                 try {
-	                GetSendingOptionsV3ResponseType result = dvkClient.getSendingOptions(header, null, null, null, false, -1, -1, 1);
-	                if ((result != null) && (result.asutused != null)) {
-	                    for (int j = 0; j < result.asutused.size(); ++j) {
-	                    	DhlCapability item = result.asutused.get(j);
-	                        int testID = getIDByRegNr(item.getOrgCode(), false, conn);
-	                        if (testID <= 0) {
-	                            Asutus newOrg = new Asutus();
-	                            newOrg.setRegistrikood(item.getOrgCode());
-	                            newOrg.setNimetus(item.getOrgName());
-	                            newOrg.setDvkSaatmine(item.getIsDhlCapable());
-	                            newOrg.setDvkOtseSaatmine(item.getIsDhlDirectCapable());
-	                            newOrg.setServerID(server.getID());
-	                            newOrg.addToDB(conn, xTeePais);
-	                            if ((orgCodeToFind != null) && !orgCodeToFind.equalsIgnoreCase("") && (orgCodeToFind == item.getOrgCode())) {
-	                                foundMissingOrg = true;
-	                            }
-	                        }
-	                    }
-	                }
+                    GetSendingOptionsV3ResponseType result = dvkClient.getSendingOptions(header, null, null, null, false, -1, -1, 1);
+                    if ((result != null) && (result.asutused != null)) {
+                        for (int j = 0; j < result.asutused.size(); ++j) {
+                            DhlCapability item = result.asutused.get(j);
+                            int testID = getIDByRegNr(item.getOrgCode(), false, conn);
+                            if (testID <= 0) {
+                                Asutus newOrg = new Asutus();
+                                newOrg.setRegistrikood(item.getOrgCode());
+                                newOrg.setNimetus(item.getOrgName());
+                                newOrg.setDvkSaatmine(item.getIsDhlCapable());
+                                newOrg.setDvkOtseSaatmine(item.getIsDhlDirectCapable());
+                                newOrg.setServerID(server.getID());
+                                newOrg.addToDB(conn, xTeePais);
+                                if ((orgCodeToFind != null)
+                                        && !orgCodeToFind.equalsIgnoreCase("") && (orgCodeToFind == item.getOrgCode())) {
+                                    foundMissingOrg = true;
+                                }
+                            }
+                        }
+                    }
                 } catch (Exception ex) {
-                	CommonMethods.logError(ex, "dhl.users.Asutus", "getOrgsFromAllKnownServers");
+                    CommonMethods.logError(ex, "dhl.users.Asutus", "getOrgsFromAllKnownServers");
                 }
 
                 // If we found the necessary organization then let's not bother another server
@@ -890,7 +898,10 @@ public class Asutus {
                 orgCodes.add(orgs.get(i).getRegistrikood());
             }
 
-            AarClient aarClient = new AarClient(Settings.Server_CentralRightsDatabaseURL, Settings.Server_CentralRightsDatabaseOrgCode, Settings.Server_CentralRightsDatabasePersonCode);
+            AarClient aarClient = new AarClient(
+                    Settings.Server_CentralRightsDatabaseURL,
+                    Settings.Server_CentralRightsDatabaseOrgCode,
+                    Settings.Server_CentralRightsDatabasePersonCode);
             ArrayList<AarAsutus> aarOrgs = aarClient.asutusedRequest(orgCodes, null);
 
             AarAsutus aarOrg = null;
@@ -937,13 +948,13 @@ public class Asutus {
                         AarOigus aarRight = aarRights.get(j);
                         int ametikohtID = Ametikoht.getIdByAarID(aarRight.getAmetikohtID(), conn);
                         int allyksusID = Allyksus.getIdByAarID(aarRight.getAllyksusID(), conn);
-                        Kasutusoigus right = Kasutusoigus.getFromDB(aarRight.getOigusNimi(), aarOrg.getDvkID(), ametikohtID, allyksusID, conn);
+                        Kasutusoigus right = Kasutusoigus.getFromDB(
+                                aarRight.getOigusNimi(), aarOrg.getDvkID(), ametikohtID, allyksusID, conn);
                         Kasutusoigus.syncWithAar(right, aarRight, aarOrg.getDvkID(), ametikohtID, allyksusID, conn);
                     }
                 }
             }
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             CommonMethods.logError(ex, "dhl.users.Asutus", "runAarSyncronization");
         }
     }
@@ -969,7 +980,10 @@ public class Asutus {
                 // asutuste registris ei ole, siis laeme need keskregistrist
                 // ja salvestame kohalikku registrisse.
                 if (getTopOrgData) {
-                    AarClient aarClient = new AarClient(Settings.Server_CentralRightsDatabaseURL, Settings.Server_CentralRightsDatabaseOrgCode, Settings.Server_CentralRightsDatabasePersonCode);
+                    AarClient aarClient = new AarClient(
+                            Settings.Server_CentralRightsDatabaseURL,
+                            Settings.Server_CentralRightsDatabaseOrgCode,
+                            Settings.Server_CentralRightsDatabasePersonCode);
                     ArrayList<Integer> topOrgIDs = new ArrayList<Integer>();
                     ArrayList<AarAsutus> aarOrgs = aarClient.asutusedRequest(null, topOrgIDs);
                     if ((aarOrgs != null) && (aarOrgs.size() > 0)) {
@@ -1003,8 +1017,7 @@ public class Asutus {
 
 
             return org.getId();
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             CommonMethods.logError(ex, "dhl.users.Asutus", "SyncWithAar");
             return 0;
         }

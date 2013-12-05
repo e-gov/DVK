@@ -10,19 +10,22 @@ import dhl.users.Asutus;
 import dhl.users.UserProfile;
 import dvk.core.AttachmentExtractionResult;
 import dvk.core.CommonMethods;
+
 import java.sql.Connection;
 import java.util.ArrayList;
+
 import org.apache.axis.AxisFault;
 import org.apache.log4j.Logger;
 
 public class GetOccupationList {
 
-	private static Logger logger = Logger.getLogger(GetOccupationList.class);
+    private static Logger logger = Logger.getLogger(GetOccupationList.class);
 
-	public static getOccupationListResponseType V1(org.apache.axis.MessageContext context, Connection conn) throws AxisFault, RequestProcessingException {
-		logger.info("GetOccupationList.V1 invoked.");
+    public static getOccupationListResponseType V1(
+            org.apache.axis.MessageContext context, Connection conn) throws AxisFault, RequestProcessingException {
+        logger.info("GetOccupationList.V1 invoked.");
 
-		getOccupationListResponseType result = new getOccupationListResponseType();
+        getOccupationListResponseType result = new getOccupationListResponseType();
 
         // Laeme päringu keha endale sobivasse andmestruktuuri
         getOccupationListRequestType bodyData = getOccupationListRequestType.getFromSOAPBody(context);
@@ -46,10 +49,11 @@ public class GetOccupationList {
         return result;
     }
 
-    public static getOccupationListV2ResponseType V2(org.apache.axis.MessageContext context, Connection conn, UserProfile user) throws Exception {
-    	logger.info("GetOccupationList.V2 invoked.");
+    public static getOccupationListV2ResponseType V2(
+            org.apache.axis.MessageContext context, Connection conn, UserProfile user) throws Exception {
+        logger.info("GetOccupationList.V2 invoked.");
 
-    	getOccupationListV2ResponseType result = new getOccupationListV2ResponseType();
+        getOccupationListV2ResponseType result = new getOccupationListV2ResponseType();
 
         // Laeme päringu keha endale sobivasse andmestruktuuri
         getOccupationListV2RequestType bodyData = getOccupationListV2RequestType.getFromSOAPBody(context);

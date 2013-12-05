@@ -13,6 +13,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+
 import org.apache.log4j.Logger;
 import org.apache.xalan.xsltc.compiler.util.Type;
 
@@ -23,12 +24,12 @@ import dvk.core.Fault;
 import dvk.core.Settings;
 
 public class DocumentStatusHistory {
-	static Logger logger = Logger.getLogger(DocumentStatusHistory.class.getName());
-	private int m_id;
-	private int m_recipientId;
-	private int m_sendingStatusId;
-	private Date m_statusDate;
-	private Fault m_fault;
+    static Logger logger = Logger.getLogger(DocumentStatusHistory.class.getName());
+    private int m_id;
+    private int m_recipientId;
+    private int m_sendingStatusId;
+    private Date m_statusDate;
+    private Fault m_fault;
     private int m_recipientStatusId;
     private String m_metaXML;
 
@@ -37,6 +38,44 @@ public class DocumentStatusHistory {
     private String m_personCode;
     private String m_subdivisionShortName;
     private String m_occupationShortName;
+
+    public DocumentStatusHistory() {
+        this.m_id = 0;
+        this.m_recipientId = 0;
+        this.m_sendingStatusId = 0;
+        this.m_statusDate = null;
+        this.m_fault = null;
+        this.m_recipientStatusId = 0;
+        this.m_metaXML = "";
+
+        this.m_orgCode = "";
+        this.m_personCode = "";
+        this.m_subdivisionShortName = "";
+        this.m_occupationShortName = "";
+    }
+
+    public DocumentStatusHistory(
+            int id,
+            int recipientId,
+            int sendingStatusId,
+            Date statusDate,
+            Fault fault,
+            int recipientStatusId,
+            String metaXml) {
+
+        this.m_id = id;
+        this.m_recipientId = recipientId;
+        this.m_sendingStatusId = sendingStatusId;
+        this.m_statusDate = statusDate;
+        this.m_fault = fault;
+        this.m_recipientStatusId = recipientStatusId;
+        this.m_metaXML = metaXml;
+
+        this.m_orgCode = "";
+        this.m_personCode = "";
+        this.m_subdivisionShortName = "";
+        this.m_occupationShortName = "";
+    }
 
     public int getId() {
         return this.m_id;
@@ -127,44 +166,6 @@ public class DocumentStatusHistory {
         this.m_occupationShortName = value;
     }
 
-    public DocumentStatusHistory() {
-    	this.m_id = 0;
-    	this.m_recipientId = 0;
-    	this.m_sendingStatusId = 0;
-    	this.m_statusDate = null;
-    	this.m_fault = null;
-    	this.m_recipientStatusId = 0;
-    	this.m_metaXML = "";
-
-    	this.m_orgCode = "";
-    	this.m_personCode = "";
-    	this.m_subdivisionShortName = "";
-    	this.m_occupationShortName = "";
-    }
-
-    public DocumentStatusHistory(
-    	int id,
-    	int recipientId,
-    	int sendingStatusId,
-    	Date statusDate,
-    	Fault fault,
-    	int recipientStatusId,
-    	String metaXml) {
-
-    	this.m_id = id;
-    	this.m_recipientId = recipientId;
-    	this.m_sendingStatusId = sendingStatusId;
-    	this.m_statusDate = statusDate;
-    	this.m_fault = fault;
-    	this.m_recipientStatusId = recipientStatusId;
-    	this.m_metaXML = metaXml;
-
-    	this.m_orgCode = "";
-    	this.m_personCode = "";
-    	this.m_subdivisionShortName = "";
-    	this.m_occupationShortName = "";
-    }
-
     public int addToDB(Connection conn, XHeader xTeePais) throws SQLException, IllegalArgumentException {
         if (conn != null) {
             Calendar cal = Calendar.getInstance();
@@ -192,12 +193,12 @@ public class DocumentStatusHistory {
             cs = CommonMethods.setNullableIntParam(cs, "vastuvotja_staatus_id", m_recipientStatusId);
 
             if (xTeePais != null) {
-            	cs.setString("xtee_isikukood", xTeePais.isikukood);
+                cs.setString("xtee_isikukood", xTeePais.isikukood);
                 cs.setString("xtee_asutus", xTeePais.asutus);
-    		} else {
-    			cs.setString("xtee_isikukood", null);
+            } else {
+                cs.setString("xtee_isikukood", null);
                 cs.setString("xtee_asutus", null);
-    		}
+            }
 
             cs.setCharacterStream("metaxml", r, m_metaXML.length());
 
@@ -209,11 +210,12 @@ public class DocumentStatusHistory {
 
             return m_id;
         } else {
-        	throw new IllegalArgumentException("Database connection is NULL!");
+            throw new IllegalArgumentException("Database connection is NULL!");
         }
     }
 
-    public static ArrayList<DocumentStatusHistory> getList(int documentId, Connection conn) throws IllegalArgumentException, IOException, SQLException {
+    public static ArrayList<DocumentStatusHistory> getList(int documentId, Connection conn)
+                                                        throws IllegalArgumentException, IOException, SQLException {
         if (conn != null) {
             Calendar cal = Calendar.getInstance();
             CallableStatement cs = conn.prepareCall("{call GET_DOCUMENTSTATUSHISTORY(?,?)}");
@@ -223,13 +225,13 @@ public class DocumentStatusHistory {
             ResultSet rs = (ResultSet) cs.getObject("RC1");
             ArrayList<DocumentStatusHistory> result = new ArrayList<DocumentStatusHistory>();
             while (rs.next()) {
-            	DocumentStatusHistory item = new DocumentStatusHistory();
-            	item.setId(rs.getInt("staatuse_ajalugu_id"));
-            	item.setRecipientId(rs.getInt("vastuvotja_id"));
-            	item.setSendingStatusId(rs.getInt("staatus_id"));
-            	item.setStatusDate(rs.getTimestamp("staatuse_muutmise_aeg", cal));
+                DocumentStatusHistory item = new DocumentStatusHistory();
+                item.setId(rs.getInt("staatuse_ajalugu_id"));
+                item.setRecipientId(rs.getInt("vastuvotja_id"));
+                item.setSendingStatusId(rs.getInt("staatus_id"));
+                item.setStatusDate(rs.getTimestamp("staatuse_muutmise_aeg", cal));
 
-            	String faultString = rs.getString("fault_string");
+                String faultString = rs.getString("fault_string");
                 if ((faultString != null) && (faultString.length() > 0)) {
                     Fault f = new Fault(rs.getString("fault_code"), rs.getString("fault_actor"), faultString, rs.getString("fault_detail"));
                     item.setFault(f);
@@ -259,7 +261,7 @@ public class DocumentStatusHistory {
             cs.close();
             return result;
         } else {
-        	throw new IllegalArgumentException("Database connection is NULL!");
+            throw new IllegalArgumentException("Database connection is NULL!");
         }
     }
 
@@ -308,7 +310,7 @@ public class DocumentStatusHistory {
 
         // Fault
         if (m_fault != null) {
-        	m_fault.appendObjectXML(xmlWriter);
+            m_fault.appendObjectXML(xmlWriter);
         }
 
         // Vastuvõtja saadetud staatus

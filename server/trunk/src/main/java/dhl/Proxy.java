@@ -6,12 +6,14 @@ import dhl.users.Ametikoht;
 import dhl.users.Asutus;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
+
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Types;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+
 import org.apache.axis.AxisFault;
 
 public class Proxy {
@@ -34,19 +36,19 @@ public class Proxy {
     }
 
     public Proxy(
-        int id,
-        int sendingID,
-        int organizationID,
-        int positionID,
-        int divisionID,
-        String personalIdCode,
-        String name,
-        String organizationName,
-        String email,
-        String departmentNumber,
-        String departmentName,
-        String positionShortName,
-        String divisionShortName) {
+            int id,
+            int sendingID,
+            int organizationID,
+            int positionID,
+            int divisionID,
+            String personalIdCode,
+            String name,
+            String organizationName,
+            String email,
+            String departmentNumber,
+            String departmentName,
+            String positionShortName,
+            String divisionShortName) {
         m_id = id;
         m_sendingID = sendingID;
         m_organizationID = organizationID;
@@ -241,12 +243,12 @@ public class Proxy {
             cs.setString("division_short_name", m_divisionShortName);
 
             if (xTeePais != null) {
-            	cs.setString("xtee_isikukood", xTeePais.isikukood);
+                cs.setString("xtee_isikukood", xTeePais.isikukood);
                 cs.setString("xtee_asutus", xTeePais.asutus);
-    		} else {
-    			cs.setString("xtee_isikukood", null);
+            } else {
+                cs.setString("xtee_isikukood", null);
                 cs.setString("xtee_asutus", null);
-    		}
+            }
 
             cs.executeUpdate();
             m_id = cs.getInt("proxy_id");
@@ -257,8 +259,7 @@ public class Proxy {
         }
     }
 
-    public static Proxy fromXML(XMLStreamReader xmlReader, Connection conn) throws AxisFault
-    {
+    public static Proxy fromXML(XMLStreamReader xmlReader, Connection conn) throws AxisFault {
         try {
             Proxy result = new Proxy();
 
@@ -306,10 +307,10 @@ public class Proxy {
                             }
                         }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("ametikoha_lyhinimetus") && xmlReader.isStartElement()) {
-	                    xmlReader.next();
-	                    if (xmlReader.isCharacters()) {
-	                         occupationShortName = xmlReader.getText().trim();
-	                    }
+                        xmlReader.next();
+                        if (xmlReader.isCharacters()) {
+                            occupationShortName = xmlReader.getText().trim();
+                        }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("allyksuse_kood") && xmlReader.isStartElement()) {
                         xmlReader.next();
                         if (xmlReader.isCharacters()) {
@@ -327,7 +328,7 @@ public class Proxy {
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("allyksuse_lyhinimetus") && xmlReader.isStartElement()) {
                         xmlReader.next();
                         if (xmlReader.isCharacters()) {
-                             subdivisionShortName = xmlReader.getText().trim();
+                            subdivisionShortName = xmlReader.getText().trim();
                         }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("epost") && xmlReader.isStartElement()) {
                         xmlReader.next();
@@ -339,8 +340,7 @@ public class Proxy {
                         if (xmlReader.isCharacters()) {
                             result.setName(xmlReader.getText().trim());
                         }
-                    }
-                    else if (xmlReader.getLocalName().equalsIgnoreCase("asutuse_nimi") && xmlReader.isStartElement()) {
+                    } else if (xmlReader.getLocalName().equalsIgnoreCase("asutuse_nimi") && xmlReader.isStartElement()) {
                         xmlReader.next();
                         if (xmlReader.isCharacters()) {
                             result.setOrganizationName(xmlReader.getText().trim());
@@ -367,32 +367,31 @@ public class Proxy {
             // Kui vahendajaks märgitud asutus ei kuulu DVK kasutajate hulka,
             // siis teavitame sellest kasutajat.
             if (orgID < 1) {
-                throw new AxisFault(CommonStructures.VIGA_TUNDMATU_VAHENDAJA_ASUTUS.replaceFirst("#1",orgCode));
+                throw new AxisFault(CommonStructures.VIGA_TUNDMATU_VAHENDAJA_ASUTUS.replaceFirst("#1", orgCode));
             }
 
             // Tuvastame osakonna lühinime järgi osakonna ID
             // Seda ei saa enne teha, kui kogu XML on läbi käidud, kuna ametikoha
             // leidmiseks peab lisaks lühinimele tedma ka asutuse ID-d.
             if ((occupationShortName != null) && (occupationShortName.length() > 0)) {
-            	int occupationId = Ametikoht.getIdByShortName(orgID, occupationShortName, conn);
-            	if (occupationId > 0) {
-            		result.setPositionID(occupationId);
-            	}
+                int occupationId = Ametikoht.getIdByShortName(orgID, occupationShortName, conn);
+                if (occupationId > 0) {
+                    result.setPositionID(occupationId);
+                }
             }
 
             // Tuvastame allüksuse lühinime järgi allüksuse ID
             // Seda ei saa enne teha, kui kogu XML on läbi käidud, kuna allüksuse
             // leidmiseks peab lisaks lühinimele tedma ka asutuse ID-d.
             if ((subdivisionShortName != null) && (subdivisionShortName.length() > 0)) {
-            	int subdivisionId = Allyksus.getIdByShortName(orgID, subdivisionShortName, conn);
-            	if (subdivisionId > 0) {
-            		result.setDivisionID(subdivisionId);
-            	}
+                int subdivisionId = Allyksus.getIdByShortName(orgID, subdivisionShortName, conn);
+                if (subdivisionId > 0) {
+                    result.setDivisionID(subdivisionId);
+                }
             }
 
             return result;
-        }
-        catch (XMLStreamException ex) {
+        } catch (XMLStreamException ex) {
             CommonMethods.logError(ex, "dhl.Proxy", "fromXML");
             throw new AxisFault("Exception parsing DVK message proxy section: " + ex.getMessage());
         }

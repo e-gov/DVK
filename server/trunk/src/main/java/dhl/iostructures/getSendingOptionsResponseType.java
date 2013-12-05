@@ -15,7 +15,7 @@ import javax.xml.soap.SOAPElement;
 public class getSendingOptionsResponseType implements SOAPOutputBodyRepresentation {
     public getSendingOptionsRequestType paring;
     public ArrayList<Asutus> asutused;
-    
+
     public getSendingOptionsResponseType() {
         asutused = null;
         paring = null;
@@ -77,10 +77,10 @@ public class getSendingOptionsResponseType implements SOAPOutputBodyRepresentati
                     SOAPElement elSendingDhl = elSending.addChildElement("saatmisviis");
                     elSendingDhl.addTextNode(CommonStructures.SENDING_DHL_DIRECT);
                 }
-                
+
                 if ((org.getKsAsutuseKood() != null) && (org.getKsAsutuseKood().length() > 0)) {
-                	SOAPElement elParentOrg = elOrg.addChildElement("ks_asutuse_regnr");
-                	elParentOrg.addTextNode(org.getKsAsutuseKood());
+                    SOAPElement elParentOrg = elOrg.addChildElement("ks_asutuse_regnr");
+                    elParentOrg.addTextNode(org.getKsAsutuseKood());
                 }
             }
         } catch (Exception ex) {

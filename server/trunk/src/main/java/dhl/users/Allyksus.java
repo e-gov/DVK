@@ -1,6 +1,7 @@
 package dhl.users;
 
 import dvk.core.CommonMethods;
+
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -25,6 +26,10 @@ public class Allyksus {
     // Abimuutuja, mida andmebaasi pole vaja salvestada
     private String m_asutusKood;
     private String m_ksAllyksuseLyhinimetus;
+
+    public Allyksus() {
+        clear();
+    }
 
     public int getID() {
         return m_id;
@@ -129,10 +134,6 @@ public class Allyksus {
 
     public void setKsAllyksuseLyhinimetus(String value) {
         this.m_ksAllyksuseLyhinimetus = value;
-    }
-
-    public Allyksus() {
-        clear();
     }
 
     public void clear() {
@@ -242,14 +243,14 @@ public class Allyksus {
                 Calendar cal = Calendar.getInstance();
                 CallableStatement cs = conn.prepareCall("{call GET_ALLYKSUSLIST(?,?,?)}");
                 if (orgID > 0) {
-                	cs.setInt("asutus_id", orgID);
+                    cs.setInt("asutus_id", orgID);
                 } else {
-                	cs.setNull("asutus_id", Types.INTEGER);
+                    cs.setNull("asutus_id", Types.INTEGER);
                 }
                 if ((name != null) && (name.length() > 0)) {
-                	cs.setString("nimetus", name);
+                    cs.setString("nimetus", name);
                 } else {
-                	cs.setNull("nimetus", Types.VARCHAR);
+                    cs.setNull("nimetus", Types.VARCHAR);
                 }
                 cs.registerOutParameter("RC1", oracle.jdbc.OracleTypes.CURSOR);
                 cs.execute();

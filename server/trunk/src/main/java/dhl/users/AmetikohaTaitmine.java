@@ -3,6 +3,7 @@ package dhl.users;
 import dhl.aar.iostructures.AarAmetikohaTaitmine;
 import dvk.core.CommonMethods;
 import dvk.core.Settings;
+
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -23,6 +24,10 @@ public class AmetikohaTaitmine {
     private String m_muutja;
     private boolean m_peatatud;
     private int m_aarID;
+
+    public AmetikohaTaitmine() {
+        clear();
+    }
 
     public int getID() {
         return m_id;
@@ -110,10 +115,6 @@ public class AmetikohaTaitmine {
 
     public void setAarID(int value) {
         m_aarID = value;
-    }
-
-    public AmetikohaTaitmine() {
-        clear();
     }
 
     public void clear() {
@@ -226,7 +227,7 @@ public class AmetikohaTaitmine {
                 cs.setTimestamp("created", CommonMethods.sqlDateFromDate(m_loodud), cal);
                 cs.setTimestamp("last_modified", CommonMethods.sqlDateFromDate(m_muudetud), cal);
                 cs.setString("username", m_muutja);
-                cs.setInt("peatatud", (m_peatatud ? 1 : 0));
+                cs.setInt("peatatud", m_peatatud ? 1 : 0);
                 cs.setInt("aar_id", m_aarID);
                 cs.executeUpdate();
                 m_id = cs.getInt("id");
@@ -255,7 +256,7 @@ public class AmetikohaTaitmine {
                 cs.setTimestamp("created", CommonMethods.sqlDateFromDate(m_loodud), cal);
                 cs.setTimestamp("last_modified", CommonMethods.sqlDateFromDate(m_muudetud), cal);
                 cs.setString("username", m_muutja);
-                cs.setInt("peatatud", (m_peatatud ? 1 : 0));
+                cs.setInt("peatatud", m_peatatud ? 1 : 0);
                 cs.setInt("aar_id", m_aarID);
                 cs.executeUpdate();
                 cs.close();

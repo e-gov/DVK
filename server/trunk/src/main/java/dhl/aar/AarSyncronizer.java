@@ -4,6 +4,7 @@ import dhl.CoreServices;
 import dhl.sys.ApplicationParams;
 import dhl.users.Asutus;
 import dvk.core.CommonMethods;
+
 import java.sql.Connection;
 import java.util.Calendar;
 import java.util.Date;
@@ -11,9 +12,9 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 
 public class AarSyncronizer implements Runnable {
-	static Logger logger = Logger.getLogger(AarSyncronizer.class);
+    static Logger logger = Logger.getLogger(AarSyncronizer.class);
 
-	Thread t;
+    Thread t;
     Connection dbConn;
     int syncDelay = 0;
 
@@ -28,11 +29,11 @@ public class AarSyncronizer implements Runnable {
                 this.t.start();
             } else {
                 logger.error("Could not start \"aar\" database synchronizer due to incorrect settings!");
-            	CommonMethods.safeCloseDatabaseConnection(this.dbConn);
+                CommonMethods.safeCloseDatabaseConnection(this.dbConn);
             }
         } catch (Exception ex) {
             logger.error(ex);
-        	CommonMethods.safeCloseDatabaseConnection(this.dbConn);
+            CommonMethods.safeCloseDatabaseConnection(this.dbConn);
         }
     }
 
@@ -44,7 +45,7 @@ public class AarSyncronizer implements Runnable {
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(params.getLastAarSync());
                 calendar.add(Calendar.MINUTE, this.syncDelay);
-                markerDate = (calendar.getTime());
+                markerDate = calendar.getTime();
             }
 
             Calendar now = Calendar.getInstance();
@@ -68,7 +69,7 @@ public class AarSyncronizer implements Runnable {
                 Asutus.runAarSyncronization(dbConn);
             }
         } catch (Exception ex) {
-        	logger.error(ex);
+            logger.error(ex);
         } finally {
             CommonMethods.safeCloseDatabaseConnection(this.dbConn);
         }

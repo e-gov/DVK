@@ -1,5 +1,6 @@
 package dhl.requests;
 
+import dhl.CoreServices;
 import dvk.core.CommonStructures;
 import dvk.core.Settings;
 import dhl.Document;
@@ -7,6 +8,7 @@ import dvk.core.Fault;
 import dhl.Recipient;
 import dhl.Sending;
 import dhl.iostructures.ExpiredDocumentData;
+
 import java.sql.Connection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -19,9 +21,13 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+
 import org.apache.axis.AxisFault;
+import org.apache.log4j.Logger;
 
 public class DeleteOldDocuments {
+    static Logger LOGGER = Logger.getLogger(DeleteOldDocuments.class);
+
     public static RequestInternalResult V1(Connection conn) throws AxisFault {
         RequestInternalResult result = new RequestInternalResult();
 
@@ -42,7 +48,8 @@ public class DeleteOldDocuments {
                 // Koostame aegumisest teatava vea objekti
                 Fault f = new Fault();
                 f.setFaultCode(CommonStructures.FAULT_EXPIRED_CODE);
-                f.setFaultString("Dokumendi saatmine ebaonnestus, kuna adressaat ei laadinud antud dokumenti sailitustahtaja jooksul DVK-st alla.");
+                f.setFaultString(
+                        "Dokumendi saatmine ebaonnestus, kuna adressaat ei laadinud antud dokumenti sailitustahtaja jooksul DVK-st alla.");
                 f.setFaultActor(CommonStructures.FAULT_ACTOR);
 
                 // Märgime saatmisel olevad adressaadid katkestatuks
@@ -88,9 +95,9 @@ public class DeleteOldDocuments {
     private static void sendEmail(String toAddress, Date docSendingDate) {
         try {
             if ((Settings.currentProperties != null) && (Settings.currentProperties.getProperty("mail.host") != null)
-                && (!Settings.currentProperties.getProperty("mail.host").equalsIgnoreCase(""))
-                && (Settings.currentProperties.getProperty("mail.from") != null)
-                && (!Settings.currentProperties.getProperty("mail.from").equalsIgnoreCase(""))) {
+                    && (!Settings.currentProperties.getProperty("mail.host").equalsIgnoreCase(""))
+                    && (Settings.currentProperties.getProperty("mail.from") != null)
+                    && (!Settings.currentProperties.getProperty("mail.from").equalsIgnoreCase(""))) {
 
                 Properties mailServerConfig = new Properties();
                 mailServerConfig.setProperty("mail.host", Settings.currentProperties.getProperty("mail.host"));
@@ -98,8 +105,8 @@ public class DeleteOldDocuments {
                 InternetAddress fromAddress = new InternetAddress(Settings.currentProperties.getProperty("mail.from"));
                 fromAddress.setPersonal("Dokumendivahetuskeskus");
 
-                Session session = Session.getDefaultInstance( mailServerConfig, null );
-                MimeMessage message = new MimeMessage( session );
+                Session session = Session.getDefaultInstance(mailServerConfig, null);
+                MimeMessage message = new MimeMessage(session);
 
                 message.addRecipient(Message.RecipientType.TO, new InternetAddress(toAddress));
                 message.addFrom(new InternetAddress[]{fromAddress});
@@ -108,10 +115,14 @@ public class DeleteOldDocuments {
                 DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
                 String docSendingDateString = dateFormat.format(docSendingDate);
 
-                message.setText("Dokumendivahetuskeskus katkestas Teie poolt "+ docSendingDateString +" saadetud dokumendi edastamise, kuna vähemalt üks adressaat ei ole dokumendi edastustähtaja jooksul saadetud dokumenti vastu võtnud.");
+                message.setText("Dokumendivahetuskeskus katkestas Teie poolt " + docSendingDateString
+                        + " saadetud dokumendi edastamise, kuna vähemalt üks adressaat ei ole dokumendi "
+                        + "edastustähtaja jooksul saadetud dokumenti vastu võtnud.");
 
                 Transport.send(message);
             }
-        } catch (Exception ex){}
+        } catch (Exception ex) {
+            LOGGER.error("Error in sendEmail: ", ex);
+        }
     }
 }

@@ -5,6 +5,7 @@ import dhl.iostructures.XHeader;
 import dvk.core.Settings;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,14 +25,15 @@ import java.util.Calendar;
 import java.util.Date;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
+
 import org.apache.axis.AxisFault;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class Document {
-	static Logger logger = Logger.getLogger(Document.class.getName());
-	private int m_id;
+    static Logger logger = Logger.getLogger(Document.class.getName());
+    private int m_id;
     private int m_organizationID;
     private String m_filePath;
     private int m_folderID;
@@ -46,6 +48,33 @@ public class Document {
     // but won't be saved to database
     private org.w3c.dom.Document m_simplifiedXmlDoc;
     private ArrayList<DocumentFile> m_files;
+
+    public Document() {
+        clear();
+    }
+
+    public Document(int id, int organizationID, int folderID, String filePath, ArrayList<Sending> sendingList, Date conservationDeadline) {
+        m_id = id;
+        m_organizationID = organizationID;
+        m_folderID = folderID;
+        m_filePath = filePath;
+        m_sendingList = sendingList;
+        m_conservationDeadline = conservationDeadline;
+        m_dvkContainerVersion = 1;
+        m_files = new ArrayList<DocumentFile>();
+    }
+
+    public Document(int id, int organizationID, int folderID, String filePath,
+                    ArrayList<Sending> sendingList, Date conservationDeadline, int dvkContainerVersion) {
+        m_id = id;
+        m_organizationID = organizationID;
+        m_folderID = folderID;
+        m_filePath = filePath;
+        m_sendingList = sendingList;
+        m_conservationDeadline = conservationDeadline;
+        m_dvkContainerVersion = dvkContainerVersion;
+        m_files = new ArrayList<DocumentFile>();
+    }
 
     public void setId(int id) {
         this.m_id = id;
@@ -111,46 +140,20 @@ public class Document {
         this.m_files = value;
     }
 
-	public int getDvkContainerVersion() {
-		return m_dvkContainerVersion;
-	}
-
-	public void setDvkContainerVersion(int containerVersion) {
-		m_dvkContainerVersion = containerVersion;
-	}
-
-	public String getGuid() {
-		return m_guid;
-	}
-
-	public void setGuid(String mGuid) {
-		m_guid = mGuid;
-	}
-
-    public Document() {
-        clear();
+    public int getDvkContainerVersion() {
+        return m_dvkContainerVersion;
     }
 
-    public Document(int id, int organizationID, int folderID, String filePath, ArrayList<Sending> sendingList, Date conservationDeadline) {
-        m_id = id;
-        m_organizationID = organizationID;
-        m_folderID = folderID;
-        m_filePath = filePath;
-        m_sendingList = sendingList;
-        m_conservationDeadline = conservationDeadline;
-        m_dvkContainerVersion = 1;
-        m_files = new ArrayList<DocumentFile>();
+    public void setDvkContainerVersion(int containerVersion) {
+        m_dvkContainerVersion = containerVersion;
     }
 
-    public Document(int id, int organizationID, int folderID, String filePath, ArrayList<Sending> sendingList, Date conservationDeadline, int dvkContainerVersion) {
-        m_id = id;
-        m_organizationID = organizationID;
-        m_folderID = folderID;
-        m_filePath = filePath;
-        m_sendingList = sendingList;
-        m_conservationDeadline = conservationDeadline;
-        m_dvkContainerVersion = dvkContainerVersion;
-        m_files = new ArrayList<DocumentFile>();
+    public String getGuid() {
+        return m_guid;
+    }
+
+    public void setGuid(String mGuid) {
+        m_guid = mGuid;
     }
 
     public void clear() {
@@ -167,9 +170,9 @@ public class Document {
         m_conservationDeadline = null;
         m_dvkContainerVersion = 1;
         if (m_files == null) {
-        	m_files = new ArrayList<DocumentFile>();
+            m_files = new ArrayList<DocumentFile>();
         } else {
-        	m_files.clear();
+            m_files.clear();
         }
     }
 
@@ -186,68 +189,69 @@ public class Document {
                 return 0;
             }
         } catch (Exception ex) {
-        	logger.error(ex);
+            logger.error(ex);
             return 0;
         }
     }
 
     public int addToDB(Connection conn, XHeader xTeePais) throws AxisFault {
-    	FileInputStream inStream = null;
+        FileInputStream inStream = null;
         InputStreamReader inReader = null;
         BufferedReader reader = null;
         try {
-	    	if (conn != null) {
-	    		boolean defaultAutoCommit = conn.getAutoCommit();
+            if (conn != null) {
+                boolean defaultAutoCommit = conn.getAutoCommit();
                 FileInputStream fis = null;
                 InputStreamReader r = null;
-	            conn.setAutoCommit(false);
-		    	try {
-		    		Calendar cal = Calendar.getInstance();
-		    		m_id = getNextID(conn);
+                conn.setAutoCommit(false);
+                try {
+                    Calendar cal = Calendar.getInstance();
+                    m_id = getNextID(conn);
 
-		    		File file = new File(m_filePath);
-		        	long fileSize = 0;
-		        	if (file.exists()) {
-		        		fileSize = file.length();
-		        	}
+                    File file = new File(m_filePath);
+                    long fileSize = 0;
+                    if (file.exists()) {
+                        fileSize = file.length();
+                    }
 
-		    		CallableStatement cs = conn.prepareCall("{call ADD_DOKUMENT(?,?,?,?,?,?,?,?,?,?)}");
-		    		cs.setInt(1, m_id);
-		    		cs.setInt(2, m_organizationID);
-		    		cs.setInt(3, m_folderID);
-		    		cs.setString(4, " ");
-		    		cs.setTimestamp(5, CommonMethods.sqlDateFromDate(m_conservationDeadline), cal);
+                    CallableStatement cs = conn.prepareCall("{call ADD_DOKUMENT(?,?,?,?,?,?,?,?,?,?)}");
+                    cs.setInt(1, m_id);
+                    cs.setInt(2, m_organizationID);
+                    cs.setInt(3, m_folderID);
+                    cs.setString(4, " ");
+                    cs.setTimestamp(5, CommonMethods.sqlDateFromDate(m_conservationDeadline), cal);
 
-		    		if (fileSize > 0) {
-		    			cs.setLong(6, fileSize);
-		            } else {
-		            	cs.setNull(6, java.sql.Types.BIGINT);
-		            }
+                    if (fileSize > 0) {
+                        cs.setLong(6, fileSize);
+                    } else {
+                        cs.setNull(6, java.sql.Types.BIGINT);
+                    }
 
-		    		cs.setInt(7, m_dvkContainerVersion);
-		    		cs.setString(8, m_guid);
+                    cs.setInt(7, m_dvkContainerVersion);
+                    cs.setString(8, m_guid);
 
-		    		if (xTeePais != null) {
-		    			cs.setString(9, xTeePais.isikukood);
-		    			cs.setString(10, xTeePais.asutus);
-		    		} else {
-		    			cs.setString(9, null);
-		    			cs.setString(10, null);
-		    		}
+                    if (xTeePais != null) {
+                        cs.setString(9, xTeePais.isikukood);
+                        cs.setString(10, xTeePais.asutus);
+                    } else {
+                        cs.setString(9, null);
+                        cs.setString(10, null);
+                    }
 
-		    		// Execute
-		    		cs.execute();
-		    		cs.close();
+                    // Execute
+                    cs.execute();
+                    cs.close();
 
-		    		// XML to CLOB
-		    		// int fileCharsCount = CommonMethods.getCharacterCountInFile(m_filePath);
-		    		// inStream = new FileInputStream(m_filePath);
-		            // inReader = new InputStreamReader(inStream, "UTF-8");
-		            // reader = new BufferedReader(inReader);
-		    		// cs.setCharacterStream(4, reader, fileCharsCount);
+                    // XML to CLOB
+                    // int fileCharsCount = CommonMethods.getCharacterCountInFile(m_filePath);
+                    // inStream = new FileInputStream(m_filePath);
+                    // inReader = new InputStreamReader(inStream, "UTF-8");
+                    // reader = new BufferedReader(inReader);
+                    // cs.setCharacterStream(4, reader, fileCharsCount);
                     if (file.exists()) {
                         Statement stmt = conn.createStatement();
-                        ResultSet rs = stmt.executeQuery("SELECT sisu FROM dokument WHERE dokument_id=" + String.valueOf(m_id) + " FOR UPDATE");
+                        ResultSet rs = stmt.executeQuery(
+                                "SELECT sisu FROM dokument WHERE dokument_id=" + String.valueOf(m_id) + " FOR UPDATE");
                         if (rs.next()) {
                             Clob sisu = rs.getClob(1);
                             Writer clobWriter = sisu.setCharacterStream(0);
@@ -262,59 +266,63 @@ public class Document {
                             CommonMethods.safeCloseReader(r);
                             CommonMethods.safeCloseStream(fis);
                         } else {
-                        	throw new Exception("Failed writing document contents to database, ID " + String.valueOf(m_id) + " returned empty recordset!");
+                            throw new Exception(
+                                    "Failed writing document contents to database, ID "
+                                            + String.valueOf(m_id) + " returned empty recordset!");
                         }
                         stmt.close();
                     } else {
-                    	throw new Exception("Document file " + m_filePath + " of document "+ String.valueOf(m_id) +" does not exist and therefore cannot be saved into database!");
+                        throw new Exception(
+                                "Document file " + m_filePath + " of document " + String.valueOf(m_id)
+                                        + " does not exist and therefore cannot be saved into database!");
                     }
 
-		    		// Execute
-		    		conn.commit();
-	    		} catch (Exception e) {
-	    			logger.error("Exception while saving document to database: ", e);
-	    			conn.rollback();
+                    // Execute
+                    conn.commit();
+                } catch (Exception e) {
+                    logger.error("Exception while saving document to database: ", e);
+                    conn.rollback();
                     conn.setAutoCommit(defaultAutoCommit);
                     throw e;
-	    		} finally {
-	    			CommonMethods.safeCloseReader(reader);
-	                CommonMethods.safeCloseReader(inReader);
-	                CommonMethods.safeCloseStream(inStream);
-	                inStream = null;
-	                inReader = null;
-	                reader = null;
-	    		}
+                } finally {
+                    CommonMethods.safeCloseReader(reader);
+                    CommonMethods.safeCloseReader(inReader);
+                    CommonMethods.safeCloseStream(inStream);
+                    inStream = null;
+                    inReader = null;
+                    reader = null;
+                }
 
-	    		// Salvestame dokumendi transpordiinfo
-	            for (Sending tmpSending: m_sendingList) {
-	                tmpSending.setDocumentID(m_id);
-	                logger.debug("Saving transport info for document: " + m_id);
-	                int sendingResult = tmpSending.addToDB(conn, xTeePais);
-	                if (sendingResult <= 0) {
-	                    conn.rollback();
-	                    conn.setAutoCommit(defaultAutoCommit);
-	                    throw new AxisFault("Error saving addressing information to database!");
-	                }
-	            }
+                // Salvestame dokumendi transpordiinfo
+                for (Sending tmpSending : m_sendingList) {
+                    tmpSending.setDocumentID(m_id);
+                    logger.debug("Saving transport info for document: " + m_id);
+                    int sendingResult = tmpSending.addToDB(conn, xTeePais);
+                    if (sendingResult <= 0) {
+                        conn.rollback();
+                        conn.setAutoCommit(defaultAutoCommit);
+                        throw new AxisFault("Error saving addressing information to database!");
+                    }
+                }
 
-	            // Kinnitame andmebaasis tehtud muudatused
-	            conn.commit();
-	            conn.setAutoCommit(defaultAutoCommit);
+                // Kinnitame andmebaasis tehtud muudatused
+                conn.commit();
+                conn.setAutoCommit(defaultAutoCommit);
 
-	    	} else {
-	    		logger.error("Database connection is null.");
-	    	}
+            } else {
+                logger.error("Database connection is null.");
+            }
         } catch (Exception e) {
-        	logger.error(CommonStructures.VIGA_ANDMEBAASI_SALVESTAMISEL + ": ", e);
+            logger.error(CommonStructures.VIGA_ANDMEBAASI_SALVESTAMISEL + ": ", e);
             throw new AxisFault(CommonStructures.VIGA_ANDMEBAASI_SALVESTAMISEL + " : " + e.getMessage());
         }
-    	return m_id;
+        return m_id;
     }
 
     public static boolean deleteFromDB(int id, Connection conn) {
         try {
             if (conn != null) {
-                CallableStatement cs =  conn.prepareCall("{call DELETE_DOCUMENT(?)}");
+                CallableStatement cs = conn.prepareCall("{call DELETE_DOCUMENT(?)}");
                 cs.setInt(1, id);
                 boolean result = cs.execute();
                 cs.close();
@@ -323,7 +331,7 @@ public class Document {
                 return false;
             }
         } catch (Exception ex) {
-        	logger.error(ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
             return false;
         }
     }
@@ -332,7 +340,7 @@ public class Document {
         try {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
-                CallableStatement cs =  conn.prepareCall("{call UPDATE_DOCUMENTEXPIRATIONDATE(?,?)}");
+                CallableStatement cs = conn.prepareCall("{call UPDATE_DOCUMENTEXPIRATIONDATE(?,?)}");
                 cs.setInt(1, id);
                 cs.setTimestamp(2, CommonMethods.sqlDateFromDate(expirationDate), cal);
                 boolean result = cs.execute();
@@ -343,7 +351,7 @@ public class Document {
                 return false;
             }
         } catch (Exception ex) {
-        	logger.error(ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
             return false;
         }
     }
@@ -352,27 +360,27 @@ public class Document {
      * Tagastab nimekirja etteantud dokumentidest, mille allalaadimiseks
      * on etteantud isikul õigus.
      *
-     * @param organizationID			asutuse ID
-     * @param folderID					kausta ID
-     * @param userID					isiku ID
-     * @param divisionID				allüksuse ID
-     * @param divisionShortName			allüksuse lühinimetus
-     * @param occupationID				ametikoha ID
-     * @param occupationShortName		ametikoha lühinimetus
-     * @param resultLimit				maksimaalne lubatud tulemuste arv
-     * @param conn						andmebaasiühenduse objekt
-     * @return							nimekiri allalaadimist ootavatest dokumentidest
+     * @param organizationID      asutuse ID
+     * @param folderID            kausta ID
+     * @param userID              isiku ID
+     * @param divisionID          allüksuse ID
+     * @param divisionShortName   allüksuse lühinimetus
+     * @param occupationID        ametikoha ID
+     * @param occupationShortName ametikoha lühinimetus
+     * @param resultLimit         maksimaalne lubatud tulemuste arv
+     * @param conn                andmebaasiühenduse objekt
+     * @return nimekiri allalaadimist ootavatest dokumentidest
      */
     public static ArrayList<Document> getDocumentsSentTo(
-        int organizationID,
-        int folderID,
-        int userID,
-        int divisionID,
-        String divisionShortName,
-        int occupationID,
-        String occupationShortName,
-        int resultLimit,
-        Connection conn) {
+            int organizationID,
+            int folderID,
+            int userID,
+            int divisionID,
+            String divisionShortName,
+            int occupationID,
+            String occupationShortName,
+            int resultLimit,
+            Connection conn) {
         try {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
@@ -462,7 +470,7 @@ public class Document {
                 return null;
             }
         } catch (Exception ex) {
-        	logger.error(ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
             return null;
         }
     }
@@ -470,13 +478,14 @@ public class Document {
     /**
      * Loob XML-i põhjal <code>Document</code> objekti.
      *
-     * @param dataFile XML fail
+     * @param dataFile       XML fail
      * @param organizationID organisatsiooni ID
-     * @param conn andmebaasiühendus
+     * @param conn           andmebaasiühendus
      * @return dokument
      * @throws AxisFault
      */
-    public static Document fromXML(String dataFile, int organizationID, boolean extractFiles, Connection conn, XHeader xTeePais) throws AxisFault {
+    public static Document fromXML(String dataFile, int organizationID,
+                                   boolean extractFiles, Connection conn, XHeader xTeePais) throws AxisFault {
         try {
             Document result = new Document();
             result.setFilePath(dataFile);
@@ -500,12 +509,12 @@ public class Document {
             fileExtensionFilter.add("bdoc");
 
             try {
-            	int guidElementCount = 0;
+                int guidElementCount = 0;
                 while (reader.hasNext()) {
                     reader.next();
 
                     if (reader.hasName()) {
-                    	logger.debug("Element: <" + reader.getLocalName() + ">");
+                        logger.debug("Element: <" + reader.getLocalName() + ">");
                         if (reader.getLocalName().equalsIgnoreCase("dokument") && reader.isEndElement()) {
                             break;
                         } else if (reader.getLocalName().equalsIgnoreCase("transport") && reader.isStartElement()) {
@@ -519,28 +528,28 @@ public class Document {
                         } else if (reader.getLocalName().equalsIgnoreCase("failid") && reader.isStartElement() && extractFiles) {
                             result.m_files = DocumentFile.getListFromContainerV2(reader, fileExtensionFilter);
                         } else if (reader.getLocalName().equalsIgnoreCase("konteineri_versioon") && reader.isStartElement()) {
-                        	reader.next();
-                        	if (reader.isCharacters()) {
-                        		String version = reader.getText().trim();
-                        		try {
-                        			Integer versionAsInteger = Integer.parseInt(version);
-                        			result.setDvkContainerVersion(versionAsInteger.intValue());
-                        		} catch (Exception e) {
-                        			result.setDvkContainerVersion(1);
-                        			logger.warn("Could not parse container version as Integer. Assuming container version = 1: ", e);
-                        		}
-                        	}
+                            reader.next();
+                            if (reader.isCharacters()) {
+                                String version = reader.getText().trim();
+                                try {
+                                    Integer versionAsInteger = Integer.parseInt(version);
+                                    result.setDvkContainerVersion(versionAsInteger.intValue());
+                                } catch (Exception e) {
+                                    result.setDvkContainerVersion(1);
+                                    logger.warn("Could not parse container version as Integer. Assuming container version = 1: ", e);
+                                }
+                            }
                         } else if (reader.getLocalName().equalsIgnoreCase("dokument_guid") && reader.isStartElement()) {
-                        	logger.debug("Found element <dokument_guid>. Reading contents...");
-                        	reader.next();
-                        	if (guidElementCount == 0) {
-                        		if (reader.isCharacters()) {
-                        			String dokumentGuidTmp = reader.getText().trim();
-                        			logger.debug("Found dokument GUID: " + dokumentGuidTmp);
-                        			result.setGuid(dokumentGuidTmp);
-                        			guidElementCount++;
-                        		}
-                        	}
+                            logger.debug("Found element <dokument_guid>. Reading contents...");
+                            reader.next();
+                            if (guidElementCount == 0) {
+                                if (reader.isCharacters()) {
+                                    String dokumentGuidTmp = reader.getText().trim();
+                                    logger.debug("Found dokument GUID: " + dokumentGuidTmp);
+                                    result.setGuid(dokumentGuidTmp);
+                                    guidElementCount++;
+                                }
+                            }
                         }
                     }
                 }
@@ -554,7 +563,7 @@ public class Document {
 
                 Sending tmpSending = result.getSendingList().get(0);
                 if (tmpSending == null) {
-                	throw new AxisFault(CommonStructures.VIGA_AADRESSANDMED_PUUDU);
+                    throw new AxisFault(CommonStructures.VIGA_AADRESSANDMED_PUUDU);
                 }
 
                 // Kuna saatjaid saab olla täpselt üks, siis anname veateate niipea,
@@ -573,7 +582,7 @@ public class Document {
             }
             return result;
         } catch (AxisFault fault) {
-        	throw fault;
+            throw fault;
         } catch (Exception ex) {
             throw new AxisFault(ex.getMessage());
         }
@@ -583,63 +592,67 @@ public class Document {
         ArrayList<Document> result = new ArrayList<Document>();
         try {
 
-        	if (requestVersion == 1) {
-        		XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+            if (requestVersion == 1) {
+                XMLInputFactory inputFactory = XMLInputFactory.newInstance();
                 XMLStreamReader reader = inputFactory.createXMLStreamReader(new FileInputStream(dataFile), "UTF-8");
                 try {
 
-                		while (reader.hasNext()) {
-                            reader.next();
+                    while (reader.hasNext()) {
+                        reader.next();
 
-                            if (reader.hasName()) {
-                                if (reader.getLocalName().equalsIgnoreCase("dhl_id") && reader.isStartElement() && reader.hasNext()) {
-                                    reader.next();
-                                    if (reader.isCharacters()) {
-                                    	Document tmpDoc = new Document();
-                                    	tmpDoc.setId(Integer.parseInt(reader.getText().trim()));
-                                        result.add(tmpDoc);
-                                    }
+                        if (reader.hasName()) {
+                            if (reader.getLocalName().equalsIgnoreCase("dhl_id") && reader.isStartElement() && reader.hasNext()) {
+                                reader.next();
+                                if (reader.isCharacters()) {
+                                    Document tmpDoc = new Document();
+                                    tmpDoc.setId(Integer.parseInt(reader.getText().trim()));
+                                    result.add(tmpDoc);
                                 }
                             }
                         }
+                    }
 
                 } finally {
                     reader.close();
                 }
 
-        	} else {
+            } else {
                 org.w3c.dom.Document xmlDoc = CommonMethods.xmlDocumentFromFile(dataFile, true);
                 NodeList itemNodeList = xmlDoc.getElementsByTagName("item");
 
                 if (itemNodeList != null) {
-                	for (int i = 0; i < itemNodeList.getLength(); i++) {
-                		Document tmpDoc = new Document();
-                		boolean documentFilled = false;
-                		Node node = itemNodeList.item(i);
-                		NodeList childNodes = node.getChildNodes();
-                		if (childNodes != null) {
-                			for (int j = 0; j < childNodes.getLength(); j++) {
-                				Node childNode = childNodes.item(j);
-                				if (childNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE && childNode.getLocalName() != null && childNode.getLocalName().equalsIgnoreCase("dhl_id")) {
-                					tmpDoc.setId(Integer.parseInt(childNode.getTextContent()));
-                					documentFilled = true;
-                				}
-                				if (childNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE && childNode.getLocalName() != null && childNode.getLocalName().equalsIgnoreCase("dokument_guid")) {
-                					tmpDoc.setGuid(childNode.getTextContent());
-                					documentFilled = true;
-                				}
-                			}
-                			if (documentFilled) {
-                				result.add(tmpDoc);
-                			}
-                		}
-                	}
+                    for (int i = 0; i < itemNodeList.getLength(); i++) {
+                        Document tmpDoc = new Document();
+                        boolean documentFilled = false;
+                        Node node = itemNodeList.item(i);
+                        NodeList childNodes = node.getChildNodes();
+                        if (childNodes != null) {
+                            for (int j = 0; j < childNodes.getLength(); j++) {
+                                Node childNode = childNodes.item(j);
+                                if (childNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE
+                                                && childNode.getLocalName() != null
+                                                && childNode.getLocalName().equalsIgnoreCase("dhl_id")) {
+                                    tmpDoc.setId(Integer.parseInt(childNode.getTextContent()));
+                                    documentFilled = true;
+                                }
+                                if (childNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE
+                                        && childNode.getLocalName() != null
+                                        && childNode.getLocalName().equalsIgnoreCase("dokument_guid")) {
+                                    tmpDoc.setGuid(childNode.getTextContent());
+                                    documentFilled = true;
+                                }
+                            }
+                            if (documentFilled) {
+                                result.add(tmpDoc);
+                            }
+                        }
+                    }
                 }
-        	}
-        	return result;
+            }
+            return result;
 
         } catch (Exception ex) {
-        	logger.error(ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
             return null;
         }
     }
@@ -672,7 +685,7 @@ public class Document {
                 return null;
             }
         } catch (Exception ex) {
-        	logger.error(ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
             return null;
         }
     }

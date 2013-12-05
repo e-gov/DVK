@@ -2,7 +2,9 @@ package dhl.iostructures;
 
 import dvk.core.CommonMethods;
 import dhl.users.Asutus;
+
 import javax.xml.soap.SOAPBody;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -82,232 +84,232 @@ public class changeOrganizationDataRequestType {
         Element el = null;
         Element el1 = null;
         changeOrganizationDataRequestType result = null;
-        
+
         try {
             msg = context.getRequestMessage();
             body = msg.getSOAPBody();
             nodes = body.getElementsByTagName("changeOrganizationData");
             if (nodes.getLength() > 0) {
-                el = (Element)nodes.item(0);
+                el = (Element) nodes.item(0);
                 nodes = el.getElementsByTagName("keha");
                 if (nodes.getLength() > 0) {
                     result = new changeOrganizationDataRequestType();
                     result.asutus = new Asutus();
-                    el = (Element)nodes.item(0);
-                    
+                    el = (Element) nodes.item(0);
+
                     nodes = el.getElementsByTagName("registrikood");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.registrikoodEsitatud = true;
                         result.asutus.setRegistrikood(CommonMethods.getNodeText(el1));
                     }
 
                     nodes = el.getElementsByTagName("endine_registrikood");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.registrikoodVanaEsitatud = true;
                         result.asutus.setRegistrikoodVana(CommonMethods.getNodeText(el1));
                     }
-                    
+
                     nodes = el.getElementsByTagName("korgemalseisva_asutuse_registrikood");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.ksAsutuseKoodEsitatud = true;
                         result.asutus.setKsAsutuseKood(CommonMethods.getNodeText(el1));
                     }
-                    
+
                     nodes = el.getElementsByTagName("nimi");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.nimetusEsitatud = true;
                         result.asutus.setNimetus(CommonMethods.getNodeText(el1));
                     }
-                    
+
                     nodes = el.getElementsByTagName("nime_lyhend");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.nimeLyhendEsitatud = true;
                         result.asutus.setNimeLyhend(CommonMethods.getNodeText(el1));
                     }
-                    
+
                     nodes = el.getElementsByTagName("liik1");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.liik1Esitatud = true;
                         result.asutus.setLiik1(CommonMethods.getNodeText(el1));
                     }
-                    
+
                     nodes = el.getElementsByTagName("liik2");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.liik2Esitatud = true;
                         result.asutus.setLiik2(CommonMethods.getNodeText(el1));
                     }
-                    
+
                     nodes = el.getElementsByTagName("tegevusala");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.tegevusalaEsitatud = true;
                         result.asutus.setTegevusala(CommonMethods.getNodeText(el1));
                     }
-                    
+
                     nodes = el.getElementsByTagName("tegevuspiirkond");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.tegevuspiirkondEsitatud = true;
                         result.asutus.setTegevuspiirkond(CommonMethods.getNodeText(el1));
                     }
-                    
+
                     nodes = el.getElementsByTagName("maakond");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.maakondEsitatud = true;
                         result.asutus.setMaakond(CommonMethods.getNodeText(el1));
                     }
-                    
+
                     nodes = el.getElementsByTagName("asukoht");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.asukohtEsitatud = true;
                         result.asutus.setAsukoht(CommonMethods.getNodeText(el1));
                     }
-                    
+
                     nodes = el.getElementsByTagName("aadress");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.aadressEsitatud = true;
                         result.asutus.setAadress(CommonMethods.getNodeText(el1));
                     }
-                    
+
                     nodes = el.getElementsByTagName("postikood");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.postikoodEsitatud = true;
                         result.asutus.setPostikood(CommonMethods.getNodeText(el1));
                     }
-                    
+
                     nodes = el.getElementsByTagName("telefon");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.telefonEsitatud = true;
                         result.asutus.setTelefon(CommonMethods.getNodeText(el1));
                     }
-                    
+
                     nodes = el.getElementsByTagName("faks");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.faksEsitatud = true;
                         result.asutus.setFaks(CommonMethods.getNodeText(el1));
                     }
-                    
+
                     nodes = el.getElementsByTagName("e_post");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.epostEsitatud = true;
                         result.asutus.setEpost(CommonMethods.getNodeText(el1));
                     }
-                    
+
                     nodes = el.getElementsByTagName("www");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.wwwEsitatud = true;
                         result.asutus.setWww(CommonMethods.getNodeText(el1));
                     }
-                    
+
                     nodes = el.getElementsByTagName("logo");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.logoEsitatud = true;
                         result.asutus.setLogo(CommonMethods.getNodeText(el1));
                     }
-                    
+
                     nodes = el.getElementsByTagName("asutamise_kuupaev");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.asutamiseKuupaevEsitatud = true;
                         result.asutus.setAsutamiseKuupaev(CommonMethods.getDateFromXML(CommonMethods.getNodeText(el1)));
                     }
-                    
+
                     nodes = el.getElementsByTagName("moodustamise_akti_nimi");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.moodustamiseAktiNimiEsitatud = true;
                         result.asutus.setMoodustamiseAktiNimi(CommonMethods.getNodeText(el1));
                     }
-                    
+
                     nodes = el.getElementsByTagName("moodustamise_akti_number");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.moodustamiseAktiNumberEsitatud = true;
                         result.asutus.setMoodustamiseAktiNumber(CommonMethods.getNodeText(el1));
                     }
-                    
+
                     nodes = el.getElementsByTagName("moodustamise_akti_kuupaev");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.moodustamiseAktiKuupaevEsitatud = true;
                         result.asutus.setMoodustamiseAktiKuupaev(CommonMethods.getDateFromXML(CommonMethods.getNodeText(el1)));
                     }
-                    
+
                     nodes = el.getElementsByTagName("pohimaaruse_akti_nimi");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.pohimaaruseAktiNimiEsitatud = true;
                         result.asutus.setPohimaaruseAktiNimi(CommonMethods.getNodeText(el1));
                     }
-                    
+
                     nodes = el.getElementsByTagName("pohimaaruse_akti_number");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.pohimaaruseAktiNumberEsitatud = true;
                         result.asutus.setPohimaaruseAktiNumber(CommonMethods.getNodeText(el1));
                     }
-                    
+
                     nodes = el.getElementsByTagName("pohimaaruse_kinnitamise_kuupaev");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.pohimaaruseKinnitamiseKuupaevEsitatud = true;
                         result.asutus.setPohimaaruseKinnitamiseKuupaev(CommonMethods.getDateFromXML(CommonMethods.getNodeText(el1)));
                     }
-                    
+
                     nodes = el.getElementsByTagName("pohimaaruse_kande_kuupaev");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.pohimaaruseKandeKuupaevEsitatud = true;
                         result.asutus.setPohimaaruseKandeKuupaev(CommonMethods.getDateFromXML(CommonMethods.getNodeText(el1)));
                     }
-                    
+
                     nodes = el.getElementsByTagName("parameetrid");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.parameetridEsitatud = true;
                         result.asutus.setParameetrid(CommonMethods.getNodeText(el1));
                     }
-                    
+
                     nodes = el.getElementsByTagName("dvk_saatmine");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.dvkSaatmineEsitatud = true;
                         result.asutus.setDvkSaatmine(CommonMethods.booleanFromXML(CommonMethods.getNodeText(el1)));
                     }
-                    
+
                     nodes = el.getElementsByTagName("dvk_otse_saatmine");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.dvkOtseSaatmineEsitatud = true;
                         result.asutus.setDvkOtseSaatmine(CommonMethods.booleanFromXML(CommonMethods.getNodeText(el1)));
                     }
-                    
+
                     nodes = el.getElementsByTagName("toetatav_dvk_versioon");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.toetatavDVKVersioonEsitatud = true;
                         result.asutus.setToetatavDVKVersioon(CommonMethods.getNodeText(el1));
                     }
-                    
+
                     nodes = el.getElementsByTagName("dokumendihaldussysteemi_nimetus");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.dhsNimetusEsitatud = true;
                         result.asutus.setDHSNimetus(CommonMethods.getNodeText(el1));
                     }
@@ -323,7 +325,7 @@ public class changeOrganizationDataRequestType {
             el = null;
             el1 = null;
         }
-        
+
         return result;
     }
 }

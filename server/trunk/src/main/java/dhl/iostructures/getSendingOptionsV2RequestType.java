@@ -1,7 +1,9 @@
 package dhl.iostructures;
 
 import dvk.core.CommonMethods;
+
 import javax.xml.soap.SOAPBody;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -15,7 +17,7 @@ public class getSendingOptionsV2RequestType {
     public boolean vastuvotmataDokumenteOotel;
 
     public getSendingOptionsV2RequestType() {
-        asutused = new String[] { };
+        asutused = new String[]{};
         vahetatudDokumenteVahemalt = -1;
         vahetatudDokumenteKuni = -1;
         vastuvotmataDokumenteOotel = false;
@@ -34,15 +36,15 @@ public class getSendingOptionsV2RequestType {
             body = msg.getSOAPBody();
             nodes = body.getElementsByTagName("getSendingOptions");
             if (nodes.getLength() > 0) {
-                el = (Element)nodes.item(0);
+                el = (Element) nodes.item(0);
                 nodes = el.getElementsByTagName("keha");
                 if (nodes.getLength() > 0) {
-                    el = (Element)nodes.item(0);
+                    el = (Element) nodes.item(0);
 
                     // Asutuste nimekiri
                     nodes = el.getElementsByTagName("asutused");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         nodes = el1.getElementsByTagName("asutus");
                         if (nodes.getLength() > 0) {
                             result.asutused = new String[nodes.getLength()];
@@ -55,7 +57,7 @@ public class getSendingOptionsV2RequestType {
                     // Ainult vastuvõtmist ootavate dokumentidega asutused
                     nodes = el.getElementsByTagName("vastuvotmata_dokumente_ootel");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.vastuvotmataDokumenteOotelStr = CommonMethods.getNodeText(el1);
                         if ((!result.vastuvotmataDokumenteOotelStr.equalsIgnoreCase("")) && !result.vastuvotmataDokumenteOotelStr.equalsIgnoreCase("0") && !result.vastuvotmataDokumenteOotelStr.equalsIgnoreCase("false")) {
                             result.vastuvotmataDokumenteOotel = true;
@@ -65,7 +67,7 @@ public class getSendingOptionsV2RequestType {
                     // Ainult asutused, kes on vahetanud vähemalt N dokumenti
                     nodes = el.getElementsByTagName("vahetatud_dokumente_vahemalt");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.vahetatudDokumenteVahemaltStr = CommonMethods.getNodeText(el1);
                         result.vahetatudDokumenteVahemalt = Integer.parseInt(result.vahetatudDokumenteVahemaltStr);
                     }
@@ -73,7 +75,7 @@ public class getSendingOptionsV2RequestType {
                     // Ainult asutused, kes on vahetanud kuni N dokumenti
                     nodes = el.getElementsByTagName("vahetatud_dokumente_kuni");
                     if (nodes.getLength() > 0) {
-                        el1 = (Element)nodes.item(0);
+                        el1 = (Element) nodes.item(0);
                         result.vahetatudDokumenteKuniStr = CommonMethods.getNodeText(el1);
                         result.vahetatudDokumenteKuni = Integer.parseInt(result.vahetatudDokumenteKuniStr);
                     }

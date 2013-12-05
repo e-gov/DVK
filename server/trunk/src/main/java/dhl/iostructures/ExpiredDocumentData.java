@@ -7,6 +7,10 @@ public class ExpiredDocumentData {
     private int m_sendStatusID;
     private Date m_conservationDeadline;
 
+    public ExpiredDocumentData() {
+        clear();
+    }
+
     public int getDocumentID() {
         return m_documentID;
     }
@@ -31,10 +35,6 @@ public class ExpiredDocumentData {
         m_conservationDeadline = value;
     }
 
-    public ExpiredDocumentData() {
-        clear();
-    }
-    
     public void clear() {
         m_documentID = 0;
         m_sendStatusID = 0;

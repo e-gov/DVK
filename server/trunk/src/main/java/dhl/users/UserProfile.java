@@ -2,8 +2,10 @@ package dhl.users;
 
 import dvk.core.CommonStructures;
 import dhl.iostructures.XHeader;
+
 import java.sql.Connection;
 import java.util.ArrayList;
+
 import org.apache.axis.AxisFault;
 
 public class UserProfile {
@@ -102,14 +104,14 @@ public class UserProfile {
         result.setOrganizationID(Asutus.getIDByRegNr(header.asutus, false, conn));
         if (result.getOrganizationID() <= 0) {
             throw new AxisFault(CommonStructures.VIGA_TUNDMATU_ASUTUS
-                .replaceFirst("#1", header.asutus));
+                    .replaceFirst("#1", header.asutus));
         }
 
         // Make sure that current users organization has not been disabled.
         Asutus org = new Asutus(result.getOrganizationID(), conn);
         if ((org == null) || !org.getDvkSaatmine()) {
             throw new AxisFault(CommonStructures.VIGA_ASUTUS_BLOKEERITUD
-                .replaceFirst("#1", result.getOrganizationCode()));
+                    .replaceFirst("#1", result.getOrganizationCode()));
         }
 
         // Leiame sõnumi saatnud isiku ID oma isikute registrist

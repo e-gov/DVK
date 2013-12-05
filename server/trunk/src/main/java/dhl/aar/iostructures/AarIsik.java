@@ -1,11 +1,13 @@
 package dhl.aar.iostructures;
 
 import dvk.core.CommonMethods;
+
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+
 import org.apache.axis.AxisFault;
 
 public class AarIsik {
@@ -15,6 +17,15 @@ public class AarIsik {
     private String m_perenimi;
     private String m_telefon;
     private String m_ePost;
+
+    public AarIsik() {
+        m_isikuID = 0;
+        m_isikukood = "";
+        m_eesnimi = "";
+        m_perenimi = "";
+        m_telefon = "";
+        m_ePost = "";
+    }
 
     public int getIsikuID() {
         return m_isikuID;
@@ -64,15 +75,6 @@ public class AarIsik {
         m_ePost = value;
     }
 
-    public AarIsik() {
-        m_isikuID = 0;
-        m_isikukood = "";
-        m_eesnimi = "";
-        m_perenimi = "";
-        m_telefon = "";
-        m_ePost = "";
-    }
-
     public static AarIsik fromXML(XMLStreamReader xmlReader, String rootTagName) throws AxisFault {
         try {
             AarIsik result = new AarIsik();
@@ -97,30 +99,30 @@ public class AarIsik {
                             }
                         }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("isikukood") && xmlReader.isStartElement()) {
-                         xmlReader.next();
-                         if (xmlReader.isCharacters()) {
-                             result.setIsikukood(xmlReader.getText().trim());
-                         }
+                        xmlReader.next();
+                        if (xmlReader.isCharacters()) {
+                            result.setIsikukood(xmlReader.getText().trim());
+                        }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("eesnimi") && xmlReader.isStartElement()) {
-                         xmlReader.next();
-                         if (xmlReader.isCharacters()) {
-                             result.setEesnimi(xmlReader.getText().trim());
-                         }
+                        xmlReader.next();
+                        if (xmlReader.isCharacters()) {
+                            result.setEesnimi(xmlReader.getText().trim());
+                        }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("perenimi") && xmlReader.isStartElement()) {
-                         xmlReader.next();
-                         if (xmlReader.isCharacters()) {
-                             result.setPerenimi(xmlReader.getText().trim());
-                         }
+                        xmlReader.next();
+                        if (xmlReader.isCharacters()) {
+                            result.setPerenimi(xmlReader.getText().trim());
+                        }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("telefon") && xmlReader.isStartElement()) {
-                         xmlReader.next();
-                         if (xmlReader.isCharacters()) {
-                             result.setTelefon(xmlReader.getText().trim());
-                         }
+                        xmlReader.next();
+                        if (xmlReader.isCharacters()) {
+                            result.setTelefon(xmlReader.getText().trim());
+                        }
                     } else if (xmlReader.getLocalName().equalsIgnoreCase("e_post") && xmlReader.isStartElement()) {
-                         xmlReader.next();
-                         if (xmlReader.isCharacters()) {
-                             result.setEPost(xmlReader.getText().trim());
-                         }
+                        xmlReader.next();
+                        if (xmlReader.isCharacters()) {
+                            result.setEPost(xmlReader.getText().trim());
+                        }
                     }
                 }
             }

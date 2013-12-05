@@ -1,10 +1,6 @@
 package dhl.requests;
 
-import dvk.core.CommonMethods;
-import dvk.core.CommonStructures;
-import dvk.core.FileSplitResult;
-import dvk.core.Settings;
-import dvk.core.XmlValidator;
+import dvk.core.*;
 import dhl.Document;
 import dhl.DocumentFile;
 import dhl.DocumentFragment;
@@ -30,8 +26,6 @@ import dvk.client.businesslayer.Counter;
 import dvk.client.businesslayer.DhlMessage;
 import dvk.client.conf.OrgSettings;
 import dvk.client.db.UnitCredential;
-import dvk.core.Fault;
-import dvk.core.HeaderVariables;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -1482,6 +1476,7 @@ public class SendDocuments {
                             // Lisame väärtused sõnumi päisest ja kehast
                             doc.setFolderID(senderTargetFolder);
                             doc.setOrganizationID(user.getOrganizationID());
+                            doc.setContainerVersion(ContainerVersion.VERSION_2_1.toString());
 
                             Date conservationDeadline = bodyData.sailitustahtaeg;
                             if (conservationDeadline == null) {

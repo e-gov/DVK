@@ -43,6 +43,9 @@ public class Document {
     // DEC container version
     private int m_dvkContainerVersion;
     private String m_guid;
+    // New column for persisting DVK container version.
+    // m_dvkContainerVersion will be deprecated in the future
+    private String containerVersion;
 
     // Helper variables that are used in data processing
     // but won't be saved to database
@@ -156,6 +159,14 @@ public class Document {
         m_guid = mGuid;
     }
 
+    public String getContainerVersion() {
+        return containerVersion;
+    }
+
+    public void setContainerVersion(String containerVersion) {
+        this.containerVersion = containerVersion;
+    }
+
     public void clear() {
         m_id = 0;
         m_organizationID = 0;
@@ -214,7 +225,7 @@ public class Document {
                         fileSize = file.length();
                     }
 
-                    CallableStatement cs = conn.prepareCall("{call ADD_DOKUMENT(?,?,?,?,?,?,?,?,?,?)}");
+                    CallableStatement cs = conn.prepareCall("{call ADD_DOKUMENT(?,?,?,?,?,?,?,?,?,?,?)}");
                     cs.setInt(1, m_id);
                     cs.setInt(2, m_organizationID);
                     cs.setInt(3, m_folderID);
@@ -237,6 +248,8 @@ public class Document {
                         cs.setString(9, null);
                         cs.setString(10, null);
                     }
+
+                    cs.setString(11, containerVersion);
 
                     // Execute
                     cs.execute();

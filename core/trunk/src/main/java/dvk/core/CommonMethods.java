@@ -82,6 +82,7 @@ public class CommonMethods {
             }
 
         	String tmpDir = System.getProperty("java.io.tmpdir", "");
+
             String result = tmpDir + File.separator + "dhl_" + String.valueOf((new Date()).getTime()) + ((itemIndex > 0) ? "_item" + String.valueOf(itemIndex) : "") + extension;
             int uniqueCounter = 0;
             while ((new File(result)).exists()) {
@@ -732,6 +733,15 @@ public class CommonMethods {
 		}
     }
 
+    /**
+     * Visatakse ajutiselt suured binaarsed andmed välja. Parandab protsessimise kiirust.
+     * @param xmlFileName
+     * @param tagLocalName
+     * @param noMainFile
+     * @param noSubFiles
+     * @param replaceMain
+     * @return
+     */
     public static FileSplitResult splitOutTags(String xmlFileName, String tagLocalName, boolean noMainFile, boolean noSubFiles, boolean replaceMain) {
         FileSplitResult result = new FileSplitResult();
         result.subFiles = new ArrayList<String>();

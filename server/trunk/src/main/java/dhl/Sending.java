@@ -335,7 +335,8 @@ public class Sending {
                     	logger.debug("Found transport.");
                         // Kui oleme jõudnud transport ploki lõppu, siis katkestame tsükli
                         break;
-                    } else if (xmlReader.getLocalName().equalsIgnoreCase("saatja") && xmlReader.isStartElement()) {
+                    } else if ((xmlReader.getLocalName().equalsIgnoreCase("saatja")
+                            || xmlReader.getLocalName().equalsIgnoreCase("DecSender")) && xmlReader.isStartElement()) {
                     	logger.debug("Found sender.");
                         // Laeme saatja andmed XML-st oma andmestruktuuri
                         result.setSender(Sender.fromXML(xmlReader, conn, xTeePais));
@@ -344,7 +345,9 @@ public class Sending {
                     	logger.debug("Found proxy.");
                         // Laeme vahendaja andmed XML-st oma andmestruktuuri
                         result.setProxy(Proxy.fromXML(xmlReader, conn));
-                    } else if (xmlReader.getLocalName().equalsIgnoreCase("saaja") && xmlReader.isStartElement()) {
+                    } else if ((xmlReader.getLocalName().equalsIgnoreCase("saaja")
+                            || xmlReader.getLocalName().equalsIgnoreCase("DecRecipient"))
+                            && xmlReader.isStartElement()) {
                     	logger.debug("Found recipient.");
                         // Laeme saaja andmed XML-st oma andmestruktuuri
                         Recipient r = Recipient.fromXML(xmlReader, conn, xTeePais);

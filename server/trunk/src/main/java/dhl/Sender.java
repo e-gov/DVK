@@ -290,10 +290,13 @@ public class Sender {
                 xmlReader.next();
 
                 if (xmlReader.hasName()) {
-                    if (xmlReader.getLocalName().equalsIgnoreCase("saatja") && xmlReader.isEndElement()) {
+                    if ((xmlReader.getLocalName().equalsIgnoreCase("saatja")
+                            || xmlReader.getLocalName().equalsIgnoreCase("DecSender")) && xmlReader.isEndElement()) {
                         // Break the loop once we reach the end of sender root element
                         break;
-                    } else if (xmlReader.getLocalName().equalsIgnoreCase("regnr") && xmlReader.isStartElement()) {
+                    } else if ((xmlReader.getLocalName().equalsIgnoreCase("regnr")
+                            || xmlReader.getLocalName().equalsIgnoreCase("OrganisationCode"))
+                            && xmlReader.isStartElement()) {
                         xmlReader.next();
                         if (xmlReader.isCharacters()) {
                             // Attempt to find sender organization from database
@@ -359,7 +362,9 @@ public class Sender {
                              subdivisionShortName = xmlReader.getText().trim();
                              result.setDivisionShortName(subdivisionShortName);
                         }
-                    } else if (xmlReader.getLocalName().equalsIgnoreCase("allyksuse_nimetus") && xmlReader.isStartElement()) {
+                    } else if ((xmlReader.getLocalName().equalsIgnoreCase("allyksuse_nimetus")
+                            || xmlReader.getLocalName().equalsIgnoreCase("StructuralUnit"))
+                            && xmlReader.isStartElement()) {
                         xmlReader.next();
                         if (xmlReader.isCharacters()) {
                              subdivisionName = xmlReader.getText().trim();
@@ -379,7 +384,9 @@ public class Sender {
                         if (xmlReader.isCharacters()) {
                             result.setOrganizationName(xmlReader.getText().trim());
                         }
-                    } else if (xmlReader.getLocalName().equalsIgnoreCase("isikukood") && xmlReader.isStartElement()) {
+                    } else if ((xmlReader.getLocalName().equalsIgnoreCase("isikukood")
+                            || xmlReader.getLocalName().equalsIgnoreCase("PersonalIdCode"))
+                            && xmlReader.isStartElement()) {
                         xmlReader.next();
                         if (xmlReader.isCharacters()) {
                             result.setPersonalIdCode(xmlReader.getText().trim());

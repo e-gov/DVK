@@ -544,6 +544,8 @@ public class CoreServices implements Dhl {
                     result = SendDocuments.V2(context, conn, user, hostOrgSettings, xTeePais);
                 } else if (ver.equalsIgnoreCase("v3")) {
                     result = SendDocuments.V3(context, conn, user, hostOrgSettings, xTeePais);
+                } else if (ver.equalsIgnoreCase("v4")) {
+                    result = SendDocuments.v4(context, conn, user, hostOrgSettings, xTeePais);
                 } else {
                     // Unknown request version
                     throw new IncorrectRequestVersionException("Vigane päringu versioon \""+ ver +"\"! Lubatud versioonid on \"v1\", \"v2\" ja \"v3\".");

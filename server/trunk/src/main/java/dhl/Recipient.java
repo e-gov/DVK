@@ -650,10 +650,14 @@ public class Recipient {
                 xmlReader.next();
 
                 if (xmlReader.hasName()) {
-                	if (xmlReader.getLocalName().equalsIgnoreCase("saaja") && xmlReader.isEndElement()) {
+                	if ((xmlReader.getLocalName().equalsIgnoreCase("saaja")
+                            || xmlReader.getLocalName().equalsIgnoreCase("DecRecipient"))
+                            && xmlReader.isEndElement()) {
                         // Kui oleme jõudnud saaja elemendi lõppu, siis katkestame tsükli
                         break;
-                    } else if (xmlReader.getLocalName().equalsIgnoreCase("regnr") && xmlReader.isStartElement()) {
+                    } else if ((xmlReader.getLocalName().equalsIgnoreCase("regnr")
+                            || xmlReader.getLocalName().equalsIgnoreCase("OrganisationCode"))
+                            && xmlReader.isStartElement()) {
                         xmlReader.next();
                         if (xmlReader.isCharacters()) {
                             // Tuvastame adressaadi asutuse
@@ -708,7 +712,9 @@ public class Recipient {
                                 }
                             }
                         }
-                    } else if (xmlReader.getLocalName().equalsIgnoreCase("allyksuse_lyhinimetus") && xmlReader.isStartElement()) {
+                    } else if ((xmlReader.getLocalName().equalsIgnoreCase("allyksuse_lyhinimetus")
+                            || xmlReader.getLocalName().equalsIgnoreCase("StructuralUnit"))
+                            && xmlReader.isStartElement()) {
                         xmlReader.next();
                         if (xmlReader.isCharacters()) {
                              subdivisionShortName = xmlReader.getText().trim();
@@ -729,7 +735,9 @@ public class Recipient {
                         if (xmlReader.isCharacters()) {
                             result.setOrganizationName(xmlReader.getText().trim());
                         }
-                    } else if (xmlReader.getLocalName().equalsIgnoreCase("isikukood") && xmlReader.isStartElement()) {
+                    } else if ((xmlReader.getLocalName().equalsIgnoreCase("isikukood")
+                            || (xmlReader.getLocalName().equalsIgnoreCase("PersonalIdCode")))
+                            && xmlReader.isStartElement()) {
                         xmlReader.next();
                         if (xmlReader.isCharacters()) {
                             result.setPersonalIdCode(xmlReader.getText().trim());

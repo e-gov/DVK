@@ -27,8 +27,13 @@ Näiteks:
 
 See on vajalik selleks, et DVK serveri projekt kasutab ka dvk-core ja dvk-client teeke.
 
-5.Mine DVK serveri projekti juurkataloogi ja käivita käsurealt järgmine käsklus:
+5. Mine DVK core projekti juurkataloogi ja käivita käsurealt järgmine käsklus:
+CMD> mvn install
 
+6. Mine DVK client projekti juurkataloogi ja käivita käsurealt järgmine käsklus:
+CMD> mvn install
+
+7.Mine DVK serveri projekti juurkataloogi ja käivita käsurealt järgmine käsklus:
 CMD> mvn package
 
 6.Maven ehitab ja paketeerib rakenduse. Kataloogi [DVK_SERVER_HOME]/target tekib fail „dhl.war“.

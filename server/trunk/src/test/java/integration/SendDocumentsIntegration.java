@@ -85,7 +85,8 @@ public class SendDocumentsIntegration {
         List<String> attachmentNames = Arrays.asList(
                 "testcontainers/v2_1/Dvk_kapsel_vers_2_1_n2ide1.xml.gz",
                 "testcontainers/v2_1/Dvk_kapsel_vers_2_1_n2ide2.xml.gz",
-                "testcontainers/v2_1/Dvk_kapsel_vers_2_1_n2ide3.xml.gz"
+                "testcontainers/v2_1/Dvk_kapsel_vers_2_1_n2ide3.xml.gz",
+                "testcontainers/v2_1/Dvk_kapsel_vers_2_1_n2ide1_DecMetaDataMissing.xml.gz"
         );
 
         sendMessageWithAttachment(attachmentNames, xHeaderBuilder.setNimi("dhl.sendDocuments.v4").build());

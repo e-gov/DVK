@@ -6,6 +6,13 @@ public class HeaderVariables {
     private String m_caseName;
     private String m_PIDWithCountryCode;
 
+    public HeaderVariables(String organizationCode, String personalIDCode, String caseName, String pidWithCountryCode) {
+        this.m_organizationCode = organizationCode;
+        this.m_personalIDCode = personalIDCode;
+        this.m_caseName = caseName;
+        this.m_PIDWithCountryCode = pidWithCountryCode;
+    }
+
     public String getOrganizationCode() {
         return m_organizationCode;
     }
@@ -36,12 +43,5 @@ public class HeaderVariables {
 
     public void setPIDWithCountryCode(String value) {
         m_PIDWithCountryCode = value;
-    }
-
-    public HeaderVariables(String organizationCode, String personalIDCode, String caseName, String pidWithCountryCode) {
-        this.m_organizationCode = organizationCode;
-        this.m_personalIDCode = personalIDCode;
-        this.m_caseName = caseName;
-        this.m_PIDWithCountryCode = pidWithCountryCode;
     }
 }

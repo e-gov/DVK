@@ -181,6 +181,6 @@
   <module name="RegexpMultiline">
     <property name="format"
               value="System\.(out)|(err)\.print(ln)?\("/>
-    <property name="message" value="Use a logger please."/>
+    <property name="message" value="Use a logger instead of System.* calls."/>
   </module>
 </module>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deployment xmlns="http://xml.apache.org/axis/wsdd/" xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+ <globalConfiguration>
+  <parameter name="sendMultiRefs" value="true"/>
+  <parameter name="disablePrettyXML" value="true"/>
+  <parameter name="adminPassword" value="admin"/>
+  <parameter name="attachments.Directory" value=".\attachments"/>
+  <parameter name="dotNetSoapEncFix" value="true"/>
+  <parameter name="enableNamespacePrefixOptimization" value="false"/>
+  <parameter name="sendXMLDeclaration" value="true"/>
+  <parameter name="sendXsiTypes" value="true"/>
+  <parameter name="attachments.implementation" value="org.apache.axis.attachments.AttachmentsImpl"/>
+  <requestFlow>
+   <handler type="java:org.apache.axis.handlers.JWSHandler">
+    <parameter name="scope" value="session"/>
+   </handler>
+   <handler type="java:org.apache.axis.handlers.JWSHandler">
+    <parameter name="scope" value="request"/>
+    <parameter name="extension" value=".jwr"/>
+   </handler>
+  </requestFlow>
+ </globalConfiguration>
+ <handler name="LocalResponder" type="java:org.apache.axis.transport.local.LocalResponder"/>
+ <handler name="URLMapper" type="java:org.apache.axis.handlers.http.URLMapper"/>
+ <requestFlow name="checks">
+  <handler type="java:org.apache.axis.handlers.SimpleAuthenticationHandler"/>
+  <handler type="java:org.apache.axis.handlers.SimpleAuthorizationHandler"/>
+ </requestFlow>
+ <handler name="Authenticate" type="java:org.apache.axis.handlers.SimpleAuthenticationHandler"/>
+  <typeMapping xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                 qname="xsd:anyType"
+                 type="java:java.lang.Object"
+                 serializer="org.apache.axis.encoding.ser.ElementSerializerFactory"
+                 deserializer="org.apache.axis.encoding.ser.ElementDeserializerFactory"
+                 encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+  <service name="dhlHttpSoapPort" provider="java:RPC" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <parameter name="className" value="dhl.CoreServices" />
+	<parameter name="allowedMethods" value="*"/>
+	<operation name="getOccupationList">
+		<parameter name="keha" type="xsd:anyType" mode="IN"/>
+	</operation>
+	<operation name="getSubdivisionList">
+		<parameter name="keha" type="xsd:anyType" mode="IN"/>
+	</operation>
+	<operation name="runSystemCheck">
+		<parameter name="keha" type="xsd:anyType" mode="IN"/>
+	</operation>
+	<operation name="changeOrganizationData">
+		<parameter name="keha" type="xsd:anyType" mode="IN"/>
+	</operation>
+	<operation name="deleteOldDocuments">
+		<parameter name="keha" type="xsd:anyType" mode="IN"/>
+	</operation>
+    <operation name="sendDocuments">
+      <parameter name="p1" type="xsd:anyType" mode="IN"/>
+      <parameter name="keha" type="xsd:anyType" mode="IN"/>
+    </operation>
+    <operation name="markDocumentsReceived">
+      <parameter name="p1" type="xsd:anyType" mode="IN"/>
+      <parameter name="keha" type="xsd:anyType" mode="IN"/>
+    </operation>
+    <operation name="receiveDocuments">
+      <parameter name="keha" type="xsd:anyType" mode="IN"/>
+    </operation>
+    <operation name="getSendStatus">
+      <parameter name="p1" type="xsd:anyType" mode="IN"/>
+      <parameter name="keha" type="xsd:anyType" mode="IN"/>
+    </operation>
+  </service>
+
+ <transport name="http">
+  <requestFlow>
+   <handler type="URLMapper"/>
+   <handler type="java:org.apache.axis.handlers.http.HTTPAuthHandler"/>
+  </requestFlow>
+  <parameter name="qs:list" value="org.apache.axis.transport.http.QSListHandler"/>
+  <parameter name="qs:wsdl" value="org.apache.axis.transport.http.QSWSDLHandler"/>
+  <parameter name="qs.list" value="org.apache.axis.transport.http.QSListHandler"/>
+  <parameter name="qs.method" value="org.apache.axis.transport.http.QSMethodHandler"/>
+  <parameter name="qs:method" value="org.apache.axis.transport.http.QSMethodHandler"/>
+  <parameter name="qs.wsdl" value="org.apache.axis.transport.http.QSWSDLHandler"/>
+ </transport>
+ <transport name="local">
+  <responseFlow>
+   <handler type="LocalResponder"/>
+  </responseFlow>
+ </transport>
+</deployment>

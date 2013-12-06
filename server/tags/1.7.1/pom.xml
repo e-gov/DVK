@@ -27,553 +27,553 @@
             <artifactId>activation</artifactId>
             <version>1.1</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\activation-1.1.jar</systemPath>
+            <systemPath>${basedir}/lib/activation-1.1.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>annogen</artifactId>
             <version>0.1.0</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\annogen-0.1.0.jar</systemPath>
+            <systemPath>${basedir}/lib/annogen-0.1.0.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>axiom-api</artifactId>
             <version>1.2.7</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\axiom-api-1.2.7.jar</systemPath>
+            <systemPath>${basedir}/lib/axiom-api-1.2.7.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>axiom-dom</artifactId>
             <version>1.2.7</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\axiom-dom-1.2.7.jar</systemPath>
+            <systemPath>${basedir}/lib/axiom-dom-1.2.7.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>axiom-impl</artifactId>
             <version>1.2.7</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\axiom-impl-1.2.7.jar</systemPath>
+            <systemPath>${basedir}/lib/axiom-impl-1.2.7.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>axis</groupId>
             <artifactId>axis</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\axis.jar</systemPath>
+            <systemPath>${basedir}/lib/axis.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2-adb</artifactId>
             <version>1.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\axis2-adb-1.4.jar</systemPath>
+            <systemPath>${basedir}/lib/axis2-adb-1.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2-adb-codegen</artifactId>
             <version>1.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\axis2-adb-codegen-1.4.jar</systemPath>
+            <systemPath>${basedir}/lib/axis2-adb-codegen-1.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2-ant-plugin</artifactId>
             <version>1.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\axis2-ant-plugin-1.4.jar</systemPath>
+            <systemPath>${basedir}/lib/axis2-ant-plugin-1.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2-clustering</artifactId>
             <version>1.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\axis2-clustering-1.4.jar</systemPath>
+            <systemPath>${basedir}/lib/axis2-clustering-1.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2-codegen</artifactId>
             <version>1.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\axis2-codegen-1.4.jar</systemPath>
+            <systemPath>${basedir}/lib/axis2-codegen-1.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2-corba</artifactId>
             <version>1.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\axis2-corba-1.4.jar</systemPath>
+            <systemPath>${basedir}/lib/axis2-corba-1.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2-fastinfoset</artifactId>
             <version>1.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\axis2-fastinfoset-1.4.jar</systemPath>
+            <systemPath>${basedir}/lib/axis2-fastinfoset-1.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2-java2wsdl</artifactId>
             <version>1.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\axis2-java2wsdl-1.4.jar</systemPath>
+            <systemPath>${basedir}/lib/axis2-java2wsdl-1.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2-jaxbri</artifactId>
             <version>1.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\axis2-jaxbri-1.4.jar</systemPath>
+            <systemPath>${basedir}/lib/axis2-jaxbri-1.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2-jaxws</artifactId>
             <version>1.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\axis2-jaxws-1.4.jar</systemPath>
+            <systemPath>${basedir}/lib/axis2-jaxws-1.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2-jaxws-api</artifactId>
             <version>1.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\axis2-jaxws-api-1.4.jar</systemPath>
+            <systemPath>${basedir}/lib/axis2-jaxws-api-1.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2-jibx</artifactId>
             <version>1.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\axis2-jibx-1.4.jar</systemPath>
+            <systemPath>${basedir}/lib/axis2-jibx-1.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2-json</artifactId>
             <version>1.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\axis2-json-1.4.jar</systemPath>
+            <systemPath>${basedir}/lib/axis2-json-1.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2-jws-api</artifactId>
             <version>1.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\axis2-jws-api-1.4.jar</systemPath>
+            <systemPath>${basedir}/lib/axis2-jws-api-1.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2-kernel</artifactId>
             <version>1.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\axis2-kernel-1.4.jar</systemPath>
+            <systemPath>${basedir}/lib/axis2-kernel-1.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2-metadata</artifactId>
             <version>1.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\axis2-metadata-1.4.jar</systemPath>
+            <systemPath>${basedir}/lib/axis2-metadata-1.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2-mtompolicy</artifactId>
             <version>1.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\axis2-mtompolicy-1.4.jar</systemPath>
+            <systemPath>${basedir}/lib/axis2-mtompolicy-1.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2-saaj</artifactId>
             <version>1.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\axis2-saaj-1.4.jar</systemPath>
+            <systemPath>${basedir}/lib/axis2-saaj-1.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2-saaj-api</artifactId>
             <version>1.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\axis2-saaj-api-1.4.jar</systemPath>
+            <systemPath>${basedir}/lib/axis2-saaj-api-1.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2-spring</artifactId>
             <version>1.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\axis2-spring-1.4.jar</systemPath>
+            <systemPath>${basedir}/lib/axis2-spring-1.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2-xmlbeans</artifactId>
             <version>1.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\axis2-xmlbeans-1.4.jar</systemPath>
+            <systemPath>${basedir}/lib/axis2-xmlbeans-1.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>backport</groupId>
             <artifactId>util-concurrent</artifactId>
             <version>3.1</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\backport-util-concurrent-3.1.jar</systemPath>
+            <systemPath>${basedir}/lib/backport-util-concurrent-3.1.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>bcmail-jdk15</artifactId>
             <version>1.44</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\bcmail-jdk15-1.44.jar</systemPath>
+            <systemPath>${basedir}/lib/bcmail-jdk15-1.44.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>bcprov-jdk15</artifactId>
             <version>1.44</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\bcprov-jdk15-1.44.jar</systemPath>
+            <systemPath>${basedir}/lib/bcprov-jdk15-1.44.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>bctsp-jdk15</artifactId>
             <version>1.44</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\bctsp-jdk15-1.44.jar</systemPath>
+            <systemPath>${basedir}/lib/bctsp-jdk15-1.44.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>apache</groupId>
             <artifactId>commons-codec</artifactId>
             <version>1.3</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\commons-codec-1.3.jar</systemPath>
+            <systemPath>${basedir}/lib/commons-codec-1.3.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>apache</groupId>
             <artifactId>commons-discovery</artifactId>
             <version>0.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\commons-discovery-0.4.jar</systemPath>
+            <systemPath>${basedir}/lib/commons-discovery-0.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>apache</groupId>
             <artifactId>commons-fileupload</artifactId>
             <version>1.2</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\commons-fileupload-1.2.jar</systemPath>
+            <systemPath>${basedir}/lib/commons-fileupload-1.2.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>apache</groupId>
             <artifactId>commons-httpclient</artifactId>
             <version>3.1</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\commons-httpclient-3.1.jar</systemPath>
+            <systemPath>${basedir}/lib/commons-httpclient-3.1.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>apache</groupId>
             <artifactId>commons-io</artifactId>
             <version>1.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\commons-io-1.4.jar</systemPath>
+            <systemPath>${basedir}/lib/commons-io-1.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>geronimo</groupId>
             <artifactId>annotation-spec</artifactId>
             <version>1.1</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\geronimo-annotation_1.0_spec-1.1.jar</systemPath>
+            <systemPath>${basedir}/lib/geronimo-annotation_1.0_spec-1.1.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>geronimo</groupId>
             <artifactId>annotation-stax-api</artifactId>
             <version>1.0.1</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\geronimo-stax-api_1.0_spec-1.0.1.jar</systemPath>
+            <systemPath>${basedir}/lib/geronimo-stax-api_1.0_spec-1.0.1.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>httpcore</artifactId>
             <version>4.0</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\httpcore-4.0-beta1.jar</systemPath>
+            <systemPath>${basedir}/lib/httpcore-4.0-beta1.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>httpcore-nio</artifactId>
             <version>4.0</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\httpcore-nio-4.0-beta1.jar</systemPath>
+            <systemPath>${basedir}/lib/httpcore-nio-4.0-beta1.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>isorelax</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\isorelax.jar</systemPath>
+            <systemPath>${basedir}/lib/isorelax.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>apache</groupId>
             <artifactId>jalopy</artifactId>
             <version>1.5rc3</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\jalopy-1.5rc3.jar</systemPath>
+            <systemPath>${basedir}/lib/jalopy-1.5rc3.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>javaee</artifactId>
             <version>1.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\javaee-1.4.jar</systemPath>
+            <systemPath>${basedir}/lib/javaee-1.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>jaxb-api</artifactId>
             <version>2.1</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\jaxb-api-2.1.jar</systemPath>
+            <systemPath>${basedir}/lib/jaxb-api-2.1.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>jaxb-impl</artifactId>
             <version>2.1.6</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\jaxb-impl-2.1.6.jar</systemPath>
+            <systemPath>${basedir}/lib/jaxb-impl-2.1.6.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>jaxb-xjc</artifactId>
             <version>2.1.6</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\jaxb-xjc-2.1.6.jar</systemPath>
+            <systemPath>${basedir}/lib/jaxb-xjc-2.1.6.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>jaxen</artifactId>
             <version>1.1.1</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\jaxen-1.1.1.jar</systemPath>
+            <systemPath>${basedir}/lib/jaxen-1.1.1.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>jaxrpc</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\jaxrpc.jar</systemPath>
+            <systemPath>${basedir}/lib/jaxrpc.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>jdigidoc</artifactId>
             <version>2.3.98</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\jdigidoc-2.3.98.jar</systemPath>
+            <systemPath>${basedir}/lib/jdigidoc-2.3.98.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>jettison</artifactId>
             <version>1.0-RC2</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\jettison-1.0-RC2.jar</systemPath>
+            <systemPath>${basedir}/lib/jettison-1.0-RC2.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>jibx-bind</artifactId>
             <version>1.1.5</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\jibx-bind-1.1.5.jar</systemPath>
+            <systemPath>${basedir}/lib/jibx-bind-1.1.5.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>jibx-run</artifactId>
             <version>1.1.5</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\jibx-run-1.1.5.jar</systemPath>
+            <systemPath>${basedir}/lib/jibx-run-1.1.5.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>jstl</artifactId>
             <version>1.2</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\jstl-1.2.jar</systemPath>
+            <systemPath>${basedir}/lib/jstl-1.2.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>apache</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.15</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\log4j-1.2.15.jar</systemPath>
+            <systemPath>${basedir}/lib/log4j-1.2.15.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>mail</artifactId>
             <version>1.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\mail-1.4.jar</systemPath>
+            <systemPath>${basedir}/lib/mail-1.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>mex</artifactId>
             <version>1.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\mex-1.4.jar</systemPath>
+            <systemPath>${basedir}/lib/mex-1.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>apache</groupId>
             <artifactId>xerces</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\xercesImpl.jar</systemPath>
+            <systemPath>${basedir}/lib/xercesImpl.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>relaxngDatatype</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\relaxngDatatype.jar</systemPath>
+            <systemPath>${basedir}/lib/relaxngDatatype.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>xsdlib</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\xsdlib.jar</systemPath>
+            <systemPath>${basedir}/lib/xsdlib.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>xmlParserAPIs</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\xmlParserAPIs.jar</systemPath>
+            <systemPath>${basedir}/lib/xmlParserAPIs.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>msv</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\msv.jar</systemPath>
+            <systemPath>${basedir}/lib/msv.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>neethi</artifactId>
             <version>2.0.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\neethi-2.0.4.jar</systemPath>
+            <systemPath>${basedir}/lib/neethi-2.0.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>oracle</groupId>
             <artifactId>jdbc</artifactId>
             <version>1.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\ojdbc14.jar</systemPath>
+            <systemPath>${basedir}/lib/ojdbc14.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>oracle</groupId>
             <artifactId>i18n</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\orai18n.jar</systemPath>
+            <systemPath>${basedir}/lib/orai18n.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>saaj</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\saaj.jar</systemPath>
+            <systemPath>${basedir}/lib/saaj.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>soapmonitor</artifactId>
             <version>1.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\soapmonitor-1.4.jar</systemPath>
+            <systemPath>${basedir}/lib/soapmonitor-1.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>stax2</artifactId>
             <version>3.0pr1</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\stax2-3.0pr1.jar</systemPath>
+            <systemPath>${basedir}/lib/stax2-3.0pr1.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>woden-api</artifactId>
             <version>1.0M8</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\woden-api-1.0M8.jar</systemPath>
+            <systemPath>${basedir}/lib/woden-api-1.0M8.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>woden-impl-dom</artifactId>
             <version>1.0M8</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\woden-impl-dom-1.0M8.jar</systemPath>
+            <systemPath>${basedir}/lib/woden-impl-dom-1.0M8.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>wsdl4j</artifactId>
             <version>1.6.2</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\wsdl4j-1.6.2.jar</systemPath>
+            <systemPath>${basedir}/lib/wsdl4j-1.6.2.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>wstx-asl</artifactId>
             <version>3.2.4</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\wstx-asl-3.2.4.jar</systemPath>
+            <systemPath>${basedir}/lib/wstx-asl-3.2.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>wstx-lgpl</artifactId>
             <version>3.9.2</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\wstx-lgpl-3.9.2.jar</systemPath>
+            <systemPath>${basedir}/lib/wstx-lgpl-3.9.2.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>xalan</artifactId>
             <version>2.7.0</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\xalan-2.7.0.jar</systemPath>
+            <systemPath>${basedir}/lib/xalan-2.7.0.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>apache</groupId>
             <artifactId>xerces-impl</artifactId>
             <version>2.8.1</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\xercesImpl-2.8.1.jar</systemPath>
+            <systemPath>${basedir}/lib/xercesImpl-2.8.1.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>xml-apis</artifactId>
             <version>1.3.04</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\xml-apis-1.3.04.jar</systemPath>
+            <systemPath>${basedir}/lib/xml-apis-1.3.04.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>xml-resolver</artifactId>
             <version>1.2</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\xml-resolver-1.2.jar</systemPath>
+            <systemPath>${basedir}/lib/xml-resolver-1.2.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>xmlbeans</artifactId>
             <version>2.3.0</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\xmlbeans-2.3.0.jar</systemPath>
+            <systemPath>${basedir}/lib/xmlbeans-2.3.0.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>xmlSchema</artifactId>
             <version>1.4.2</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\xmlSchema-1.4.2.jar</systemPath>
+            <systemPath>${basedir}/lib/xmlSchema-1.4.2.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>xmlsec</artifactId>
             <version>1.4.2</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\xmlsec-1.3.0.jar</systemPath>
+            <systemPath>${basedir}/lib/xmlsec-1.3.0.jar</systemPath>
         </dependency>
 
        <!-- <dependency>
@@ -711,7 +711,7 @@
                         <artifactId>jdbc</artifactId>
                         <version>1.4</version>
                         <scope>system</scope>
-                        <systemPath>${basedir}\lib\ojdbc14.jar</systemPath>
+                        <systemPath>${basedir}/lib/ojdbc14.jar</systemPath>
                     </dependency>
                     <!-- <dependency>
                          <groupId>org.mortbay.jetty</groupId>

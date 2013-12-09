@@ -566,7 +566,7 @@
             <artifactId>xmlSchema</artifactId>
             <version>1.4.2</version>
             <scope>system</scope>
-            <systemPath>${basedir}/lib/xmlSchema-1.4.2.jar</systemPath>
+            <systemPath>${basedir}/lib/XmlSchema-1.4.2.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>

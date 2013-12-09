@@ -7,23 +7,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public class Fault {
-    static Logger logger = Logger.getLogger(Fault.class.getName());
-
-    private String m_faultCode;
+	static Logger logger = Logger.getLogger(Fault.class.getName());
+	
+	private String m_faultCode;
     private String m_faultActor;
     private String m_faultString;
     private String m_faultDetail;
-
-    public Fault() {
-        clear();
-    }
-
-    public Fault(String faultCode, String faultActor, String faultString, String faultDetail) {
-        m_faultCode = faultCode;
-        m_faultActor = faultActor;
-        m_faultString = faultString;
-        m_faultDetail = faultDetail;
-    }
 
     public void setFaultCode(String faultCode) {
         this.m_faultCode = faultCode;
@@ -57,6 +46,17 @@ public class Fault {
         return m_faultDetail;
     }
 
+    public Fault() {
+        clear();
+    }
+
+    public Fault(String faultCode, String faultActor, String faultString, String faultDetail) {
+        m_faultCode = faultCode;
+        m_faultActor = faultActor;
+        m_faultString = faultString;
+        m_faultDetail = faultDetail;
+    }
+
     public void clear() {
         m_faultCode = "";
         m_faultActor = "";
@@ -82,29 +82,29 @@ public class Fault {
 
             // Fault code
             if ((m_faultCode != null) && (m_faultCode.length() > 0)) {
-                xmlWriter.write("<faultcode>" + m_faultCode + "</faultcode>");
+            	xmlWriter.write("<faultcode>" + m_faultCode + "</faultcode>");
             }
 
             // Fault actor
             if ((m_faultActor != null) && (m_faultActor.length() > 0)) {
-                xmlWriter.write("<faultactor>" + m_faultActor + "</faultactor>");
+            	xmlWriter.write("<faultactor>" + m_faultActor + "</faultactor>");
             }
 
             // Fault string
             if ((m_faultString != null) && (m_faultString.length() > 0)) {
-                xmlWriter.write("<faultstring>" + m_faultString + "</faultstring>");
+            	xmlWriter.write("<faultstring>" + m_faultString + "</faultstring>");
             }
 
             // Fault detail
             if ((m_faultDetail != null) && (m_faultDetail.length() > 0)) {
-                xmlWriter.write("<faultdetail>" + m_faultDetail + "</faultdetail>");
+            	xmlWriter.write("<faultdetail>" + m_faultDetail + "</faultdetail>");
             }
 
             // Item element end
             xmlWriter.write("</fault>");
             return true;
         } catch (Exception ex) {
-            logger.error(ex);
+        	logger.error(ex);
             return false;
         }
     }
@@ -132,10 +132,7 @@ public class Fault {
             result.setFaultDetail(CommonMethods.getNodeText(nl.item(0)));
         }
 
-        if (((result.getFaultCode() == null) || (result.getFaultCode().trim().length() == 0))
-                && ((result.getFaultActor() == null) || (result.getFaultActor().trim().length() == 0))
-                && ((result.getFaultString() == null) || (result.getFaultString().trim().length() == 0))
-                && ((result.getFaultDetail() == null) || (result.getFaultDetail().trim().length() == 0))) {
+        if (((result.getFaultCode() == null) || (result.getFaultCode().trim().length() == 0)) && ((result.getFaultActor() == null) || (result.getFaultActor().trim().length() == 0)) && ((result.getFaultString() == null) || (result.getFaultString().trim().length() == 0)) && ((result.getFaultDetail() == null) || (result.getFaultDetail().trim().length() == 0))) {
             result = null;
         }
 

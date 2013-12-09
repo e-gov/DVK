@@ -1,9 +1,9 @@
 package dvk.core;
 
 public class AttachmentExtractionResult {
-    private String m_extractedFileName;
-    private String m_attachmentHash;
-
+	private String m_extractedFileName;
+	private String m_attachmentHash;
+	
     public String getExtractedFileName() {
         return this.m_extractedFileName;
     }

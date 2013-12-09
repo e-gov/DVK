@@ -19,14 +19,12 @@ import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.w3c.dom.Document;
 import org.apache.axis.attachments.AttachmentPart;
 import org.apache.axis.encoding.Base64;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import javax.mail.Message;
@@ -42,7 +40,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
 import org.apache.axis.AxisFault;
 import org.apache.log4j.Logger;
 import org.codehaus.stax2.XMLInputFactory2;
@@ -55,52 +52,48 @@ import org.xml.sax.InputSource;
 
 
 public class CommonMethods {
-    static Logger logger = Logger.getLogger(CommonMethods.class.getName());
-    private static final char kHexChars[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
+	static Logger logger = Logger.getLogger(CommonMethods.class.getName());
 
-    /**
-     * Genereerib operatsioonisüsteemi ajutiste failide kataloogi uue unikaalse nimega ajutise faili.
-     *
-     * @param itemIndex Faili järjekorranumber. Võimaldab vajadusel eristada näiteks tsüklis loodud ajutisi faile.
-     * @return Faili nimi (absolute path)
-     */
-    public static String createPipelineFile(int itemIndex) {
-        return createPipelineFile(itemIndex, "");
-    }
+	/**
+	 * Genereerib operatsioonisüsteemi ajutiste failide kataloogi uue unikaalse nimega ajutise faili.
+	 *
+	 * @param itemIndex		Faili järjekorranumber. Võimaldab vajadusel eristada näiteks tsüklis loodud ajutisi faile.
+	 * @return				Faili nimi (absolute path)
+	 */
+	public static String createPipelineFile(int itemIndex) {
+		return createPipelineFile(itemIndex, "");
+	}
 
-    /**
-     * Genereerib operatsioonisüsteemi ajutiste failide kataloogi uue unikaalse nimega ajutise faili.
-     *
-     * @param itemIndex Faili järjekorranumber. Võimaldab vajadusel eristada näiteks tsüklis loodud ajutisi faile.
-     * @param extension Faililaiend. Võimaldab ajutisele failile vajadusel ka faililaiendi anda.
-     * @return Faili nimi (absolute path)
-     */
+	/**
+	 * Genereerib operatsioonisüsteemi ajutiste failide kataloogi uue unikaalse nimega ajutise faili.
+	 *
+	 * @param itemIndex		Faili järjekorranumber. Võimaldab vajadusel eristada näiteks tsüklis loodud ajutisi faile.
+	 * @param extension		Faililaiend. Võimaldab ajutisele failile vajadusel ka faililaiendi anda.
+	 * @return				Faili nimi (absolute path)
+	 */
     public static String createPipelineFile(int itemIndex, String extension) {
         try {
             if (extension == null) {
-                extension = "";
+            	extension = "";
             }
             if ((extension.length() > 0) && !extension.startsWith(".")) {
-                extension = "." + extension;
+            	extension = "." + extension;
             }
 
-            String tmpDir = System.getProperty("java.io.tmpdir", "");
+        	String tmpDir = System.getProperty("java.io.tmpdir", "");
 
-            String result = tmpDir + File.separator + "dhl_" + String.valueOf((new Date()).getTime())
-                                + ((itemIndex > 0) ? "_item" + String.valueOf(itemIndex) : "") + extension;
+            String result = tmpDir + File.separator + "dhl_" + String.valueOf((new Date()).getTime()) + ((itemIndex > 0) ? "_item" + String.valueOf(itemIndex) : "") + extension;
             int uniqueCounter = 0;
             while ((new File(result)).exists()) {
                 ++uniqueCounter;
-                result = tmpDir + File.separator + "dhl_" + String.valueOf((new Date()).getTime())
-                        + ((itemIndex > 0) ? "_item" + String.valueOf(itemIndex) : "")
-                        + "_" + String.valueOf(uniqueCounter) + extension;
+                result = tmpDir + File.separator + "dhl_" + String.valueOf((new Date()).getTime()) + ((itemIndex > 0) ? "_item" + String.valueOf(itemIndex) : "") + "_" + String.valueOf(uniqueCounter) + extension;
             }
             File file = new File(result);
             file.createNewFile();
             return result;
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+        	logger.error(ex.getMessage(), ex);
             return null;
         }
     }
@@ -110,22 +103,21 @@ public class CommonMethods {
         File tempPath = new File(System.getProperty("java.io.tmpdir", ""));
         if ((tempPath != null) && tempPath.exists() && tempPath.isDirectory()) {
             if (giveFeedbackOnConsole) {
-                System.out.println("Deleting old temporary files from " + tempPath.getAbsolutePath());
+                System.out.println("Deleting old temporary files from "+ tempPath.getAbsolutePath());
             }
 
             FilenameFilter filter = new FilenameFilter() {
-                String startMarker = "dhl_";
-
-                public boolean accept(File dir, String name) {
-                    return name.startsWith(startMarker);
-                }
-            };
+                    String startMarker = "dhl_";
+                    public boolean accept(File dir, String name) {
+                        return name.startsWith(startMarker);
+                    }
+                };
 
             File[] files = tempPath.listFiles(filter);
             if ((files != null) && (files.length > 0)) {
                 int count = Math.min(maxFilesToDelete, files.length);
                 if (giveFeedbackOnConsole) {
-                    System.out.println(String.valueOf(count) + " files to delete...");
+                    System.out.println(String.valueOf(count) +" files to delete...");
                 }
                 for (int i = 0; i < count; ++i) {
                     try {
@@ -133,7 +125,7 @@ public class CommonMethods {
                             files[i].delete();
                         }
                     } catch (Exception ex) {
-                        logger.error(ex.getMessage(), ex);
+                    	logger.error(ex.getMessage(), ex);
                     }
                 }
                 if (giveFeedbackOnConsole) {
@@ -159,28 +151,28 @@ public class CommonMethods {
                 return result;
             }
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+        	logger.error(ex.getMessage(), ex);
             return null;
         }
     }
 
     public static boolean gzipUnpackXML(String sourceFile, boolean appendDocumentHeader) {
         if (isNullOrEmpty(sourceFile)) {
-            logger.error("Extracting gzipped XML file failed because file name was not supplied!");
-            return false;
+        	logger.error("Extracting gzipped XML file failed because file name was not supplied!");
+        	return false;
         }
 
         File sourceFileAsObject = new File(sourceFile);
         if (!sourceFileAsObject.exists()) {
-            logger.error("Extracting gzipped XML file failed because file " + sourceFile + " does not exist!");
-            return false;
+        	logger.error("Extracting gzipped XML file failed because file "+ sourceFile +" does not exist!");
+        	return false;
         }
         if (sourceFileAsObject.length() < 1) {
-            logger.error("Extracting gzipped XML file failed because file " + sourceFile + " is empty!");
-            return false;
+        	logger.error("Extracting gzipped XML file failed because file "+ sourceFile +" is empty!");
+        	return false;
         }
 
-        long totalBytesExtracted = 0;
+    	long totalBytesExtracted = 0;
         byte[] buf = new byte[Settings.getBinaryBufferSize()];
         int len;
         FileInputStream sourceStream = null;
@@ -222,9 +214,8 @@ public class CommonMethods {
 
             return true;
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
-            logger.error("Initial file length: " + sourceFileAsObject.length()
-                    + ", total bytes extracted before error: " + totalBytesExtracted);
+        	logger.error(ex.getMessage(), ex);
+        	logger.error("Initial file length: "+ sourceFileAsObject.length() +", total bytes extracted before error: "+ totalBytesExtracted);
             return false;
         } finally {
             safeCloseStream(in);
@@ -241,43 +232,41 @@ public class CommonMethods {
 
     public static String gzipPackXML(String filePath, String orgCode, String requestName) throws IllegalArgumentException, IOException {
         if (!(new File(filePath)).exists()) {
-            logger.debug("Input file \"" + filePath + "\" does not exist!");
+        	logger.debug("Input file \""+ filePath +"\" does not exist!");
             throw new IllegalArgumentException("Data file does not exist!");
         }
 
         String tmpDir = System.getProperty("java.io.tmpdir", "");
 
         // Pakime andmed kokku
-        String zipOutFileName = tmpDir + File.separator + "dhl_" + requestName + "_" + orgCode
-                                            + "_" + String.valueOf((new Date()).getTime()) + "_zipOutBuffer.dat";
+        String zipOutFileName = tmpDir + File.separator + "dhl_" + requestName + "_" + orgCode + "_" + String.valueOf((new Date()).getTime()) + "_zipOutBuffer.dat";
         InputStream in = new BufferedInputStream(new FileInputStream(filePath));
         OutputStream zipOutFile = new BufferedOutputStream(new FileOutputStream(zipOutFileName, false));
         GZIPOutputStream out = new GZIPOutputStream(zipOutFile);
         byte[] buf = new byte[Settings.getBinaryBufferSize()];
         int len;
         try {
-            while ((len = in.read(buf)) > 0) {
-                out.write(buf, 0, len);
-            }
+	        while ((len = in.read(buf)) > 0) {
+	            out.write(buf, 0, len);
+	        }
         } finally {
-            in.close();
-            out.finish();
-            out.close();
+	        in.close();
+	        out.finish();
+	        out.close();
         }
 
         // Kodeerime pakitud andmed base64 kujule
-        String base64OutFileName = tmpDir + File.separator + "dhl_" + requestName + "_" + orgCode
-                                        + "_" + String.valueOf((new Date()).getTime()) + "_base64OutBuffer.dat";
+        String base64OutFileName = tmpDir + File.separator + "dhl_" + requestName + "_" + orgCode + "_" + String.valueOf((new Date()).getTime()) + "_base64OutBuffer.dat";
         in = new BufferedInputStream(new FileInputStream(zipOutFileName));
         OutputStream b64out = new BufferedOutputStream(new FileOutputStream(base64OutFileName, false));
         buf = new byte[66000];  // Puhvri pikkus peaks jaguma 3-ga
         try {
-            while ((len = in.read(buf)) > 0) {
-                b64out.write(Base64.encode(buf, 0, len).getBytes());
-            }
+	        while ((len = in.read(buf)) > 0) {
+	            b64out.write(Base64.encode(buf, 0, len).getBytes());
+	        }
         } finally {
-            in.close();
-            b64out.close();
+	        in.close();
+	        b64out.close();
         }
 
         // Kustutame vaheproduktideks olnud failid ära
@@ -290,7 +279,7 @@ public class CommonMethods {
         try {
             return xmlElementToString(xmlElement).getBytes("UTF-8");
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+        	logger.error(ex.getMessage(), ex);
             return null;
         }
     }
@@ -312,7 +301,7 @@ public class CommonMethods {
             trans = null;
             source = null;
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+        	logger.error(ex.getMessage(), ex);
             result = false;
         } finally {
             safeCloseWriter(ow);
@@ -334,7 +323,7 @@ public class CommonMethods {
             trans.transform(source, new StreamResult(sw));
             return sw.toString();
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+        	logger.error(ex.getMessage(), ex);
             return "";
         }
     }
@@ -347,7 +336,7 @@ public class CommonMethods {
             DocumentBuilder builder = factory.newDocumentBuilder();
             return builder.parse(resultStream);
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+        	logger.error(ex.getMessage(), ex);
             return null;
         }
     }
@@ -393,7 +382,7 @@ public class CommonMethods {
             result = result.substring(0, result.length() - 2) + ":" + result.substring(result.length() - 2);
             return result;
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+        	logger.error(ex.getMessage(), ex);
             return "";
         }
     }
@@ -467,10 +456,10 @@ public class CommonMethods {
 
     public static boolean booleanFromXML(String xmlBool) {
         if (xmlBool == null) {
-            return false;
+        	return false;
         } else {
-            xmlBool = xmlBool.trim();
-            if (xmlBool.length() < 1) {
+        	xmlBool = xmlBool.trim();
+        	if (xmlBool.length() < 1) {
                 return false;
             } else if (xmlBool.equalsIgnoreCase("true")) {
                 return true;
@@ -501,7 +490,7 @@ public class CommonMethods {
             }
             return byteStream.toByteArray();
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+        	logger.error(ex.getMessage(), ex);
             return null;
         }
     }
@@ -528,7 +517,7 @@ public class CommonMethods {
                         outStream.write(buf, 0, len);
                     }
                 } else {
-                    base64DecoderStream = javax.mail.internet.MimeUtility.decode(dataStream, "base64");
+                	base64DecoderStream = javax.mail.internet.MimeUtility.decode(dataStream, "base64");
                     while ((len = base64DecoderStream.read(buf, 0, buf.length)) > 0) {
                         md.update(buf, 0, len);
                         outStream.write(buf, 0, len);
@@ -549,7 +538,7 @@ public class CommonMethods {
 
             return byteArrayToHex(digest);
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+        	logger.error(ex.getMessage(), ex);
             return null;
         }
     }
@@ -569,16 +558,18 @@ public class CommonMethods {
         hexString.append(lowNibble);
     }
 
+    private static final char kHexChars[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+
     public static boolean writeToFile(String fileName, byte[] data) {
-        boolean result = true;
-        FileOutputStream fs = null;
-        try {
+    	boolean result = true;
+    	FileOutputStream fs = null;
+    	try {
             fs = new FileOutputStream(fileName, true);
             fs.write(data);
         } catch (Exception ex) {
             result = false;
         } finally {
-            safeCloseStream(fs);
+        	safeCloseStream(fs);
         }
         return result;
     }
@@ -692,7 +683,6 @@ public class CommonMethods {
             try {
                 r.close();
             } catch (Exception ex) {
-                logger.error("In safeCloseReader", ex);
             } finally {
                 r = null;
             }
@@ -705,7 +695,6 @@ public class CommonMethods {
                 w.flush();
                 w.close();
             } catch (Exception ex) {
-                logger.error("In safeCloseWriter", ex);
             } finally {
                 w = null;
             }
@@ -717,7 +706,6 @@ public class CommonMethods {
             try {
                 s.close();
             } catch (Exception ex) {
-                logger.error("In safeCloseStream", ex);
             } finally {
                 s = null;
             }
@@ -729,7 +717,6 @@ public class CommonMethods {
             try {
                 s.close();
             } catch (Exception ex) {
-                logger.error("In safeCloseStream", ex);
             } finally {
                 s = null;
             }
@@ -737,18 +724,17 @@ public class CommonMethods {
     }
 
     public static void safeCloseDatabaseConnection(Connection dbConnection) {
-        try {
-            if ((dbConnection != null) && !dbConnection.isClosed()) {
-                dbConnection.close();
-            }
-        } catch (Exception ex) {
-            logger.warn("Failed closing database connection!", ex);
-        }
+    	try {
+	    	if ((dbConnection != null) && !dbConnection.isClosed()) {
+	    		dbConnection.close();
+	    	}
+    	} catch (Exception ex) {
+			logger.warn("Failed closing database connection!", ex);
+		}
     }
 
     /**
      * Visatakse ajutiselt suured binaarsed andmed välja. Parandab protsessimise kiirust.
-     *
      * @param xmlFileName
      * @param tagLocalName
      * @param noMainFile
@@ -756,8 +742,7 @@ public class CommonMethods {
      * @param replaceMain
      * @return
      */
-    public static FileSplitResult splitOutTags(String xmlFileName, String tagLocalName,
-                                               boolean noMainFile, boolean noSubFiles, boolean replaceMain) {
+    public static FileSplitResult splitOutTags(String xmlFileName, String tagLocalName, boolean noMainFile, boolean noSubFiles, boolean replaceMain) {
         FileSplitResult result = new FileSplitResult();
         result.subFiles = new ArrayList<String>();
 
@@ -773,12 +758,9 @@ public class CommonMethods {
         OutputStreamWriter subOutWriter = null;
         BufferedWriter subWriter = null;
 
-        Pattern startPattern = Pattern.compile("<([\\w]+:)?" + tagLocalName,
-                                                Pattern.DOTALL | Pattern.CANON_EQ | Pattern.CASE_INSENSITIVE);
-        Pattern endPattern = Pattern.compile("<\\/([\\w]+:)?" + tagLocalName,
-                                                Pattern.DOTALL | Pattern.CANON_EQ | Pattern.CASE_INSENSITIVE);
-        Pattern startAndEndPattern = Pattern.compile("<([\\w]+:)?" + tagLocalName + "([^>])*\\/([\\s])*>",
-                                                Pattern.DOTALL | Pattern.CANON_EQ | Pattern.CASE_INSENSITIVE);
+        Pattern startPattern = Pattern.compile("<([\\w]+:)?" + tagLocalName, Pattern.DOTALL | Pattern.CANON_EQ | Pattern.CASE_INSENSITIVE);
+        Pattern endPattern = Pattern.compile("<\\/([\\w]+:)?" + tagLocalName, Pattern.DOTALL | Pattern.CANON_EQ | Pattern.CASE_INSENSITIVE);
+        Pattern startAndEndPattern = Pattern.compile("<([\\w]+:)?" + tagLocalName + "([^>])*\\/([\\s])*>", Pattern.DOTALL | Pattern.CANON_EQ | Pattern.CASE_INSENSITIVE);
 
         int charsRead = 0;
         char[] readBuffer = new char[1];
@@ -835,7 +817,7 @@ public class CommonMethods {
 
                     if (startAndEndMatcher.find()) {
 
-                        dvkContainerVersion = 1;
+                    	dvkContainerVersion = 1;
 
                         if (!noSubFiles) {
                             if (currentLevel == 0) {
@@ -861,7 +843,7 @@ public class CommonMethods {
                         }
                     } else if (startMatcher.find()) {
 
-                        dvkContainerVersion = 1;
+                    	dvkContainerVersion = 1;
 
                         // Puhvris on eraldatava TAGi algus
                         ++currentLevel;
@@ -889,7 +871,7 @@ public class CommonMethods {
                         }
                     } else if (endMatcher.find()) {
 
-                        dvkContainerVersion = 1;
+                    	dvkContainerVersion = 1;
 
                         if (!noSubFiles) {
                             // Puhvris on eraldatava TAGi lõpp
@@ -947,7 +929,7 @@ public class CommonMethods {
                 }
             }
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+        	logger.error(ex.getMessage(), ex);
         } finally {
             // Streamid kinni
             safeCloseReader(mainReader);
@@ -979,9 +961,9 @@ public class CommonMethods {
 
         // What version of DVK Container
         if (dvkContainerVersion == 0) {
-            result.setDvkContainerVersion(2);
+        	result.setDvkContainerVersion(2);
         } else {
-            result.setDvkContainerVersion(1);
+        	result.setDvkContainerVersion(1);
         }
 
         return result;
@@ -1021,8 +1003,7 @@ public class CommonMethods {
                     isTag = false;
 
                     if (ioBuffer.startsWith("<!--DVK_SYS_INCLUDE_")) {
-                        String subFileName = tmpDir + File.separator
-                                        + ioBuffer.replace("<!--DVK_SYS_INCLUDE_", "").replace("-->", "").trim();
+                        String subFileName = tmpDir + File.separator + ioBuffer.replace("<!--DVK_SYS_INCLUDE_", "").replace("-->", "").trim();
                         if ((new File(subFileName)).exists()) {
                             subInStream = new FileInputStream(subFileName);
                             subInReader = new InputStreamReader(subInStream, "UTF-8");
@@ -1055,7 +1036,7 @@ public class CommonMethods {
             // Kustutame ajutise faili
             (new File(xmlFileName)).delete();
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+        	logger.error(ex.getMessage(), ex);
         } finally {
             safeCloseReader(mainReader);
             safeCloseReader(mainInReader);
@@ -1076,12 +1057,10 @@ public class CommonMethods {
     }
 
     public static Fault validateDVKContainerWithLocalSchema(String containerFilename) throws AxisFault {
-        if (Settings.Server_ValidateContainer
-                && (Settings.Server_ValidationSchemaFile != null)
-                && (new File(Settings.Server_ValidationSchemaFile)).exists()) {
+        if (Settings.Server_ValidateContainer && (Settings.Server_ValidationSchemaFile != null) && (new File(Settings.Server_ValidationSchemaFile)).exists()) {
             XMLValidationSchemaFactory schemaFactory = XMLValidationSchemaFactory.newInstance(XMLValidationSchema.SCHEMA_ID_W3C_SCHEMA);
             XMLValidationSchema schema = null;
-            XMLInputFactory2 xmlIF = (XMLInputFactory2) XMLInputFactory.newInstance();
+            XMLInputFactory2 xmlIF = (XMLInputFactory2)XMLInputFactory.newInstance();
             xmlIF.configureForLowMemUsage();
             XMLStreamReader2 reader = null;
 
@@ -1239,8 +1218,7 @@ public class CommonMethods {
         return result;
     }
 
-    public static Element appendTextNode(Document xmlDoc, Element parentNode, String tagName,
-                                                                    String tagValue, String nsPrefix, String nsURI) {
+    public static Element appendTextNode(Document xmlDoc, Element parentNode, String tagName, String tagValue, String nsPrefix, String nsURI) {
         Element e = null;
         NodeList foundNodes = parentNode.getElementsByTagNameNS(nsURI, tagName);
         if (foundNodes.getLength() == 0) {
@@ -1257,8 +1235,7 @@ public class CommonMethods {
         return parentNode;
     }
 
-    public static Element appendTextNodeBefore(Document xmlDoc, Element parentNode, String tagName,
-                                                        String tagValue, String nsPrefix, String nsURI, Node refNode) {
+    public static Element appendTextNodeBefore(Document xmlDoc, Element parentNode, String tagName, String tagValue, String nsPrefix, String nsURI, Node refNode) {
         Element e = null;
         NodeList foundNodes = parentNode.getElementsByTagNameNS(nsURI, tagName);
         if (foundNodes.getLength() == 0) {
@@ -1289,8 +1266,8 @@ public class CommonMethods {
         String dvkNamespace = CommonStructures.DhlNamespace;
         NodeList foundNodes = currentXmlContent.getDocumentElement().getElementsByTagNameNS(dvkNamespace, "transport");
         if (foundNodes.getLength() < 1) {
-            dvkNamespace = CommonStructures.DhlNamespaceV2;
-            foundNodes = currentXmlContent.getDocumentElement().getElementsByTagNameNS(dvkNamespace, "transport");
+        	dvkNamespace = CommonStructures.DhlNamespaceV2;
+        	foundNodes = currentXmlContent.getDocumentElement().getElementsByTagNameNS(dvkNamespace, "transport");
         }
 
         if (foundNodes.getLength() > 0) {
@@ -1300,7 +1277,7 @@ public class CommonMethods {
             // Eemaldame saajate hulgast nende asutuste/isikute andmed,
             // kellele on dokument antud serveri piires juba kohale toimetatud
             for (int i = 0; i < foundNodes.getLength(); ++i) {
-                NodeList regNrNodes = ((Element) foundNodes.item(i)).getElementsByTagNameNS(dvkNamespace, "regnr");
+                NodeList regNrNodes = ((Element)foundNodes.item(i)).getElementsByTagNameNS(dvkNamespace, "regnr");
                 String regNr = "";
                 if (regNrNodes.getLength() > 0) {
                     regNr = CommonMethods.getNodeText(regNrNodes.item(0));
@@ -1323,11 +1300,9 @@ public class CommonMethods {
 
             // Märgime antud DVK serveri sõnumi vahendajaks
             if (addProxy) {
-                Element elProxy = currentXmlContent.createElementNS(dvkNamespace, defaultPrefix + ":vahendaja");
-                elProxy = CommonMethods.appendTextNode(currentXmlContent, elProxy, "regnr",
-                                                Settings.Client_DefaultOrganizationCode, defaultPrefix, dvkNamespace);
-                elProxy = CommonMethods.appendTextNode(currentXmlContent, elProxy, "isikukood",
-                                                Settings.Client_DefaultPersonCode, defaultPrefix, dvkNamespace);
+            	Element elProxy = currentXmlContent.createElementNS(dvkNamespace, defaultPrefix + ":vahendaja");
+                elProxy = CommonMethods.appendTextNode(currentXmlContent, elProxy, "regnr", Settings.Client_DefaultOrganizationCode, defaultPrefix, dvkNamespace);
+                elProxy = CommonMethods.appendTextNode(currentXmlContent, elProxy, "isikukood", Settings.Client_DefaultPersonCode, defaultPrefix, dvkNamespace);
                 transportNode.appendChild(elProxy);
             }
         }
@@ -1439,14 +1414,12 @@ public class CommonMethods {
     /**
      * Saadab veakirjelduse e-mailiga administraatorile.
      *
-     * @param emailBody Veakirjeldus
+     * @param emailBody     Veakirjeldus
      */
     public static void sendEmail(final String emailBody) {
         try {
             Properties mailServerConfig = new Properties();
-            if ((Settings.currentProperties != null)
-                    && (Settings.currentProperties.getProperty("mail.host") != null)
-                    && (Settings.currentProperties.getProperty("mail.host").length() > 0)) {
+            if ((Settings.currentProperties != null) && (Settings.currentProperties.getProperty("mail.host") != null) && (Settings.currentProperties.getProperty("mail.host").length() > 0)) {
                 mailServerConfig.setProperty("mail.host", Settings.currentProperties.getProperty("mail.host"));
                 String emailTo = Settings.currentProperties.getProperty("mail.to");
 
@@ -1456,15 +1429,14 @@ public class CommonMethods {
                 Session session = Session.getDefaultInstance(mailServerConfig, null);
                 MimeMessage message = new MimeMessage(session);
 
-                message.addRecipient(Message.RecipientType.TO, new InternetAddress(emailTo));
-                message.addFrom(new InternetAddress[]{fromAddress});
-                message.setSubject("DVK client error!");
-                message.setText(emailBody);
-                Transport.send(message);
-            }
-        } catch (Exception ex) {
-            logger.error("In sendEmail", ex);
-        }
+				message.addRecipient(Message.RecipientType.TO, new InternetAddress(emailTo));
+				message.addFrom(new InternetAddress[] { fromAddress });
+				message.setSubject("DVK client error!");
+				message.setText(emailBody);
+				Transport.send(message);
+			}
+		} catch (Exception ex) {
+		}
     }
 
     public static String TruncateString(final String text, final int len) {
@@ -1492,47 +1464,46 @@ public class CommonMethods {
      * Detects if two Strings have equal value.
      * Ignores case and treats empty string and null as equal.
      *
-     * @param s1 First string to compare.
-     * @param s2 Second string to compare.
-     * @return {@code true} if both strings have the same value.
+     * @param s1
+     * 		First string to compare.
+     * @param s2
+     * 		Second string to compare.
+     * @return
+     * 		{@code true} if both strings have the same value.
      */
     public static boolean stringsEqualIgnoreNull(final String s1, final String s2) {
-        if (s1 == null) {
-            return s2 == null || s2.length() < 1;
-        } else if (s2 == null) {
-            return s1.length() < 1;
-        } else {
-            return s1.trim().equalsIgnoreCase(s2.trim());
-        }
+    	if (s1 == null) {
+    		return ((s2 == null) || (s2.length() < 1));
+    	} else if (s2 == null) {
+    		return (s1.length() < 1);
+    	} else {
+    		return s1.trim().equalsIgnoreCase(s2.trim());
+    	}
     }
 
-    public static AttachmentExtractionResult getExtractedFileFromAttachment(
-            final org.apache.axis.MessageContext context, final String attachmentReference) throws AxisFault {
-        return getExtractedFileFromAttachmentPart(
-                (org.apache.axis.attachments.AttachmentPart) context.getCurrentMessage()
-                        .getAttachmentsImpl().getAttachmentByReference(attachmentReference));
+    public static AttachmentExtractionResult getExtractedFileFromAttachment(final org.apache.axis.MessageContext context, final String attachmentReference) throws AxisFault {
+        return getExtractedFileFromAttachmentPart((org.apache.axis.attachments.AttachmentPart) context.getCurrentMessage().getAttachmentsImpl().getAttachmentByReference(attachmentReference));
     }
 
     public static AttachmentExtractionResult getExtractedFileFromAttachment(org.apache.axis.Message response) throws AxisFault {
-        AttachmentExtractionResult result = new AttachmentExtractionResult();
-        Iterator attachments = response.getAttachments();
+    	AttachmentExtractionResult result = new AttachmentExtractionResult();
+    	Iterator attachments = response.getAttachments();
         if (attachments.hasNext()) {
-            result = getExtractedFileFromAttachmentPart((AttachmentPart) attachments.next());
+        	result = getExtractedFileFromAttachmentPart((AttachmentPart)attachments.next());
         }
-        return result;
+    	return result;
     }
 
-    private static AttachmentExtractionResult getExtractedFileFromAttachmentPart(
-                                        org.apache.axis.attachments.AttachmentPart attachmentPart) throws AxisFault {
-        AttachmentExtractionResult result = new AttachmentExtractionResult();
+    private static AttachmentExtractionResult getExtractedFileFromAttachmentPart(org.apache.axis.attachments.AttachmentPart attachmentPart) throws AxisFault {
+    	AttachmentExtractionResult result = new AttachmentExtractionResult();
 
-        // Leiame sõnumi kehas olnud viite alusels MIME lisast vajalikud andmed
+    	// Leiame sõnumi kehas olnud viite alusels MIME lisast vajalikud andmed
         if (attachmentPart == null) {
-            throw new AxisFault(CommonStructures.VIGA_PUUDUV_MIME_LISA);
+            throw new AxisFault( CommonStructures.VIGA_PUUDUV_MIME_LISA );
         }
         DataSource attachmentSource = attachmentPart.getActivationDataHandler().getDataSource();
         if (attachmentSource == null) {
-            throw new AxisFault(CommonStructures.VIGA_PUUDUV_MIME_LISA);
+            throw new AxisFault( CommonStructures.VIGA_PUUDUV_MIME_LISA );
         }
 
         // Laeme SOAP attachmendis asunud andmed baidimassiivi
@@ -1547,7 +1518,7 @@ public class CommonMethods {
         String pipelineDataFile = CommonMethods.createPipelineFile(0);
         result.setAttachmentHash(CommonMethods.getDataFromDataSource(attachmentSource, encoding, pipelineDataFile, false));
         if (result.getAttachmentHash() == null) {
-            throw new AxisFault(CommonStructures.VIGA_VIGANE_MIME_LISA);
+            throw new AxisFault( CommonStructures.VIGA_VIGANE_MIME_LISA );
         }
 
         // Pakime andmed GZIPiga lahti
@@ -1564,9 +1535,9 @@ public class CommonMethods {
      * Eraldab X-Tee päringu kehast elemendi <heha>, mis  tuleb vastussõnumi
      * koosseisus hiljem päringu teostajale tagasi saata.
      *
-     * @param context     Axis sõnumi kontekst
-     * @param requestName X-Tee päringu nimi (näit. sendDocuments)
-     * @return SOAP sõnumi kehas asuv <keha> element.
+     * @param context			Axis sõnumi kontekst
+     * @param requestName		X-Tee päringu nimi (näit. sendDocuments)
+     * @return					SOAP sõnumi kehas asuv <keha> element.
      */
     public static Element getXRoadRequestBodyElement(org.apache.axis.MessageContext context, String requestName) {
         Element result = null;
@@ -1591,49 +1562,57 @@ public class CommonMethods {
      * Determines if given String is null or empty (zero length).
      * Whitespace is not treated as empty string.
      *
-     * @param stringToEvaluate String that will be checked for having NULL or empty value
-     * @return true, if input String is NULL or has zero length
+     * @param stringToEvaluate
+     * 		String that will be checked for having NULL or empty value
+     * @return
+     * 		true, if input String is NULL or has zero length
      */
     public static boolean isNullOrEmpty(final String stringToEvaluate) {
-        return stringToEvaluate == null || stringToEvaluate.isEmpty();
+    	return ((stringToEvaluate == null) || stringToEvaluate.isEmpty());
     }
 
     /**
      * Seeks specified value from String list.
      * Ignores case and treats null and empty values as equal.
      *
-     * @param list        List of strings
-     * @param valueToSeek String value to seek from list
-     * @return true if specified string is found in list
+     * @param list
+     *     List of strings
+     * @param valueToSeek
+     *     String value to seek from list
+     * @return
+     *     true if specified string is found in list
      */
     public static boolean listContainsIgnoreCase(List<String> list, String valueToSeek) {
-        if (list != null) {
-            for (String item : list) {
-                if (stringsEqualIgnoreNull(item, valueToSeek)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+    	if (list != null) {
+	    	for (String item : list) {
+	    		if (stringsEqualIgnoreNull(item, valueToSeek)) {
+	    			return true;
+	    		}
+	    	}
+    	}
+    	return false;
     }
 
     /**
      * Joins list of strings to a single string (separated by specified delimiter).
      *
-     * @param s         List of strings
-     * @param delimiter Item delimiter in resulting string
-     * @return String consisting of list items
+     * @param s
+     *     List of strings
+     * @param delimiter
+     *     Item delimiter in resulting string
+     * @return
+     *     String consisting of list items
      */
     public static String join(List<? extends CharSequence> s, String delimiter) {
-        StringBuilder buffer = new StringBuilder();
-        Iterator<? extends CharSequence> iter = s.iterator();
-        if (iter.hasNext()) {
-            buffer.append(iter.next());
-            while (iter.hasNext()) {
-                buffer.append(delimiter);
-                buffer.append(iter.next());
-            }
-        }
-        return buffer.toString();
+    	StringBuilder buffer = new StringBuilder();
+    	Iterator<? extends CharSequence> iter = s.iterator();
+    	if (iter.hasNext()) {
+    	    buffer.append(iter.next());
+    	    while (iter.hasNext()) {
+	    		buffer.append(delimiter);
+	    		buffer.append(iter.next());
+    	    }
+    	}
+    	return buffer.toString();
     }
 }

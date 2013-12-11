@@ -59,6 +59,21 @@
                 <dvkClientDir>C:\Work\Dev\DVK\client\tags\1.7.1</dvkClientDir>
             </properties>
         </profile>
+        <profile>
+            <id>jenkins-trunk</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>../core/trunk</module>
+                <module>../client/trunk</module>
+                <module>../server/trunk</module>
+            </modules>
+            <properties>
+                <dvkCoreDir>../core/trunk</dvkCoreDir>
+                <dvkClientDir>../client/trunk</dvkClientDir>
+            </properties>
+        </profile>
     </profiles>
 
     <dependencies>

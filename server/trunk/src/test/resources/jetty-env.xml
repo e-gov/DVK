@@ -14,8 +14,8 @@
         </Arg>
     </New>
 
-    <Call class="java.lang.System" name="setProperty">
+    <!--<Call class="java.lang.System" name="setProperty">
         <Arg>java.io.tmpdir</Arg>
         <Arg>C:\Users\hendrik\AppData\Local\Temp</Arg>
-    </Call>
+    </Call>-->
 </Configure>

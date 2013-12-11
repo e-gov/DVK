@@ -598,7 +598,7 @@
                     </connectors>
                     <stopKey>foo</stopKey>
                     <stopPort>9999</stopPort>
-                    <jettyEnvXml>src/test/resources/jetty-env.xml</jettyEnvXml>
+                    <jettyEnvXml>${dvkServerJettyEnvLocation}</jettyEnvXml>
                     <overrideWebXml>src/test/resources/web-test.xml</overrideWebXml>
                     <contextPath>/</contextPath>
                 </configuration>

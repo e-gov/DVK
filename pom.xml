@@ -70,8 +70,8 @@
                 <module>server/trunk</module>
             </modules>
             <properties>
-                <dvkCoreDir>/var/lib/jenkins/workspace/DVK trunk tests/core/trunk</dvkCoreDir>
-                <dvkClientDir>/var/lib/jenkins/workspace/DVK trunk tests/client/trunk</dvkClientDir>
+                <dvkCoreDir>/var/lib/jenkins/workspace/DVK_trunk_tests/core/trunk</dvkCoreDir>
+                <dvkClientDir>/var/lib/jenkins/workspace/DVK_trunk_tests/client/trunk</dvkClientDir>
             </properties>
         </profile>
     </profiles>

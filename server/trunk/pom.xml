@@ -382,7 +382,7 @@
         Commented out for further notice.
         ERROR ModuleDeployer - The mex-1.4.jar module, which is not valid, caused java.lang.ArrayIndexOutOfBoundsException: -1
         org.apache.axis2.deployment.DeploymentException: java.lang.ArrayIndexOutOfBoundsException: -1
-        -->
+
         <dependency>
             <groupId>java</groupId>
             <artifactId>mex</artifactId>
@@ -390,6 +390,7 @@
             <scope>system</scope>
             <systemPath>${basedir}/lib/mex-1.4.jar</systemPath>
         </dependency>
+        -->
         <dependency>
             <groupId>java</groupId>
             <artifactId>neethi</artifactId>

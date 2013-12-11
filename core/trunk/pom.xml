@@ -10,7 +10,7 @@
         <groupId>dvk</groupId>
         <artifactId>parent</artifactId>
         <version>1.7.1</version>
-        <relativePath>../../parent</relativePath>
+        <relativePath>../..</relativePath>
     </parent>
 
     <!-- Build -->

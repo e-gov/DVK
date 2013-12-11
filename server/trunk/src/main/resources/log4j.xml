@@ -22,20 +22,20 @@
     </appender>
 
     <logger name="dhl">
-        <level value="DEBUG"></level>
+        <level value="info"></level>
         <appender-ref ref="file"/>
         <appender-ref ref="stdout"/>
     </logger>
 
     <logger name="dvk">
-        <level value="DEBUG"></level>
+        <level value="info"></level>
         <appender-ref ref="file"/>
         <appender-ref ref="stdout"/>
     </logger>
 
 
     <logger name="org.apache.axis">
-        <level value="DEBUG"></level>
+        <level value="info"></level>
         <appender-ref ref="file"/>
         <appender-ref ref="stdout"/>
     </logger>

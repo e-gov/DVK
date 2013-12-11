@@ -7,9 +7,9 @@
         <Arg>
             <New class="oracle.jdbc.pool.OracleDataSource">
                 <Set name="DriverType">thin</Set>
-                <Set name="URL">jdbc:oracle:thin:/@123123123123:XE</Set>
-                <Set name="User">adsads</Set>
-                <Set name="Password">sssss</Set>
+                <Set name="URL">jdbc:oracle:thin:/@10.32.1.158:1521:XE</Set>
+                <Set name="User">DVK</Set>
+                <Set name="Password">dvkd</Set>
             </New>
         </Arg>
     </New>

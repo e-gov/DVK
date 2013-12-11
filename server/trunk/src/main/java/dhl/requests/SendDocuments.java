@@ -1258,7 +1258,7 @@ public class SendDocuments {
     public static RequestInternalResult v4(
             MessageContext context, Connection connection, UserProfile user,
             OrgSettings hostOrgSettings, XHeader xTeePais) throws Exception {
-        logger.info("SendDocuments.V3 invoked.");
+        logger.info("SendDocuments.v4 invoked.");
 
         return generalSendDocuments(context, connection, user, hostOrgSettings, xTeePais);
     }

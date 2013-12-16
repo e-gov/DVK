@@ -56,13 +56,16 @@
                 <module>server/tags/1.7.1</module>
             </modules>
             <properties>
-                <dvkCoreDir>C:\Work\Dev\DVK\core\tags\1.7.1</dvkCoreDir>
-                <dvkClientDir>C:\Work\Dev\DVK\client\tags\1.7.1</dvkClientDir>
-                <dvkServerJettyEnvLocation>C:\Work\Dev\DVK\server\tags\1.7.1\src\test\resources\jetty-env.xml</dvkServerJettyEnvLocation>
+                <!-- e.g. C:\Work\Dev\DVK\core\tags\1.7.1 -->
+                <dvkCoreDir>${dvkCoreDir}</dvkCoreDir>
+                <!-- e.g. C:\Work\Dev\DVK\client\tags\1.7.1 -->
+                <dvkClientDir>${dvkClientDir}</dvkClientDir>
+                <!-- e.g. C:\Work\Dev\DVK\server\tags\1.7.1\src\test\resources\jetty-env.xml -->
+                <dvkServerJettyEnvLocation>${dvkServerJettyEnvLocation}</dvkServerJettyEnvLocation>
             </properties>
         </profile>
         <profile>
-            <id>jenkins-trunk</id>
+            <id>ci-trunk</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
@@ -72,9 +75,12 @@
                 <module>server/trunk</module>
             </modules>
             <properties>
-                <dvkCoreDir>/var/lib/jenkins/workspace/DVK_trunk_tests/core/trunk</dvkCoreDir>
-                <dvkClientDir>/var/lib/jenkins/workspace/DVK_trunk_tests/client/trunk</dvkClientDir>
-                <dvkServerJettyEnvLocation>/var/lib/jenkins/workspace/DVK_trunk_tests/server/trunk/src/test/resources/jetty-env-jenkins.xml</dvkServerJettyEnvLocation>
+                <!-- e.g. C:\Work\Dev\DVK\core\trunk -->
+                <dvkCoreDir>${dvkCoreDir}</dvkCoreDir>
+                <!-- e.g. C:\Work\Dev\DVK\client\trunk -->
+                <dvkClientDir>${dvkClientDir}</dvkClientDir>
+                <!-- e.g. C:\Work\Dev\DVK\server\trunk\src\test\resources\jetty-env-jenkins.xml -->
+                <dvkServerJettyEnvLocation>${dvkServerJettyEnvLocation}</dvkServerJettyEnvLocation>
             </properties>
         </profile>
     </profiles>

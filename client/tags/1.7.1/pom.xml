@@ -12,7 +12,7 @@
 
   	<!-- Change this! -->
   	<!-- This variable should contain the root path of DVK "core" project -->
-  	<dvkCoreDir>C:\Work\Dev\DVK\core\trunk</dvkCoreDir>
+  	<dvkCoreDir>C:\Work\Dev\DVK\core\tags\1.7.1</dvkCoreDir>
   </properties>
 
   <!-- Dependencies -->

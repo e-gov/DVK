@@ -63,9 +63,6 @@
         </profile>
         <profile>
             <id>ci-trunk</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <modules>
                 <module>core/trunk</module>
                 <module>client/trunk</module>

@@ -4,11 +4,18 @@ Siin kataloogis asuvad viimase versiooni installipaketid, kuid neid on võimlik 
   - serveri rakenduse jaoks kaustad "server", "client" ja "core"
 - ehitada Maveni abil rakenduse pakett (loe allolevat lühikirjeldust)
 
-Rakenduse ehitamiseks on alates DVK versioonist 1.6.0 kasutusel Maven2 raamistik (http://maven.apache.org/). Ehitamisskript ise asub projekti juurkataloogis ja kannab nime „pom.xml“. Selles failis on kirjeldatud ära rakenduse kasutatavad teegid (dependencies) ja rakenduse ehitamise juhised (build). Ehitamiseks toimi järgnevalt:
+
+Rakenduse ehitamiseks on alates DVK versioonist 1.6.0 kasutusel Maven2 raamistik (http://maven.apache.org/).
+Ehitamisskript ise asub projekti juurkataloogis ja kannab nime „pom.xml“.
+Selles failis on kirjeldatud ära rakenduse kasutatavad teegid (dependencies) ja rakenduse ehitamise juhised (build). Ehitamiseks toimi järgnevalt:
 
 1.Lae alla Apache Maven versioon 2.x.x (.zip fail).
 2.Paki allalaetud pakett lahti.
 3.Lisa [MAVEN2_HOME]/bin kataloog keskkonnamuutujasse „PATH“.
+
+
+Järgnevad sammud käivad versioonide kohta enne 1.7.1
+
 4.Ava fail [DVK_SERVER_HOME]/pom.xml tekstiredaktoriga ning muuda järgmised read:
 
 <properties>
@@ -37,3 +44,19 @@ CMD> mvn install
 CMD> mvn package
 
 6.Maven ehitab ja paketeerib rakenduse. Kataloogi [DVK_SERVER_HOME]/target tekib fail „dhl.war“.
+
+
+Sammud mida oleks vaja täita kui soovite ehitada 1.7.1 versiooni rakendusest
+
+1. Avage Dvk juurkataloogis olev POM fail
+2. Leidke failist 1.7.1 ehitusprofiil
+3. Profiilis muutke vastavaid ridu, et need viitaksid õigetele absoluutsetele kataloogiteedele
+
+<dvkCoreDir>C:\Work\Dev\DVK\core\tags\1.7.1</dvkCoreDir>
+<dvkClientDir>C:\Work\Dev\DVK\client\tags\1.7.1</dvkClientDir>
+<dvkServerJettyEnvLocation>C:\Work\Dev\DVK\server\tags\1.7.1\src\test\resources\jetty-env.xml</dvkServerJettyEnvLocation>
+
+4. käivitage vastav maveni käsklus dvk juurkataloogis
+mvn -P 1.7.1 clean package
+
+5. Vastavad failid luuakse iga projekti õigesse kataloogi target kausta

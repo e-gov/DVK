@@ -38,14 +38,14 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <modules>
-                <module>core/trunk</module>
-                <module>client/trunk</module>
-                <module>server/trunk</module>
+                <module>core/development/trunk</module>
+                <module>client/development/trunk</module>
+                <module>server/development/trunk</module>
             </modules>
             <properties>
-                <dvkCoreDir>C:\Work\Dev\DVK\core\trunk</dvkCoreDir>
-                <dvkClientDir>C:\Work\Dev\DVK\client\trunk</dvkClientDir>
-                <dvkServerJettyEnvLocation>C:\Work\Dev\DVK\server\trunk\src\test\resources\jetty-env.xml</dvkServerJettyEnvLocation>
+                <dvkCoreDir>C:\Work\Dev\DVK\core\development\trunk</dvkCoreDir>
+                <dvkClientDir>C:\Work\Dev\DVK\client\development\trunk</dvkClientDir>
+                <dvkServerJettyEnvLocation>C:\Work\Dev\DVK\server\development\trunk\src\test\resources\jetty-env.xml</dvkServerJettyEnvLocation>
             </properties>
         </profile>
         <profile>
@@ -64,16 +64,16 @@
         <profile>
             <id>ci-trunk</id>
             <modules>
-                <module>core/trunk</module>
-                <module>client/trunk</module>
-                <module>server/trunk</module>
+                <module>core/development/trunk</module>
+                <module>client/development/trunk</module>
+                <module>server/development/trunk</module>
             </modules>
             <properties>
-                <!-- e.g. C:\Work\Dev\DVK\core\trunk -->
+                <!-- e.g. C:\Work\Dev\DVK\core\development\trunk -->
                 <dvkCoreDir>${dvkCoreDir}</dvkCoreDir>
-                <!-- e.g. C:\Work\Dev\DVK\client\trunk -->
+                <!-- e.g. C:\Work\Dev\DVK\client\development\trunk -->
                 <dvkClientDir>${dvkClientDir}</dvkClientDir>
-                <!-- e.g. C:\Work\Dev\DVK\server\trunk\src\test\resources\jetty-env-jenkins.xml -->
+                <!-- e.g. C:\Work\Dev\DVK\server\development\trunk\src\test\resources\jetty-env-jenkins.xml -->
                 <dvkServerJettyEnvLocation>${dvkServerJettyEnvLocation}</dvkServerJettyEnvLocation>
             </properties>
         </profile>

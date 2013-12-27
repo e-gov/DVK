@@ -31,7 +31,7 @@ public class ReceiveDocumentsDvkSoapClient extends AbstractDvkServiceSoapClient 
         OMElement arv = fac.createOMElement("arv", null);
         OMAttribute attID = fac.createOMAttribute("xsi:type", null, "xsd:integer");
         arv.addAttribute(attID);
-        arv. setText("1");
+        arv.setText("1");
         elKeha.addChild(arv);
         receiveDocuments.addChild(elKeha);
         return receiveDocuments;

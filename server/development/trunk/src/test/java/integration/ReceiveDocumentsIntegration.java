@@ -15,6 +15,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.xml.namespace.QName;
@@ -81,18 +82,7 @@ public class ReceiveDocumentsIntegration {
         logger.info("response: "+receiveDocumentsResponse.toString());
         Assert.assertTrue(receiveDocumentsResponse.toString().contains("keha href=\"cid"));
 
-        OMElement receiveDocuments = receiveDocumentsResponse.getBody().getFirstElement();
-        Iterator it = receiveDocuments.getChildren();
-
-        String contentID = "";
-
-        while (it.hasNext()) {
-            OMElement element = (OMElement) it.next();
-            if (element.getLocalName().equals("keha")) {
-               contentID = element.getAttributeValue(new QName("href")).substring(4);
-            }
-        }
-
+        String contentID = getContentID(receiveDocumentsResponse.getBody().getFirstElement());
         InputStream input = new FileInputStream(decodeBase64FileFrom(receiveDocumentsMessageContext.getAttachment(contentID).getInputStream()));
         String xml = FileUtils.readFileToString(gunzip(input));
         logger.debug("xml: "+xml);
@@ -100,11 +90,56 @@ public class ReceiveDocumentsIntegration {
         Assert.assertTrue(xml.contains("<mm:koostaja_asutuse_nr>87654321</mm:koostaja_asutuse_nr>"));
     }
 
+    private String getContentID(OMElement omElement) {
+        Iterator it = omElement.getChildren();
+
+        String contentID = "";
+
+        while (it.hasNext()) {
+            OMElement element = (OMElement) it.next();
+            if (element.getLocalName().equals("keha")) {
+                contentID = element.getAttributeValue(new QName("href")).substring(4);
+            }
+        }
+
+        return contentID;
+    }
+
+    @Test
+    public void whenContainer_V21_isSentTo_sendDocuments_v4_receiveDocuments_v1_mustRespondWithTheSameDocument_withAutomaticMetadata() throws Exception {
+        updatePreviouslySentDocumentsStatusToReceived();
+
+        SendDocumentsDvkSoapClient sendDocumentsDvkSoapClient = new SendDocumentsDvkSoapClient(options);
+
+        MessageContext sendDocumentsMessageContext = sendDocumentsDvkSoapClient.sendMessage(
+                "../testcontainers/v2_1/Dvk_kapsel_vers_2_1_n2ide3.xml.gz",
+                    xHeaderBuilder.setNimi("dhl.sendDocuments.v4").build());
+        SOAPEnvelope sendDocumentsResponse = sendDocumentsMessageContext.getEnvelope();
+        Assert.assertTrue(sendDocumentsResponse.toString().contains("keha href=\"cid"));
+
+        ReceiveDocumentsDvkSoapClient receiveDocumentsDvkSoapClient = new ReceiveDocumentsDvkSoapClient(options);
+        MessageContext receiveDocumentsMessageContext = receiveDocumentsDvkSoapClient.sendMessage(
+                xHeaderBuilder.setNimi("dhl.receiveDocuments.v1").build());
+        SOAPEnvelope receiveDocumentsResponse = receiveDocumentsMessageContext.getEnvelope();
+
+        logger.info("response: "+receiveDocumentsResponse.toString());
+        Assert.assertTrue(receiveDocumentsResponse.toString().contains("keha href=\"cid"));
+
+        String contentID = getContentID(receiveDocumentsResponse.getBody().getFirstElement());
+        InputStream input = new FileInputStream(decodeBase64FileFrom(receiveDocumentsMessageContext.getAttachment(contentID).getInputStream()));
+        String xml = FileUtils.readFileToString(gunzip(input));
+        logger.debug("xml: "+xml);
+        Assert.assertTrue(xml.contains("<DecMetadata>"));
+        Assert.assertTrue(xml.contains("<DecFolder>"));
+        Assert.assertTrue(xml.contains("<DecReceiptDate>"));
+        Assert.assertTrue(!xml.contains("dhl_id"));
+    }
+
     private File decodeBase64FileFrom(InputStream inputStream) throws Exception {
         byte[] bytes = new byte[65536];
         File file = new File("target", UUID.randomUUID().toString());
 
-        logger.info("decodedbase64File: "+file.getAbsolutePath());
+        logger.info("decodedbase64File: " + file.getAbsolutePath());
         OutputStream outputStream = null;
         InputStream base64DecoderStream = javax.mail.internet.MimeUtility.decode(inputStream, "base64");
 

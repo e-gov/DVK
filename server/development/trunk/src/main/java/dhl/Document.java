@@ -443,6 +443,7 @@ public class Document {
                     item.setFolderID(rs.getInt("kaust_id"));
                     item.setConservationDeadline(rs.getTimestamp("sailitustahtaeg", cal));
                     item.setDvkContainerVersion(rs.getInt("versioon"));
+                    item.setContainerVersion(rs.getString("kapsli_versioon"));
 
                     // Loeme CLOB-ist dokumendi andmed
                     Clob tmpBlob = rs.getClob("sisu");

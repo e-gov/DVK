@@ -26,12 +26,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import dvk.core.ContainerVersion;
 import org.apache.axis.AxisFault;
 import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 
 public class ReceiveDocuments {
 
@@ -157,7 +155,8 @@ public class ReceiveDocuments {
                                                 senderOrg,
                                                 recipientOrg,
                                                 conn,
-                                                tmpDoc.getDvkContainerVersion());
+                                                tmpDoc.getDvkContainerVersion(),
+                                                tmpDoc.getContainerVersion());
 
                                         // Paigaldame varem eraldatud SignedDoc elemendid uuesti XML
                                         // faili koosseisu tagasi.
@@ -333,7 +332,8 @@ public class ReceiveDocuments {
                                                     senderOrg,
                                                     recipientOrg,
                                                     conn,
-                                                    tmpDoc.getDvkContainerVersion());
+                                                    tmpDoc.getDvkContainerVersion(),
+                                                    tmpDoc.getContainerVersion());
 
                                             // Paigaldame varem eraldatud SignedDoc elemendid uuesti XML
                                             // faili koosseisu tagasi.
@@ -570,7 +570,8 @@ public class ReceiveDocuments {
                                                     senderOrg,
                                                     recipientOrg,
                                                     conn,
-                                                    tmpDoc.getDvkContainerVersion());
+                                                    tmpDoc.getDvkContainerVersion(),
+                                                    tmpDoc.getContainerVersion());
 
                                             // Paigaldame varem eraldatud SignedDoc elemendid uuesti XML
                                             // faili koosseisu tagasi.
@@ -788,7 +789,8 @@ public class ReceiveDocuments {
                                                     senderOrg,
                                                     recipientOrg,
                                                     conn,
-                                                    tmpDoc.getDvkContainerVersion());
+                                                    tmpDoc.getDvkContainerVersion(),
+                                                    tmpDoc.getContainerVersion());
 
                                             // Paigaldame varem eraldatud SignedDoc elemendid uuesti XML
                                             // faili koosseisu tagasi.
@@ -880,9 +882,117 @@ public class ReceiveDocuments {
      * @param documentData  Dokumendi saatja andmed
      * @param senderOrg     Dokumendi saatnud asutuse andmed
      * @param recipientOrg  Dokumenti hetkel vastuvõtva asutuse andmed
+     * @param conn          Database connection
+     * @param containerVersion old container version (int)
+     * @param documentContainerVersion new container version
      * @throws Exception
      */
     private static void appendAutomaticMetaData(
+            String filePath,
+            Sending sendingData,
+            Recipient recipientData,
+            dhl.Document documentData,
+            Asutus senderOrg,
+            Asutus recipientOrg,
+            Connection conn,
+            int containerVersion, String documentContainerVersion) throws Exception {
+
+        if (documentContainerVersion != null
+                    && ContainerVersion.VERSION_2_1.toString().equals(documentContainerVersion)) {
+            appendAutomaticMetaDataForVersion21(filePath, sendingData, documentData, conn);
+        } else {
+            appendAutomaticMetaDataForVersions10And20(
+                   filePath, sendingData, recipientData, documentData,
+                   senderOrg, recipientOrg, conn, containerVersion);
+        }
+    }
+
+    /**
+     * Append metadata for container version 2.1
+     *
+     * @param filePath      Töödeldava XML faili asukoht
+     * @param sendingData   Dokumendi saatmise andmed
+     * @param documentData  Dokumendi saatja andmed
+     * @param conn          Database connection
+     * @throws Exception
+     */
+    private static void appendAutomaticMetaDataForVersion21(String filePath,
+                                                                  Sending sendingData,
+                                                                  dhl.Document documentData,
+                                                                  Connection conn) throws Exception {
+        logger.debug("Constructing document from XML. File: " + filePath);
+        Document currentXmlContent = CommonMethods.xmlDocumentFromFile(filePath, true);
+
+        if (currentXmlContent == null) {
+            throw new Exception(
+                    "Failed to process XML contents of document "
+                            + documentData.getId() + "! Document XML is empty or invalid.");
+        }
+
+        Element decMetadata = null;
+
+        NodeList foundNodes = currentXmlContent.getDocumentElement().getElementsByTagName("DecMetadata");
+
+        if (foundNodes != null && foundNodes.getLength() > 0) {
+            decMetadata = (Element) foundNodes.item(0);
+        } else {
+            decMetadata = currentXmlContent.createElement("DecMetadata");
+        }
+
+        Node firstMetadataNode = decMetadata.getFirstChild();
+
+        decMetadata = appendTextElement(
+                currentXmlContent, decMetadata, "DecId", String.valueOf(documentData.getId()),
+                firstMetadataNode);
+
+        decMetadata = appendTextElement(
+                currentXmlContent, decMetadata, "DecFolder",
+                Folder.getFolderFullPath(documentData.getFolderID(), conn), firstMetadataNode);
+
+        appendTextElement(
+                currentXmlContent, decMetadata, "DecReceiptDate",
+                CommonMethods.getDateISO8601(sendingData.getStartDate()),
+                firstMetadataNode);
+
+        // Salvestame muudetud XML andmed faili
+        CommonMethods.xmlElementToFile(currentXmlContent.getDocumentElement(), filePath);
+    }
+
+    private static Element appendTextElement(Document xmlDoc, Element parentNode, String tagName, String tagValue, Node refNode) {
+        Element e = null;
+        NodeList foundNodes = parentNode.getElementsByTagName(tagName);
+        if (foundNodes.getLength() == 0) {
+            e = xmlDoc.createElement(tagName);
+            if (refNode != null) {
+                parentNode.insertBefore(e, refNode);
+            } else {
+                parentNode.appendChild(e);
+            }
+        } else {
+            e = (Element) foundNodes.item(0);
+            CommonMethods.removeNodeChildren(e);
+        }
+        Text t = xmlDoc.createTextNode(tagValue);
+        if ((t != null) && (t.getNodeValue() != null) && !t.getNodeValue().equalsIgnoreCase("")) {
+            e.appendChild(t);
+        }
+        return parentNode;
+    }
+
+
+    /**
+     * Append metadata for container versions 1.0 and 2.0
+     * @param filePath      Töödeldava XML faili asukoht
+     * @param sendingData   Dokumendi saatmise andmed
+     * @param recipientData Dokumenti hetkel vastuvõtva adressaadi andmed
+     * @param documentData  Dokumendi saatja andmed
+     * @param senderOrg     Dokumendi saatnud asutuse andmed
+     * @param recipientOrg  Dokumenti hetkel vastuvõtva asutuse andmed
+     * @param conn          Database connection
+     * @param containerVersion old container version (int)
+     * @throws Exception
+     */
+    private static void appendAutomaticMetaDataForVersions10And20(
             String filePath,
             Sending sendingData,
             Recipient recipientData,

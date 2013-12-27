@@ -29,7 +29,7 @@ public enum ContainerVersion {
              return containerVersion;
           }
         }
-        throw new IllegalArgumentException("There is no version " + version + " defined!");
+        return null;
     }
 }
 

@@ -77,6 +77,22 @@
                 <dvkServerJettyEnvLocation>${dvkServerJettyEnvLocation}</dvkServerJettyEnvLocation>
             </properties>
         </profile>
+        <profile>
+            <id>ci-1.7.1</id>
+            <modules>
+                <module>core/tags/1.7.1</module>
+                <module>client/tags/1.7.1</module>
+                <module>server/tags/1.7.1</module>
+            </modules>
+            <properties>
+                <!-- e.g. C:\Work\Dev\DVK\core\development\trunk -->
+                <dvkCoreDir>${dvkCoreDir}</dvkCoreDir>
+                <!-- e.g. C:\Work\Dev\DVK\client\development\trunk -->
+                <dvkClientDir>${dvkClientDir}</dvkClientDir>
+                <!-- e.g. C:\Work\Dev\DVK\server\development\trunk\src\test\resources\jetty-env-jenkins.xml -->
+                <dvkServerJettyEnvLocation>${dvkServerJettyEnvLocation}</dvkServerJettyEnvLocation>
+            </properties>
+        </profile>
     </profiles>
 
     <dependencies>

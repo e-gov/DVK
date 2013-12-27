@@ -35,7 +35,7 @@
 
 
     <logger name="org.apache.axis">
-        <level value="info"></level>
+        <level value="debug"></level>
         <appender-ref ref="file"/>
         <appender-ref ref="stdout"/>
     </logger>

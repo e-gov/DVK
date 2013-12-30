@@ -937,13 +937,22 @@ public class ReceiveDocuments {
             decMetadata = (Element) foundNodes.item(0);
         } else {
             decMetadata = currentXmlContent.createElement("DecMetadata");
+            currentXmlContent.getDocumentElement().appendChild(decMetadata);
         }
 
         Node firstMetadataNode = decMetadata.getFirstChild();
 
-        decMetadata = appendTextElement(
-                currentXmlContent, decMetadata, "DecId", String.valueOf(documentData.getId()),
-                firstMetadataNode);
+        if (firstMetadataNode == null) {
+            Element decId = currentXmlContent.createElement("DecId");
+            Text t = currentXmlContent.createTextNode(String.valueOf(documentData.getId()));
+            decId.appendChild(t);
+            decMetadata.appendChild(decId);
+            firstMetadataNode = decMetadata.getFirstChild();
+        } else {
+            decMetadata = appendTextElement(
+                    currentXmlContent, decMetadata, "DecId", String.valueOf(documentData.getId()),
+                    firstMetadataNode);
+        }
 
         decMetadata = appendTextElement(
                 currentXmlContent, decMetadata, "DecFolder",

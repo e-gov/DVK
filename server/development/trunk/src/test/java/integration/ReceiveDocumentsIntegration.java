@@ -135,6 +135,35 @@ public class ReceiveDocumentsIntegration {
         Assert.assertTrue(!xml.contains("dhl_id"));
     }
 
+    @Test
+    public void when_2_1_isSentWithoutDecMetaDataBlock_mustRespondWithProperMetaDataBlock() throws Exception {
+        updatePreviouslySentDocumentsStatusToReceived();
+
+        SendDocumentsDvkSoapClient sendDocumentsDvkSoapClient = new SendDocumentsDvkSoapClient(options);
+
+        MessageContext sendDocumentsMessageContext = sendDocumentsDvkSoapClient.sendMessage(
+                "../testcontainers/v2_1/uus_kapsel_1.xml.gz", xHeaderBuilder.setNimi("dhl.sendDocuments.v4").build());
+        SOAPEnvelope sendDocumentsResponse = sendDocumentsMessageContext.getEnvelope();
+        Assert.assertTrue(sendDocumentsResponse.toString().contains("keha href=\"cid"));
+
+        ReceiveDocumentsDvkSoapClient receiveDocumentsDvkSoapClient = new ReceiveDocumentsDvkSoapClient(options);
+        MessageContext receiveDocumentsMessageContext = receiveDocumentsDvkSoapClient.sendMessage(
+                xHeaderBuilder.setNimi("dhl.receiveDocuments.v1").build());
+        SOAPEnvelope receiveDocumentsResponse = receiveDocumentsMessageContext.getEnvelope();
+
+        logger.info("response: "+receiveDocumentsResponse.toString());
+        Assert.assertTrue(receiveDocumentsResponse.toString().contains("keha href=\"cid"));
+
+        String contentID = getContentID(receiveDocumentsResponse.getBody().getFirstElement());
+        InputStream input = new FileInputStream(decodeBase64FileFrom(receiveDocumentsMessageContext.getAttachment(contentID).getInputStream()));
+        String xml = FileUtils.readFileToString(gunzip(input));
+        logger.debug("xml: "+xml);
+        Assert.assertTrue(xml.contains("<DecMetadata>"));
+        Assert.assertTrue(xml.contains("<DecFolder>"));
+        Assert.assertTrue(xml.contains("<DecReceiptDate>"));
+        Assert.assertTrue(!xml.contains("dhl_id"));
+    }
+
     private File decodeBase64FileFrom(InputStream inputStream) throws Exception {
         byte[] bytes = new byte[65536];
         File file = new File("target", UUID.randomUUID().toString());

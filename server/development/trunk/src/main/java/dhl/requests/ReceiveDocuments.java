@@ -943,28 +943,36 @@ public class ReceiveDocuments {
         Node firstMetadataNode = decMetadata.getFirstChild();
 
         if (firstMetadataNode == null) {
-            Element decId = currentXmlContent.createElement("DecId");
-            Text t = currentXmlContent.createTextNode(String.valueOf(documentData.getId()));
-            decId.appendChild(t);
-            decMetadata.appendChild(decId);
-            firstMetadataNode = decMetadata.getFirstChild();
+            addTextElement(currentXmlContent, decMetadata,
+                    "DecId", String.valueOf(documentData.getId()));
+            addTextElement(currentXmlContent, decMetadata,
+                    "DecFolder", Folder.getFolderFullPath(documentData.getFolderID(), conn));
+            addTextElement(currentXmlContent, decMetadata,
+                    "DecReceiptDate", CommonMethods.getDateISO8601(sendingData.getStartDate()));
         } else {
             decMetadata = appendTextElement(
                     currentXmlContent, decMetadata, "DecId", String.valueOf(documentData.getId()),
                     firstMetadataNode);
+
+            decMetadata = appendTextElement(
+                    currentXmlContent, decMetadata, "DecFolder",
+                    Folder.getFolderFullPath(documentData.getFolderID(), conn), firstMetadataNode);
+
+            appendTextElement(
+                    currentXmlContent, decMetadata, "DecReceiptDate",
+                    CommonMethods.getDateISO8601(sendingData.getStartDate()),
+                    firstMetadataNode);
         }
-
-        decMetadata = appendTextElement(
-                currentXmlContent, decMetadata, "DecFolder",
-                Folder.getFolderFullPath(documentData.getFolderID(), conn), firstMetadataNode);
-
-        appendTextElement(
-                currentXmlContent, decMetadata, "DecReceiptDate",
-                CommonMethods.getDateISO8601(sendingData.getStartDate()),
-                firstMetadataNode);
 
         // Salvestame muudetud XML andmed faili
         CommonMethods.xmlElementToFile(currentXmlContent.getDocumentElement(), filePath);
+    }
+
+    private static void addTextElement(Document xmlDoc, Element parentNode, String tagName, String tagValue) {
+        Element element = xmlDoc.createElement(tagName);
+        Text value = xmlDoc.createTextNode(tagValue);
+        element.appendChild(value);
+        parentNode.appendChild(element);
     }
 
     private static Element appendTextElement(Document xmlDoc, Element parentNode, String tagName, String tagValue, Node refNode) {

@@ -9,7 +9,7 @@
     </appender>
 
     <appender name="file" class="org.apache.log4j.FileAppender">
-        <param name="file" value="../logs/dvkServer.log" />
+        <param name="file" value="${server.log.file}" />
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="%d{ABSOLUTE} %5p %C.%M:%L - %m%n" />
         </layout>

@@ -16,6 +16,7 @@
         <!-- Configuration properties replaced with these values when the war is generated. -->
         <dhl.properties>/WEB-INF/dhl.properties</dhl.properties>
         <attachments.directory>./attachments</attachments.directory>
+        <server.log.file>../logs/dvkServer.log</server.log.file>
     </properties>
 
     <build>

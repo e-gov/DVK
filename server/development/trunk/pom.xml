@@ -519,9 +519,6 @@
 
         <resources>
             <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-            <resource>
                 <directory>lib</directory>
                 <targetPath>../${packageName}/WEB-INF/lib</targetPath>
                 <excludes>
@@ -588,6 +585,14 @@
                                 <include>**/web.xml</include>
                                 <include>**/server-config.wsdd</include>
                             </includes>
+                        </resource>
+                        <resource>
+                            <filtering>true</filtering>
+                            <directory>src/main/resources</directory>
+                            <includes>
+                                <include>**/*.xml</include>
+                            </includes>
+                            <targetPath>WEB-INF/classes</targetPath>
                         </resource>
                     </webResources>
                     <warSourceDirectory>src/main/webapp</warSourceDirectory>

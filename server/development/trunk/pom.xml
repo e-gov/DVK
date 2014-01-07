@@ -546,17 +546,8 @@
                 <directory>sql</directory>
                 <targetPath>../${packageName}/sql</targetPath>
             </resource>
-
         </resources>
-        <!--<testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
-        <testResources>
-            <testResource>
-                <directory>${basedir}/src/main/resources/</directory>
-                <includes>
-                    <include>*</include>
-                </includes>
-            </testResource>
-        </testResources>-->
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -584,6 +575,24 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <webResources>
+                        <resource>
+                            <filtering>true</filtering>
+                            <directory>src/main/webapp</directory>
+                            <includes>
+                                <include>**/web.xml</include>
+                                <include>**/server-config.wsdd</include>
+                            </includes>
+                        </resource>
+                    </webResources>
+                    <warSourceDirectory>src/main/webapp</warSourceDirectory>
+                    <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.mortbay.jetty</groupId>

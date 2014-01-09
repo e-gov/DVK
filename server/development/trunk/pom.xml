@@ -614,6 +614,7 @@
                     <stopPort>9999</stopPort>
                     <jettyEnvXml>${dvkServerJettyEnvLocation}</jettyEnvXml>
                     <overrideWebXml>src/test/resources/web-test.xml</overrideWebXml>
+                    <webAppSourceDirectory>target/dhl</webAppSourceDirectory>
                     <contextPath>/</contextPath>
                 </configuration>
                 <executions>

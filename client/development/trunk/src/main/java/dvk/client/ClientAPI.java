@@ -1,6 +1,5 @@
 package dvk.client;
 
-import com.sun.deploy.config.Config;
 import dvk.client.businesslayer.Classifier;
 import dvk.client.businesslayer.DhlCapability;
 import dvk.client.businesslayer.DhlMessage;

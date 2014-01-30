@@ -45,6 +45,7 @@
                 <module>core/development/trunk</module>
                 <module>client/development/trunk</module>
                 <module>server/development/trunk</module>
+                <module>api/development/trunk</module>
             </modules>
             <properties>
                 <dvkCoreDir>C:\Work\Dev\DVK\core\development\trunk</dvkCoreDir>

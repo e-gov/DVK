@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
+import dvk.api.container.v2_1.ContainerVer2_1;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.xml.MarshalException;
@@ -18,12 +21,13 @@ import dvk.api.ml.Util;
 
 public abstract class Container {
 	public enum Version {
-		Ver1, Ver2
+		Ver1, Ver2, Ver2_1
 	}
 
 	private Integer version;
 	public final static String CastorMappingsFileVer1 = "castor-mapping/dhl.v1.xml";
 	public final static String CastorMappingsFileVer2 = "castor-mapping/dhl.v2.xml";
+    public final static String CastorMappingsFileVer2_1 = "castor-mapping/dhl.v2_1.xml";
 
 	public void setVersion(Integer version) {
 		this.version = version;
@@ -33,35 +37,47 @@ public abstract class Container {
 		return version;
 	}
 
-	private static Mapping mapping;
+	private static Map<Version, Mapping> mappings;
 
-	private static void prepareVersion(Version version) throws IOException, MappingException {
-		if (mapping == null) {
-			mapping = new Mapping();
+	private static Mapping prepareMapping(Version version) throws IOException, MappingException {
+		if (mappings == null) {
+			mappings = new HashMap<Version, Mapping>();
+        }
 
-			switch (version) {
-				case Ver1:
-				    //mapping.loadMapping("./src/main/resources/" + CastorMappingsFileVer1);
-				    URL mappingURL = mapping.getClassLoader().getResource(CastorMappingsFileVer1);
-					mapping.loadMapping(mappingURL);
-					//mapping.loadMapping(CastorMappingsFileVer1);
-					break;
-				case Ver2:
-					URL mappingURL2 = mapping.getClassLoader().getResource(CastorMappingsFileVer2);
-					mapping.loadMapping(mappingURL2);
-					//mapping.loadMapping(CastorMappingsFileVer2);
-					break;
-				default:
-					throw new RuntimeException("Unexpected version: " + version);
-				}
-		}
+        if (mappings.containsKey(version)) {
+           return mappings.get(version);
+        }
+
+        Mapping mapping = new Mapping();
+
+		switch (version) {
+            case Ver1:
+                //mapping.loadMapping("./src/main/resources/" + CastorMappingsFileVer1);
+                URL mappingURL = Mapping.class.getClassLoader().getResource(CastorMappingsFileVer1);
+                mapping.loadMapping(mappingURL);
+                //mapping.loadMapping(CastorMappingsFileVer1);
+                break;
+            case Ver2:
+                URL mappingURL2 = Mapping.class.getClassLoader().getResource(CastorMappingsFileVer2);
+                mapping.loadMapping(mappingURL2);
+                //mapping.loadMapping(CastorMappingsFileVer2);
+                break;
+            case Ver2_1:
+                URL mappingURL3 = Mapping.class.getClassLoader().getResource(CastorMappingsFileVer2_1);
+                mapping.loadMapping(mappingURL3);
+                break;
+            default:
+                throw new RuntimeException("Unexpected version: " + version);
+        }
+
+        mappings.put(version, mapping);
+
+        return mapping;
 	}
 
 	protected Marshaller createMarshaller(Writer out) throws MappingException, IOException {
 		Marshaller marshaller = new Marshaller(out);
 		Version containerVersion = getInternalVersion();
-
-		prepareVersion(containerVersion);
 
 		switch (containerVersion) {
 			case Ver1:
@@ -78,11 +94,15 @@ public abstract class Container {
 				marshaller.setNamespaceMapping("ma", "http://www.riik.ee/schemas/dhl-meta-automatic");
 				marshaller.setNamespaceMapping("rkel", "http://www.riik.ee/schemas/dhl/rkel_letter");
 				break;
+
+            case Ver2_1:
+
+                break;
 			default:
 				throw new RuntimeException("Unexpected version: " + version);
 			}
 
-		marshaller.setMapping(mapping);
+		marshaller.setMapping(prepareMapping(getInternalVersion()));
 
 		return marshaller;
 	}
@@ -97,13 +117,14 @@ public abstract class Container {
 			case Ver2:
 				unmarshaller = new Unmarshaller(ContainerVer2.class);
 				break;
+            case Ver2_1:
+                unmarshaller = new Unmarshaller(ContainerVer2_1.class);
+                break;
 			default:
 				throw new RuntimeException("Unexpected version: " + version);
 			}
 
-		prepareVersion(version);
-
-		unmarshaller.setMapping(mapping);
+		unmarshaller.setMapping(prepareMapping(version));
 
 		return unmarshaller;
 	}

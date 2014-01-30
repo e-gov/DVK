@@ -23,6 +23,13 @@
             <systemPath>${basedir}/lib/jsse.jar</systemPath>
         </dependency>
         <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>8.3-603.jdbc3</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/postgresql-8.3-603.jdbc3.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>dvk</groupId>
             <artifactId>core</artifactId>
             <version>1.7.1</version>

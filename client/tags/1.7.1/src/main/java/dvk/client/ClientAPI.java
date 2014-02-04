@@ -50,11 +50,7 @@ import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.security.Security;
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -885,7 +881,7 @@ public class ClientAPI {
             String attachmentFile = CommonMethods.createPipelineFile(0);
 
             while (attachments.hasNext()) {
-                AttachmentPart a = (AttachmentPart)attachments.next();
+                AttachmentPart a = (AttachmentPart) attachments.next();
                 DataHandler dh = a.getDataHandler();
                 DataSource ds = dh.getDataSource();
                 
@@ -893,17 +889,21 @@ public class ClientAPI {
                 String encoding;
                 if((headers == null) || (headers.length < 1)) {
                     encoding = "base64";
-                }
-                else {
+                } else {
                     encoding = headers[0];
                 }
                 String md5Hash = CommonMethods.getDataFromDataSource(ds, encoding, attachmentFile, false);
                 if (md5Hash == null) {
-                    throw new Exception( CommonStructures.VIGA_VIGANE_MIME_LISA );
+                    throw new Exception(CommonStructures.VIGA_VIGANE_MIME_LISA);
                 }
                 
                 CommonMethods.gzipUnpackXML(attachmentFile, true);
                 FileSplitResult splitResult = CommonMethods.splitOutTags(attachmentFile, "dokument", true, false, false);
+
+                if (splitResult != null && splitResult.subFiles != null && splitResult.subFiles.size() == 0) {
+                    splitResult = CommonMethods.splitOutTags(attachmentFile, "DecContainer", true, false, false);
+                }
+
                 result.documents.addAll(splitResult.subFiles);
                 
                 // Kustutame manuse faili, kuna kogu edasine tää toimub juba

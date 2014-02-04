@@ -403,8 +403,8 @@ public class ContainerVer2_1Test {
         Assert.assertEquals(expectedZipBase64Content, file.getZipBase64Content());
     }
 
-    private String getInputStreamContents(InputStream inputStream) {
-        InputStreamReader is = new InputStreamReader(inputStream);
+    private String getInputStreamContents(InputStream inputStream) throws Exception {
+        InputStreamReader is = new InputStreamReader(inputStream, "UTF-8");
         BufferedReader br = new BufferedReader(is);
         String read = null;
         StringBuffer sb = new StringBuffer();

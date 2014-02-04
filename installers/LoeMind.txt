@@ -16,18 +16,15 @@ Selles failis on kirjeldatud ära rakenduse kasutatavad teegid (dependencies) ja
 
 Ehitamisjuhend versioonide 1.7.1 ning hilisemate jaoks:
 
-1. Avage Dvk juurkataloogis olev POM fail
-2. Leidke failist vastav ehitusprofiil N: 1.7.1
-3. Profiilis muutke vastavaid ridu, et need viitaksid õigetele absoluutsetele kataloogiteedele
+1. Käivitage juurkataloogis järgmine käsk
 
-<dvkCoreDir>C:\Work\Dev\DVK\core\tags\1.7.1</dvkCoreDir>
-<dvkClientDir>C:\Work\Dev\DVK\client\tags\1.7.1</dvkClientDir>
-<dvkServerJettyEnvLocation>C:\Work\Dev\DVK\server\tags\1.7.1\src\test\resources\jetty-env.xml</dvkServerJettyEnvLocation>
+mvn -P {profiili nimi} clean package -DdvkCoreDir="/path/to/coredir" -DdvkClientDir="/path/to/clientdir" -Ddhl.properties="/path/to/dhl.properties" -Dattachments.directory="/path/to/attachments" -Dserver.log.file="/path/to/dvkServer.log"
 
-4. käivitage vastav maveni käsklus dvk juurkataloogis
-mvn -P 1.7.1 clean package
+-D võtmega lisatud parameetrid asendatakse war'i ehitamise käigus automaatselt serveri konfiguratsioonis
 
-5. Vastavad failid luuakse iga projekti õigesse kataloogi target kausta
+N: mvn -P 1.7.1 clean package -DdvkCoreDir="/var/lib/jenkins/workspace/DVK_trunk_tests/core/development/trunk" -DdvkClientDir="/var/lib/jenkins/workspace/DVK_trunk_tests/client/development/trunk" -Ddhl.properties="/home/tomcat/conf/dhl.properties" -Dattachments.directory="/home/jenkins/attachments" -Dserver.log.file="/usr/share/tomcat6/logs/dvkServer.log"
+
+2. Vastavad failid luuakse iga projekti õigesse kataloogi target kausta
 N: server/tags/1.7.1/target/dhl.war, client/tags/1.7.1/target/dvk-client.jar, core/tags/1.7.1/target/dvk-core.jar
 
 

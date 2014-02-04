@@ -9,7 +9,7 @@
     </appender>
 
     <appender name="file" class="org.apache.log4j.FileAppender">
-        <param name="file" value="../logs/dvkServer.log" />
+        <param name="file" value="${server.log.file}" />
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="%d{ABSOLUTE} %5p %C.%M:%L - %m%n" />
         </layout>
@@ -22,20 +22,20 @@
     </appender>
 
     <logger name="dhl">
-        <level value="DEBUG"></level>
+        <level value="info"></level>
         <appender-ref ref="file"/>
         <appender-ref ref="stdout"/>
     </logger>
 
     <logger name="dvk">
-        <level value="DEBUG"></level>
+        <level value="info"></level>
         <appender-ref ref="file"/>
         <appender-ref ref="stdout"/>
     </logger>
 
 
     <logger name="org.apache.axis">
-        <level value="DEBUG"></level>
+        <level value="debug"></level>
         <appender-ref ref="file"/>
         <appender-ref ref="stdout"/>
     </logger>
@@ -47,7 +47,7 @@
     </logger>
 
     <root>
-        <priority value ="info" />
+        <priority value ="debug" />
         <appender-ref ref="console" />
     </root>
 </log4j:configuration>

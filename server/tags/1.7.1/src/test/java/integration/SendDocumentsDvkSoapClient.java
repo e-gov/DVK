@@ -8,6 +8,7 @@ import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.context.MessageContext;
+import org.apache.log4j.Logger;
 
 import javax.activation.FileDataSource;
 import java.util.HashMap;
@@ -19,6 +20,7 @@ import java.util.Map;
  * @since 18.12.13
  */
 public class SendDocumentsDvkSoapClient extends AbstractDvkServiceSoapClient {
+    private static Logger logger = Logger.getLogger(SendDocumentsDvkSoapClient.class);
 
     public SendDocumentsDvkSoapClient(Options options) {
         super(options);
@@ -47,7 +49,9 @@ public class SendDocumentsDvkSoapClient extends AbstractDvkServiceSoapClient {
     @Override
     protected void addAttachmentTo(MessageContext messageContext) {
         //attachment
+        logger.info("addAttachmentTo: "+attachmentName);
         String attachmentFilePath = AbstractDvkServiceSoapClient.class.getResource(attachmentName).getPath();
+        logger.info("attachmentFilePath: "+attachmentFilePath);
         FileDataSource fileDataSource = new FileDataSource(attachmentFilePath);
         ConfigurableDataHandler dataHandler = new ConfigurableDataHandler(fileDataSource);
         dataHandler.setTransferEncoding("base64");

@@ -59,6 +59,7 @@
                 <module>core/tags/1.7.1</module>
                 <module>client/tags/1.7.1</module>
                 <module>server/tags/1.7.1</module>
+                <module>api/tags/1.7.1</module>
             </modules>
             <properties>
                 <dvkCoreDir>C:\Work\Dev\DVK\core\tags\1.7.1</dvkCoreDir>

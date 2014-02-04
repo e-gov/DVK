@@ -428,6 +428,10 @@
             <bind-xml name="FileSize" node="element" />
         </field>
 
+        <field name="MimeType" type="string" >
+            <bind-xml name="MimeType" node="element" />
+        </field>
+
         <field name="ZipBase64Content" type="string" >
             <bind-xml name="ZipBase64Content" node="element" />
         </field>

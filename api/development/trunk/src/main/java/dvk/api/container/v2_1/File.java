@@ -10,6 +10,7 @@ public class File {
     private String fileName;
     private Integer fileSize;
     private String zipBase64Content;
+    private String mimeType;
 
     public String getFileGuid() {
         return fileGuid;
@@ -49,5 +50,13 @@ public class File {
 
     public void setZipBase64Content(String zipBase64Content) {
         this.zipBase64Content = zipBase64Content;
+    }
+
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
     }
 }

@@ -202,7 +202,7 @@ public class ContainerVer2_1Test {
         Assert.assertEquals(true, file.getRecordMainComponent());
         Assert.assertEquals("Ettepaneku edastus.ddoc", file.getFileName());
         Assert.assertEquals(new Integer(355690), file.getFileSize());
-
+        Assert.assertEquals("application/x-ddoc", file.getMimeType());
         String expectedZipBase64Content = "H4sIAAAAAAAAA+28V7OrSJcg+s6vqKh+VNSHB9FRVXPxQgIkvOBlAu+N8OLXX7T3MfuYqq7uvnNj" +
                 "ImZ0jhBkJivXyuUXyf79f6x19csc90PeNn/8Cv8L+vWXuAnbKG/SP361TOG346//40/gdyNPmzji" +
                 "2vCXpO1rf/zjV04SJe7K/nZX5F8/AkB//WUH2Qx//JqNY/fvILgsy7+G8l9xDHJ5mu8gwHkf9S/o" +

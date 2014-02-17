@@ -62,6 +62,7 @@ public class Asutus {
     private String m_toetatavDVKVersioon;
     private int m_serverID;
     private int m_aarID;
+    private String m_kapsel_versioon;
 
     public Asutus() {
         clear();
@@ -375,6 +376,14 @@ public class Asutus {
         m_aarID = value;
     }
 
+    public String getKapselVersioon() {
+        return m_kapsel_versioon;
+    }
+
+    public void setKapselVersioon(String m_kapsel_versioon) {
+        this.m_kapsel_versioon = m_kapsel_versioon;
+    }
+
     public void clear() {
         m_id = 0;
         m_registrikood = "";
@@ -414,6 +423,7 @@ public class Asutus {
         m_toetatavDVKVersioon = "";
         m_serverID = 0;
         m_aarID = 0;
+        m_kapsel_versioon = "";
     }
 
     public void loadByID(int id, Connection conn) {
@@ -421,7 +431,7 @@ public class Asutus {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
                 CallableStatement cs = conn.prepareCall(
-                        "{call GET_ASUTUSBYID(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                        "{call GET_ASUTUSBYID(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 cs.setInt("id", id);
                 cs.registerOutParameter("registrikood", Types.VARCHAR);
                 cs.registerOutParameter("registrikood_vana", Types.VARCHAR);
@@ -460,6 +470,7 @@ public class Asutus {
                 cs.registerOutParameter("toetatav_dvk_versioon", Types.VARCHAR);
                 cs.registerOutParameter("server_id", Types.INTEGER);
                 cs.registerOutParameter("aar_id", Types.INTEGER);
+                cs.registerOutParameter("kapsel_versioon", Types.VARCHAR);
                 cs.executeUpdate();
                 m_id = id;
                 m_registrikood = cs.getString("registrikood");
@@ -499,6 +510,7 @@ public class Asutus {
                 m_toetatavDVKVersioon = cs.getString("toetatav_dvk_versioon");
                 m_serverID = cs.getInt("server_id");
                 m_aarID = cs.getInt("aar_id");
+                m_kapsel_versioon = cs.getString("kapsel_versioon");
                 cs.close();
             } else {
                 clear();
@@ -514,7 +526,7 @@ public class Asutus {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
                 CallableStatement cs = conn.prepareCall(
-                        "{call GET_ASUTUSBYREGNR(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                        "{call GET_ASUTUSBYREGNR(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 cs.setString("registrikood", registrikood);
                 cs.registerOutParameter("id", Types.INTEGER);
                 cs.registerOutParameter("registrikood_vana", Types.VARCHAR);
@@ -553,6 +565,7 @@ public class Asutus {
                 cs.registerOutParameter("toetatav_dvk_versioon", Types.VARCHAR);
                 cs.registerOutParameter("server_id", Types.INTEGER);
                 cs.registerOutParameter("aar_id", Types.INTEGER);
+                cs.registerOutParameter("kapsel_versioon", Types.VARCHAR);
                 cs.executeUpdate();
                 m_id = cs.getInt("id");
                 m_registrikood = registrikood;
@@ -592,6 +605,7 @@ public class Asutus {
                 m_toetatavDVKVersioon = cs.getString("toetatav_dvk_versioon");
                 m_serverID = cs.getInt("server_id");
                 m_aarID = cs.getInt("aar_id");
+                m_kapsel_versioon = cs.getString("kapsel_versioon");
                 cs.close();
             } else {
                 clear();
@@ -690,6 +704,7 @@ public class Asutus {
                     item.setToetatavDVKVersioon(rs.getString("toetatav_dvk_versioon"));
                     item.setServerID(rs.getInt("server_id"));
                     item.setAarID(rs.getInt("aar_id"));
+                    item.setKapselVersioon(rs.getString("kapsel_versioon"));
                     result.add(item);
                 }
                 rs.close();
@@ -709,7 +724,7 @@ public class Asutus {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
                 CallableStatement cs = conn.prepareCall(
-                        "{call ADD_ASUTUS(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                        "{call ADD_ASUTUS(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 cs.registerOutParameter("id", Types.INTEGER);
                 cs.setString("registrikood", m_registrikood);
                 cs.setString("registrikood_vana", m_registrikoodVana);
@@ -757,6 +772,7 @@ public class Asutus {
 
                 CommonMethods.setNullableIntParam(cs, "server_id", m_serverID);
                 CommonMethods.setNullableIntParam(cs, "aar_id", m_aarID);
+                cs.setString("kapsel_versioon", m_kapsel_versioon);
                 cs.executeUpdate();
                 m_id = cs.getInt("id");
                 cs.close();
@@ -772,7 +788,7 @@ public class Asutus {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
                 CallableStatement cs = conn.prepareCall(
-                        "{call UPDATE_ASUTUS(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                        "{call UPDATE_ASUTUS(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 cs.setInt("id", m_id);
                 cs.setString("registrikood", m_registrikood);
                 cs.setString("registrikood_vana", m_registrikoodVana);
@@ -820,6 +836,7 @@ public class Asutus {
 
                 CommonMethods.setNullableIntParam(cs, "server_id", m_serverID);
                 CommonMethods.setNullableIntParam(cs, "aar_id", m_aarID);
+                cs.setString("kapsel_versioon", m_kapsel_versioon);
                 cs.executeUpdate();
                 cs.close();
             }

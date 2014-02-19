@@ -44,8 +44,9 @@ class XHeaderBuilder {
         return this;
     }
 
-    public void setIsikukood(String isikukood) {
+    public XHeaderBuilder setIsikukood(String isikukood) {
         this.isikukood = isikukood;
+        return this;
     }
 
     public XHeader build() {

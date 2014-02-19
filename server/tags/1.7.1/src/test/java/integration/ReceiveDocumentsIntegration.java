@@ -38,15 +38,9 @@ public class ReceiveDocumentsIntegration {
     private static Logger logger = Logger.getLogger(ReceiveDocumentsIntegration.class);
 
     private static Options options;
-    private static XHeaderBuilder xHeaderBuilder;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        xHeaderBuilder = new XHeaderBuilder();
-        xHeaderBuilder.setAsutus("87654321").setAndmekogu("dhl")
-                .setAmetnik("EE38806190294").setId("6cae248568b3db7e97ff784673a4d38c5906bee0")
-                .setNimi("dhl.sendDocuments.v1").setToimik("").setIsikukood("EE38806190294");
-
         String serviceUrl = "http://0.0.0.0:9099/services/dhlHttpSoapPort";
         EndpointReference endpointReference = new EndpointReference(serviceUrl);
         options = new Options();
@@ -63,6 +57,14 @@ public class ReceiveDocumentsIntegration {
         options.setProperty(HTTPConstants.HTTP_HEADERS, customHeaders);
     }
 
+    private static XHeaderBuilder getDefaultXHeaderBuilder() {
+        XHeaderBuilder xHeaderBuilder = new XHeaderBuilder();
+        xHeaderBuilder.setAsutus("87654321").setAndmekogu("dhl")
+                .setAmetnik("EE38806190294").setId("6cae248568b3db7e97ff784673a4d38c5906bee0")
+                .setNimi("dhl.sendDocuments.v1").setToimik("").setIsikukood("EE38806190294");
+        return xHeaderBuilder;
+    }
+
     @Test
     public void whenContainer_V1_isSentTo_sendDocuments_v1_receiveDocuments_mustRespondWithTheSameDocument() throws Exception {
         updatePreviouslySentDocumentsStatusToReceived();
@@ -70,13 +72,13 @@ public class ReceiveDocumentsIntegration {
         SendDocumentsDvkSoapClient sendDocumentsDvkSoapClient = new SendDocumentsDvkSoapClient(options);
 
         MessageContext sendDocumentsMessageContext = sendDocumentsDvkSoapClient.sendMessage(
-                "../testcontainers/v1_0/dvk_konteiner_v1.xml.gz", xHeaderBuilder.build());
+                "../testcontainers/v1_0/dvk_konteiner_v1.xml.gz", getDefaultXHeaderBuilder().build());
         SOAPEnvelope sendDocumentsResponse = sendDocumentsMessageContext.getEnvelope();
         Assert.assertTrue(sendDocumentsResponse.toString().contains("keha href=\"cid"));
 
         ReceiveDocumentsDvkSoapClient receiveDocumentsDvkSoapClient = new ReceiveDocumentsDvkSoapClient(options);
         MessageContext receiveDocumentsMessageContext = receiveDocumentsDvkSoapClient.sendMessage(
-                xHeaderBuilder.setNimi("dhl.receiveDocuments.v1").build());
+                getDefaultXHeaderBuilder().setNimi("dhl.receiveDocuments.v1").build());
         SOAPEnvelope receiveDocumentsResponse = receiveDocumentsMessageContext.getEnvelope();
 
         logger.info("response: "+receiveDocumentsResponse.toString());
@@ -92,13 +94,16 @@ public class ReceiveDocumentsIntegration {
 
     private String getContentID(OMElement omElement) {
         Iterator it = omElement.getChildren();
+        QName href = new QName("href");
 
         String contentID = "";
 
         while (it.hasNext()) {
             OMElement element = (OMElement) it.next();
-            if (element.getLocalName().equals("keha")) {
-                contentID = element.getAttributeValue(new QName("href")).substring(4);
+            if (element.getLocalName().equals("keha") && element.getAttribute(href) != null) {
+                contentID = element.getAttributeValue(href).substring(4);
+            } else if (element.getLocalName().equals("keha"))  {
+                contentID = element.getFirstChildWithName(new QName("dokumendid")).getAttributeValue(href).substring(4);
             }
         }
 
@@ -113,13 +118,13 @@ public class ReceiveDocumentsIntegration {
 
         MessageContext sendDocumentsMessageContext = sendDocumentsDvkSoapClient.sendMessage(
                 "../testcontainers/v2_1/Dvk_kapsel_vers_2_1_n2ide3.xml.gz",
-                    xHeaderBuilder.setNimi("dhl.sendDocuments.v4").build());
+                    getDefaultXHeaderBuilder().setNimi("dhl.sendDocuments.v4").build());
         SOAPEnvelope sendDocumentsResponse = sendDocumentsMessageContext.getEnvelope();
         Assert.assertTrue(sendDocumentsResponse.toString().contains("keha href=\"cid"));
 
         ReceiveDocumentsDvkSoapClient receiveDocumentsDvkSoapClient = new ReceiveDocumentsDvkSoapClient(options);
         MessageContext receiveDocumentsMessageContext = receiveDocumentsDvkSoapClient.sendMessage(
-                xHeaderBuilder.setNimi("dhl.receiveDocuments.v1").build());
+                getDefaultXHeaderBuilder().setNimi("dhl.receiveDocuments.v1").build());
         SOAPEnvelope receiveDocumentsResponse = receiveDocumentsMessageContext.getEnvelope();
 
         logger.info("response: "+receiveDocumentsResponse.toString());
@@ -129,10 +134,10 @@ public class ReceiveDocumentsIntegration {
         InputStream input = new FileInputStream(decodeBase64FileFrom(receiveDocumentsMessageContext.getAttachment(contentID).getInputStream()));
         String xml = FileUtils.readFileToString(gunzip(input));
         logger.debug("xml: "+xml);
-        Assert.assertTrue(xml.contains("<DecMetadata>"));
-        Assert.assertTrue(xml.contains("<DecFolder>"));
-        Assert.assertTrue(xml.contains("<DecReceiptDate>"));
-        Assert.assertTrue(!xml.contains("dhl_id"));
+        Assert.assertTrue(!xml.contains("<DecMetadata>"));
+        Assert.assertTrue(!xml.contains("<DecFolder>"));
+        Assert.assertTrue(!xml.contains("<DecReceiptDate>"));
+        Assert.assertTrue(xml.contains("dhl_id"));
     }
 
     @Test
@@ -142,13 +147,13 @@ public class ReceiveDocumentsIntegration {
         SendDocumentsDvkSoapClient sendDocumentsDvkSoapClient = new SendDocumentsDvkSoapClient(options);
 
         MessageContext sendDocumentsMessageContext = sendDocumentsDvkSoapClient.sendMessage(
-                "../testcontainers/v2_1/uus_kapsel_1.xml.gz", xHeaderBuilder.setNimi("dhl.sendDocuments.v4").build());
+                "../testcontainers/v2_1/uus_kapsel_1.xml.gz", getDefaultXHeaderBuilder().setNimi("dhl.sendDocuments.v4").build());
         SOAPEnvelope sendDocumentsResponse = sendDocumentsMessageContext.getEnvelope();
         Assert.assertTrue(sendDocumentsResponse.toString().contains("keha href=\"cid"));
 
         ReceiveDocumentsDvkSoapClient receiveDocumentsDvkSoapClient = new ReceiveDocumentsDvkSoapClient(options);
         MessageContext receiveDocumentsMessageContext = receiveDocumentsDvkSoapClient.sendMessage(
-                xHeaderBuilder.setNimi("dhl.receiveDocuments.v1").build());
+                getDefaultXHeaderBuilder().setNimi("dhl.receiveDocuments.v1").build());
         SOAPEnvelope receiveDocumentsResponse = receiveDocumentsMessageContext.getEnvelope();
 
         logger.info("response: "+receiveDocumentsResponse.toString());
@@ -157,7 +162,42 @@ public class ReceiveDocumentsIntegration {
         String contentID = getContentID(receiveDocumentsResponse.getBody().getFirstElement());
         InputStream input = new FileInputStream(decodeBase64FileFrom(receiveDocumentsMessageContext.getAttachment(contentID).getInputStream()));
         String xml = FileUtils.readFileToString(gunzip(input));
-        logger.debug("xml: "+xml);
+        logger.info("xml: "+xml);
+        Assert.assertTrue(!xml.contains("<DecMetadata>"));
+        Assert.assertTrue(!xml.contains("<DecFolder>"));
+        Assert.assertTrue(!xml.contains("<DecReceiptDate>"));
+        Assert.assertTrue(xml.contains("dhl_id"));
+    }
+
+    @Test
+    public void when_2_1_isSentToOrgWith2_1ContainerSupport() throws Exception {
+        updatePreviouslySentDocumentsStatusToReceived();
+
+        SendDocumentsDvkSoapClient sendDocumentsDvkSoapClient = new SendDocumentsDvkSoapClient(options);
+
+        MessageContext sendDocumentsMessageContext = sendDocumentsDvkSoapClient.sendMessage(
+                "../testcontainers/v2_1/2_1_container_for_org_2_1_container_support.xml.gz",
+                getDefaultXHeaderBuilder().setNimi("dhl.sendDocuments.v4").setAsutus("10434343")
+                        .setAmetnik("EE36212240216").setIsikukood("EE36212240216").build());
+        SOAPEnvelope sendDocumentsResponse = sendDocumentsMessageContext.getEnvelope();
+        Assert.assertTrue(sendDocumentsResponse.toString().contains("keha href=\"cid"));
+
+        ReceiveDocumentsDvkSoapClient receiveDocumentsDvkSoapClient = new ReceiveDocumentsDvkSoapClient(options);
+        MessageContext receiveDocumentsMessageContext = receiveDocumentsDvkSoapClient.sendMessage(
+                getDefaultXHeaderBuilder().setNimi("dhl.receiveDocuments.v4").setAsutus("10434343")
+                        .setAmetnik("EE36212240216").setIsikukood("EE36212240216").build());
+        SOAPEnvelope receiveDocumentsResponse = receiveDocumentsMessageContext.getEnvelope();
+
+        logger.info("response: "+receiveDocumentsResponse.toString());
+        Assert.assertTrue(receiveDocumentsResponse.toString().contains("dokumendid href=\"cid"));
+
+        String contentID = getContentID(receiveDocumentsResponse.getBody().getFirstElement());
+        logger.info("contentID: "+contentID);
+        InputStream input = new FileInputStream(decodeBase64FileFrom(receiveDocumentsMessageContext.getAttachment(contentID).getInputStream()));
+        String xml = FileUtils.readFileToString(gunzip(input));
+        logger.info("xml: "+xml);
+        Assert.assertNotNull(xml);
+        Assert.assertTrue(xml.length() > 0);
         Assert.assertTrue(xml.contains("<DecMetadata>"));
         Assert.assertTrue(xml.contains("<DecFolder>"));
         Assert.assertTrue(xml.contains("<DecReceiptDate>"));
@@ -199,7 +239,6 @@ public class ReceiveDocumentsIntegration {
         byte[] buffer = new byte[1024];
         File output = new File("target", UUID.randomUUID().toString());
         output.createNewFile();
-        System.out.println("gunzipped file: "+output.getAbsolutePath());
 
         try {
             GZIPInputStream gZIPInputStream = new GZIPInputStream(inputStream);
@@ -215,7 +254,7 @@ public class ReceiveDocumentsIntegration {
             gZIPInputStream.close();
             fileOutputStream.close();
 
-            System.out.println("The file was decompressed successfully!");
+            logger.info("The file was decompressed successfully!");
 
         } catch (IOException ex) {
             ex.printStackTrace();

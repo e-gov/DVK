@@ -35,13 +35,13 @@
     
 
     <logger name="org.apache.axis">
-    	<level value="DEBUG"></level>
+    	<level value="INFO"></level>
     	<appender-ref ref="file"/>
     	<appender-ref ref="stdout"/>
     </logger>
 
     <logger name="org.mortbay.jetty">
-        <level value="DEBUG"></level>
+        <level value="INFO"></level>
         <appender-ref ref="file"/>
         <appender-ref ref="stdout"/>
     </logger>

@@ -302,14 +302,12 @@
             <xsl:attribute name="Filename">
                 <xsl:value-of select="src:FileName"/>
             </xsl:attribute>
-            <xsl:attribute name="Id">
+            <xsl:attribute name="ID">
                 <xsl:value-of select="concat('D',(position() - 1))"/>
             </xsl:attribute>
-            <!-- TODO -->
-            <xsl:attribute name="MimeType">
-                <xsl:value-of select="'application/pdf'"/>
+            <xsl:attribute name="Mimetype">
+                <xsl:value-of select="src:MimeType"/>
             </xsl:attribute>
-            <!-- //TODO -->
             <xsl:attribute name="Size">
                 <xsl:value-of select="src:FileSize"/>
             </xsl:attribute>

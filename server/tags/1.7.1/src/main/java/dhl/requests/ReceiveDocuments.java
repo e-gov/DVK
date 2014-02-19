@@ -126,21 +126,9 @@ public class ReceiveDocuments {
                                         Asutus senderOrg = new Asutus(tmpSending.getSender().getOrganizationID(), conn);
                                         Asutus recipientOrg = new Asutus(tmpRecipient.getOrganizationID(), conn);
 
-                                        if (tmpDoc.getDvkContainerVersion() == 2) {
-
-                                            // Convert to DVK container version 1
-                                            Conversion conversion = new Conversion();
-                                            conversion.setInputFile(tmpDoc.getFilePath());
-                                            conversion.setOutputFile(tmpDoc.getFilePath() + ".tmp");
-                                            conversion.setVersion(2);
-                                            conversion.setTargetVersion(1);
-
-                                            // Get the XSLT from database
-                                            conversion.getConversionFromDB(conn);
-
-                                            conversion.convert();
-
-                                            tmpDoc.setFilePath(tmpDoc.getFilePath() + ".tmp");
+                                        if (isContainerConversionNeeded(
+                                                recipientOrg.getKapselVersioon(), tmpDoc.getContainerVersion())) {
+                                            tmpDoc.setFilePath(convertContainer(conn, tmpDoc, 21, 1).getOutputFile());
                                         }
 
                                         // Viskame XML failist välja suure mahuga SignedDoc elemendid
@@ -195,6 +183,41 @@ public class ReceiveDocuments {
             t.markElapsed("Compressing response data");
         } finally {
             (new File(pipelineDataFile)).delete();
+        }
+
+        return result;
+    }
+
+    private static Conversion convertContainer(Connection conn, dhl.Document document, Integer fromVersion, Integer toVersion) throws Exception {
+        // Convert to DVK container version 1
+        Conversion conversion = new Conversion();
+        conversion.setInputFile(document.getFilePath());
+        conversion.setOutputFile(document.getFilePath() + ".tmp");
+        //TODO: this must be refactored,
+        // the database field should map a string not an integer
+        conversion.setVersion(fromVersion);
+        conversion.setTargetVersion(toVersion);
+
+        // Get the XSLT from database
+        conversion.getConversionFromDB(conn);
+
+        conversion.convert();
+        return conversion;
+    }
+
+    /**
+     * Decide if the document needs to be converted from 2.1 to 1.0
+     * @param recipientSupportedContainerVersion {@link ContainerVersion}
+     * @param documentContainerVersion if null it represents ContainerVersion.VERSION_1_0, if present then {@link ContainerVersion}
+     * @return true if the conversion is needed othewise false.
+     */
+    protected static boolean isContainerConversionNeeded(String recipientSupportedContainerVersion, String documentContainerVersion) {
+        boolean result = false;
+
+        if (documentContainerVersion != null
+                && documentContainerVersion.equals(ContainerVersion.VERSION_2_1.toString())
+                && ContainerVersion.VERSION_1_0.toString().equals(recipientSupportedContainerVersion)) {
+            result = true;
         }
 
         return result;
@@ -302,22 +325,9 @@ public class ReceiveDocuments {
                                             Asutus senderOrg = new Asutus(tmpSending.getSender().getOrganizationID(), conn);
                                             Asutus recipientOrg = new Asutus(tmpRecipient.getOrganizationID(), conn);
 
-                                            if (tmpDoc.getDvkContainerVersion() == 2) {
-
-                                                // Convert to DVK container version 1
-                                                Conversion conversion = new Conversion();
-                                                conversion.setInputFile(tmpDoc.getFilePath());
-                                                conversion.setOutputFile(tmpDoc.getFilePath() + ".tmp");
-                                                conversion.setVersion(2);
-                                                conversion.setTargetVersion(1);
-
-                                                // Get the XSLT from database
-                                                conversion.getConversionFromDB(conn);
-
-                                                conversion.convert();
-
-                                                tmpDoc.setFilePath(tmpDoc.getFilePath() + ".tmp");
-
+                                            if (isContainerConversionNeeded(
+                                                    recipientOrg.getKapselVersioon(), tmpDoc.getContainerVersion())) {
+                                                tmpDoc.setFilePath(convertContainer(conn, tmpDoc, 21, 1).getOutputFile());
                                             }
 
                                             // Viskame XML failist välja suure mahuga SignedDoc elemendid
@@ -533,29 +543,9 @@ public class ReceiveDocuments {
                                             Asutus senderOrg = new Asutus(tmpSending.getSender().getOrganizationID(), conn);
                                             Asutus recipientOrg = new Asutus(tmpRecipient.getOrganizationID(), conn);
 
-                                            if (tmpDoc.getDvkContainerVersion() == 2) {
-                                                logger.debug("Converting DVK container to older version.");
-
-                                                try {
-                                                    logger.debug("TmpDoc filePath: " + tmpDoc.getFilePath());
-                                                    logger.debug("TmpDoc filePath out: " + tmpDoc.getFilePath() + ".tmp");
-
-                                                    // Convert to DVK container version 1
-                                                    Conversion conversion = new Conversion();
-                                                    conversion.setInputFile(tmpDoc.getFilePath());
-                                                    conversion.setOutputFile(tmpDoc.getFilePath() + ".tmp");
-                                                    conversion.setVersion(2);
-                                                    conversion.setTargetVersion(1);
-
-                                                    // Get the XSLT from database
-                                                    conversion.getConversionFromDB(conn);
-
-                                                    conversion.convert();
-
-                                                    tmpDoc.setFilePath(tmpDoc.getFilePath() + ".tmp");
-                                                } catch (Exception e) {
-                                                    logger.error("Error while converting DVK container: ", e);
-                                                }
+                                            if (isContainerConversionNeeded(
+                                                    recipientOrg.getKapselVersioon(), tmpDoc.getContainerVersion())) {
+                                                tmpDoc.setFilePath(convertContainer(conn, tmpDoc, 21, 1).getOutputFile());
                                             }
 
                                             logger.debug("Splitting out file tag: 'SignedDoc' from file: " + tmpDoc.getFilePath());
@@ -776,6 +766,11 @@ public class ReceiveDocuments {
                                             Asutus senderOrg = new Asutus(tmpSending.getSender().getOrganizationID(), conn);
                                             Asutus recipientOrg = new Asutus(tmpRecipient.getOrganizationID(), conn);
 
+                                            if (isContainerConversionNeeded(
+                                                    recipientOrg.getKapselVersioon(), tmpDoc.getContainerVersion())) {
+                                                tmpDoc.setFilePath(convertContainer(conn, tmpDoc, 21, 1).getOutputFile());
+                                            }
+
                                             // Viskame XML failist välja suure mahuga SignedDoc elemendid
                                             //CommonMethods.splitOutTags(tmpDoc.getFilePath(), "SignedDoc", false, false, true);
                                             CommonMethods.splitOutTags(tmpDoc.getFilePath(), "failid", false, false, true);
@@ -896,9 +891,10 @@ public class ReceiveDocuments {
             Asutus recipientOrg,
             Connection conn,
             int containerVersion, String documentContainerVersion) throws Exception {
-
+        //if the documentContainerVersion is 2.1 && it was not needed to be converted to 1.0 then append metadata for 2.1
         if (documentContainerVersion != null
-                    && ContainerVersion.VERSION_2_1.toString().equals(documentContainerVersion)) {
+                    && ContainerVersion.VERSION_2_1.toString().equals(documentContainerVersion)
+                && !isContainerConversionNeeded(recipientOrg.getKapselVersioon(), documentContainerVersion)) {
             appendAutomaticMetaDataForVersion21(filePath, sendingData, documentData, conn);
         } else {
             appendAutomaticMetaDataForVersions10And20(

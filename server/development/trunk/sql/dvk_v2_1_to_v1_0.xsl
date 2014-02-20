@@ -19,10 +19,9 @@
             <dhl:metainfo>
                 <mm:koostaja_asutuse_nr>
                     <xsl:call-template name="alternative">
-                        <xsl:with-param name="primeValue" select="src:RecordCreator/src:Organisation/src:Name"/>
-                        <xsl:with-param name="value1" select="src:RecordCreator/src:Organisation/src:OrganisationCode"/>
-                        <xsl:with-param name="value2"
-                                        select="src:RecordSenderToDec/src:Organisation/src:OrganisationCode"/>
+                        <xsl:with-param name="primeValue" select="src:RecordCreator/src:Organisation/src:OrganisationCode"/>
+                        <xsl:with-param name="value1" select="src:RecordSenderToDec/src:Organisation/src:OrganisationCode"/>
+                        <xsl:with-param name="value2" select="src:RecordCreator/src:Organisation/src:Name"/>
                     </xsl:call-template>
                 </mm:koostaja_asutuse_nr>
                 <mm:saaja_asutuse_nr>
@@ -47,7 +46,10 @@
                     <xsl:value-of select="src:RecordMetadata/src:RecordDateRegistered"/>
                 </mm:koostaja_kuupaev>
                 <mm:koostaja_asutuse_nimi>
-                    <xsl:value-of select="src:RecordSenderToDec/src:Name"/>
+                    <xsl:call-template name="alternative">
+                        <xsl:with-param name="primeValue" select="src:RecordCreator/src:Organisation/src:Name"/>
+                        <xsl:with-param name="value1" select="src:RecordSenderToDec/src:Organisation/src:Name"/>
+                    </xsl:call-template>
                 </mm:koostaja_asutuse_nimi>
                 <mm:autori_osakond>
                     <xsl:call-template name="alternative">
@@ -302,10 +304,10 @@
             <xsl:attribute name="Filename">
                 <xsl:value-of select="src:FileName"/>
             </xsl:attribute>
-            <xsl:attribute name="ID">
+            <xsl:attribute name="Id">
                 <xsl:value-of select="concat('D',(position() - 1))"/>
             </xsl:attribute>
-            <xsl:attribute name="Mimetype">
+            <xsl:attribute name="MimeType">
                 <xsl:value-of select="src:MimeType"/>
             </xsl:attribute>
             <xsl:attribute name="Size">

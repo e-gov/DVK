@@ -605,6 +605,11 @@ EXEC DBMS_UTILITY.compile_schema(schema => 'DVK');
 
 /
 
+-- Insert conversion data
+CREATE OR REPLACE DIRECTORY DIR_TEMP_KONV AS '&KONVERSIOON_DIRECTORY';
+
+/
+
 DECLARE
 
     v_inputFile VARCHAR2(100) := 'dvk_v2_1_to_v1_0.xsl';

@@ -54,6 +54,20 @@
             </properties>
         </profile>
         <profile>
+            <id>trunk-igor</id>
+            <modules>
+                <module>core/development/trunk</module>
+                <module>client/development/trunk</module>
+                <module>server/development/trunk</module>
+                <module>api/development/trunk</module>
+            </modules>
+            <properties>
+                <dvkCoreDir>C:\Projects\RIA_DVK\core\development\trunk</dvkCoreDir>
+                <dvkClientDir>C:\Projects\RIA_DVK\client\development\trunk</dvkClientDir>
+                <dvkServerJettyEnvLocation>C:\Projects\RIA_DVK\server\development\trunk\src\test\resources\jetty-env.xml</dvkServerJettyEnvLocation>
+            </properties>
+        </profile>
+        <profile>
             <id>1.7.1</id>
             <modules>
                 <module>core/tags/1.7.1</module>

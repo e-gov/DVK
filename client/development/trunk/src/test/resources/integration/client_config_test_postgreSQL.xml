@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <databases>
   <database>
-    <provider>[MSSQL|MSSQL2005|ORACLE|POSTGRE|SQLANYWHERE]</provider>
-    <server_name>[db_server_name]</server_name>
-    <server_port>[db_port]</server_port>
-    <database_name>[db_name]</database_name>
-    <username>[db_username]</username>
-    <password>[db_password]</password>
-    <process_name>[db_process_name]</process_name>
-    <instance_name>[mssql_instance_name]</instance_name>
-    <schema_name>[postgres_schema_name]</schema_name>
+    <provider>POSTGRE</provider>
+    <server_name>localhost</server_name>
+    <server_port>5433</server_port>
+    <database_name>postgres</database_name>
+    <username>postgres</username>
+    <password>md52f10098c7591bc0cde71f67cb5f3b2b0</password>
+    <process_name> </process_name>
+    <instance_name />
+    <schema_name>dvk</schema_name>
     
     <dvk_settings>
       <!-- Kui siin service_url väärtus määramata jätta, siis kasutab rakendus antud andmebaasi puhul
       üldist (dvk_client.properties failis määratud) turvaserveri aadressi -->
-      <service_url>http://[TURVASERVER]/cgi-bin/consumer_proxy</service_url>
+      <service_url>http://srv-xtee.icefire/cgi-bin/consumer_proxy</service_url>
       
-      <send_documents_ver>1</send_documents_ver> <!-- Võimalikud väärtused: 1, 2, 3 -->
-      <receive_documents_ver>1</receive_documents_ver> <!-- Võimalikud väärtused: 1, 2, 3, 4 -->
-      <mark_documents_received_ver>1</mark_documents_received_ver> <!-- Võimalikud väärtused: 1, 2, 3 -->
-      <get_send_status_ver>1</get_send_status_ver> <!-- Võimalikud väärtused: 1, 2 -->
-      <get_sending_options_ver>1</get_sending_options_ver> <!-- Võimalikud väärtused: 1, 2, 3 -->
-      <get_subdivision_list_ver>1</get_subdivision_list_ver> <!-- Võimalikud väärtused: 1, 2 -->
-      <get_occupation_list_ver>1</get_occupation_list_ver> <!-- Võimalikud väärtused: 1, 2 -->
+      <send_documents_ver>4</send_documents_ver> <!-- Võimalikud väärtused: 1, 2, 3, 4 -->
+      <receive_documents_ver>4</receive_documents_ver> <!-- Võimalikud väärtused: 1, 2, 3, 4 -->
+      <mark_documents_received_ver>3</mark_documents_received_ver> <!-- Võimalikud väärtused: 1, 2, 3 -->
+      <get_send_status_ver>2</get_send_status_ver> <!-- Võimalikud väärtused: 1, 2 -->
+      <get_sending_options_ver>3</get_sending_options_ver> <!-- Võimalikud väärtused: 1, 2, 3 -->
+      <get_subdivision_list_ver>2</get_subdivision_list_ver> <!-- Võimalikud väärtused: 1, 2 -->
+      <get_occupation_list_ver>2</get_occupation_list_ver> <!-- Võimalikud väärtused: 1, 2 -->
+
       <default_status_id>0</default_status_id> <!-- Võimalikud väärtused: 0-11 -->
     </dvk_settings>
     

@@ -1,6 +1,7 @@
 package dvk.client.businesslayer;
 
 import dvk.client.conf.OrgSettings;
+import dvk.client.dhl.service.LoggingService;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import java.sql.CallableStatement;
@@ -21,10 +22,13 @@ public class Counter {
                 result = cs.getInt(1);
                 cs.close();
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL", "dvk.client.businesslayer.Counter" + " getNextDhlID");
+                LoggingService.logError(errorLog);
                 result = 0;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dvk.client.businesslayer.getNextDhlID", "getNextDhlID");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.Counter" + " getNextDhlID");
+            LoggingService.logError(errorLog);
             result = 0;
         }
         return result;

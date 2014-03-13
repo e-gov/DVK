@@ -77,7 +77,8 @@ public class CommonStructures {
     // Andmebaasiplatvormid
     public static final String PROVIDER_TYPE_MSSQL = "MSSQL";
     public static final String PROVIDER_TYPE_MSSQL_2005 = "MSSQL2005";
-    public static final String PROVIDER_TYPE_ORACLE = "ORACLE";
+    public static final String PROVIDER_TYPE_ORACLE_10G = "ORACLE_10G";
+    public static final String PROVIDER_TYPE_ORACLE_11G = "ORACLE_11G";
     public static final String PROVIDER_TYPE_POSTGRE = "POSTGRE";
 	public static final String PROVIDER_TYPE_SQLANYWHERE = "SQLANYWHERE";
 }

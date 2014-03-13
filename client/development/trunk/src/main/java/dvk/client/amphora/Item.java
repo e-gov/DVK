@@ -1,5 +1,7 @@
 package dvk.client.amphora;
 
+import dvk.client.businesslayer.ErrorLog;
+import dvk.client.dhl.service.LoggingService;
 import dvk.core.CommonMethods;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -95,12 +97,14 @@ public class Item {
 
                 return m_id;
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL", this.getClass().getName() + " addItem");
+                LoggingService.logError(errorLog);
                 return 0;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, this.getClass().getName(), "addItem");
+            ErrorLog errorLog = new ErrorLog(ex, this.getClass().getName() + " addItem");
+            LoggingService.logError(errorLog);
             return 0;
         }
     }
-
 }

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 import dvk.client.conf.OrgSettings;
 import dvk.client.db.DBConnection;
-import dvk.core.CommonMethods;
+import dvk.client.dhl.service.LoggingService;
 import dvk.core.CommonStructures;
 import dvk.core.Settings;
 
@@ -77,7 +77,8 @@ public class Classifier {
         		}
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, this.getClass().getName(), "loadFromDB");
+            ErrorLog errorLog = new ErrorLog(ex, this.getClass().getName() + " loadFromDB");
+            LoggingService.logError(errorLog);
         }
     }
     
@@ -98,12 +99,19 @@ public class Classifier {
                 dbConnection.commit();
                 result = true;
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL", this.getClass().getName() + " saveToDB");
+                LoggingService.logError(errorLog);
             	result = false;
             }
         } catch (Exception ex) {
-            try { dbConnection.rollback(); }
-            catch(SQLException ex1) { CommonMethods.logError(ex1, this.getClass().getName(), "saveToDB"); }
-            CommonMethods.logError(ex, this.getClass().getName(), "saveToDB");
+            try {
+                dbConnection.rollback();
+            } catch(SQLException ex1) {
+                ErrorLog errorLog = new ErrorLog(ex1, this.getClass().getName() + " saveToDB");
+                LoggingService.logError(errorLog);
+            }
+            ErrorLog errorLog = new ErrorLog(ex, this.getClass().getName() + " saveToDB");
+            LoggingService.logError(errorLog);
             result = false;
         }
         return result;
@@ -131,7 +139,8 @@ public class Classifier {
         		}
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "clnt.businesslayer.Classifier", "getList");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.Classifier" + " getList");
+            LoggingService.logError(errorLog);
         }
         return result;
     }

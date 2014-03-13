@@ -1,6 +1,7 @@
 package dvk.client.amphora;
 
-import dvk.core.CommonMethods;
+import dvk.client.businesslayer.ErrorLog;
+import dvk.client.dhl.service.LoggingService;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Types;
@@ -16,10 +17,13 @@ public class Party {
                 cs.close();
                 return true;
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL", "dvk.client.amphora.Party" + " addParty");
+                LoggingService.logError(errorLog);
                 return false;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dvk.client.amphora.Party", "addParty");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.amphora.Party" + " addParty");
+            LoggingService.logError(errorLog);
             return false;
         }
     }
@@ -34,10 +38,13 @@ public class Party {
                 cs.close();
                 return true;
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL", "dvk.client.amphora.Party" + " addPartyRole");
+                LoggingService.logError(errorLog);
                 return false;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dvk.client.amphora.Party", "addPartyRole");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.amphora.Party" + " addPartyRole");
+            LoggingService.logError(errorLog);
             return false;
         }
     }
@@ -57,14 +64,19 @@ public class Party {
                 cs.close();
                 return true;
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL", "dvk.client.amphora.Party" + " addPartyRelationship");
+                LoggingService.logError(errorLog);
                 return false;
             }
         } catch (Exception ex) {
-            Exception e = new Exception("party1_id " + String.valueOf(party1_ID));
-            CommonMethods.logError(e, "dvk.client.amphora.Party", "addPartyRelationship");
-            e = new Exception("party2_id " + String.valueOf(party2_ID));
-            CommonMethods.logError(e, "dvk.client.amphora.Party", "addPartyRelationship");
-            CommonMethods.logError(ex, "dvk.client.amphora.Party", "addPartyRelationship");
+            Exception e1 = new Exception("party1_id " + String.valueOf(party1_ID));
+            Exception e2 = new Exception("party2_id " + String.valueOf(party2_ID));
+            ErrorLog errorLog1 = new ErrorLog(e1, "dvk.client.amphora.Party" + " addPartyRelationship");
+            ErrorLog errorLog2 = new ErrorLog(e2, "dvk.client.amphora.Party" + " addPartyRelationship");
+            ErrorLog errorLog3 = new ErrorLog(ex, "dvk.client.amphora.Party" + " addPartyRelationship");
+            LoggingService.logError(errorLog3);
+            LoggingService.logError(errorLog1);
+            LoggingService.logError(errorLog2);
             return false;
         }
     }

@@ -1,5 +1,7 @@
 package dvk.client;
 
+import dvk.client.businesslayer.ErrorLog;
+import dvk.client.dhl.service.LoggingService;
 import dvk.client.iostructures.GetSendStatusBody;
 import dvk.client.iostructures.MarkDocumentsReceivedBody;
 import dvk.client.iostructures.ReceiveDocumentsBody;
@@ -211,7 +213,7 @@ public class TestClient {
                         call.invoke(msg);
                     }
                 } catch (Exception ex) {
-                    CommonMethods.logError(ex, "clnt.DhlTestClient", "main");
+                    LoggingService.logError(new ErrorLog(ex, "dvk.client.DhlTestClient" + " main"));
                     CommonMethods.writeLog(ex.toString(), true);
                     CommonMethods.writeLog(ex.getMessage(), true);
                     continue;
@@ -241,7 +243,7 @@ public class TestClient {
             long globalEnd = (new Date()).getTime();
             CommonMethods.writeLog("Process total duration: " + String.valueOf((double) (((double) globalEnd - (double) globalStart) / 1000f)), true);
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "clnt.DhlTestClient", "main");
+            LoggingService.logError(new ErrorLog(ex, "dvk.client.DhlTestClient" + " main"));
             CommonMethods.writeLog(ex.toString(), true);
             CommonMethods.writeLog(ex.getMessage(), true);
         }
@@ -264,6 +266,8 @@ public class TestClient {
             }
             result = sb.toString();
         } catch (Exception ex) {
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.DhlTestClient" + " getFileContents");
+            LoggingService.logError(errorLog);
             ex.printStackTrace();
         } finally {
             CommonMethods.safeCloseReader(reader);
@@ -275,5 +279,4 @@ public class TestClient {
         }
         return result;
     }
-
 }

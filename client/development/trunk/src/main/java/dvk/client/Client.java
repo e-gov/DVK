@@ -1,14 +1,11 @@
 package dvk.client;
 
-import dvk.client.ClientAPI;
-import dvk.client.businesslayer.Classifier;
-import dvk.client.businesslayer.DhlCapability;
-import dvk.client.businesslayer.DhlMessage;
-import dvk.client.businesslayer.Occupation;
-import dvk.client.businesslayer.Subdivision;
+import dvk.client.businesslayer.*;
 import dvk.client.conf.OrgSettings;
 import dvk.client.db.DBConnection;
 import dvk.client.db.UnitCredential;
+import dvk.client.dhl.service.DatabaseSessionService;
+import dvk.client.dhl.service.LoggingService;
 import dvk.client.iostructures.GetSendStatusResponseItem;
 import dvk.client.iostructures.GetSendingOptionsV3ResponseType;
 import dvk.client.iostructures.ReceiveDocumentsResult;
@@ -21,8 +18,6 @@ import java.io.File;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
-
-import dvk.client.businesslayer.MessageRecipient;
 
 import java.util.Hashtable;
 
@@ -98,6 +93,8 @@ public class Client {
                 dvkClient.setAllKnownDatabases(allKnownDatabases);
             } catch (Exception ex) {
                 ex.printStackTrace();
+                ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " main");
+                LoggingService.logError(errorLog);
                 return;
             }
 
@@ -106,9 +103,11 @@ public class Client {
                 Connection dbConnection = null;
                 try {
                     dbConnection = DBConnection.getConnection(db);
+                    DatabaseSessionService.getInstance().setSession(dbConnection, db);
                     Classifier.duplicateSettingsToDB(db, dbConnection);
                 } finally {
                     CommonMethods.safeCloseDatabaseConnection(dbConnection);
+                    DatabaseSessionService.getInstance().clearSession();
                 }
             }
 
@@ -118,6 +117,7 @@ public class Client {
                     Connection dbConnection = null;
                     try {
                         dbConnection = DBConnection.getConnection(db);
+                        DatabaseSessionService.getInstance().setSession(dbConnection, db);
 
                         dvkClient.setOrgSettings(db.getDvkSettings());
                         UnitCredential[] credentials = UnitCredential.getCredentials(db, dbConnection);
@@ -149,11 +149,13 @@ public class Client {
                                     System.out.println("Vastuvõetud sõnumite (" + updatedMessages + ") staatused ja veateated uuendatud!");
                                 }
                             } catch (Exception ex) {
-                                CommonMethods.logError(ex, "dvk.client.Client", "main");
+                                ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " main");
+                                LoggingService.logError(errorLog);
                                 System.out.println("Viga DVK andmevahetuses (väljuvad): " + ex.getMessage());
                             }
                         }
                     } finally {
+                        DatabaseSessionService.getInstance().clearSession();
                         CommonMethods.safeCloseDatabaseConnection(dbConnection);
                     }
                 }
@@ -185,7 +187,7 @@ public class Client {
                         Connection dbConnection = null;
                         try {
                             dbConnection = DBConnection.getConnection(db);
-
+                            DatabaseSessionService.getInstance().setSession(dbConnection, db);
                             dvkClient.setOrgSettings(db.getDvkSettings());
                             UnitCredential[] credentials = UnitCredential.getCredentials(db, dbConnection);
 
@@ -217,12 +219,14 @@ public class Client {
                                     int updatedMessages = UpdateSendStatus(credentials[i], db, dbConnection);
                                     System.out.println("Välja saadetud sõnumite (" + updatedMessages + ") staatused uuendatud!");
                                 } catch (Exception ex) {
-                                    CommonMethods.logError(ex, "dvk.client.Client", "main");
+                                    ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " main");
+                                    LoggingService.logError(errorLog);
                                     System.out.println("Viga DVK andmevahetuses (saabuvad): " + ex.getMessage());
                                 }
                             }
                         } finally {
                             CommonMethods.safeCloseDatabaseConnection(dbConnection);
+                            DatabaseSessionService.getInstance().clearSession();
                         }
                     }
                 } else {
@@ -233,16 +237,21 @@ public class Client {
                     try {
                         GetSendingOptionsV3ResponseType waitingInstitutions = ReceiveDownloadWaitingInstitutionsV2(currentClientDatabases);
                         //ArrayList<String> waitingInstitutions = ReceiveDownloadWaitingInstitutions(currentClientDatabases);
+                        RequestLog requestLog = new RequestLog("dhl-if.getSendingOptions.v", Settings.Client_DefaultOrganizationCode,
+                                Settings.Client_DefaultPersonCode);
+                        requestLog.setResponse(ResponseStatus.OK.toString());
+                        LoggingService.logMarkDocumentsRequestToDataBases(currentClientDatabases, requestLog);
+
                         if ((waitingInstitutions != null) && (!waitingInstitutions.asutused.isEmpty())) {
                             logger.debug("Asutuste nimekiri käes. Alustame töötlemist.");
                             for (OrgSettings db : currentClientDatabases) {
                                 Connection dbConnection = null;
                                 try {
                                     dbConnection = DBConnection.getConnection(db);
+                                    DatabaseSessionService.getInstance().setSession(dbConnection, db);
 
                                     dvkClient.setOrgSettings(db.getDvkSettings());
                                     UnitCredential[] credentials = UnitCredential.getCredentials(db, dbConnection);
-
                                     for (int i = 0; i < credentials.length; ++i) {
                                         try {
                                             boolean found = false;
@@ -326,12 +335,14 @@ public class Client {
                                                 System.out.println("Välja saadetud sõnumite (" + updatedMessages + ") staatused uuendatud!");
                                             }
                                         } catch (Exception ex) {
-                                            CommonMethods.logError(ex, "dvk.client.Client", "main");
-                                            System.out.println("Viga DVK andmevahetuses (saabuvad): " + ex.getMessage());
+                                                ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " main");
+                                                LoggingService.logError(errorLog);
+                                                System.out.println("Viga DVK andmevahetuses (saabuvad): " + ex.getMessage());
                                         }
                                     }
                                 } finally {
                                     CommonMethods.safeCloseDatabaseConnection(dbConnection);
+                                    DatabaseSessionService.getInstance().clearSession();
                                 }
                             }
                         } else {
@@ -339,7 +350,12 @@ public class Client {
                         }
                     } catch (Exception ex) {
                         logger.info("Dokumentide vastuvõtmisel tekkis viga - " + ex.getMessage());
-                        logger.error(ex);
+                        ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " main");
+                        LoggingService.logError(errorLog);
+                        RequestLog requestLog = new RequestLog("dhl-if.getSendingOptions.v", Settings.Client_DefaultOrganizationCode,
+                                Settings.Client_DefaultPersonCode);
+                        requestLog.setResponse(ResponseStatus.NOK.toString());
+                        LoggingService.logMarkDocumentsRequestToDataBases(currentClientDatabases, requestLog);
                     }
                 }
             }
@@ -350,7 +366,7 @@ public class Client {
                     Connection dbConnection = null;
                     try {
                         dbConnection = DBConnection.getConnection(db);
-
+                        DatabaseSessionService.getInstance().setSession(dbConnection, db);
                         dvkClient.setOrgSettings(db.getDvkSettings());
                         UnitCredential[] credentials = UnitCredential.getCredentials(db, dbConnection);
                         for (int i = 0; i < credentials.length; ++i) {
@@ -376,12 +392,14 @@ public class Client {
                                 int updatedMessages = UpdateSendStatus(credentials[i], db, dbConnection);
                                 System.out.println("Sõnumite (" + updatedMessages + ") staatused uuendatud!");
                             } catch (Exception ex) {
-                                CommonMethods.logError(ex, "dvk.client.Client", "main");
+                                ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " main");
+                                LoggingService.logError(errorLog);
                                 System.out.println("Viga DVK andmevahetuses (staatuse uuendamine): " + ex.getMessage());
                             }
                         }
                     } finally {
                         CommonMethods.safeCloseDatabaseConnection(dbConnection);
+                        DatabaseSessionService.getInstance().clearSession();
                     }
                 }
             }
@@ -400,6 +418,7 @@ public class Client {
                             Connection dbConnection = null;
                             try {
                                 dbConnection = DBConnection.getConnection(db);
+                                DatabaseSessionService.getInstance().setSession(dbConnection, db);
                                 System.out.println("\nKustutan andmebaasist \"" + db.getDatabaseName() + "\" kõik " + currentDbDocLifetimeInDays + " päevast vanemad dokumendid");
                                 int deletedDocumentCount = DhlMessage.deleteOldDocuments(currentDbDocLifetimeInDays, db, dbConnection);
                                 System.out.println("Kustutatud kokku " + deletedDocumentCount + " dokumenti.");
@@ -407,6 +426,7 @@ public class Client {
                                 logger.info("Deleted " + deletedDocumentCount + " old documents from database \"" + db.getDatabaseName() + "\". Application was configured to delete all documents older than " + currentDbDocLifetimeInDays + " days.");
                             } finally {
                                 CommonMethods.safeCloseDatabaseConnection(dbConnection);
+                                DatabaseSessionService.getInstance().clearSession();
                             }
                         } else {
                             System.out.println("Andmebaasist \"" + db.getDatabaseName() + "\" ei kustutata ühtegi dokumenti.");
@@ -416,7 +436,8 @@ public class Client {
             }
         } catch (Exception ex) {
             System.out.println("DVK kliendi töös tekkis viga! " + ex.getMessage());
-            logger.error(ex);
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " main");
+            LoggingService.logError(errorLog);
         }
 
         // Kustutame ajutised failid
@@ -429,6 +450,8 @@ public class Client {
                         f.delete();
                     }
                 } catch (Exception ex) {
+                    ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " main");
+                    LoggingService.logError(errorLog);
                 }
             }
         }
@@ -469,6 +492,8 @@ public class Client {
                         break;
                 }
             } catch (Exception ex) {
+                ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " InitExecType");
+                LoggingService.logError(errorLog);
                 ExecType = ClientExecType.SendReceive;
             }
         }
@@ -585,7 +610,8 @@ public class Client {
             }
             messages = null;
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dvk.client.Client", "UpdateSendStatus");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " UpdateSendStatus");
+            LoggingService.logError(errorLog);
             System.out.println("    Staatuste uuendamisel tekkis viga: " + ex.getMessage());
         }
 
@@ -594,7 +620,8 @@ public class Client {
         try {
             dvkClient.initClient(Settings.Client_ServiceUrl, Settings.Client_ProducerName);
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dvk.client.Client", "UpdateSendStatus");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " UpdateSendStatus");
+            LoggingService.logError(errorLog);
         }
 
         return resultCounter;
@@ -632,7 +659,8 @@ public class Client {
                 }
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dvk.client.Client", "UpdateClientStatus");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " UpdateClientStatus");
+            LoggingService.logError(errorLog);
             System.out.println("    Staatuste uuendamisel tekkis viga: " + ex.getMessage());
         }
         return resultCounter;
@@ -742,7 +770,14 @@ public class Client {
                     // Märgime saatja andmebaasis, et sõnum on saatmisel
                     DhlMessage.calculateAndUpdateMessageStatus(msg.getId(), db, dbConnection);
                 } catch (Exception ex1) {
-                    CommonMethods.logError(ex1, "dvk.client.Client", "SendUnsentMessages");
+                    ErrorLog errorLog = new ErrorLog(ex1, "dvk.client.Client" + " SendUnsentMessages");
+                    if (msg != null) {
+                        errorLog.setOrganizationCode(msg.getSenderOrgCode());
+                        errorLog.setUserCode(msg.getSenderPersonCode());
+                    }
+
+                    errorLog.setMessageId(msg.getId());
+                    LoggingService.logError(errorLog);
                     System.out.println("    Sõnumite saatmisel tekkis viga: " + ex1.getMessage());
                     if (msg != null) {
                         try {
@@ -752,7 +787,11 @@ public class Client {
                             msg.setQueryID(dvkClient.getQueryId());  // paneme sõnumile külge päringu ID
                             msg.updateMetaDataInDB(db, dbConnection);
                         } catch (Exception ex2) {
-                            CommonMethods.logError(ex2, "dvk.client.Client", "SendUnsentMessages");
+                            ErrorLog errorLog1 = new ErrorLog(ex2, "dvk.client.Client" + " SendUnsentMessages");
+                            errorLog1.setOrganizationCode(msg.getSenderOrgCode());
+                            errorLog1.setUserCode(msg.getSenderPersonCode());
+                            errorLog1.setMessageId(msg.getId());
+                            LoggingService.logError(errorLog1);
                             System.out.println("    Sõnumite saatmisel tekkis viga: " + ex2.getMessage());
                         }
                     }
@@ -761,7 +800,8 @@ public class Client {
             System.out.println("Väljuvad sõnumid saadetud!");
 
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dvk.client.Client", "SendUnsentMessages");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " SendUnsentMessages");
+            LoggingService.logError(errorLog);
             System.out.println("    Sõnumite saatmisel tekkis viga: " + ex.getMessage());
         }
         return resultCounter;
@@ -778,7 +818,6 @@ public class Client {
                     masterCredential.getPersonalIdCode(),
                     "",
                     (CommonMethods.personalIDCodeHasCountryCode(masterCredential.getPersonalIdCode()) ? masterCredential.getPersonalIdCode() : "EE" + masterCredential.getPersonalIdCode()));
-
             ReceiveDocumentsResult resultFiles = dvkClient.receiveDocuments(header, 10, masterCredential.getFolders(), masterCredential.getDivisionID(), masterCredential.getDivisionShortName(), masterCredential.getOccupationID(), masterCredential.getOccupationShortName());
             ArrayList<DhlMessage> receivedDocs = new ArrayList<DhlMessage>();
             ArrayList<DhlMessage> failedDocs = new ArrayList<DhlMessage>();
@@ -801,7 +840,14 @@ public class Client {
                         failedDocs.add(message);
                     }
                 } catch (Exception ex) {
-                    logger.error(ex);
+                    ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " ReceiveNewMessages");
+                    errorLog.setMessageId(message.getId());
+
+                    if (message != null) {
+                        errorLog.setOrganizationCode(message.getSenderOrgCode());
+                        errorLog.setUserCode(message.getSenderPersonCode());
+                    }
+                    LoggingService.logError(errorLog);
                     failedDocs.add(message);
                 }
             }
@@ -821,8 +867,9 @@ public class Client {
                 MarkDocumentsReceived(failedDocs, masterCredential, 0, clientFault, "", resultFiles.deliverySessionID, db, dbConnection);
             }
         } catch (Exception ex) {
-            logger.error(ex);
-            System.out.println("    Dokumentide vastuvõtmisel tekkis viga: " + ex.getMessage());
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " ReceiveNewMessages");
+            LoggingService.logError(errorLog);
+            System.out.println("Dokumentide vastuvõtmisel tekkis viga: " + ex.getMessage());
         }
     }
 
@@ -846,7 +893,8 @@ public class Client {
             // Käivitame päringu
             dvkClient.markDocumentsReceived(header, documents, statusID, clientFault, metaXML, deliverySessionID, false, db, dbConnection, masterCredential);
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dvk.client.Client", "MarkDocumentsReceived");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " MarkDocumentsReceived");
+            LoggingService.logError(errorLog);
             System.out.println("    Dokumentide staatuste uuendamisel tekkis viga: " + ex.getMessage());
             return;
         }
@@ -864,7 +912,7 @@ public class Client {
         dvkClient.markDocumentsReceived(header, documents, deliverySessionID, db, dbConnection, masterCredential);
     }
 
-    private static GetSendingOptionsV3ResponseType ReceiveDownloadWaitingInstitutionsV2(ArrayList<OrgSettings> databases) throws Exception {
+    protected static GetSendingOptionsV3ResponseType ReceiveDownloadWaitingInstitutionsV2(ArrayList<OrgSettings> databases) throws Exception {
         // Saadetava sõnumi päisesse kantavad parameetrid
         HeaderVariables headerVar = new HeaderVariables(
                 Settings.Client_DefaultOrganizationCode,

@@ -24,6 +24,7 @@ public class DBConnection {
         connInfo.put("user", settings.getUserName());
         connInfo.put("password", settings.getPassword());
 
+        //TODO: refactor the logic
         if (settings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_MSSQL)) {
             Class.forName("com.microsoft.jdbc.sqlserver.SQLServerDriver");
             connectionString = "jdbc:microsoft:sqlserver://" + settings.getServerName();
@@ -48,9 +49,13 @@ public class DBConnection {
             connectionString += ";databaseName=" + settings.getDatabaseName() + ";sendStringAsUnicode=true";
             connInfo.put("charSet", "UTF8");
             connection = DriverManager.getConnection(connectionString, connInfo);
-        } else if (settings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE)) {
+        } else if (settings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_10G)) {
             Class.forName("oracle.jdbc.driver.OracleDriver");
             connectionString = "jdbc:oracle:thin:@" + settings.getServerName() + ":" + settings.getServerPort() + ":" + settings.getProcessName();
+            connection = DriverManager.getConnection(connectionString, connInfo);
+        } else if (settings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_11G)) {
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+            connectionString = "jdbc:oracle:thin:@" + settings.getServerName() + ":" + settings.getServerPort() + "/" + settings.getProcessName();
             connection = DriverManager.getConnection(connectionString, connInfo);
         } else if (settings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
             Class.forName("org.postgresql.Driver");
@@ -85,7 +90,8 @@ public class DBConnection {
 
     public static CallableStatement getStatementForResultSet(String procName, int paramCount, OrgSettings db, Connection conn) throws Exception {
         int localParamCount = paramCount;
-        if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE)) {
+        if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_10G)
+                || db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_11G)) {
             localParamCount++;
         }
 
@@ -104,7 +110,8 @@ public class DBConnection {
         callString += ")}";
 
         CallableStatement result = conn.prepareCall(callString);
-        if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE)) {
+        if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_10G) ||
+                db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_11G)) {
             result.registerOutParameter(localParamCount, oracle.jdbc.OracleTypes.CURSOR);
         } else if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
             result.registerOutParameter(1, Types.OTHER);
@@ -114,7 +121,8 @@ public class DBConnection {
     }
 
     public static ResultSet getResultSet(CallableStatement cs, OrgSettings db, int paramCount) throws Exception {
-        if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE)) {
+        if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_10G) ||
+                db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_11G)) {
             cs.execute();
             return (ResultSet)cs.getObject(paramCount + 1);
         } else if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {

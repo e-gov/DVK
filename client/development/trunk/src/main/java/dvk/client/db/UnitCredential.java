@@ -1,6 +1,8 @@
 package dvk.client.db;
 
+import dvk.client.businesslayer.ErrorLog;
 import dvk.client.conf.OrgSettings;
+import dvk.client.dhl.service.LoggingService;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import java.sql.CallableStatement;
@@ -212,7 +214,8 @@ public class UnitCredential {
             }
             return result;
         } catch (Exception ex) {
-        	logger.error(ex);
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.db.UnitCredential" + " loadFolders");
+            LoggingService.logError(errorLog);
             return new ArrayList<String>();
         }
     }
@@ -249,10 +252,13 @@ public class UnitCredential {
 
                 return result;
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL", "dvk.client.db.UnitCredential" + " getExchangedDocumentsCount");
+                LoggingService.logError(errorLog);
                 return 0;
             }
         } catch (Exception ex) {
-        	logger.error(ex);
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.db.UnitCredential" + " getExchangedDocumentsCount");
+            LoggingService.logError(errorLog);
             return 0;
         }
     }

@@ -4,6 +4,8 @@ import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import dvk.client.businesslayer.ErrorLog;
+import dvk.client.dhl.service.LoggingService;
 import org.apache.axis.AxisFault;
 import dvk.core.CommonMethods;
 
@@ -40,12 +42,11 @@ public class GetSubdivisionListV2Body implements SOAPBodyOverride {
                 }
                 bw.write("</asutused>");
             }
-        }
-        catch (Exception ex) {
-            CommonMethods.logError( ex, this.getClass().getName(), "createAttachmentFile" );
+        } catch (Exception ex) {
+            ErrorLog errorLog = new ErrorLog(ex, this.getClass().getName() + " createAttachmentFile");
+            LoggingService.logError(errorLog);
             throw new AxisFault( "Error composing response message: " +" ("+ ex.getClass().getName() +": "+ ex.getMessage() +")" );
-        }
-        finally {
+        } finally {
             CommonMethods.safeCloseWriter(bw);
             CommonMethods.safeCloseWriter(ow);
             CommonMethods.safeCloseStream(out);

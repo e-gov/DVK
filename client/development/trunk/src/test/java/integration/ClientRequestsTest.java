@@ -11,42 +11,91 @@ import dvk.client.dhl.service.DatabaseSessionService;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import dvk.core.Settings;
+import ee.ria.dvk.client.testutil.IntegrationTestsConfigUtil;
 import junit.framework.Assert;
+import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ClientRequestsTest {
-    private class DhlResultRow {
-        private int id;
-        private String xmlData;
+    private static Logger logger = Logger.getLogger(ClientRequestsTest.class);
 
-        DhlResultRow(int id, String xmlData) {
-            this.id = id;
-            this.xmlData = xmlData;
-        }
+    @Test
+    public void sendAndReceiveAndGetSendStatusRequestsTest() throws Exception {
+        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePaths();
 
-        DhlResultRow() {
+        for (String path: configFilePaths) {
+            int messageId = 0;
 
-        }
+            // Before test, insert a new message to DB
+            try {
+                messageId = insertNewMessageToDB(path);
+            } catch (Exception ex) {
+                logger.error("Can't insert a new message", ex);
+                Assert.fail();
+            }
 
-        public int getId() {
-            return id;
-        }
+            if (messageId == -1) {
+                logger.error("Can't insert a new message");
+                Assert.fail();
+            }
 
-        public void setId(int id) {
-            this.id = id;
-        }
+            // Execute the client for sending and receiving our message
 
-        public String getXmlData() {
-            return xmlData;
-        }
+            try {
+                String[] args = new String[]{"-mode=3", "-prop="+path};
+                Client.main(args);
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+                Assert.fail();
+            }
 
-        public void setXmlData(String xmlData) {
-            this.xmlData = xmlData;
+            String sendedXMLData = "";
+            String receivedXMLData = "";
+            ContainerVer2_1 containerForSendedMessage = null;
+            ContainerVer1 containerForReceivedMessage = null;
+            DhlResultRow dhlResultRow = null;
+
+            try {
+                dhlResultRow = getSendedMessageXMLData(messageId, path);
+                sendedXMLData = dhlResultRow.getXmlData();
+            } catch (Exception ex) {
+                logger.error("Can't get a sended document");
+                Assert.fail();
+            }
+
+            try {
+                dhlResultRow = getTheLastReceivedDocumentXMLDataFromDB(path);
+                receivedXMLData = dhlResultRow.getXmlData();
+            } catch (Exception ex) {
+                logger.error("Can't get a received document");
+                Assert.fail();
+            }
+
+            // Create a containers ver 2.1 for sended message, ver 1.0 for received message
+            try {
+                containerForSendedMessage = ContainerVer2_1.parse(sendedXMLData);
+                containerForReceivedMessage = ContainerVer1.parse(receivedXMLData);
+            } catch (Exception ex) {
+                logger.error("Can't create the containers");
+                Assert.fail();
+            }
+
+            // Do asserts
+            doDataAsserts(sendedXMLData, receivedXMLData, containerForSendedMessage, containerForReceivedMessage);
+
+            // Get status (getSendStatusRequest) of sended message
+            int statusOfSendingMessage = returnMessageStatus(messageId, path);
+            // Get status (markDocumentReceived) of received message
+            int statusOfReceivedMessage = returnMessageStatus(dhlResultRow.getId(), path);
+
+            // Do asserts
+            doStatusAsserts(statusOfSendingMessage, statusOfReceivedMessage);
         }
     }
 
@@ -90,7 +139,7 @@ public class ClientRequestsTest {
         try {
             setUpFromConfigFile(propertiesFile);
         } catch (Exception ex) {
-            System.out.println("Can't get a connection to DB");
+            logger.error("Can't get a connection to DB");
             throw ex;
         }
 
@@ -113,7 +162,7 @@ public class ClientRequestsTest {
                 throw new Exception("Can't recognize the database");
             }
         } catch (Exception ex) {
-            System.out.println("Can't read SQL file or insert a message to Oracle");
+            logger.error("Can't read SQL file or insert a message to Oracle", ex);
             throw ex;
         }
 
@@ -180,7 +229,7 @@ public class ClientRequestsTest {
         try {
             setUpFromConfigFile(propertiesFile);
         } catch (Exception ex) {
-            System.out.println("Can't get connection to DB");
+            logger.error("Can't get connection to DB", ex);
             throw ex;
         }
 
@@ -339,216 +388,33 @@ public class ClientRequestsTest {
         Assert.assertEquals(Settings.Client_StatusReceived, statusOfReceivedMessage);
     }
 
-    @Test
-    public void sendAndReceiveAndGetSendStatusRequestsTestForPostgreSQL() throws Exception {
-        String propertiesFile = ClientRequestsTest.class.getResource("../dvk_client_postgreSQL.properties").getPath();
-        int messageId = 0;
+    private class DhlResultRow {
+        private int id;
+        private String xmlData;
 
-        // Before test, insert a new message to DB
-        try {
-            messageId = insertNewMessageToDB(propertiesFile);
-        } catch (Exception ex) {
-            System.out.println("Can't insert a new message");
-            Assert.fail();
+        DhlResultRow(int id, String xmlData) {
+            this.id = id;
+            this.xmlData = xmlData;
         }
 
-        if (messageId == -1) {
-            System.out.println("Can't insert a new message");
-            Assert.fail();
+        DhlResultRow() {
+
         }
 
-        // Execute the client for sending and receiving our message
-
-        try {
-            String[] args = new String[]{"-mode=3", "-prop="+propertiesFile};
-            Client.main(args);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            Assert.fail();
+        public int getId() {
+            return id;
         }
 
-        String sendedXMLData = "";
-        String receivedXMLData = "";
-        ContainerVer2_1 containerForSendedMessage = null;
-        ContainerVer1 containerForReceivedMessage = null;
-        DhlResultRow dhlResultRow = null;
-
-        try {
-            dhlResultRow = getSendedMessageXMLData(messageId, propertiesFile);
-            sendedXMLData = dhlResultRow.getXmlData();
-        } catch (Exception ex) {
-            System.out.println("Can't get a sended document");
-            Assert.fail();
+        public void setId(int id) {
+            this.id = id;
         }
 
-        try {
-            dhlResultRow = getTheLastReceivedDocumentXMLDataFromDB(propertiesFile);
-            receivedXMLData = dhlResultRow.getXmlData();
-        } catch (Exception ex) {
-            System.out.println("Can't get a received document");
-            Assert.fail();
+        public String getXmlData() {
+            return xmlData;
         }
 
-        // Create a containers ver 2.1 for sended message, ver 1.0 for received message
-        try {
-            containerForSendedMessage = ContainerVer2_1.parse(sendedXMLData);
-            containerForReceivedMessage = ContainerVer1.parse(receivedXMLData);
-        } catch (Exception ex) {
-            System.out.println("Can't create the containers");
-            Assert.fail();
+        public void setXmlData(String xmlData) {
+            this.xmlData = xmlData;
         }
-
-        // Do asserts
-        doDataAsserts(sendedXMLData, receivedXMLData, containerForSendedMessage, containerForReceivedMessage);
-
-        // Get status (getSendStatusRequest) of sended message
-        int statusOfSendingMessage = returnMessageStatus(messageId, propertiesFile);
-        // Get status (markDocumentReceived) of received message
-        int statusOfReceivedMessage = returnMessageStatus(dhlResultRow.getId(), propertiesFile);
-
-        // Do asserts
-        doStatusAsserts(statusOfSendingMessage, statusOfReceivedMessage);
-    }
-
-    @Test
-    public void sendAndReceiveAndGetSendStatusRequestsTestForOracle() throws Exception {
-        String propertiesFile = ClientRequestsTest.class.getResource("../dvk_client_Oracle.properties").getPath();
-        int messageId = 0;
-
-        // Before test, insert a new message to DB
-        try {
-            messageId = insertNewMessageToDB(propertiesFile);
-        } catch (Exception ex) {
-            System.out.println("Can't insert a new message");
-            Assert.fail();
-        }
-
-        if (messageId == -1) {
-            System.out.println("Can't insert a new message");
-            Assert.fail();
-        }
-
-        // Execute the client for sending and receiving our message
-
-        try {
-            String[] args = new String[]{"-mode=3", "-prop="+propertiesFile};
-            Client.main(args);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            Assert.fail();
-        }
-
-        String sendedXMLData = "";
-        String receivedXMLData = "";
-        ContainerVer2_1 containerForSendedMessage = null;
-        ContainerVer1 containerForReceivedMessage = null;
-        DhlResultRow dhlResultRow = null;
-
-        try {
-            dhlResultRow = getSendedMessageXMLData(messageId, propertiesFile);
-            sendedXMLData = dhlResultRow.getXmlData();
-        } catch (Exception ex) {
-            System.out.println("Can't get a sended document");
-            Assert.fail();
-        }
-
-        try {
-            dhlResultRow = getTheLastReceivedDocumentXMLDataFromDB(propertiesFile);
-            receivedXMLData = dhlResultRow.getXmlData();
-        } catch (Exception ex) {
-            System.out.println("Can't get a received document");
-            Assert.fail();
-        }
-
-        // Create a containers ver 2.1 for sended message, ver 1.0 for received message
-        try {
-            containerForSendedMessage = ContainerVer2_1.parse(sendedXMLData);
-            containerForReceivedMessage = ContainerVer1.parse(receivedXMLData);
-        } catch (Exception ex) {
-            System.out.println("Can't create the containers");
-            Assert.fail();
-        }
-
-        // Do asserts
-        doDataAsserts(sendedXMLData, receivedXMLData, containerForSendedMessage, containerForReceivedMessage);
-
-        // Get status (getSendStatusRequest) of sended message
-        int statusOfSendingMessage = returnMessageStatus(messageId, propertiesFile);
-        // Get status (markDocumentReceived) of received message
-        int statusOfReceivedMessage = returnMessageStatus(dhlResultRow.getId(), propertiesFile);
-
-        // Do asserts
-        doStatusAsserts(statusOfSendingMessage, statusOfReceivedMessage);
-    }
-
-    @Test
-    public void sendAndReceiveAndGetSendStatusRequestsTestForMSSQL() throws Exception {
-        String propertiesFile = ClientRequestsTest.class.getResource("../dvk_client_MSSQL.properties").getPath();
-        int messageId = 0;
-
-        // Before test, insert a new message to DB
-        try {
-            messageId = insertNewMessageToDB(propertiesFile);
-        } catch (Exception ex) {
-            System.out.println("Can't insert a new message");
-            Assert.fail();
-        }
-
-        if (messageId == -1) {
-            System.out.println("Can't insert a new message");
-            Assert.fail();
-        }
-
-        // Execute the client for sending and receiving our message
-
-        try {
-            String[] args = new String[]{"-mode=3", "-prop="+propertiesFile};
-            Client.main(args);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            Assert.fail();
-        }
-
-        String sendedXMLData = "";
-        String receivedXMLData = "";
-        ContainerVer2_1 containerForSendedMessage = null;
-        ContainerVer1 containerForReceivedMessage = null;
-        DhlResultRow dhlResultRow = null;
-
-        try {
-            dhlResultRow = getSendedMessageXMLData(messageId, propertiesFile);
-            sendedXMLData = dhlResultRow.getXmlData();
-        } catch (Exception ex) {
-            System.out.println("Can't get a sended document");
-            Assert.fail();
-        }
-
-        try {
-            dhlResultRow = getTheLastReceivedDocumentXMLDataFromDB(propertiesFile);
-            receivedXMLData = dhlResultRow.getXmlData();
-        } catch (Exception ex) {
-            System.out.println("Can't get a received document");
-            Assert.fail();
-        }
-
-        // Create a containers ver 2.1 for sended message, ver 1.0 for received message
-        try {
-            containerForSendedMessage = ContainerVer2_1.parse(sendedXMLData);
-            containerForReceivedMessage = ContainerVer1.parse(receivedXMLData);
-        } catch (Exception ex) {
-            System.out.println("Can't create the containers");
-            Assert.fail();
-        }
-
-        // Do asserts
-        doDataAsserts(sendedXMLData, receivedXMLData, containerForSendedMessage, containerForReceivedMessage);
-
-        // Get status (getSendStatusRequest) of sended message
-        int statusOfSendingMessage = returnMessageStatus(messageId, propertiesFile);
-        // Get status (markDocumentReceived) of received message
-        int statusOfReceivedMessage = returnMessageStatus(dhlResultRow.getId(), propertiesFile);
-
-        // Do asserts
-        doStatusAsserts(statusOfSendingMessage, statusOfReceivedMessage);
     }
 }

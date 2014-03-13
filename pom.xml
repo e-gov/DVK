@@ -51,6 +51,7 @@
                 <dvkCoreDir>C:\Work\Dev\DVK\core\development\trunk</dvkCoreDir>
                 <dvkClientDir>C:\Work\Dev\DVK\client\development\trunk</dvkClientDir>
                 <dvkServerJettyEnvLocation>C:\Work\Dev\DVK\server\development\trunk\src\test\resources\jetty-env.xml</dvkServerJettyEnvLocation>
+                <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_hendrik.properties</listOfTestConfigs>
             </properties>
         </profile>
         <profile>

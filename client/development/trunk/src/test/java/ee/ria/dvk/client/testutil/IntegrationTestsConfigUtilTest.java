@@ -15,6 +15,5 @@ public class IntegrationTestsConfigUtilTest {
         List<String> absolutePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePaths();
 
         Assert.assertNotNull(absolutePaths);
-        Assert.assertEquals(1, absolutePaths.size());
     }
 }

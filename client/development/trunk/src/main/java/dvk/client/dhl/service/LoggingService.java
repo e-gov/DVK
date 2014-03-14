@@ -72,12 +72,10 @@ public class LoggingService {
                 cs = dbConnection.prepareCall("{? = call \"Add_DhlErrorLog\"(?,?,?,?,?,?)}");
             }
 
-            //TODO: investigate this thing
-//            if (!CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(orgSettings.getDbProvider())) {
-//                parNr++;
-//            }
+            if (!CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(orgSettings.getDbProvider())) {
+                cs.setInt(parNr++, 0);
+            }
 
-            cs.setInt(parNr++, 0);
             cs.setTimestamp(parNr++, CommonMethods.sqlDateFromDate(errorLog.getErrorDateTime()), cal);
             cs.setString(parNr++, errorLog.getOrganizationCode());
             cs.setString(parNr++, errorLog.getUserCode());

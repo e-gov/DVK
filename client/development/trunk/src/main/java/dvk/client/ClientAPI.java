@@ -219,7 +219,7 @@ public class ClientAPI {
                 	}                   
                 }
                 processedIDs = null;
-                
+
                 // Väljundstreamid kinni
                 CommonMethods.safeCloseWriter(writer);
                 CommonMethods.safeCloseWriter(outWriter);
@@ -266,10 +266,22 @@ public class ClientAPI {
                 logger.debug("Got response message. Processing...");
                 // Teeme vastussänumi andmetest omad järeldused
                 Message respMessage = call.getResponseMessage();
-                // TODO: investigate
+
                 RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
+
                 if (respMessage != null) {
-                    requestLog.setResponse(ResponseStatus.OK.toString());
+                    SOAPBody body = respMessage.getSOAPBody();
+                    NodeList nList = body.getElementsByTagName("keha");
+                    if (nList.getLength() > 0) {
+                        Element msgBodyNode = (Element)nList.item(0);
+                        if (msgBodyNode != null
+                                && respMessage.getAttachments() != null
+                                && respMessage.getAttachments().hasNext()) {
+                            requestLog.setResponse(ResponseStatus.OK.toString());
+                        } else {
+                            requestLog.setResponse(ResponseStatus.NOK.toString());
+                        }
+                    }
                 } else {
                     requestLog.setResponse(ResponseStatus.NOK.toString());
                 }
@@ -503,14 +515,15 @@ public class ClientAPI {
 	        a1.addMimeHeader("Content-Encoding", "gzip");
 	        msg.addAttachmentPart(a1);
 	        msg.saveChanges();
-	        
-	        // Käivitame päringu
+
+            // Käivitame päringu
 	        call.invoke(msg);
 	        
 	        // Vastuse täätlemine
 	        Message response = call.getResponseMessage();
 
             RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
+
             if (response != null && response.getAttachments() != null && response.getAttachments().hasNext()) {
                 requestLog.setResponse(ResponseStatus.OK.toString());
             } else {
@@ -1077,95 +1090,109 @@ public class ClientAPI {
         int requestVersion = orgSettings.getMarkDocumentsReceivedRequestVersion();
         String requestName = this.producerName + ".markDocumentsReceived.v" + String.valueOf(requestVersion);
 
+        try {
         // Saadetava sänumi päisesse kantavad parameetrid
-        XHeader header = new XHeader(
-            headerVar.getOrganizationCode(),
-            this.producerName,
-            headerVar.getPersonalIDCode(),
-            queryId,
-            requestName,
-            headerVar.getCaseName(),
-            headerVar.getPIDWithCountryCode());
-    	
-        String attachmentName = "";
-        String attachmentFile = ""; 
-        String messageBody = "";
-        
-        ArrayList<Integer> dokumendidIdList = new ArrayList<Integer>();
-        for(int i = 0; i < centralServerDocs.size(); i++) {
-        	DhlMessage msgTmp = centralServerDocs.get(i);
-        	dokumendidIdList.add(msgTmp.getDhlID());
-        }
-        
-        if (requestVersion < 3) {
-        	logger.debug("RequestVersion < 3.");
-        	attachmentName = String.valueOf(System.currentTimeMillis());
-        	attachmentFile = MarkDocumentsReceivedBody.createResponseFile(dokumendidIdList, statusID, clientFault, metaXML, requestVersion, new Date());
-	        MarkDocumentsReceivedBody b = new MarkDocumentsReceivedBody();
-	        b.dokumendid = attachmentName;
-	        b.kaust = "";
-	        b.edastusID = deliverySessionID;
-	        
-	        // Alläksuse ja ametikoha parameetrid lisame markDocumentsReceived
-	        // päringule äksnes juhul, kui allalaadimisel kasutatud receiveDocuments
-	        // päring toetas alläksuse ja ametikoha parameetrite kasutamist.
-	        if ((unitSettings != null) && (orgSettings.getReceiveDocumentsRequestVersion() >= 3)) {
-		        b.allyksuseId = unitSettings.getDivisionID();
-		        b.ametikohaId = unitSettings.getOccupationID();
-	        }
-	        messageBody = (new SoapMessageBuilder(header, b.getBodyContentsAsText())).getMessageAsText();
-        } else {
-        	logger.debug("RequestVersion = 3");
-	        MarkDocumentsReceivedV3Body b3 = new MarkDocumentsReceivedV3Body();
-	        b3.dokumendidIdList = dokumendidIdList;
-	        b3.kaust = "";
-	        b3.edastusID = deliverySessionID;
-	        b3.vastuvotjaStaatusId = statusID;
-	    	b3.vastuvotjaVeateade = clientFault;
-	    	b3.metaXml = metaXML;
-	        
-	        // Alläksuse ja ametikoha parameetrid lisame markDocumentsReceived
-	        // päringule äksnes juhul, kui allalaadimisel kasutatud receiveDocuments
-	        // päring toetas alläksuse ja ametikoha parameetrite kasutamist.
-	        if ((unitSettings != null) && (orgSettings.getReceiveDocumentsRequestVersion() >= 3)) {
-		        b3.allyksuseLyhinimetus = unitSettings.getDivisionShortName();
-		        b3.ametikohaLyhinimetus = unitSettings.getOccupationShortName();
-	        }
-	        messageBody = (new SoapMessageBuilder(header, b3.getBodyContentsAsText())).getMessageAsText();
-        }
-        
-        Message msg = new Message(messageBody);
-        call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "markDocumentsReceived"));
+            XHeader header = new XHeader(
+                headerVar.getOrganizationCode(),
+                this.producerName,
+                headerVar.getPersonalIDCode(),
+                queryId,
+                requestName,
+                headerVar.getCaseName(),
+                headerVar.getPIDWithCountryCode());
 
-        // Lisame sänumile manuse
-        if (requestVersion < 3) {
-	        String tempFile = CommonMethods.gzipPackXML(attachmentFile, header.getAsutus(), "markDocumentsReceived");
-	        tempFiles.add(tempFile);
-	        FileDataSource ds = new FileDataSource(tempFile);
-	        DataHandler d1 = new DataHandler(ds);
-	        AttachmentPart a1 = new AttachmentPart(d1);
-	        a1.setContentId(attachmentName);
-	        a1.setMimeHeader("Content-Transfer-Encoding", "base64");
-	        a1.setContentType("{http://www.w3.org/2001/XMLSchema}base64Binary");
-	        a1.addMimeHeader("Content-Encoding", "gzip");
-	        msg.addAttachmentPart(a1);
-	        msg.saveChanges();
-        }
+            String attachmentName = "";
+            String attachmentFile = "";
+            String messageBody = "";
 
-        call.invoke(msg);
+            ArrayList<Integer> dokumendidIdList = new ArrayList<Integer>();
+            for(int i = 0; i < centralServerDocs.size(); i++) {
+                DhlMessage msgTmp = centralServerDocs.get(i);
+                dokumendidIdList.add(msgTmp.getDhlID());
+            }
 
-        RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
-        // Vastuse täätlemine
-        Message response = call.getResponseMessage();
-        // Käivitame päringu
+            if (requestVersion < 3) {
+                logger.debug("RequestVersion < 3.");
+                attachmentName = String.valueOf(System.currentTimeMillis());
+                attachmentFile = MarkDocumentsReceivedBody.createResponseFile(dokumendidIdList, statusID, clientFault, metaXML, requestVersion, new Date());
+                MarkDocumentsReceivedBody b = new MarkDocumentsReceivedBody();
+                b.dokumendid = attachmentName;
+                b.kaust = "";
+                b.edastusID = deliverySessionID;
 
-        if (isMarkDocumentsResponseOK(response)) {
-            requestLog.setResponse(ResponseStatus.OK.toString());
-        } else {
+                // Alläksuse ja ametikoha parameetrid lisame markDocumentsReceived
+                // päringule äksnes juhul, kui allalaadimisel kasutatud receiveDocuments
+                // päring toetas alläksuse ja ametikoha parameetrite kasutamist.
+                if ((unitSettings != null) && (orgSettings.getReceiveDocumentsRequestVersion() >= 3)) {
+                    b.allyksuseId = unitSettings.getDivisionID();
+                    b.ametikohaId = unitSettings.getOccupationID();
+                }
+                messageBody = (new SoapMessageBuilder(header, b.getBodyContentsAsText())).getMessageAsText();
+            } else {
+                logger.debug("RequestVersion = 3");
+                MarkDocumentsReceivedV3Body b3 = new MarkDocumentsReceivedV3Body();
+                b3.dokumendidIdList = dokumendidIdList;
+                b3.kaust = "";
+                b3.edastusID = deliverySessionID;
+                b3.vastuvotjaStaatusId = statusID;
+                b3.vastuvotjaVeateade = clientFault;
+                b3.metaXml = metaXML;
+
+                // Alläksuse ja ametikoha parameetrid lisame markDocumentsReceived
+                // päringule äksnes juhul, kui allalaadimisel kasutatud receiveDocuments
+                // päring toetas alläksuse ja ametikoha parameetrite kasutamist.
+                if ((unitSettings != null) && (orgSettings.getReceiveDocumentsRequestVersion() >= 3)) {
+                    b3.allyksuseLyhinimetus = unitSettings.getDivisionShortName();
+                    b3.ametikohaLyhinimetus = unitSettings.getOccupationShortName();
+                }
+                messageBody = (new SoapMessageBuilder(header, b3.getBodyContentsAsText())).getMessageAsText();
+            }
+
+            Message msg = new Message(messageBody);
+            call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "markDocumentsReceived"));
+
+            // Lisame sänumile manuse
+            if (requestVersion < 3) {
+                String tempFile = CommonMethods.gzipPackXML(attachmentFile, header.getAsutus(), "markDocumentsReceived");
+                tempFiles.add(tempFile);
+                FileDataSource ds = new FileDataSource(tempFile);
+                DataHandler d1 = new DataHandler(ds);
+                AttachmentPart a1 = new AttachmentPart(d1);
+                a1.setContentId(attachmentName);
+                a1.setMimeHeader("Content-Transfer-Encoding", "base64");
+                a1.setContentType("{http://www.w3.org/2001/XMLSchema}base64Binary");
+                a1.addMimeHeader("Content-Encoding", "gzip");
+                msg.addAttachmentPart(a1);
+                msg.saveChanges();
+            }
+
+            call.invoke(msg);
+
+            // Vastuse täätlemine
+            Message response = call.getResponseMessage();
+
+            RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
+
+            if (isMarkDocumentsResponseOK(response)) {
+                requestLog.setResponse(ResponseStatus.OK.toString());
+            } else {
+                requestLog.setResponse(ResponseStatus.NOK.toString());
+            }
+
+            LoggingService.logRequest(requestLog);
+        } catch (Exception ex) {
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.ClientAPI" + " markDocumentsReceived");
+            errorLog.setOrganizationCode(headerVar.getOrganizationCode());
+            errorLog.setUserCode(headerVar.getPersonalIDCode());
+            RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
+            int errorLogId = LoggingService.logError(errorLog);
+            if (errorLogId != -1) {
+                requestLog.setErrorLogId(errorLogId);
+            }
             requestLog.setResponse(ResponseStatus.NOK.toString());
+            LoggingService.logRequest(requestLog);
+            throw ex;
         }
-
-        LoggingService.logRequest(requestLog);
     }
 
     private boolean isMarkDocumentsResponseOK(Message response) throws SOAPException {
@@ -1466,7 +1493,7 @@ public class ClientAPI {
 
         String requestName = null;
 
-        try{
+        try {
             // Päringu nimi
             requestName = this.producerName + ".getSendingOptions.v" + String.valueOf(requestVersion);
 
@@ -1813,7 +1840,7 @@ public class ClientAPI {
             errorLog.setUserCode(headerVar.getPersonalIDCode());
             RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
             int errorLogId = LoggingService.logError(errorLog);
-            if (errorLogId != -1){
+            if (errorLogId != -1) {
                 requestLog.setErrorLogId(errorLogId);
             }
             requestLog.setResponse(ResponseStatus.NOK.toString());

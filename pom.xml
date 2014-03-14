@@ -97,6 +97,7 @@
                 <dvkClientDir>${dvkClientDir}</dvkClientDir>
                 <!-- e.g. C:\Work\Dev\DVK\server\development\trunk\src\test\resources\jetty-env-jenkins.xml -->
                 <dvkServerJettyEnvLocation>${dvkServerJettyEnvLocation}</dvkServerJettyEnvLocation>
+                <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI.properties</listOfTestConfigs>
             </properties>
         </profile>
         <profile>

@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ErrorLoggingTest {
+public class ErrorLoggingIntegration {
     ArrayList<OrgSettings> allKnownDatabases;
 
 
@@ -58,7 +58,7 @@ public class ErrorLoggingTest {
             Connection connection = setUpFromConfigFile(path);
 
             int errorLogEntryId = 0;
-            String actionName = "dvk.client.src.test.integration.ErrorLoggingTest" + " saveErrorLogToDB";
+            String actionName = "dvk.client.src.test.integration.ErrorLoggingIntegration" + " saveErrorLogToDB";
 
             ErrorLog errorLog = new ErrorLog();
             errorLog.setErrorMessage(errorMessage);
@@ -102,7 +102,7 @@ public class ErrorLoggingTest {
         for (String path: configFilePaths) {
             Connection connection = setUpFromConfigFile(path);
             int errorLogEntryId = 0;
-            String actionName = "dvk.client.src.test.integration.ErrorLoggingTest" +
+            String actionName = "dvk.client.src.test.integration.ErrorLoggingIntegration" +
                     " saveErrorLogToDBWithoutConnectionToDatabase";
             DatabaseSessionService.getInstance().setConnection(null);
             ErrorLog errorLog = new ErrorLog();
@@ -124,7 +124,7 @@ public class ErrorLoggingTest {
         for (String path: configFilePaths) {
             Connection connection = setUpFromConfigFile(path);
             int errorLogEntryId = 0;
-            String actionName = "dvk.client.src.test.integration.ErrorLoggingTest" + " saveErrorLogToDBWithoutOrgSettings";
+            String actionName = "dvk.client.src.test.integration.ErrorLoggingIntegration" + " saveErrorLogToDBWithoutOrgSettings";
             DatabaseSessionService.getInstance().setOrgSettings(null);
             ErrorLog errorLog = new ErrorLog();
             errorLog.setErrorMessage(errorMessage);
@@ -146,7 +146,7 @@ public class ErrorLoggingTest {
             Connection connection = setUpFromConfigFile(path);
 
             int errorLogEntryId = 0;
-            String actionName = "dvk.client.src.test.integration.ErrorLoggingTest" + " saveErrorLogToDBWithoutAnErrorMessage";
+            String actionName = "dvk.client.src.test.integration.ErrorLoggingIntegration" + " saveErrorLogToDBWithoutAnErrorMessage";
             ErrorLog errorLog = new ErrorLog();
             errorLog.setErrorMessage(null);
             errorLog.setActionName(actionName);

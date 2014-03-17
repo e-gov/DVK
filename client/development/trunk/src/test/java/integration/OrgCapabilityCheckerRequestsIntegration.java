@@ -19,7 +19,7 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrgCapabilityCheckerRequestsTest {
+public class OrgCapabilityCheckerRequestsIntegration {
 
     private ClientAPI dvkClient;
 

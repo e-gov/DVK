@@ -22,8 +22,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClientRequestsTest {
-    private static Logger logger = Logger.getLogger(ClientRequestsTest.class);
+public class ClientRequestsIntegration {
+    private static Logger logger = Logger.getLogger(ClientRequestsIntegration.class);
 
     @Test
     public void sendAndReceiveAndGetSendStatusRequestsTest() throws Exception {
@@ -132,8 +132,8 @@ public class ClientRequestsTest {
     private int insertNewMessageToDB(String propertiesFile) throws Exception {
         String sql = "";
         int messageId = 0;
-        String sqlFile = ClientRequestsTest.class.getResource("../insert_message").getPath();
-        String sqlFileMSSQL = ClientRequestsTest.class.getResource("../insert_messageForMSSQL").getPath();
+        String sqlFile = ClientRequestsIntegration.class.getResource("../insert_message").getPath();
+        String sqlFileMSSQL = ClientRequestsIntegration.class.getResource("../insert_messageForMSSQL").getPath();
 
         // Before, connect to database to insert a new message
         try {
@@ -206,7 +206,7 @@ public class ClientRequestsTest {
         int messageID = 0;
 
         // Get data from xml file for new message
-        String xmlFileForMessage = ClientRequestsTest.class.getResource("../xmlDataForNewMessage.xml").getPath();
+        String xmlFileForMessage = ClientRequestsIntegration.class.getResource("../xmlDataForNewMessage.xml").getPath();
         UnitCredential[] credentials = UnitCredential.getCredentials(orgSettings, dbConnection);
 
         // Create a new message with information, then, save it to DB

@@ -18,7 +18,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RequestLoggingTest {
+public class RequestLoggingIntegration {
     ArrayList<OrgSettings> allKnownDatabases;
 
     static String requestName = "Request name";

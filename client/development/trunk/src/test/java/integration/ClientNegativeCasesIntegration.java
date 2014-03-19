@@ -16,13 +16,16 @@ import org.junit.Test;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.sql.*;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ClientNegativeCasesIntegration {
     private static Logger logger = Logger.getLogger(ClientRequestsIntegration.class);
-    String serverIsMissingPropertiesFile = Class.class.getResource("/conf/integrationTests/dvk_client_postgreSQL-V9_3_Igor_serverIsMissing.properties").getPath();
+    String serverIsMissingPropertiesFile = Class.class.getResource("/conf/integrationTests/dvk_client_postgreSQL-V9_3_serverIsMissing.properties").getPath();
 
 
     @Test

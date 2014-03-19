@@ -145,11 +145,9 @@ public class LoggingService {
                 cs = dbConnection.prepareCall("{? = call \"Add_DhlRequestLog\"(?,?,?,?,?,?)}");
             }
 
-//            if (!CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(orgSettings.getDbProvider())) {
-//                parNr++;
-//            }
-
-            cs.setInt(parNr++, 0);
+            if (!CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(orgSettings.getDbProvider())) {
+                cs.setInt(parNr++, 0);
+            }
             cs.setTimestamp(parNr++, CommonMethods.sqlDateFromDate(requestLog.getRequestDateTime()), cal);
             cs.setString(parNr++, requestLog.getOrganizationCode());
             cs.setString(parNr++, requestLog.getUserCode());

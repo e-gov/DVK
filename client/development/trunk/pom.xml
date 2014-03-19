@@ -74,6 +74,13 @@
             <scope>system</scope>
             <systemPath>${basedir}/lib/sqljdbc4.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>sybase</groupId>
+            <artifactId>jconn3</artifactId>
+            <version>6.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/jconn3.jar</systemPath>
+        </dependency>
     </dependencies>
 
     <!-- Build -->

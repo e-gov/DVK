@@ -44,7 +44,7 @@ public class ClientNegativeCasesIntegration {
 
         // Get the error message from the last error_log entry
         try {
-            errorMessageActual = getTheLastErrorsMessage();
+            errorMessageActual = getTheLastErrorsMessage(serverIsMissingPropertiesFile);
         } catch (Exception e) {
             logger.error(e.getMessage());
             Assert.fail();
@@ -86,7 +86,7 @@ public class ClientNegativeCasesIntegration {
             String errorMessageActual = "";
 
             try {
-                errorMessageActual = getTheLastErrorsMessage();
+                errorMessageActual = getTheLastErrorsMessage(path);
             } catch (Exception e) {
                 logger.error(e.getMessage());
                 Assert.fail();
@@ -203,13 +203,13 @@ public class ClientNegativeCasesIntegration {
         return fileData.toString();
     }
 
-    private String getTheLastErrorsMessage() throws Exception {
+    private String getTheLastErrorsMessage(String path) throws Exception {
         String errorMessage = "";
         int receivedMessageId = 0;
 
         // Before, connect to the database
         try {
-            setUpFromConfigFile(serverIsMissingPropertiesFile);
+            setUpFromConfigFile(path);
         } catch (Exception ex) {
             logger.error("Can't get connection to DB", ex);
             throw ex;

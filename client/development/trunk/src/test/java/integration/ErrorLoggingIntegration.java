@@ -6,17 +6,15 @@ import dvk.client.db.DBConnection;
 import dvk.client.dhl.service.DatabaseSessionService;
 import dvk.client.dhl.service.LoggingService;
 import dvk.core.CommonMethods;
-import dvk.core.CommonStructures;
 import dvk.core.Settings;
 import ee.ria.dvk.client.testutil.IntegrationTestsConfigUtil;
 import junit.framework.Assert;
-import org.junit.Before;
+import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +22,7 @@ import java.util.List;
 public class ErrorLoggingIntegration {
     ArrayList<OrgSettings> allKnownDatabases;
 
+    static Logger logger = Logger.getLogger(LoggingService.class.getName());
 
     static String errorMessage = "Error message";
     static String orgCode = "123456";
@@ -44,6 +43,7 @@ public class ErrorLoggingIntegration {
             connection = DBConnection.getConnection(allKnownDatabases.get(0));
         } catch (Exception ex) {
             System.out.println("Can't get a connection to DB");
+            logger.error(ex.getMessage());
         }
         DatabaseSessionService.getInstance().setSession(connection, allKnownDatabases.get(0));
 

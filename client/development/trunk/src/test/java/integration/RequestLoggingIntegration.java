@@ -48,7 +48,7 @@ public class RequestLoggingIntegration {
 
     @Test
     public void saveRequestLogToDB() {
-        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePaths();
+        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCases();
 
         for (String path: configFilePaths) {
             Connection connection = setUpFromConfigFile(path);
@@ -91,7 +91,7 @@ public class RequestLoggingIntegration {
 
     @Test
     public void saveRequestLogToDBWithoutConnectionToDatabase() {
-        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePaths();
+        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCases();
 
         for (String path: configFilePaths) {
             setUpFromConfigFile(path);
@@ -109,7 +109,7 @@ public class RequestLoggingIntegration {
 
     @Test
     public void saveRequestLogToDBWithoutOrgSettings() {
-        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePaths();
+        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCases();
 
         for (String path: configFilePaths) {
             setUpFromConfigFile(path);
@@ -127,7 +127,7 @@ public class RequestLoggingIntegration {
 
     @Test
     public void saveRequestLogWithoutARequestName() {
-        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePaths();
+        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCases();
 
         for (String path: configFilePaths) {
             setUpFromConfigFile(path);
@@ -144,7 +144,7 @@ public class RequestLoggingIntegration {
 
     @Test
     public void saveRequestLogWithoutAnOrganizationCode() {
-        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePaths();
+        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCases();
 
         for (String path: configFilePaths) {
             setUpFromConfigFile(path);

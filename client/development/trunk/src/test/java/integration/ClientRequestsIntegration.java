@@ -11,13 +11,16 @@ import dvk.client.dhl.service.DatabaseSessionService;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import dvk.core.Settings;
+import ee.ria.dvk.client.testutil.FileUtil;
 import ee.ria.dvk.client.testutil.IntegrationTestsConfigUtil;
 import junit.framework.Assert;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +30,7 @@ public class ClientRequestsIntegration {
 
     @Test
     public void sendAndReceiveAndGetSendStatusRequestsTest() throws Exception {
-        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePaths();
+        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCases();
 
         for (String path: configFilePaths) {
             int messageId = 0;
@@ -114,21 +117,6 @@ public class ClientRequestsIntegration {
         DatabaseSessionService.getInstance().setSession(connection, allKnownDatabases.get(0));
     }
 
-    private String readSQLToString(String filePath) throws Exception {
-        StringBuffer fileData = new StringBuffer();
-        BufferedReader reader = new BufferedReader(new FileReader(filePath));
-        char[] buf = new char[1024];
-        int numRead = 0;
-
-        while((numRead=reader.read(buf)) != -1) {
-            String readData = String.valueOf(buf, 0, numRead);
-            fileData.append(readData);
-        }
-        reader.close();
-
-        return fileData.toString();
-    }
-
     private int insertNewMessageToDB(String propertiesFile) throws Exception {
         String sql = "";
         int messageId = 0;
@@ -151,9 +139,9 @@ public class ClientRequestsIntegration {
             if ((orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_MSSQL))
                 || (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_MSSQL_2005))
                 || (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_SQLANYWHERE))){
-                sql = readSQLToString(sqlFileMSSQL);
+                sql = FileUtil.readSQLToString(sqlFileMSSQL);
             } else if (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                sql = readSQLToString(sqlFile);
+                sql = FileUtil.readSQLToString(sqlFile);
             } else if (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_10G)
                     || orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_11G)) {
                 messageId = insertNewMessageToDBForOracle(propertiesFile, dbConnection, orgSettings);
@@ -262,7 +250,7 @@ public class ClientRequestsIntegration {
             if (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_10G)
                     || orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_11G)) {
                 dataClob = resultSet.getClob("data");
-                data = parseClobData(dataClob);
+                data = FileUtil.parseClobData(dataClob);
             } else {
                 data = resultSet.getString("data");
             }
@@ -308,7 +296,7 @@ public class ClientRequestsIntegration {
             if (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_10G)
                || orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_11G)) {
                 dataClob = resultSet.getClob("data");
-                data = parseClobData(dataClob);
+                data = FileUtil.parseClobData(dataClob);
             } else {
                 data = resultSet.getString("data");
             }
@@ -318,19 +306,6 @@ public class ClientRequestsIntegration {
         dhlResultRow.setXmlData(data);
 
         return dhlResultRow;
-    }
-
-    private String parseClobData(Clob clob) throws Exception {
-        StringBuffer stringBuffer = new StringBuffer();
-        String strng;
-
-        BufferedReader bufferRead = new BufferedReader(clob.getCharacterStream());
-
-        while ((strng=bufferRead.readLine()) != null) {
-            stringBuffer.append(strng);
-        }
-
-        return stringBuffer.toString();
     }
 
     private int returnMessageStatus(int messageId, String propertiesFile) throws Exception {

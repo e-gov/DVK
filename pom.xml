@@ -52,6 +52,7 @@
                 <dvkClientDir>C:\Work\Dev\DVK\client\development\trunk</dvkClientDir>
                 <dvkServerJettyEnvLocation>C:\Work\Dev\DVK\server\development\trunk\src\test\resources\jetty-env.xml</dvkServerJettyEnvLocation>
                 <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_hendrik.properties</listOfTestConfigs>
+                <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_serverIsMissing.properties</serverIsMissingConfigs>
             </properties>
         </profile>
         <profile>
@@ -67,20 +68,7 @@
                 <dvkClientDir>C:\Projects\RIA_DVK\client\development\trunk</dvkClientDir>
                 <dvkServerJettyEnvLocation>C:\Projects\RIA_DVK\server\development\trunk\src\test\resources\jetty-env.xml</dvkServerJettyEnvLocation>
                 <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_Igor.properties, ./conf/integrationTests/dvk_client_MSSQL-V2005_Igor.properties, ./conf/integrationTests/dvk_client_Oracle-V11G_Igor.properties</listOfTestConfigs>
-            </properties>
-        </profile>
-        <profile>
-            <id>1.7.1</id>
-            <modules>
-                <module>core/tags/1.7.1</module>
-                <module>client/tags/1.7.1</module>
-                <module>server/tags/1.7.1</module>
-                <module>api/tags/1.7.1</module>
-            </modules>
-            <properties>
-                <dvkCoreDir>C:\Work\Dev\DVK\core\tags\1.7.1</dvkCoreDir>
-                <dvkClientDir>C:\Work\Dev\DVK\client\tags\1.7.1</dvkClientDir>
-                <dvkServerJettyEnvLocation>C:\Work\Dev\DVK\server\tags\1.7.1\src\test\resources\jetty-env.xml</dvkServerJettyEnvLocation>
+                <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_IgorAndLiza-serverIsMissing.properties</serverIsMissingConfigs>
             </properties>
         </profile>
         <profile>
@@ -99,22 +87,7 @@
                 <!-- e.g. C:\Work\Dev\DVK\server\development\trunk\src\test\resources\jetty-env-jenkins.xml -->
                 <dvkServerJettyEnvLocation>${dvkServerJettyEnvLocation}</dvkServerJettyEnvLocation>
                 <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI.properties</listOfTestConfigs>
-            </properties>
-        </profile>
-        <profile>
-            <id>ci-1.7.1</id>
-            <modules>
-                <module>core/tags/1.7.1</module>
-                <module>client/tags/1.7.1</module>
-                <module>server/tags/1.7.1</module>
-            </modules>
-            <properties>
-                <!-- e.g. C:\Work\Dev\DVK\core\development\trunk -->
-                <dvkCoreDir>${dvkCoreDir}</dvkCoreDir>
-                <!-- e.g. C:\Work\Dev\DVK\client\development\trunk -->
-                <dvkClientDir>${dvkClientDir}</dvkClientDir>
-                <!-- e.g. C:\Work\Dev\DVK\server\development\trunk\src\test\resources\jetty-env-jenkins.xml -->
-                <dvkServerJettyEnvLocation>${dvkServerJettyEnvLocation}</dvkServerJettyEnvLocation>
+                <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_CI_serverIsMissing.properties</serverIsMissingConfigs>
             </properties>
         </profile>
     </profiles>

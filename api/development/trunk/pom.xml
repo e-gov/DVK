@@ -3,17 +3,10 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>dvk</groupId>
     <artifactId>api</artifactId>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
     <packaging>jar</packaging>
     <name>dvk-api</name>
 
- <!--   <parent>
-        <groupId>dvk</groupId>
-        <artifactId>parent</artifactId>
-        <version>1.7.1</version>
-        <relativePath>../../..</relativePath>
-    </parent>
--->
     <dependencies>
         <dependency>
             <groupId>java</groupId>

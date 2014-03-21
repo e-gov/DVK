@@ -13,7 +13,7 @@ import java.util.List;
 public class IntegrationTestsConfigUtilIntegration {
     @Test
     public void testFindAbsolutePathsForCurrentProfile() {
-        List<String> absolutePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePaths();
+        List<String> absolutePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCases();;
 
         Assert.assertNotNull(absolutePaths);
     }

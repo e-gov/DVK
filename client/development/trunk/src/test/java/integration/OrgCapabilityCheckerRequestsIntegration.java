@@ -25,7 +25,7 @@ public class OrgCapabilityCheckerRequestsIntegration {
 
     @Test
     public void getOccupationListAndGetSendingOptionsAndGetSubdivionListRequestsTest() {
-        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePaths();
+        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCases();
 
         for (String path: configFilePaths) {
             ArrayList<Occupation> resultOfGetOccupationList = null;

@@ -52,7 +52,7 @@ public class ErrorLoggingIntegration {
 
     @Test
     public void saveErrorLogToDB() {
-        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePaths();
+        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCases();
 
         for (String path: configFilePaths) {
             Connection connection = setUpFromConfigFile(path);
@@ -97,7 +97,7 @@ public class ErrorLoggingIntegration {
 
     @Test
     public void saveErrorLogToDBWithoutConnectionToDatabase() {
-        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePaths();
+        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCases();
 
         for (String path: configFilePaths) {
             Connection connection = setUpFromConfigFile(path);
@@ -119,7 +119,7 @@ public class ErrorLoggingIntegration {
 
     @Test
     public void saveErrorLogToDBWithoutOrgSettings() {
-        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePaths();
+        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCases();
 
         for (String path: configFilePaths) {
             Connection connection = setUpFromConfigFile(path);
@@ -140,7 +140,7 @@ public class ErrorLoggingIntegration {
 
     @Test
     public void saveErrorLogToDBWithoutAnErrorMessage() {
-        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePaths();
+        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCases();
 
         for (String path: configFilePaths) {
             Connection connection = setUpFromConfigFile(path);

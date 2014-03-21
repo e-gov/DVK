@@ -1,4 +1,16 @@
-  1.6.3
+1.7.1
+-------------------------------------------------------------------------------
+- Lisatud päringute ja vigade logimine andmebaasi
+- Integratsioonitestid lisatud toetatud andmebaaside kohta
+- Lisatud puudu olevad jarid
+- Täiendatud pidevintegratsiooniga seotut
+- Nüüdsest eristatakse konfiguratsioonis Oracle 10G ja Oracle 11G baase
+- Kapsli versiooni 2.1 tugi lisatud
+- 2.1 kapsli versiooni konverteerimine 1.0 lisatud
+- Puudu olev insert_new_row protseduur???
+
+
+1.6.3
 -------------------------------------------------------------------------------
 - Universaalklient kustutab nüüd igal käivitamisel ajutisest kaustast rohkem kui
   10 minutit vanad "dhl_" prefiksiga failid. St universaalkliendi loodud

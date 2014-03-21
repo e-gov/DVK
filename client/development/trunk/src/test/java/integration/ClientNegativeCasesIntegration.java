@@ -9,6 +9,7 @@ import dvk.client.dhl.service.DatabaseSessionService;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import dvk.core.Settings;
+import ee.ria.dvk.client.testutil.FileUtil;
 import ee.ria.dvk.client.testutil.IntegrationTestsConfigUtil;
 import junit.framework.Assert;
 import org.apache.log4j.Logger;
@@ -25,37 +26,38 @@ import java.util.List;
 
 public class ClientNegativeCasesIntegration {
     private static Logger logger = Logger.getLogger(ClientRequestsIntegration.class);
-    String serverIsMissingPropertiesFile = Class.class.getResource("/conf/integrationTests/dvk_client_postgreSQL-V9_3_serverIsMissing.properties").getPath();
-
 
     @Test
     public void serverIsMissingTest() {
-        // Execute Client with valid configuration, but with the wrong URL to the server
-        try {
-            String[] args = new String[]{"-mode=3", "-prop="+serverIsMissingPropertiesFile};
-            Client.main(args);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            Assert.fail();
+        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForNegativeCases();
+        for (String path: configFilePaths) {
+            // Execute Client with valid configuration, but with the wrong URL to the server
+            try {
+                String[] args = new String[]{"-mode=3", "-prop="+path};
+                Client.main(args);
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+                Assert.fail();
+            }
+
+            String errorMessageActual = "";
+            String errorMessageExpected = "(404)Not Found";
+
+            // Get the error message from the last error_log entry
+            try {
+                errorMessageActual = getTheLastErrorsMessage(path);
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+                Assert.fail();
+            }
+
+            Assert.assertEquals(errorMessageExpected, errorMessageActual);
         }
-
-        String errorMessageActual = "";
-        String errorMessageExpected = "(404)Not Found";
-
-        // Get the error message from the last error_log entry
-        try {
-            errorMessageActual = getTheLastErrorsMessage(serverIsMissingPropertiesFile);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            Assert.fail();
-        }
-
-        Assert.assertEquals(errorMessageExpected, errorMessageActual);
     }
 
     @Test
     public void sendersOrgCodeInsideTheMessageDoesNotMatchWithTheSendersOrgCodeInsideTheConfigFileTest() {
-        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePaths();
+        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCases();
 
         for (String path: configFilePaths) {
             int messageId = 0;
@@ -118,9 +120,9 @@ public class ClientNegativeCasesIntegration {
             if ((orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_MSSQL))
                     || (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_MSSQL_2005))
                     || (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_SQLANYWHERE))){
-                sql = readSQLToString(sqlFileMSSQL);
+                sql = FileUtil.readSQLToString(sqlFileMSSQL);
             } else if (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                sql = readSQLToString(sqlFile);
+                sql = FileUtil.readSQLToString(sqlFile);
             } else if (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_10G)
                     || orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_11G)) {
                 messageId = insertNewMessageToDBForOracle(propertiesFile, dbConnection, orgSettings);
@@ -186,21 +188,6 @@ public class ClientNegativeCasesIntegration {
         DatabaseSessionService.getInstance().clearSession();
 
         return messageID;
-    }
-
-    private String readSQLToString(String filePath) throws Exception {
-        StringBuffer fileData = new StringBuffer();
-        BufferedReader reader = new BufferedReader(new FileReader(filePath));
-        char[] buf = new char[1024];
-        int numRead = 0;
-
-        while((numRead=reader.read(buf)) != -1) {
-            String readData = String.valueOf(buf, 0, numRead);
-            fileData.append(readData);
-        }
-        reader.close();
-
-        return fileData.toString();
     }
 
     private String getTheLastErrorsMessage(String path) throws Exception {

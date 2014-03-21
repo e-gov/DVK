@@ -1447,4 +1447,48 @@ AS
 SET @request_log_entry_id = SCOPE_IDENTITY();
 GO
 
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Delete_DhlOccupation]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[Delete_DhlOccupation]
+GO
+create procedure [dbo].[Delete_DhlOccupation]
+	@id int
+as
+delete
+from    [dhl_occupation]
+where   [occupation_code] = @id
+GO
+
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Delete_DhlSubdivision]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[Delete_DhlSubdivision]
+GO
+create procedure [dbo].[Delete_DhlSubdivision]
+	@id int
+as
+delete
+from    [dhl_subdivision]
+where   [subdivision_code] = @id
+GO
+
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Get_DhlSubdivisionList]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[Get_DhlSubdivisionList]
+GO
+create procedure [dbo].[Get_DhlSubdivisionList]
+as
+select  *
+from    [dhl_subdivision]
+GO
+
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Get_DhlOccupationList]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[Get_DhlOccupationList]
+GO
+create procedure [dbo].[Get_DhlOccupationList]
+as
+select  *
+from    [dhl_occupation]
+GO
+
+
+
+
+
 

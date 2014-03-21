@@ -1,6 +1,7 @@
 package dvk.client.businesslayer;
 
 import dvk.client.conf.OrgSettings;
+import dvk.client.dhl.service.LoggingService;
 import dvk.core.Settings;
 import dvk.client.db.DBConnection;
 import dvk.client.iostructures.Fault;
@@ -336,10 +337,13 @@ public class MessageRecipient {
         		}
                 return result;
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL", "dvk.client.businesslayer.MessageRecipient" + " getList");
+                LoggingService.logError(errorLog);
                 return null;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "clnt.businesslayer.MessageRecipient", "getList");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.MessageRecipient" + " getList");
+            LoggingService.logError(errorLog);
             return null;
         }
     }
@@ -431,6 +435,8 @@ public class MessageRecipient {
                 dbConnection.commit();
                 return true;
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL", "dvk.client.businesslayer.MessageRecipient" + " saveToDB");
+                LoggingService.logError(errorLog);
                 return false;
             }
         } catch (Exception ex) {
@@ -438,10 +444,14 @@ public class MessageRecipient {
                 try {
                 	dbConnection.rollback();
                 } catch(SQLException ex1) {
-                    CommonMethods.logError(ex, this.getClass().getName(), "saveToDB");
+                    ErrorLog errorLog = new ErrorLog(ex, this.getClass().getName() + " saveToDB");
+                    LoggingService.logError(errorLog);
                 }
             }
-            CommonMethods.logError(ex, this.getClass().getName(), "saveToDB");
+            ErrorLog errorLog = new ErrorLog(ex, this.getClass().getName() + " saveToDB");
+            errorLog.setOrganizationCode(this.getRecipientOrgCode());
+            errorLog.setUserCode(this.getRecipientPersonCode());
+            LoggingService.logError(errorLog);
             return false;
         }
     }
@@ -558,7 +568,8 @@ public class MessageRecipient {
             }
             return result;
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "clnt.businesslayer.MessageRecipient", "fromXML");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.MessageRecipient" + " fromXML");
+            LoggingService.logError(errorLog);
             return null;
         }
     }
@@ -579,7 +590,10 @@ public class MessageRecipient {
                 }
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "clnt.businesslayer.MessageRecipient", "FindRecipientFromList");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.MessageRecipient" + " FindRecipientFromList");
+            errorLog.setOrganizationCode(orgCode);
+            errorLog.setUserCode(personCode);
+            LoggingService.logError(errorLog);
             return null;
         }
         return null;

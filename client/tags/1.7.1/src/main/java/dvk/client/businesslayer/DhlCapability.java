@@ -2,6 +2,7 @@ package dvk.client.businesslayer;
 
 import dvk.client.conf.OrgSettings;
 import dvk.client.db.DBConnection;
+import dvk.client.dhl.service.LoggingService;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import java.sql.CallableStatement;
@@ -146,12 +147,20 @@ public class DhlCapability {
                 dbConnection.commit();
                 return true;
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL", this.getClass().getName() + " saveToDB");
+                LoggingService.logError(errorLog);
                 return false;
             }
         } catch (Exception ex) {
-            try { dbConnection.rollback(); }
-            catch(SQLException ex1) { CommonMethods.logError(ex, this.getClass().getName(), "saveToDB"); }
-            CommonMethods.logError(ex, this.getClass().getName(), "saveToDB");
+            try {
+                dbConnection.rollback();
+            } catch(SQLException ex1) {
+                ErrorLog errorLog = new ErrorLog(ex1, this.getClass().getName() + " saveToDB");
+                LoggingService.logError(errorLog);
+            }
+            ErrorLog errorLog = new ErrorLog(ex, this.getClass().getName() + " saveToDB");
+            errorLog.setOrganizationCode(this.getOrgCode());
+            LoggingService.logError(errorLog);
             return false;
         }
     }
@@ -186,7 +195,9 @@ public class DhlCapability {
         		}
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "clnt.businesslayer.DhlCapability", "loadFromDB");
+            ErrorLog errorLog = new ErrorLog(ex, this.getClass().getName() + " loadFromDB");
+            errorLog.setOrganizationCode(this.getOrgCode());
+            LoggingService.logError(errorLog);
         }
     }
 
@@ -220,10 +231,13 @@ public class DhlCapability {
         		}
                 return result;
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL", "dvk.client.businesslayer.DhlCapability" + " getList");
+                LoggingService.logError(errorLog);
                 return null;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "clnt.businesslayer.DhlCapability", "getListByMessageID");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.DhlCapability" + " getList");
+            LoggingService.logError(errorLog);
             return null;
         }
     }
@@ -262,10 +276,14 @@ public class DhlCapability {
         		}
                 return result;
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL", "dvk.client.businesslayer.DhlCapability" + " getListByMessageID");
+                LoggingService.logError(errorLog);
                 return null;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "clnt.businesslayer.DhlCapability", "getListByMessageID");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.DhlCapability" + " getListByMessageID");
+            errorLog.setMessageId(messageID);
+            LoggingService.logError(errorLog);
             return null;
         }
     }
@@ -303,10 +321,13 @@ public class DhlCapability {
         		}
                 return result;
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL", "dvk.client.businesslayer.DhlCapability" + " getOrgsByCapability");
+                LoggingService.logError(errorLog);
                 return null;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "clnt.businesslayer.DhlCapability", "getOrgsByCapability");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.DhlCapability" + " getOrgsByCapability");
+            LoggingService.logError(errorLog);
             return null;
         }
     }
@@ -337,7 +358,10 @@ public class DhlCapability {
                 return true;
             } 
         } catch (Exception ex) {
-            CommonMethods.logError(ex, this.getClass().getName(), "updateDhlID");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.DhlCapability" + " updateDhlID");
+            errorLog.setOrganizationCode(this.getOrgCode());
+            errorLog.setMessageId(msg.getId());
+            LoggingService.logError(errorLog);
             return false;
         }        
      return false;
@@ -388,7 +412,8 @@ public class DhlCapability {
                 return item;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dvk.client.businesslayer.DhlCapability", "fromXML");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.DhlCapability" + " fromXML");
+            LoggingService.logError(errorLog);
             return null;
         }
     }

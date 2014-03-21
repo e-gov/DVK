@@ -3,6 +3,8 @@ package dvk.client.businesslayer;
 import dvk.client.ClientAPI;
 import dvk.client.conf.OrgAddressFilter;
 import dvk.client.conf.OrgSettings;
+import dvk.client.dhl.service.DatabaseSessionService;
+import dvk.client.dhl.service.LoggingService;
 import dvk.core.Settings;
 import dvk.client.db.DBConnection;
 import dvk.client.db.UnitCredential;
@@ -582,7 +584,8 @@ public class DhlMessage implements Cloneable {
                                     }
                                     logger.debug("Container data was read from database. Container size: " + totalSize + " characters.");
                                 } catch (Exception e) {
-                                    CommonMethods.logError(e, "dhl.Document", "getDocumentsSentTo");
+                                    ErrorLog errorLog = new ErrorLog(e, "dvk.client.businesslayer.DhlMessage" + " getDocumentsSentTo");
+                                    LoggingService.logError(errorLog);
                                     throw e;
                                 } finally {
                                     out.flush();
@@ -638,7 +641,10 @@ public class DhlMessage implements Cloneable {
                 }
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, this.getClass().getName(), "getByID");
+            ErrorLog errorLog = new ErrorLog(ex, this.getClass().getName() + " getByID");
+            errorLog.setMessageId(id);
+            errorLog.setUserCode(this.getSenderPersonCode());
+            LoggingService.logError(errorLog);
         }
     }
 
@@ -702,7 +708,8 @@ public class DhlMessage implements Cloneable {
                                     }
                                     logger.debug("Container data was read from database. Container size: " + totalSize + " characters.");
                                 } catch (Exception e) {
-                                    CommonMethods.logError(e, "dvk.client.businesslayer.DhlMessage", "getList");
+                                    ErrorLog errorLog = new ErrorLog(e, "dvk.client.businesslayer.DhlMessage" + " getList");
+                                    LoggingService.logError(errorLog);
                                     throw e;
                                 } finally {
                                     out.flush();
@@ -761,10 +768,13 @@ public class DhlMessage implements Cloneable {
                 }
                 return result;
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL", "dvk.client.businesslayer.DhlMessage" + " getList");
+                LoggingService.logError(errorLog);
                 return null;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "clnt.businesslayer.DhlMessage", "getList");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.DhlMessage" + " getList");
+            LoggingService.logError(errorLog);
             return null;
         }
     }
@@ -938,11 +948,16 @@ public class DhlMessage implements Cloneable {
 
                 return true;
             } else {
-                logger.error("Database connection is NULL!");
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL!", "dvk.client.businesslayer.DhlMessage" + " updateInDb");
+                LoggingService.logError(errorLog);
                 return false;
             }
         } catch (Exception ex) {
-            logger.error(ex);
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.DhlMessage" + " updateInDb");
+            errorLog.setMessageId(this.getId());
+            errorLog.setOrganizationCode(this.getSenderOrgCode());
+            errorLog.setUserCode(this.getSenderPersonCode());
+            LoggingService.logError(errorLog);
             return false;
         } finally {
             CommonMethods.safeCloseReader(reader);
@@ -1012,11 +1027,16 @@ public class DhlMessage implements Cloneable {
 
                 return true;
             } else {
-                logger.error("Database connection is NULL!");
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL!", "dvk.client.businesslayer.DhlMessage" + " updateMetaDataInDb");
+                LoggingService.logError(errorLog);
                 return false;
             }
         } catch (Exception ex) {
-            logger.error(ex);
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.DhlMessage" + " updateMetaDataInDb");
+            errorLog.setMessageId(this.getId());
+            errorLog.setOrganizationCode(this.getSenderOrgCode());
+            errorLog.setUserCode(this.getSenderPersonCode());
+            LoggingService.logError(errorLog);
             return false;
         }
     }
@@ -1061,10 +1081,13 @@ public class DhlMessage implements Cloneable {
 
                 return result;
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL!", "dvk.client.businesslayer.DhlMessage" + " getMessageID");
+                LoggingService.logError(errorLog);
                 return 0;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "clnt.businesslayer.DhlMessage", "getMessageID");
+            ErrorLog errorLog = new ErrorLog(ex, "client.businesslayer.DhlMessage" + "dvk.client.businesslayer.DhlMessage" + " getMessageID");
+            LoggingService.logError(errorLog);
             return 0;
         }
     }
@@ -1104,10 +1127,13 @@ public class DhlMessage implements Cloneable {
 
                 return result;
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL!", "dvk.client.businesslayer.DhlMessage" + " getMessageID");
+                LoggingService.logError(errorLog);
                 return 0;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "clnt.businesslayer.DhlMessage", "getMessageID");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.DhlMessage" + " getMessageID");
+            LoggingService.logError(errorLog);
             return 0;
         }
     }
@@ -1142,11 +1168,14 @@ public class DhlMessage implements Cloneable {
 
                 return true;
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL!", "dvk.client.businesslayer.DhlMessage" + " updateStatus");
+                LoggingService.logError(errorLog);
                 return false;
             }
         } catch (Exception ex) {
-            logger.error("Exception while updating message status: ", ex);
-            CommonMethods.logError(ex, "clnt.businesslayer.DhlMessage", "updateStatus");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.DhlMessage" + " updateStatus");
+            errorLog.setMessageId(messageID);
+            LoggingService.logError(errorLog);
             return false;
         }
     }
@@ -1232,10 +1261,14 @@ public class DhlMessage implements Cloneable {
 
                 return true;
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL!", "dvk.client.businesslayer.DhlMessage" + " updateStatus");
+                LoggingService.logError(errorLog);
                 return false;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "clnt.businesslayer.DhlMessage", "updateStatus");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.DhlMessage" + " updateStatus");
+            errorLog.setMessageId(messageID);
+            LoggingService.logError(errorLog);
             return false;
         }
     }
@@ -1259,11 +1292,16 @@ public class DhlMessage implements Cloneable {
                 cs.close();
                 return true;
             } else {
-                logger.warn("Database connection is null.");
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL!", "dvk.client.businesslayer.DhlMessage" + " updateDhlID");
+                LoggingService.logError(errorLog);
                 return false;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, this.getClass().getName(), "updateDhlID");
+            ErrorLog errorLog = new ErrorLog(ex, this.getClass().getName() + " updateDhlID");
+            errorLog.setOrganizationCode(this.getSenderOrgCode());
+            errorLog.setMessageId(this.getId());
+            errorLog.setUserCode(this.getSenderPersonCode());
+            LoggingService.logError(errorLog);
             return false;
         }
     }
@@ -1288,10 +1326,16 @@ public class DhlMessage implements Cloneable {
                 cs.close();
                 return true;
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL!", "dvk.client.businesslayer.DhlMessage" + " updateStatusUpdateNeed");
+                LoggingService.logError(errorLog);
                 return false;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, this.getClass().getName(), "updateStatusUpdateNeed");
+            ErrorLog errorLog = new ErrorLog(ex, this.getClass().getName() + " updateStatusUpdateNeed");
+            errorLog.setOrganizationCode(this.getSenderOrgCode());
+            errorLog.setMessageId(this.getId());
+            errorLog.setUserCode(this.getSenderPersonCode());
+            LoggingService.logError(errorLog);
             return false;
         }
     }
@@ -1344,7 +1388,8 @@ public class DhlMessage implements Cloneable {
                                     }
                                     logger.debug("Container data was read from database. Container size: " + totalSize + " characters.");
                                 } catch (Exception e) {
-                                    CommonMethods.logError(e, "dhl.Document", "getDocumentsSentTo");
+                                    ErrorLog errorLog = new ErrorLog(e, "dvk.client.businesslayer.DhlMessage" + " getByDhlID");
+                                    LoggingService.logError(errorLog);
                                     throw e;
                                 } finally {
                                     out.flush();
@@ -1401,10 +1446,13 @@ public class DhlMessage implements Cloneable {
                 }
                 return result;
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL!", "dvk.client.businesslayer.DhlMessage" + " getByDhlID");
+                LoggingService.logError(errorLog);
                 return null;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "clnt.businesslayer.DhlMessage", "updateStatusUpdateNeed");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.DhlMessage" + " getByDhlID");
+            LoggingService.logError(errorLog);
             return null;
         }
     }
@@ -1457,7 +1505,8 @@ public class DhlMessage implements Cloneable {
                                     }
                                     logger.debug("Container data was read from database. Container size: " + totalSize + " characters.");
                                 } catch (Exception e) {
-                                    CommonMethods.logError(e, "dhl.Document", "getDocumentsSentTo");
+                                    ErrorLog errorLog = new ErrorLog(e, "dvk.client.businesslayer.DhlMessage" + " getByGUID");
+                                    LoggingService.logError(errorLog);
                                     throw e;
                                 } finally {
                                     out.flush();
@@ -1514,10 +1563,13 @@ public class DhlMessage implements Cloneable {
                 }
                 return result;
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL!", "dvk.client.businesslayer.DhlMessage" + " getByGUID");
+                LoggingService.logError(errorLog);
                 return null;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "clnt.businesslayer.DhlMessage", "updateStatusUpdateNeed");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.DhlMessage" + " getByGUID");
+            LoggingService.logError(errorLog);
             return null;
         }
     }
@@ -2106,7 +2158,11 @@ public class DhlMessage implements Cloneable {
         try {
             recipients = extractRecipientData(this.m_filePath);
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dvk.client.businesslayer.DhlMessage", "loadRecipientsFromXML");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.DhlMessage" +" loadRecipientsFromXML");
+            errorLog.setOrganizationCode(this.getSenderOrgCode());
+            errorLog.setUserCode(this.getSenderPersonCode());
+            errorLog.setMessageId(this.getId());
+            LoggingService.logError(errorLog);
             recipients = null;
         }
 
@@ -2163,7 +2219,9 @@ public class DhlMessage implements Cloneable {
         try {
             recipients = extractRecipientData(message.getFilePath());
         } catch (Exception ex) {
-            logger.error(ex);
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.DhlMessage" + " extractAndSaveMessageRecipients");
+            errorLog.setMessageId(message.getId());
+            LoggingService.logError(errorLog);
             recipients = null;
         }
 
@@ -2747,10 +2805,12 @@ public class DhlMessage implements Cloneable {
                 cs.execute();
                 cs.close();
             } else {
-                logger.warn("Database connection is NULL.");
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL", "dvk.client.businesslayer.DhlMessage" + " updateMetaDataInDB");
+                LoggingService.logError(errorLog);
             }
         } catch (Exception ex) {
-            logger.error(ex);
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.DhlMessage" + " updateMetaDataInDB");
+            LoggingService.logError(errorLog);
         }
         return result;
     }

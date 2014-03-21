@@ -1,5 +1,7 @@
 package dvk.client.iostructures;
 
+import dvk.client.businesslayer.ErrorLog;
+import dvk.client.dhl.service.LoggingService;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import org.w3c.dom.Element;
@@ -110,7 +112,8 @@ public class GetSendingOptionsResponseItem {
                 return item;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dvk.client.iostructures.GetSendingOptionsResponseItem", "fromXML");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.iostructures.GetSendingOptionsResponseItem" + " fromXML");
+            LoggingService.logError(errorLog);
             return null;
         }
     }

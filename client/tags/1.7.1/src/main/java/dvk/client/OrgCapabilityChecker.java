@@ -2,11 +2,10 @@ package dvk.client;
 
 import dvk.client.amphora.Department;
 import dvk.client.amphora.Organization;
-import dvk.client.businesslayer.Classifier;
-import dvk.client.businesslayer.DhlCapability;
-import dvk.client.businesslayer.Occupation;
-import dvk.client.businesslayer.Subdivision;
+import dvk.client.businesslayer.*;
 import dvk.client.conf.OrgSettings;
+import dvk.client.dhl.service.DatabaseSessionService;
+import dvk.client.dhl.service.LoggingService;
 import dvk.core.Settings;
 import dvk.client.db.DBConnection;
 import dvk.client.db.UnitCredential;
@@ -75,6 +74,7 @@ public class OrgCapabilityChecker {
 	        try {
 	            dvkClient.initClient(Settings.Client_ServiceUrl, Settings.Client_ProducerName);
 	        } catch (Exception ex) {
+                LoggingService.logError(new ErrorLog(ex, "dvk.client.OrgCapabilityChecker" + " main"));
 	            ex.printStackTrace();
 	            return;
 	        }
@@ -93,9 +93,11 @@ public class OrgCapabilityChecker {
 	        UnitCredential[] credList = new UnitCredential[] {};
 	        OrgSettings firstKnownDatabase =  databases.get(0);
 	        Connection dbConnection = DBConnection.getConnection(firstKnownDatabase);
+            DatabaseSessionService.getInstance().setSession(dbConnection, firstKnownDatabase);
 	        try {
 	        	credList = UnitCredential.getCredentials(databases.get(0), dbConnection);
 	        } finally  {
+                DatabaseSessionService.getInstance().clearSession();
 	        	CommonMethods.safeCloseDatabaseConnection(dbConnection);
 	        }
 
@@ -108,14 +110,29 @@ public class OrgCapabilityChecker {
 	                "",
 	                (CommonMethods.personalIDCodeHasCountryCode(cred.getPersonalIdCode()) ? cred.getPersonalIdCode() : "EE"+cred.getPersonalIdCode()));
 
+                Connection connection = null;
 	            try {
+                    connection = DBConnection.getConnection(firstKnownDatabase);
+                    DatabaseSessionService.getInstance().setSession(connection, firstKnownDatabase);
 	            	result = dvkClient.getSendingOptions(headerVar, null, null, null, false, -1, -1, databases.get(0).getDvkSettings().getGetSendingOptionsRequestVersion());
+                    RequestLog requestLog = new RequestLog(".getSendingOptions.v" +
+                            databases.get(0).getDvkSettings().getGetSendingOptionsRequestVersion(), "default_org", "default_user_code");
+                    if (result != null) {
+                        requestLog.setResponse(ResponseStatus.OK.toString());
+                    } else {
+                        requestLog.setResponse(ResponseStatus.NOK.toString());
+                    }
+                    LoggingService.logRequest(requestLog);
 	            } catch (Exception ex) {
-	                CommonMethods.logError(ex, "dvk.client.OrgCapabilityChecker", "main");
-	                System.out.println("    Exception occured while exchanging data: " + ex.getMessage());
+                    ErrorLog errorLog = new ErrorLog(ex, "dvk.client.OrgCapabilityChecker" + " main");
+                    LoggingService.logError(errorLog);
+                    System.out.println("    Exception occured while exchanging data: " + ex.getMessage());
 	                System.out.println("Canceling work...");
 	                return;
-	            }
+	            } finally {
+                    CommonMethods.safeCloseDatabaseConnection(connection);
+                    DatabaseSessionService.getInstance().clearSession();
+                }
 	            System.out.println("    Got response from DVK server...");
 
 	            // Kui andmete vahetamisel kasutatava DVK serveri versioon on vähemalt 1.5, siis
@@ -132,23 +149,29 @@ public class OrgCapabilityChecker {
 		                if ((result.allyksused == null) || (result.allyksused.size() < 1)) {
 			                System.out.println("    Requesting subdivision data...");
 			                try {
+                                DatabaseSessionService.getInstance().setSession(dbConnection, firstKnownDatabase);
 			                	result.allyksused = dvkClient.getSubdivisionList(headerVar, orgCodes);
 			                } catch (Exception ex) {
 			                    System.out.println("    Exception occured while getting subdivision data...");
-			                    CommonMethods.logError(ex, "dvk.client.OrgCapabilityChecker", "main");
+                                LoggingService.logError(new ErrorLog(ex, "dvk.client.OrgCapabilityChecker" + " main"));
 			                    result.allyksused = new ArrayList<Subdivision>();
-			                }
+			                } finally {
+                                DatabaseSessionService.getInstance().clearSession();
+                            }
 		                }
 
 		                if ((result.ametikohad == null) || (result.ametikohad.size() < 1)) {
 			                System.out.println("    Requesting occupation data...");
 			                try {
+                                DatabaseSessionService.getInstance().setSession(dbConnection, firstKnownDatabase);
 			                	result.ametikohad = dvkClient.getOccupationList(headerVar, orgCodes);
 			                } catch (Exception ex) {
 			                    System.out.println("    Exception occured while getting occupation data...");
-			                    CommonMethods.logError(ex, "dvk.client.OrgCapabilityChecker", "main");
+                                LoggingService.logError(new ErrorLog(ex, "dvk.client.OrgCapabilityChecker" + " main"));
 			                    result.ametikohad = new ArrayList<Occupation>();
-			                }
+			                } finally {
+                                DatabaseSessionService.getInstance().clearSession();
+                            }
 		                }
 	                }
 	            }
@@ -164,8 +187,10 @@ public class OrgCapabilityChecker {
 
 	            try {
 	            	dbConnection = DBConnection.getConnection(db);
+                    DatabaseSessionService.getInstance().setSession(dbConnection, db);
 		            if (dbConnection == null) {
-		            	logger.error("Failed opening database connection to database \"" + db.getDatabaseName() + "\". Resulting connection is NULL.");
+                        ErrorLog errorLog = new ErrorLog("Database connection is NULL " + db.getDatabaseName(), "dvk.client.OrgCapabilityChecker" + " main");
+                        LoggingService.logError(errorLog);
 		            } else {
 			            // Sync status classifier values from config file to database
 		            	Classifier.duplicateSettingsToDB(db, dbConnection);
@@ -273,14 +298,16 @@ public class OrgCapabilityChecker {
 			                r.gc();
 			            }
 		            }
-	            } finally {
+                } finally {
+                    DatabaseSessionService.getInstance().clearSession();
 	            	CommonMethods.safeCloseDatabaseConnection(dbConnection);
 	            }
 	        }
 	        System.out.println("    Processing response data completed successfully!");
         } catch (Exception ex) {
-        	System.out.println("    Exception occurred! " + ex.getMessage());
-        	logger.error(ex);
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.OrgCapabilityChecker" + " main");
+            LoggingService.logError(errorLog);
+            System.out.println("    Exception occurred! " + ex.getMessage());
         }
 
         Date endDate = new Date();

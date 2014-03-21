@@ -24,7 +24,7 @@ public class DhlMessageTest {
 	public void setUp() throws Exception {
 		currentDbConf = new OrgSettings();
 		currentDbConf.setDatabaseName("dvk_client");
-		currentDbConf.setDbProvider(CommonStructures.PROVIDER_TYPE_ORACLE);
+		currentDbConf.setDbProvider(CommonStructures.PROVIDER_TYPE_ORACLE_10G);
 		currentDbConf.setDbToDbCommunicationOnly(false);
 		currentDbConf.setDeleteOldDocumentsAfterDays(0);
 		currentDbConf.setInstanceName(null);

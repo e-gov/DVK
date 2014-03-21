@@ -1,15 +1,12 @@
 package dvk.client;
 
-import dvk.client.businesslayer.Classifier;
-import dvk.client.businesslayer.DhlCapability;
-import dvk.client.businesslayer.DhlMessage;
-import dvk.client.businesslayer.MessageRecipient;
-import dvk.client.businesslayer.Occupation;
-import dvk.client.businesslayer.Subdivision;
+import dvk.client.businesslayer.*;
 import dvk.client.conf.OrgDvkSettings;
 import dvk.client.conf.OrgSettings;
 import dvk.client.db.DBConnection;
 import dvk.client.db.UnitCredential;
+import dvk.client.dhl.service.DatabaseSessionService;
+import dvk.client.dhl.service.LoggingService;
 import dvk.client.iostructures.GetOccupationListBody;
 import dvk.client.iostructures.GetOccupationListV2Body;
 import dvk.client.iostructures.GetSendStatusBody;
@@ -172,14 +169,16 @@ public class ClientAPI {
         OutputStreamWriter outWriter = null;
         BufferedWriter writer = null;
         ArrayList<GetSendStatusResponseItem> result = null;
-        
+
+        String requestName = null;
+
         try {
             // Manuse ID
             String attachmentName = String.valueOf(System.currentTimeMillis());
             
             if (!messages.isEmpty()) {
                 // Päringu nimi
-                String requestName = this.producerName + ".getSendStatus.v" + String.valueOf(requestVersion);
+                requestName = this.producerName + ".getSendStatus.v" + String.valueOf(requestVersion);
                 
                 // Päringu ID koostamine
                 queryId =  "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
@@ -220,7 +219,7 @@ public class ClientAPI {
                 	}                   
                 }
                 processedIDs = null;
-                
+
                 // Väljundstreamid kinni
                 CommonMethods.safeCloseWriter(writer);
                 CommonMethods.safeCloseWriter(outWriter);
@@ -267,10 +266,41 @@ public class ClientAPI {
                 logger.debug("Got response message. Processing...");
                 // Teeme vastussänumi andmetest omad järeldused
                 Message respMessage = call.getResponseMessage();
-                
+
+                RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
+
+                if (respMessage != null) {
+                    SOAPBody body = respMessage.getSOAPBody();
+                    NodeList nList = body.getElementsByTagName("keha");
+                    if (nList.getLength() > 0) {
+                        Element msgBodyNode = (Element)nList.item(0);
+                        if (msgBodyNode != null
+                                && respMessage.getAttachments() != null
+                                && respMessage.getAttachments().hasNext()) {
+                            requestLog.setResponse(ResponseStatus.OK.toString());
+                        } else {
+                            requestLog.setResponse(ResponseStatus.NOK.toString());
+                        }
+                    }
+                } else {
+                    requestLog.setResponse(ResponseStatus.NOK.toString());
+                }
+
                 // harutame päringu vastuse lahti
                 result = extractGetSendStatusResponse(respMessage);
+                LoggingService.logRequest(requestLog);
             }
+        } catch (Exception ex) {
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.ClientAPI" + " getSendStatus");
+            errorLog.setOrganizationCode(headerVar.getOrganizationCode());
+            errorLog.setUserCode(headerVar.getPersonalIDCode());
+            RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
+            int errorLogId = LoggingService.logError(errorLog);
+            if (errorLogId != -1) {
+                requestLog.setErrorLogId(errorLogId);
+            }
+            requestLog.setResponse(ResponseStatus.NOK.toString());
+            LoggingService.logRequest(requestLog);
         } finally {
             CommonMethods.safeCloseWriter(writer);
             CommonMethods.safeCloseWriter(outWriter);
@@ -358,7 +388,7 @@ public class ClientAPI {
                 for (int i = 0; i < b.fragmenteKokku; ++i) {
                     b.fragmentNr = i;
                     String messageData = (new SoapMessageBuilder(header, b.getBodyContentsAsText())).getMessageAsText();
-                    resultID = runSendDocumentsRequest(messageData, fragmentFiles.get(i), attachmentName);
+                    resultID = runSendDocumentsRequest(messageData, fragmentFiles.get(i), attachmentName, headerVar, requestName);
                 }
                 return resultID;
             } else {
@@ -366,7 +396,7 @@ public class ClientAPI {
                 b.fragmenteKokku = 0;
                 b.fragmentNr = -1;
                 String messageData = (new SoapMessageBuilder(header, b.getBodyContentsAsText())).getMessageAsText();
-                return runSendDocumentsRequest(messageData, tmpFile, attachmentName);
+                return runSendDocumentsRequest(messageData, tmpFile, attachmentName,  headerVar, requestName);
             }
         } else {
             // Koostame SOAP sänumi keha
@@ -374,7 +404,7 @@ public class ClientAPI {
             b.dokumendid = attachmentName;
             b.kaust = message.getDhlFolderName();
             String messageData = (new SoapMessageBuilder(header, b.getBodyContentsAsText())).getMessageAsText();
-            return runSendDocumentsRequest(messageData, tmpFile, attachmentName);
+            return runSendDocumentsRequest(messageData, tmpFile, attachmentName,  headerVar, requestName);
         }
     }
     
@@ -458,7 +488,8 @@ public class ClientAPI {
     	return result;
     }
     
-    private int runSendDocumentsRequest(String messageData, String attachmentFile, String attachmentName) throws Exception {
+    private int runSendDocumentsRequest(String messageData, String attachmentFile, String attachmentName,
+                                        HeaderVariables headerVar, String requestName) throws Exception {
         if ((attachmentFile == null) || (attachmentFile.length() < 1)) {
 			throw new Exception("Unable to send message because message file is unspecified!");
 		} else {
@@ -484,16 +515,37 @@ public class ClientAPI {
 	        a1.addMimeHeader("Content-Encoding", "gzip");
 	        msg.addAttachmentPart(a1);
 	        msg.saveChanges();
-	        
-	        // Käivitame päringu
+
+            // Käivitame päringu
 	        call.invoke(msg);
 	        
 	        // Vastuse täätlemine
 	        Message response = call.getResponseMessage();
+
+            RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
+
+            if (response != null && response.getAttachments() != null && response.getAttachments().hasNext()) {
+                requestLog.setResponse(ResponseStatus.OK.toString());
+            } else {
+                requestLog.setResponse(ResponseStatus.NOK.toString());
+            }
+
+            LoggingService.logRequest(requestLog);
+
 	        return extractSendDocumentsResponse(response);
         } catch (Exception ex) {
         	// Vea puhul logime vea pähjustanud SOAP sänumi keha
-        	logger.error("SOAP message body: " + messageData);
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.ClientAPI" + " runSendDocumentsRequest");
+            errorLog.setAdditionalInformation("SOAP message body: " + messageData);
+            errorLog.setOrganizationCode(headerVar.getOrganizationCode());
+            errorLog.setUserCode(headerVar.getPersonalIDCode());
+            RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
+            int errorLogId = LoggingService.logError(errorLog);
+            if (errorLogId != -1) {
+                requestLog.setErrorLogId(errorLogId);
+            }
+            requestLog.setResponse(ResponseStatus.NOK.toString());
+            LoggingService.logRequest(requestLog);
         	throw ex;
         }
     }
@@ -592,87 +644,106 @@ public class ClientAPI {
                 b4.fragmentNr = -1;
                 result.deliverySessionID = b4.edastusID;
                 while (hasMoreFragments) {
-                    b4.fragmentNr++;
-                    messageData = (new SoapMessageBuilder(header, b4.getBodyContentsAsText())).getMessageAsText();
-                    Message msg = new Message(messageData);
-                    call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "receiveDocuments"));
-                    
-                    // Teostame päringu
-                    call.invoke(msg);
-                    
-                    // Päringu tulemuste täätlemine
-                    Message response = call.getResponseMessage();
-                    
-                    // Loeme päringu vastusest andmed fragmendi kohta
-                    int fragmentNr = -1;
-                    int fragmentCount = 0;
-                    SOAPBody body = response.getSOAPBody();
-                    NodeList nList = body.getElementsByTagName("keha");
-                    if (nList.getLength() > 0) {
-                        Element msgBodyNode = (Element)nList.item(0);
-                        if (msgBodyNode != null) {
-                            nList = msgBodyNode.getElementsByTagName("fragment_nr");
-                            if (nList.getLength() > 0) {
-                                try {
-                                    fragmentNr = Integer.parseInt(CommonMethods.getNodeText(nList.item(0)));
-                                } catch (Exception e) {
-                                    fragmentNr = -1;
+                    try {
+                        b4.fragmentNr++;
+                        messageData = (new SoapMessageBuilder(header, b4.getBodyContentsAsText())).getMessageAsText();
+                        Message msg = new Message(messageData);
+                        call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "receiveDocuments"));
+
+                        // Teostame päringu
+                        call.invoke(msg);
+
+                        // Päringu tulemuste täätlemine
+                        Message response = call.getResponseMessage();
+                        RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
+
+                        // Loeme päringu vastusest andmed fragmendi kohta
+                        int fragmentNr = -1;
+                        int fragmentCount = 0;
+                        SOAPBody body = response.getSOAPBody();
+                        NodeList nList = body.getElementsByTagName("keha");
+                        if (nList.getLength() > 0) {
+                            Element msgBodyNode = (Element)nList.item(0);
+                            if (msgBodyNode != null) {
+                                requestLog.setResponse(ResponseStatus.OK.toString());
+                                nList = msgBodyNode.getElementsByTagName("fragment_nr");
+                                if (nList.getLength() > 0) {
+                                    try {
+                                        fragmentNr = Integer.parseInt(CommonMethods.getNodeText(nList.item(0)));
+                                    } catch (Exception e) {
+                                        fragmentNr = -1;
+                                    }
                                 }
-                            }
-                            nList = msgBodyNode.getElementsByTagName("fragmente_kokku");
-                            if (nList.getLength() > 0) {
-                                try {
-                                    fragmentCount = Integer.parseInt(CommonMethods.getNodeText(nList.item(0)));
-                                } catch (Exception e) {
-                                    fragmentCount = 0;
+                                nList = msgBodyNode.getElementsByTagName("fragmente_kokku");
+                                if (nList.getLength() > 0) {
+                                    try {
+                                        fragmentCount = Integer.parseInt(CommonMethods.getNodeText(nList.item(0)));
+                                    } catch (Exception e) {
+                                        fragmentCount = 0;
+                                    }
                                 }
+                            } else {
+                                requestLog.setResponse(ResponseStatus.NOK.toString());
+                                logger.debug("Response <keha> element is empty.");
                             }
-                        } else {
-                        	logger.debug("Response <keha> element is empty.");
                         }
-                    }
-                    
-                    logger.debug("Document fragment number: " + fragmentNr);
-                    logger.debug("b4.fragmentNr: " + b4.fragmentNr);
-                    
-                    if (fragmentNr != b4.fragmentNr) {
-                        logger.debug("Server returned document fragment with wrong fragment index!");
-						throw new Exception("Server returned document fragment with wrong fragment index!");
-                    }
-                    hasMoreFragments = ((fragmentCount - fragmentNr) > 1);
-                    
-                    Iterator attachments = response.getAttachments();
-                    if (attachments.hasNext()) {
-                        AttachmentPart a = (AttachmentPart)attachments.next();
-                        DataHandler dh = a.getDataHandler();
-                        DataSource ds = dh.getDataSource();
-                        
-                        String[] headers = a.getMimeHeader("Content-Transfer-Encoding");
-                        String encoding;
-                        if((headers == null) || (headers.length < 1)) {
-                            encoding = "base64";
+
+                        LoggingService.logRequest(requestLog);
+
+                        logger.debug("Document fragment number: " + fragmentNr);
+                        logger.debug("b4.fragmentNr: " + b4.fragmentNr);
+
+                        if (fragmentNr != b4.fragmentNr) {
+                            logger.debug("Server returned document fragment with wrong fragment index!");
+                            throw new Exception("Server returned document fragment with wrong fragment index!");
                         }
-                        else {
-                            encoding = headers[0];
+                        hasMoreFragments = ((fragmentCount - fragmentNr) > 1);
+
+                        Iterator attachments = response.getAttachments();
+                        if (attachments.hasNext()) {
+                            AttachmentPart a = (AttachmentPart)attachments.next();
+                            DataHandler dh = a.getDataHandler();
+                            DataSource ds = dh.getDataSource();
+
+                            String[] headers = a.getMimeHeader("Content-Transfer-Encoding");
+                            String encoding;
+                            if((headers == null) || (headers.length < 1)) {
+                                encoding = "base64";
+                            }
+                            else {
+                                encoding = headers[0];
+                            }
+                            String md5Hash = CommonMethods.getDataFromDataSource(ds, encoding, attachmentFile, (fragmentNr > 0));
+                            if (md5Hash == null) {
+                                throw new Exception( CommonStructures.VIGA_VIGANE_MIME_LISA );
+                            }
+
+                            // Kui käik fragmendid on käes, siis täätleme faili ära
+                            // ja salvestame saadud dokumendid andmebaasi.
+                            if (!hasMoreFragments) {
+                                CommonMethods.gzipUnpackXML(attachmentFile, true);
+                                FileSplitResult splitResult = CommonMethods.splitOutTags(attachmentFile, "dokument", true, false, false);
+                                result.documents.addAll(splitResult.subFiles);
+
+                                // Kustutame manuse faili, kuna kogu edasine tää toimub juba
+                                // eraldatud dokumentide failidega.
+                                (new File(attachmentFile)).delete();
+
+                                return result;
+                            }
                         }
-                        String md5Hash = CommonMethods.getDataFromDataSource(ds, encoding, attachmentFile, (fragmentNr > 0));
-                        if (md5Hash == null) {
-                            throw new Exception( CommonStructures.VIGA_VIGANE_MIME_LISA );
+                    } catch (Exception ex) {
+                        ErrorLog errorLog = new ErrorLog(ex, "dvk.client.ClientAPI" + " receiveDocuments");
+                        errorLog.setOrganizationCode(headerVar.getOrganizationCode());
+                        errorLog.setUserCode(headerVar.getPersonalIDCode());
+                        RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
+                        int errorLogId = LoggingService.logError(errorLog);
+                        if (errorLogId != -1) {
+                            requestLog.setErrorLogId(errorLogId);
                         }
-                        
-                        // Kui käik fragmendid on käes, siis täätleme faili ära
-                        // ja salvestame saadud dokumendid andmebaasi.
-                        if (!hasMoreFragments) {
-                            CommonMethods.gzipUnpackXML(attachmentFile, true);
-                            FileSplitResult splitResult = CommonMethods.splitOutTags(attachmentFile, "dokument", true, false, false);
-                            result.documents.addAll(splitResult.subFiles);
-                            
-                            // Kustutame manuse faili, kuna kogu edasine tää toimub juba
-                            // eraldatud dokumentide failidega.
-                            (new File(attachmentFile)).delete();
-                            
-                            return result;
-                        }
+                        requestLog.setResponse(ResponseStatus.NOK.toString());
+                        LoggingService.logRequest(requestLog);
+                        throw ex;
                     }
                 }
             } else {
@@ -691,82 +762,104 @@ public class ClientAPI {
                 b3.edastusID = headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
                 b3.fragmentNr = -1;
                 result.deliverySessionID = b3.edastusID;
-                while (hasMoreFragments) {
-                    b3.fragmentNr++;
-                    messageData = (new SoapMessageBuilder(header, b3.getBodyContentsAsText())).getMessageAsText();
-                    Message msg = new Message(messageData);
-                    call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "receiveDocuments"));
-                    
-                    // Teostame päringu
-                    call.invoke(msg);
-                    
-                    // Päringu tulemuste täätlemine
-                    Message response = call.getResponseMessage();
-                    
-                    // Loeme päringu vastusest andmed fragmendi kohta
-                    int fragmentNr = -1;
-                    int fragmentCount = 0;
-                    SOAPBody body = response.getSOAPBody();
-                    NodeList nList = body.getElementsByTagName("keha");
-                    if (nList.getLength() > 0) {
-                        Element msgBodyNode = (Element)nList.item(0);
-                        if (msgBodyNode != null) {
-                            nList = msgBodyNode.getElementsByTagName("fragment_nr");
-                            if (nList.getLength() > 0) {
-                                try {
-                                    fragmentNr = Integer.parseInt(CommonMethods.getNodeText(nList.item(0)));
-                                } catch (Exception e) {
-                                    fragmentNr = -1;
+                try {
+                    while (hasMoreFragments) {
+                        b3.fragmentNr++;
+                        messageData = (new SoapMessageBuilder(header, b3.getBodyContentsAsText())).getMessageAsText();
+                        Message msg = new Message(messageData);
+                        call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "receiveDocuments"));
+
+                        // Teostame päringu
+                        call.invoke(msg);
+
+                        // Päringu tulemuste täätlemine
+                        Message response = call.getResponseMessage();
+
+                        RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
+
+                        // Loeme päringu vastusest andmed fragmendi kohta
+                        int fragmentNr = -1;
+                        int fragmentCount = 0;
+                        SOAPBody body = response.getSOAPBody();
+                        NodeList nList = body.getElementsByTagName("keha");
+                        if (nList.getLength() > 0) {
+                            Element msgBodyNode = (Element)nList.item(0);
+                            if (msgBodyNode != null) {
+                                requestLog.setResponse(ResponseStatus.OK.toString());
+                                nList = msgBodyNode.getElementsByTagName("fragment_nr");
+                                if (nList.getLength() > 0) {
+                                    try {
+                                        fragmentNr = Integer.parseInt(CommonMethods.getNodeText(nList.item(0)));
+                                    } catch (Exception e) {
+                                        fragmentNr = -1;
+                                    }
                                 }
-                            }
-                            nList = msgBodyNode.getElementsByTagName("fragmente_kokku");
-                            if (nList.getLength() > 0) {
-                                try {
-                                    fragmentCount = Integer.parseInt(CommonMethods.getNodeText(nList.item(0)));
-                                } catch (Exception e) {
-                                    fragmentCount = 0;
+                                nList = msgBodyNode.getElementsByTagName("fragmente_kokku");
+                                if (nList.getLength() > 0) {
+                                    try {
+                                        fragmentCount = Integer.parseInt(CommonMethods.getNodeText(nList.item(0)));
+                                    } catch (Exception e) {
+                                        fragmentCount = 0;
+                                    }
                                 }
+                            } else {
+                                requestLog.setResponse(ResponseStatus.NOK.toString());
+                            }
+                        }
+
+                        LoggingService.logRequest(requestLog);
+
+                        if (fragmentNr != b3.fragmentNr) {
+                            throw new Exception("Server returned document fragment with wrong fragment index!");
+                        }
+                        hasMoreFragments = ((fragmentCount - fragmentNr) > 1);
+
+                        Iterator attachments = response.getAttachments();
+                        if (attachments.hasNext()) {
+                            AttachmentPart a = (AttachmentPart)attachments.next();
+                            DataHandler dh = a.getDataHandler();
+                            DataSource ds = dh.getDataSource();
+
+                            String[] headers = a.getMimeHeader("Content-Transfer-Encoding");
+                            String encoding;
+                            if((headers == null) || (headers.length < 1)) {
+                                encoding = "base64";
+                            }
+                            else {
+                                encoding = headers[0];
+                            }
+                            String md5Hash = CommonMethods.getDataFromDataSource(ds, encoding, attachmentFile, (fragmentNr > 0));
+                            if (md5Hash == null) {
+                                throw new Exception( CommonStructures.VIGA_VIGANE_MIME_LISA );
+                            }
+
+                            // Kui käik fragmendid on käes, siis täätleme faili ära
+                            // ja salvestame saadud dokumendid andmebaasi.
+                            if (!hasMoreFragments) {
+                                CommonMethods.gzipUnpackXML(attachmentFile, true);
+                                FileSplitResult splitResult = CommonMethods.splitOutTags(attachmentFile, "dokument", true, false, false);
+                                result.documents.addAll(splitResult.subFiles);
+
+                                // Kustutame manuse faili, kuna kogu edasine tää toimub juba
+                                // eraldatud dokumentide failidega.
+                                (new File(attachmentFile)).delete();
+
+                                return result;
                             }
                         }
                     }
-                    if (fragmentNr != b3.fragmentNr) {
-                        throw new Exception("Server returned document fragment with wrong fragment index!");
+                } catch (Exception ex) {
+                    ErrorLog errorLog = new ErrorLog(ex, "dvk.client.ClientAPI" + " receiveDocuments");
+                    errorLog.setOrganizationCode(headerVar.getOrganizationCode());
+                    errorLog.setUserCode(headerVar.getPersonalIDCode());
+                    RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
+                    int errorLogId = LoggingService.logError(errorLog);
+                    if (errorLogId != -1) {
+                        requestLog.setErrorLogId(errorLogId);
                     }
-                    hasMoreFragments = ((fragmentCount - fragmentNr) > 1);
-                    
-                    Iterator attachments = response.getAttachments();
-                    if (attachments.hasNext()) {
-                        AttachmentPart a = (AttachmentPart)attachments.next();
-                        DataHandler dh = a.getDataHandler();
-                        DataSource ds = dh.getDataSource();
-                        
-                        String[] headers = a.getMimeHeader("Content-Transfer-Encoding");
-                        String encoding;
-                        if((headers == null) || (headers.length < 1)) {
-                            encoding = "base64";
-                        }
-                        else {
-                            encoding = headers[0];
-                        }
-                        String md5Hash = CommonMethods.getDataFromDataSource(ds, encoding, attachmentFile, (fragmentNr > 0));
-                        if (md5Hash == null) {
-                            throw new Exception( CommonStructures.VIGA_VIGANE_MIME_LISA );
-                        }
-                        
-                        // Kui käik fragmendid on käes, siis täätleme faili ära
-                        // ja salvestame saadud dokumendid andmebaasi.
-                        if (!hasMoreFragments) {
-                            CommonMethods.gzipUnpackXML(attachmentFile, true);
-                            FileSplitResult splitResult = CommonMethods.splitOutTags(attachmentFile, "dokument", true, false, false);
-                            result.documents.addAll(splitResult.subFiles);
-                            
-                            // Kustutame manuse faili, kuna kogu edasine tää toimub juba
-                            // eraldatud dokumentide failidega.
-                            (new File(attachmentFile)).delete();
-                            
-                            return result;
-                        }
-                    }
+                    requestLog.setResponse(ResponseStatus.NOK.toString());
+                    LoggingService.logRequest(requestLog);
+                    throw ex;
                 }
             } else {
                 messageData = (new SoapMessageBuilder(header, b3.getBodyContentsAsText())).getMessageAsText();
@@ -782,82 +875,104 @@ public class ClientAPI {
                 b2.edastusID = headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
                 b2.fragmentNr = -1;
                 result.deliverySessionID = b2.edastusID;
-                while (hasMoreFragments) {
-                    b2.fragmentNr++;
-                    messageData = (new SoapMessageBuilder(header, b2.getBodyContentsAsText())).getMessageAsText();
-                    Message msg = new Message(messageData);
-                    call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "receiveDocuments"));
-                    
-                    // Teostame päringu
-                    call.invoke(msg);
-                    
-                    // Päringu tulemuste täätlemine
-                    Message response = call.getResponseMessage();
-                    
-                    // Loeme päringu vastusest andmed fragmendi kohta
-                    int fragmentNr = -1;
-                    int fragmentCount = 0;
-                    SOAPBody body = response.getSOAPBody();
-                    NodeList nList = body.getElementsByTagName("keha");
-                    if (nList.getLength() > 0) {
-                        Element msgBodyNode = (Element)nList.item(0);
-                        if (msgBodyNode != null) {
-                            nList = msgBodyNode.getElementsByTagName("fragment_nr");
-                            if (nList.getLength() > 0) {
-                                try {
-                                    fragmentNr = Integer.parseInt(CommonMethods.getNodeText(nList.item(0)));
-                                } catch (Exception e) {
-                                    fragmentNr = -1;
+                try {
+                    while (hasMoreFragments) {
+                        b2.fragmentNr++;
+                        messageData = (new SoapMessageBuilder(header, b2.getBodyContentsAsText())).getMessageAsText();
+                        Message msg = new Message(messageData);
+                        call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "receiveDocuments"));
+
+                        // Teostame päringu
+                        call.invoke(msg);
+
+                        // Päringu tulemuste täätlemine
+                        Message response = call.getResponseMessage();
+
+                        RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
+
+                        // Loeme päringu vastusest andmed fragmendi kohta
+                        int fragmentNr = -1;
+                        int fragmentCount = 0;
+                        SOAPBody body = response.getSOAPBody();
+                        NodeList nList = body.getElementsByTagName("keha");
+                        if (nList.getLength() > 0) {
+                            Element msgBodyNode = (Element)nList.item(0);
+                            if (msgBodyNode != null) {
+                                requestLog.setResponse(ResponseStatus.OK.toString());
+                                nList = msgBodyNode.getElementsByTagName("fragment_nr");
+                                if (nList.getLength() > 0) {
+                                    try {
+                                        fragmentNr = Integer.parseInt(CommonMethods.getNodeText(nList.item(0)));
+                                    } catch (Exception e) {
+                                        fragmentNr = -1;
+                                    }
                                 }
-                            }
-                            nList = msgBodyNode.getElementsByTagName("fragmente_kokku");
-                            if (nList.getLength() > 0) {
-                                try {
-                                    fragmentCount = Integer.parseInt(CommonMethods.getNodeText(nList.item(0)));
-                                } catch (Exception e) {
-                                    fragmentCount = 0;
+                                nList = msgBodyNode.getElementsByTagName("fragmente_kokku");
+                                if (nList.getLength() > 0) {
+                                    try {
+                                        fragmentCount = Integer.parseInt(CommonMethods.getNodeText(nList.item(0)));
+                                    } catch (Exception e) {
+                                        fragmentCount = 0;
+                                    }
                                 }
+                            } else {
+                                requestLog.setResponse(ResponseStatus.NOK.toString());
+                            }
+                        }
+
+                        LoggingService.logRequest(requestLog);
+
+                        if (fragmentNr != b2.fragmentNr) {
+                            throw new Exception("Server returned document fragment with wrong fragment index!");
+                        }
+                        hasMoreFragments = ((fragmentCount - fragmentNr) > 1);
+
+                        Iterator attachments = response.getAttachments();
+                        if (attachments.hasNext()) {
+                            AttachmentPart a = (AttachmentPart)attachments.next();
+                            DataHandler dh = a.getDataHandler();
+                            DataSource ds = dh.getDataSource();
+
+                            String[] headers = a.getMimeHeader("Content-Transfer-Encoding");
+                            String encoding;
+                            if((headers == null) || (headers.length < 1)) {
+                                encoding = "base64";
+                            }
+                            else {
+                                encoding = headers[0];
+                            }
+                            String md5Hash = CommonMethods.getDataFromDataSource(ds, encoding, attachmentFile, (fragmentNr > 0));
+                            if (md5Hash == null) {
+                                throw new Exception( CommonStructures.VIGA_VIGANE_MIME_LISA );
+                            }
+
+                            // Kui käik fragmendid on käes, siis täätleme faili ära
+                            // ja salvestame saadud dokumendid andmebaasi.
+                            if (!hasMoreFragments) {
+                                CommonMethods.gzipUnpackXML(attachmentFile, true);
+                                FileSplitResult splitResult = CommonMethods.splitOutTags(attachmentFile, "dokument", true, false, false);
+                                result.documents.addAll(splitResult.subFiles);
+
+                                // Kustutame manuse faili, kuna kogu edasine tää toimub juba
+                                // eraldatud dokumentide failidega.
+                                (new File(attachmentFile)).delete();
+
+                                return result;
                             }
                         }
                     }
-                    if (fragmentNr != b2.fragmentNr) {
-                        throw new Exception("Server returned document fragment with wrong fragment index!");
+                } catch (Exception ex) {
+                    ErrorLog errorLog = new ErrorLog(ex, "dvk.client.ClientAPI" + " receiveDocuments");
+                    errorLog.setOrganizationCode(headerVar.getOrganizationCode());
+                    errorLog.setUserCode(headerVar.getPersonalIDCode());
+                    RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
+                    int errorLogId = LoggingService.logError(errorLog);
+                    if (errorLogId != -1) {
+                        requestLog.setErrorLogId(errorLogId);
                     }
-                    hasMoreFragments = ((fragmentCount - fragmentNr) > 1);
-                    
-                    Iterator attachments = response.getAttachments();
-                    if (attachments.hasNext()) {
-                        AttachmentPart a = (AttachmentPart)attachments.next();
-                        DataHandler dh = a.getDataHandler();
-                        DataSource ds = dh.getDataSource();
-                        
-                        String[] headers = a.getMimeHeader("Content-Transfer-Encoding");
-                        String encoding;
-                        if((headers == null) || (headers.length < 1)) {
-                            encoding = "base64";
-                        }
-                        else {
-                            encoding = headers[0];
-                        }
-                        String md5Hash = CommonMethods.getDataFromDataSource(ds, encoding, attachmentFile, (fragmentNr > 0));
-                        if (md5Hash == null) {
-                            throw new Exception( CommonStructures.VIGA_VIGANE_MIME_LISA );
-                        }
-                        
-                        // Kui käik fragmendid on käes, siis täätleme faili ära
-                        // ja salvestame saadud dokumendid andmebaasi.
-                        if (!hasMoreFragments) {
-                            CommonMethods.gzipUnpackXML(attachmentFile, true);
-                            FileSplitResult splitResult = CommonMethods.splitOutTags(attachmentFile, "dokument", true, false, false);
-                            result.documents.addAll(splitResult.subFiles);
-                            
-                            // Kustutame manuse faili, kuna kogu edasine tää toimub juba
-                            // eraldatud dokumentide failidega.
-                            (new File(attachmentFile)).delete();
-                            
-                            return result;
-                        }
-                    }
+                    requestLog.setResponse(ResponseStatus.NOK.toString());
+                    LoggingService.logRequest(requestLog);
+                    throw ex;
                 }
             } else {
                 messageData = (new SoapMessageBuilder(header, b2.getBodyContentsAsText())).getMessageAsText();
@@ -868,14 +983,42 @@ public class ClientAPI {
             b.kaust = folders;
             messageData = (new SoapMessageBuilder(header, b.getBodyContentsAsText())).getMessageAsText();
         }
+
         Message msg = new Message(messageData);
         call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "receiveDocuments"));
 
-        // Teostame päringu
-        call.invoke(msg);
+        Message response = null;
 
-        // Päringu tulemuste täätlemine
-        Message response = call.getResponseMessage();
+        try {
+            // Teostame päringu
+            call.invoke(msg);
+            // Päringu tulemuste täätlemine
+            response = call.getResponseMessage();
+
+            RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
+
+            if (response != null && response.getAttachments() != null && response.getAttachments().hasNext()) {
+                requestLog.setResponse(ResponseStatus.OK.toString());
+            } else {
+                requestLog.setResponse(ResponseStatus.NOK.toString());
+            }
+
+            LoggingService.logRequest(requestLog);
+
+        } catch (Exception ex) {
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.ClientAPI" + " receiveDocuments");
+            errorLog.setOrganizationCode(headerVar.getOrganizationCode());
+            errorLog.setUserCode(headerVar.getPersonalIDCode());
+            RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
+            int errorLogId = LoggingService.logError(errorLog);
+            if (errorLogId != -1) {
+                requestLog.setErrorLogId(errorLogId);
+            }
+            requestLog.setResponse(ResponseStatus.NOK.toString());
+            LoggingService.logRequest(requestLog);
+            throw ex;
+        }
+
         Iterator attachments = response.getAttachments();
         if (attachments.hasNext()) {
             String attachmentFile = CommonMethods.createPipelineFile(0);
@@ -946,84 +1089,131 @@ public class ClientAPI {
         // Päringu nimi ja versioon
         int requestVersion = orgSettings.getMarkDocumentsReceivedRequestVersion();
         String requestName = this.producerName + ".markDocumentsReceived.v" + String.valueOf(requestVersion);
-        
+
+        try {
         // Saadetava sänumi päisesse kantavad parameetrid
-        XHeader header = new XHeader(
-            headerVar.getOrganizationCode(),
-            this.producerName,
-            headerVar.getPersonalIDCode(),
-            queryId,
-            requestName,
-            headerVar.getCaseName(),
-            headerVar.getPIDWithCountryCode());
-    	
-        String attachmentName = "";
-        String attachmentFile = ""; 
-        String messageBody = "";
-        
-        ArrayList<Integer> dokumendidIdList = new ArrayList<Integer>();
-        for(int i = 0; i < centralServerDocs.size(); i++) {
-        	DhlMessage msgTmp = centralServerDocs.get(i);
-        	dokumendidIdList.add(msgTmp.getDhlID());
-        }
-        
-        if (requestVersion < 3) {
-        	logger.debug("RequestVersion < 3.");
-        	attachmentName = String.valueOf(System.currentTimeMillis());
-        	attachmentFile = MarkDocumentsReceivedBody.createResponseFile(dokumendidIdList, statusID, clientFault, metaXML, requestVersion, new Date());
-	        MarkDocumentsReceivedBody b = new MarkDocumentsReceivedBody();
-	        b.dokumendid = attachmentName;
-	        b.kaust = "";
-	        b.edastusID = deliverySessionID;
-	        
-	        // Alläksuse ja ametikoha parameetrid lisame markDocumentsReceived
-	        // päringule äksnes juhul, kui allalaadimisel kasutatud receiveDocuments
-	        // päring toetas alläksuse ja ametikoha parameetrite kasutamist.
-	        if ((unitSettings != null) && (orgSettings.getReceiveDocumentsRequestVersion() >= 3)) {
-		        b.allyksuseId = unitSettings.getDivisionID();
-		        b.ametikohaId = unitSettings.getOccupationID();
-	        }
-	        messageBody = (new SoapMessageBuilder(header, b.getBodyContentsAsText())).getMessageAsText();
-        } else {
-        	logger.debug("RequestVersion = 3");
-	        MarkDocumentsReceivedV3Body b3 = new MarkDocumentsReceivedV3Body();
-	        b3.dokumendidIdList = dokumendidIdList;
-	        b3.kaust = "";
-	        b3.edastusID = deliverySessionID;
-	        b3.vastuvotjaStaatusId = statusID;
-	    	b3.vastuvotjaVeateade = clientFault;
-	    	b3.metaXml = metaXML;
-	        
-	        // Alläksuse ja ametikoha parameetrid lisame markDocumentsReceived
-	        // päringule äksnes juhul, kui allalaadimisel kasutatud receiveDocuments
-	        // päring toetas alläksuse ja ametikoha parameetrite kasutamist.
-	        if ((unitSettings != null) && (orgSettings.getReceiveDocumentsRequestVersion() >= 3)) {
-		        b3.allyksuseLyhinimetus = unitSettings.getDivisionShortName();
-		        b3.ametikohaLyhinimetus = unitSettings.getOccupationShortName();
-	        }
-	        messageBody = (new SoapMessageBuilder(header, b3.getBodyContentsAsText())).getMessageAsText();
-        }
-        
-        Message msg = new Message(messageBody);
-        call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "markDocumentsReceived"));
+            XHeader header = new XHeader(
+                headerVar.getOrganizationCode(),
+                this.producerName,
+                headerVar.getPersonalIDCode(),
+                queryId,
+                requestName,
+                headerVar.getCaseName(),
+                headerVar.getPIDWithCountryCode());
 
-        // Lisame sänumile manuse
-        if (requestVersion < 3) {
-	        String tempFile = CommonMethods.gzipPackXML(attachmentFile, header.getAsutus(), "markDocumentsReceived");
-	        tempFiles.add(tempFile);
-	        FileDataSource ds = new FileDataSource(tempFile);
-	        DataHandler d1 = new DataHandler(ds);
-	        AttachmentPart a1 = new AttachmentPart(d1);
-	        a1.setContentId(attachmentName);
-	        a1.setMimeHeader("Content-Transfer-Encoding", "base64");
-	        a1.setContentType("{http://www.w3.org/2001/XMLSchema}base64Binary");
-	        a1.addMimeHeader("Content-Encoding", "gzip");
-	        msg.addAttachmentPart(a1);
-	        msg.saveChanges();
+            String attachmentName = "";
+            String attachmentFile = "";
+            String messageBody = "";
+
+            ArrayList<Integer> dokumendidIdList = new ArrayList<Integer>();
+            for(int i = 0; i < centralServerDocs.size(); i++) {
+                DhlMessage msgTmp = centralServerDocs.get(i);
+                dokumendidIdList.add(msgTmp.getDhlID());
+            }
+
+            if (requestVersion < 3) {
+                logger.debug("RequestVersion < 3.");
+                attachmentName = String.valueOf(System.currentTimeMillis());
+                attachmentFile = MarkDocumentsReceivedBody.createResponseFile(dokumendidIdList, statusID, clientFault, metaXML, requestVersion, new Date());
+                MarkDocumentsReceivedBody b = new MarkDocumentsReceivedBody();
+                b.dokumendid = attachmentName;
+                b.kaust = "";
+                b.edastusID = deliverySessionID;
+
+                // Alläksuse ja ametikoha parameetrid lisame markDocumentsReceived
+                // päringule äksnes juhul, kui allalaadimisel kasutatud receiveDocuments
+                // päring toetas alläksuse ja ametikoha parameetrite kasutamist.
+                if ((unitSettings != null) && (orgSettings.getReceiveDocumentsRequestVersion() >= 3)) {
+                    b.allyksuseId = unitSettings.getDivisionID();
+                    b.ametikohaId = unitSettings.getOccupationID();
+                }
+                messageBody = (new SoapMessageBuilder(header, b.getBodyContentsAsText())).getMessageAsText();
+            } else {
+                logger.debug("RequestVersion = 3");
+                MarkDocumentsReceivedV3Body b3 = new MarkDocumentsReceivedV3Body();
+                b3.dokumendidIdList = dokumendidIdList;
+                b3.kaust = "";
+                b3.edastusID = deliverySessionID;
+                b3.vastuvotjaStaatusId = statusID;
+                b3.vastuvotjaVeateade = clientFault;
+                b3.metaXml = metaXML;
+
+                // Alläksuse ja ametikoha parameetrid lisame markDocumentsReceived
+                // päringule äksnes juhul, kui allalaadimisel kasutatud receiveDocuments
+                // päring toetas alläksuse ja ametikoha parameetrite kasutamist.
+                if ((unitSettings != null) && (orgSettings.getReceiveDocumentsRequestVersion() >= 3)) {
+                    b3.allyksuseLyhinimetus = unitSettings.getDivisionShortName();
+                    b3.ametikohaLyhinimetus = unitSettings.getOccupationShortName();
+                }
+                messageBody = (new SoapMessageBuilder(header, b3.getBodyContentsAsText())).getMessageAsText();
+            }
+
+            Message msg = new Message(messageBody);
+            call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "markDocumentsReceived"));
+
+            // Lisame sänumile manuse
+            if (requestVersion < 3) {
+                String tempFile = CommonMethods.gzipPackXML(attachmentFile, header.getAsutus(), "markDocumentsReceived");
+                tempFiles.add(tempFile);
+                FileDataSource ds = new FileDataSource(tempFile);
+                DataHandler d1 = new DataHandler(ds);
+                AttachmentPart a1 = new AttachmentPart(d1);
+                a1.setContentId(attachmentName);
+                a1.setMimeHeader("Content-Transfer-Encoding", "base64");
+                a1.setContentType("{http://www.w3.org/2001/XMLSchema}base64Binary");
+                a1.addMimeHeader("Content-Encoding", "gzip");
+                msg.addAttachmentPart(a1);
+                msg.saveChanges();
+            }
+
+            call.invoke(msg);
+
+            // Vastuse täätlemine
+            Message response = call.getResponseMessage();
+
+            RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
+
+            if (isMarkDocumentsResponseOK(response)) {
+                requestLog.setResponse(ResponseStatus.OK.toString());
+            } else {
+                requestLog.setResponse(ResponseStatus.NOK.toString());
+            }
+
+            LoggingService.logRequest(requestLog);
+        } catch (Exception ex) {
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.ClientAPI" + " markDocumentsReceived");
+            errorLog.setOrganizationCode(headerVar.getOrganizationCode());
+            errorLog.setUserCode(headerVar.getPersonalIDCode());
+            RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
+            int errorLogId = LoggingService.logError(errorLog);
+            if (errorLogId != -1) {
+                requestLog.setErrorLogId(errorLogId);
+            }
+            requestLog.setResponse(ResponseStatus.NOK.toString());
+            LoggingService.logRequest(requestLog);
+            throw ex;
+        }
+    }
+
+    private boolean isMarkDocumentsResponseOK(Message response) throws SOAPException {
+        boolean result = false;
+
+        if (response != null) {
+            SOAPBody body = response.getSOAPBody();
+            NodeList keha = body.getElementsByTagName("keha");
+
+            if (keha.getLength() > 0) {
+                Node kehaBody = keha.item(0);
+
+                if (kehaBody != null && kehaBody.hasChildNodes()) {
+                      if ("OK".equalsIgnoreCase(kehaBody.getFirstChild().toString())) {
+                          result = true;
+                      }
+                }
+            }
         }
 
-        // Käivitame päringu
-        call.invoke(msg);
+        return result;
     }
 
     public void markDocumentsReceived(
@@ -1033,84 +1223,112 @@ public class ClientAPI {
     	OrgSettings db,
     	Connection dbConnection,
     	UnitCredential unitSettings) throws Exception {
-    	
-    	// Kontrollime, kas vajalikud andmed on olemas
-    	ArrayList<DhlMessage> centralServerDocs = markDocumentsReceivedDirect(documents, db, dbConnection);
-    	
-    	int length = centralServerDocs.size();
-        if (length < 1) {
-            return;
-        }
-    	
-        // Päringu ID koostamine
-        queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
-        
-        // Päringu nimi ja versioon
-        int requestVersion = orgSettings.getMarkDocumentsReceivedRequestVersion();
-        String requestName = this.producerName + ".markDocumentsReceived.v" + String.valueOf(requestVersion);
-        
-        // Saadetava sänumi päisesse kantavad parameetrid
-        XHeader header = new XHeader(
-            headerVar.getOrganizationCode(),
-            this.producerName,
-            headerVar.getPersonalIDCode(),
-            queryId,
-            requestName,
-            headerVar.getCaseName(),
-            headerVar.getPIDWithCountryCode());
-    	
-        String attachmentName = "";
-        String attachmentFile = ""; 
-        String messageBody = "";
-        
-        if (requestVersion < 3) {
-        	attachmentName = String.valueOf(System.currentTimeMillis());
-        	attachmentFile = MarkDocumentsReceivedBody.createResponseFile(centralServerDocs, requestVersion, new Date());
-	        MarkDocumentsReceivedBody b = new MarkDocumentsReceivedBody();
-	        b.dokumendid = attachmentName;
-	        b.kaust = "";
-	        b.edastusID = deliverySessionID;
-	        if (unitSettings != null) {
-		        b.allyksuseId = unitSettings.getDivisionID();
-		        b.ametikohaId = unitSettings.getOccupationID();
-	        }
-	        messageBody = (new SoapMessageBuilder(header, b.getBodyContentsAsText())).getMessageAsText();
-        } else {
-	        MarkDocumentsReceivedV3Body b3 = new MarkDocumentsReceivedV3Body();
-	        b3.dokumendidObjectList = centralServerDocs;
-	        b3.kaust = "";
-	        b3.edastusID = deliverySessionID;
-	        
-	        // Vastuvätja staatus, veateade ja metaxml tulevad iga
-	        // konkreetse dokumendi andmetest.
-	        
-	        if (unitSettings != null) {
-		        b3.allyksuseLyhinimetus = unitSettings.getDivisionShortName();
-		        b3.ametikohaLyhinimetus = unitSettings.getOccupationShortName();
-	        }
-	        messageBody = (new SoapMessageBuilder(header, b3.getBodyContentsAsText())).getMessageAsText();
-        }
-        
-        Message msg = new Message(messageBody);
-        call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "markDocumentsReceived"));
 
-        // Lisame sänumile manuse
-        if (requestVersion < 3) {
-	        String tempFile = CommonMethods.gzipPackXML(attachmentFile, header.getAsutus(), "markDocumentsReceived");
-	        tempFiles.add(tempFile);
-	        FileDataSource ds = new FileDataSource(tempFile);
-	        DataHandler d1 = new DataHandler(ds);
-	        AttachmentPart a1 = new AttachmentPart(d1);
-	        a1.setContentId(attachmentName);
-	        a1.setMimeHeader("Content-Transfer-Encoding", "base64");
-	        a1.setContentType("{http://www.w3.org/2001/XMLSchema}base64Binary");
-	        a1.addMimeHeader("Content-Encoding", "gzip");
-	        msg.addAttachmentPart(a1);
-	        msg.saveChanges();
-        }
+        String requestName = null;
 
-        // Käivitame päringu
-        call.invoke(msg);
+        try {
+            // Kontrollime, kas vajalikud andmed on olemas
+            ArrayList<DhlMessage> centralServerDocs = markDocumentsReceivedDirect(documents, db, dbConnection);
+
+            int length = centralServerDocs.size();
+            if (length < 1) {
+                return;
+            }
+
+            // Päringu ID koostamine
+            queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
+
+            // Päringu nimi ja versioon
+            int requestVersion = orgSettings.getMarkDocumentsReceivedRequestVersion();
+            requestName = this.producerName + ".markDocumentsReceived.v" + String.valueOf(requestVersion);
+
+            // Saadetava sänumi päisesse kantavad parameetrid
+            XHeader header = new XHeader(
+                headerVar.getOrganizationCode(),
+                this.producerName,
+                headerVar.getPersonalIDCode(),
+                queryId,
+                requestName,
+                headerVar.getCaseName(),
+                headerVar.getPIDWithCountryCode());
+
+            String attachmentName = "";
+            String attachmentFile = "";
+            String messageBody = "";
+
+            if (requestVersion < 3) {
+                attachmentName = String.valueOf(System.currentTimeMillis());
+                attachmentFile = MarkDocumentsReceivedBody.createResponseFile(centralServerDocs, requestVersion, new Date());
+                MarkDocumentsReceivedBody b = new MarkDocumentsReceivedBody();
+                b.dokumendid = attachmentName;
+                b.kaust = "";
+                b.edastusID = deliverySessionID;
+                if (unitSettings != null) {
+                    b.allyksuseId = unitSettings.getDivisionID();
+                    b.ametikohaId = unitSettings.getOccupationID();
+                }
+                messageBody = (new SoapMessageBuilder(header, b.getBodyContentsAsText())).getMessageAsText();
+            } else {
+                MarkDocumentsReceivedV3Body b3 = new MarkDocumentsReceivedV3Body();
+                b3.dokumendidObjectList = centralServerDocs;
+                b3.kaust = "";
+                b3.edastusID = deliverySessionID;
+
+                // Vastuvätja staatus, veateade ja metaxml tulevad iga
+                // konkreetse dokumendi andmetest.
+
+                if (unitSettings != null) {
+                    b3.allyksuseLyhinimetus = unitSettings.getDivisionShortName();
+                    b3.ametikohaLyhinimetus = unitSettings.getOccupationShortName();
+                }
+                messageBody = (new SoapMessageBuilder(header, b3.getBodyContentsAsText())).getMessageAsText();
+            }
+
+            Message msg = new Message(messageBody);
+            call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "markDocumentsReceived"));
+
+            // Lisame sänumile manuse
+            if (requestVersion < 3) {
+                String tempFile = CommonMethods.gzipPackXML(attachmentFile, header.getAsutus(), "markDocumentsReceived");
+                tempFiles.add(tempFile);
+                FileDataSource ds = new FileDataSource(tempFile);
+                DataHandler d1 = new DataHandler(ds);
+                AttachmentPart a1 = new AttachmentPart(d1);
+                a1.setContentId(attachmentName);
+                a1.setMimeHeader("Content-Transfer-Encoding", "base64");
+                a1.setContentType("{http://www.w3.org/2001/XMLSchema}base64Binary");
+                a1.addMimeHeader("Content-Encoding", "gzip");
+                msg.addAttachmentPart(a1);
+                msg.saveChanges();
+            }
+
+            // Käivitame päringu
+             call.invoke(msg);
+
+            RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
+            // Vastuse täätlemine
+            Message response = call.getResponseMessage();
+            // Käivitame päringu
+
+            if (isMarkDocumentsResponseOK(response)) {
+                requestLog.setResponse(ResponseStatus.OK.toString());
+            } else {
+                requestLog.setResponse(ResponseStatus.NOK.toString());
+            }
+            LoggingService.logRequest(requestLog);
+        } catch (Exception ex) {
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.ClientAPI" + " markDocumentsReceived");
+            errorLog.setOrganizationCode(headerVar.getOrganizationCode());
+            errorLog.setUserCode(headerVar.getPersonalIDCode());
+            RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
+            int errorLogId = LoggingService.logError(errorLog);
+            if (errorLogId != -1) {
+                requestLog.setErrorLogId(errorLogId);
+            }
+            requestLog.setResponse(ResponseStatus.NOK.toString());
+            LoggingService.logRequest(requestLog);
+            throw ex;
+        }
     }
 
     /**
@@ -1225,6 +1443,7 @@ public class ClientAPI {
         	Connection dbConnection = null;
         	try {
 	        	dbConnection = DBConnection.getConnection(db);
+                DatabaseSessionService.getInstance().setSession(dbConnection, db);
 	            UnitCredential[] credentials = UnitCredential.getCredentials(db, dbConnection);
 	            for (UnitCredential uc : credentials){
 	                String orgCode = uc.getInstitutionCode();
@@ -1246,9 +1465,10 @@ public class ClientAPI {
         	} catch (Exception ex) {
         		// One misconfigured database connection or unreachable database
         		// should not cancel the whole process.
-        		logger.warn("Error reading credentials from database \""+ db.getDatabaseName() +"\".");
+        		logger.warn("Error reading credentials from database \"" + db.getDatabaseName() +"\".");
         	} finally {
         		CommonMethods.safeCloseDatabaseConnection(dbConnection);
+                DatabaseSessionService.getInstance().clearSession();
         	}
         }
         
@@ -1270,105 +1490,115 @@ public class ClientAPI {
 		logger.debug("getSendingOptionsV3 invoked.");
 		
 		GetSendingOptionsV3ResponseType result = new GetSendingOptionsV3ResponseType();
-            
-        // Päringu nimi
-        String requestName = this.producerName + ".getSendingOptions.v" + String.valueOf(requestVersion);
-        
-        // Päringu ID koostamine
-        this.queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
-        
-        // Saadetava sänumi päisesse kantavad parameetrid        
-        XHeader header = new XHeader(
-            headerVar.getOrganizationCode(),
-            this.producerName,
-            headerVar.getPersonalIDCode(),
-            this.queryId,
-            requestName,
-            headerVar.getCaseName(),
-            headerVar.getPIDWithCountryCode());
 
-        // Koostame SOAP sänumi keha
-        String messageData = "";
-        String attachmentName = String.valueOf(System.currentTimeMillis());
-        String attachmentFileName = "";
-        switch (requestVersion) {
-        	case 1:
-        		GetSendingOptionsBody b1 = new GetSendingOptionsBody();
-        		b1.keha = orgCodes;
-        		messageData = (new SoapMessageBuilder(header, b1.getBodyContentsAsText())).getMessageAsText();
-        		break;
-        	case 2:
-    	        GetSendingOptionsV2Body b2 = new GetSendingOptionsV2Body();
-    	        b2.asutused = orgCodes;
-    	        b2.vastuvotmata_dokumente_ootel = onlyOrgsWithDocumentsWaiting;
-    	        b2.vahetatud_dokumente_vahemalt = minimumCountOfDocumentsExchanged;
-    	        b2.vahetatud_dokumente_kuni = maximumCountOfDocumentsExchanged;
-    	        messageData = (new SoapMessageBuilder(header, b2.getBodyContentsAsText())).getMessageAsText();
-        		break;
-        	case 3:
-        		GetSendingOptionsV3Body b3 = new GetSendingOptionsV3Body();
-        		b3.kehaHref = attachmentName;
-        		b3.asutused = orgCodes;
-        		b3.allyksused = subdivisions;
-        		b3.ametikohad = occupations;
-        		b3.vastuvotmataDokumenteOotel = onlyOrgsWithDocumentsWaiting;
-    	        b3.vahetatudDokumenteVahemalt = minimumCountOfDocumentsExchanged;
-    	        b3.vahetatudDokumenteKuni = maximumCountOfDocumentsExchanged;
-        		attachmentFileName = b3.createAttachmentFile();
-        		messageData = (new SoapMessageBuilder(header, b3.getBodyContentsAsText())).getMessageAsText();
-        		break;
-        	default:
-        		break;
-        }
-        
-        Message msg = new Message(messageData);
-        call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "getSendingOptions"));
+        String requestName = null;
 
-        // Lisame sänumile manuse
-        if (requestVersion == 3) {
-	        FileDataSource ds = new FileDataSource(attachmentFileName);
-	        DataHandler d1 = new DataHandler(ds);
-	        AttachmentPart a1 = new AttachmentPart(d1);
-	        a1.setContentId(attachmentName);
-	        a1.setMimeHeader("Content-Transfer-Encoding", "base64");
-	        a1.setContentType("{http://www.w3.org/2001/XMLSchema}base64Binary");
-	        a1.addMimeHeader("Content-Encoding", "gzip");
-	        msg.addAttachmentPart(a1);
-	        msg.saveChanges();
-        }
-        
-        // Teostame päringu
-        call.invoke(msg);
+        try {
+            // Päringu nimi
+            requestName = this.producerName + ".getSendingOptions.v" + String.valueOf(requestVersion);
 
-        // Päringu tulemuste täätlemine
-        Message response = call.getResponseMessage();
-        
-        if (requestVersion < 3) {
-        	ArrayList<DhlCapability> orgs = new ArrayList<DhlCapability>();
-        	SOAPBody body = response.getSOAPBody();
-	        NodeList nList = body.getElementsByTagName("keha");
-	        if (nList.getLength() > 0) {
-	            Node msgBodyNode = nList.item(0);
-	            if (msgBodyNode != null) {
-	                nList = ((Element)msgBodyNode).getElementsByTagName("asutus");
-	                for (int i = 0; i < nList.getLength(); ++i) {
-	                	DhlCapability item = DhlCapability.fromXML((Element)nList.item(i));
-	                    if (item != null) {
-	                        orgs.add(item);
-	                    }
-	                }
-	            }
-	        }
-	        result.asutused = orgs;
-        } else {
-        	AttachmentExtractionResult responseData = CommonMethods.getExtractedFileFromAttachment(response);
-        	if (responseData != null) {
-        		String fileName = responseData.getExtractedFileName();
-        		if ((fileName != null) && (fileName.length() > 0) && (new File(fileName)).exists()) {
-        			Document xmlDoc = CommonMethods.xmlDocumentFromFile(fileName, true);
-        			result = GetSendingOptionsV3ResponseType.fromXML(xmlDoc.getDocumentElement());        			
-        		}
-        	}
+            // Päringu ID koostamine
+            this.queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
+
+            // Saadetava sänumi päisesse kantavad parameetrid
+            XHeader header = new XHeader(
+                headerVar.getOrganizationCode(),
+                this.producerName,
+                headerVar.getPersonalIDCode(),
+                this.queryId,
+                requestName,
+                headerVar.getCaseName(),
+                headerVar.getPIDWithCountryCode());
+
+            // Koostame SOAP sänumi keha
+            String messageData = "";
+            String attachmentName = String.valueOf(System.currentTimeMillis());
+            String attachmentFileName = "";
+            switch (requestVersion) {
+                case 1:
+                    GetSendingOptionsBody b1 = new GetSendingOptionsBody();
+                    b1.keha = orgCodes;
+                    messageData = (new SoapMessageBuilder(header, b1.getBodyContentsAsText())).getMessageAsText();
+                    break;
+                case 2:
+                    GetSendingOptionsV2Body b2 = new GetSendingOptionsV2Body();
+                    b2.asutused = orgCodes;
+                    b2.vastuvotmata_dokumente_ootel = onlyOrgsWithDocumentsWaiting;
+                    b2.vahetatud_dokumente_vahemalt = minimumCountOfDocumentsExchanged;
+                    b2.vahetatud_dokumente_kuni = maximumCountOfDocumentsExchanged;
+                    messageData = (new SoapMessageBuilder(header, b2.getBodyContentsAsText())).getMessageAsText();
+                    break;
+                case 3:
+                    GetSendingOptionsV3Body b3 = new GetSendingOptionsV3Body();
+                    b3.kehaHref = attachmentName;
+                    b3.asutused = orgCodes;
+                    b3.allyksused = subdivisions;
+                    b3.ametikohad = occupations;
+                    b3.vastuvotmataDokumenteOotel = onlyOrgsWithDocumentsWaiting;
+                    b3.vahetatudDokumenteVahemalt = minimumCountOfDocumentsExchanged;
+                    b3.vahetatudDokumenteKuni = maximumCountOfDocumentsExchanged;
+                    attachmentFileName = b3.createAttachmentFile();
+                    messageData = (new SoapMessageBuilder(header, b3.getBodyContentsAsText())).getMessageAsText();
+                    break;
+                default:
+                    break;
+            }
+
+            Message msg = new Message(messageData);
+            call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "getSendingOptions"));
+
+            // Lisame sänumile manuse
+            if (requestVersion == 3) {
+                FileDataSource ds = new FileDataSource(attachmentFileName);
+                DataHandler d1 = new DataHandler(ds);
+                AttachmentPart a1 = new AttachmentPart(d1);
+                a1.setContentId(attachmentName);
+                a1.setMimeHeader("Content-Transfer-Encoding", "base64");
+                a1.setContentType("{http://www.w3.org/2001/XMLSchema}base64Binary");
+                a1.addMimeHeader("Content-Encoding", "gzip");
+                msg.addAttachmentPart(a1);
+                msg.saveChanges();
+            }
+
+            // Teostame päringu
+            call.invoke(msg);
+
+            // Päringu tulemuste täätlemine
+            Message response = call.getResponseMessage();
+
+            if (requestVersion < 3) {
+                ArrayList<DhlCapability> orgs = new ArrayList<DhlCapability>();
+                SOAPBody body = response.getSOAPBody();
+                NodeList nList = body.getElementsByTagName("keha");
+                if (nList.getLength() > 0) {
+                    Node msgBodyNode = nList.item(0);
+                    if (msgBodyNode != null) {
+                        nList = ((Element)msgBodyNode).getElementsByTagName("asutus");
+                        for (int i = 0; i < nList.getLength(); ++i) {
+                            DhlCapability item = DhlCapability.fromXML((Element)nList.item(i));
+                            if (item != null) {
+                                orgs.add(item);
+                            }
+                        }
+                    }
+                }
+                result.asutused = orgs;
+            } else {
+                AttachmentExtractionResult responseData = CommonMethods.getExtractedFileFromAttachment(response);
+                if (responseData != null) {
+                    String fileName = responseData.getExtractedFileName();
+                    if ((fileName != null) && (fileName.length() > 0) && (new File(fileName)).exists()) {
+                        Document xmlDoc = CommonMethods.xmlDocumentFromFile(fileName, true);
+                        result = GetSendingOptionsV3ResponseType.fromXML(xmlDoc.getDocumentElement());
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.ClientAPI" + " getSendingOptions");
+            errorLog.setOrganizationCode(headerVar.getOrganizationCode());
+            errorLog.setUserCode(headerVar.getPersonalIDCode());
+            LoggingService.logError(errorLog);
+            throw ex;
         }
 
         return result;
@@ -1381,98 +1611,118 @@ public class ClientAPI {
     	}
     	return getSubdivisionList(headerVar, orgCodes, requestVersion);
     }
-    
+
     public ArrayList<Subdivision> getSubdivisionList(HeaderVariables headerVar, ArrayList<String> orgCodes, int requestVersion) throws Exception {
         ArrayList<Subdivision> result = new ArrayList<Subdivision>();
-        
-        // Päringu nimi
-        String requestName = this.producerName + ".getSubdivisionList.v" + String.valueOf(requestVersion);
-        
-        // Päringu ID koostamine
-        queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
-        
-        // Saadetava sänumi päisesse kantavad parameetrid        
-        XHeader header = new XHeader(
-            headerVar.getOrganizationCode(),
-            this.producerName,
-            headerVar.getPersonalIDCode(),
-            queryId,
-            requestName,
-            headerVar.getCaseName(),
-            headerVar.getPIDWithCountryCode());
+        String requestName = null;
+        try {
+            // Päringu nimi
+            requestName = this.producerName + ".getSubdivisionList.v" + String.valueOf(requestVersion);
 
-        // Koostame SOAP sänumi keha
-        String messageData = "";
-        String attachmentName = String.valueOf(System.currentTimeMillis());
-        String attachmentFileName = "";
-        switch (requestVersion) {
-        	case 1:
-                GetSubdivisionListBody b = new GetSubdivisionListBody();        
-                b.keha = orgCodes;
-                messageData = (new SoapMessageBuilder(header, b.getBodyContentsAsText())).getMessageAsText();
-                break;
-        	case 2:
-                GetSubdivisionListV2Body b2 = new GetSubdivisionListV2Body();
-                b2.asutusedHref = attachmentName;
-                b2.asutused = orgCodes;
-                attachmentFileName = b2.createAttachmentFile();
-                messageData = (new SoapMessageBuilder(header, b2.getBodyContentsAsText())).getMessageAsText();
-                break;
-            default:
-            	throw new Exception("Request getSubdivisionList does not have version v" + String.valueOf(requestVersion) + "!");
-        }
-        
-        Message msg = new Message(messageData);
-        call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "getSubdivisionList"));
+            // Päringu ID koostamine
+            queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
 
-        // Lisame sänumile manuse
-        if (requestVersion == 2) {
-	        FileDataSource ds = new FileDataSource(attachmentFileName);
-	        DataHandler d1 = new DataHandler(ds);
-	        AttachmentPart a1 = new AttachmentPart(d1);
-	        a1.setContentId(attachmentName);
-	        a1.setMimeHeader("Content-Transfer-Encoding", "base64");
-	        a1.setContentType("{http://www.w3.org/2001/XMLSchema}base64Binary");
-	        a1.addMimeHeader("Content-Encoding", "gzip");
-	        msg.addAttachmentPart(a1);
-	        msg.saveChanges();
-        }
-        
-        // Teostame päringu
-        call.invoke(msg);
-        Message response = call.getResponseMessage();
-        
-        // Päringu tulemuste täätlemine
-        Node msgBodyNode = null;
-        if (requestVersion < 2) {
-	        SOAPBody body = response.getSOAPBody();
-	        NodeList nList = body.getElementsByTagName("keha");
-	        if (nList.getLength() > 0) {
-	            msgBodyNode = nList.item(0);
-	        }
-        } else {
-        	AttachmentExtractionResult responseData = CommonMethods.getExtractedFileFromAttachment(response);
-        	if (responseData != null) {
-        		String fileName = responseData.getExtractedFileName();
-        		if ((fileName != null) && (fileName.length() > 0) && (new File(fileName)).exists()) {
-        			Document xmlDoc = CommonMethods.xmlDocumentFromFile(fileName, true);
-        	    	NodeList nList = xmlDoc.getDocumentElement().getElementsByTagName("allyksused");
-        	    	if (nList.getLength() > 0) {
-        	            msgBodyNode = nList.item(0);
-        	    	}
-        		}
-        	}
-        }
-        if (msgBodyNode != null) {
-        	NodeList nList = ((Element)msgBodyNode).getElementsByTagName("allyksus");
-            for (int i = 0; i < nList.getLength(); ++i) {
-                Subdivision item = Subdivision.fromXML((Element)nList.item(i));
-                if (item != null) {
-                    result.add(item);
+            // Saadetava sänumi päisesse kantavad parameetrid
+            XHeader header = new XHeader(
+                    headerVar.getOrganizationCode(),
+                    this.producerName,
+                    headerVar.getPersonalIDCode(),
+                    queryId,
+                    requestName,
+                    headerVar.getCaseName(),
+                    headerVar.getPIDWithCountryCode());
+
+            // Koostame SOAP sänumi keha
+            String messageData = "";
+            String attachmentName = String.valueOf(System.currentTimeMillis());
+            String attachmentFileName = "";
+            switch (requestVersion) {
+                case 1:
+                    GetSubdivisionListBody b = new GetSubdivisionListBody();
+                    b.keha = orgCodes;
+                    messageData = (new SoapMessageBuilder(header, b.getBodyContentsAsText())).getMessageAsText();
+                    break;
+                case 2:
+                    GetSubdivisionListV2Body b2 = new GetSubdivisionListV2Body();
+                    b2.asutusedHref = attachmentName;
+                    b2.asutused = orgCodes;
+                    attachmentFileName = b2.createAttachmentFile();
+                    messageData = (new SoapMessageBuilder(header, b2.getBodyContentsAsText())).getMessageAsText();
+                    break;
+                default:
+                    throw new Exception("Request getSubdivisionList does not have version v" + String.valueOf(requestVersion) + "!");
+            }
+
+            Message msg = new Message(messageData);
+            call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "getSubdivisionList"));
+
+            // Lisame sänumile manuse
+            if (requestVersion == 2) {
+                FileDataSource ds = new FileDataSource(attachmentFileName);
+                DataHandler d1 = new DataHandler(ds);
+                AttachmentPart a1 = new AttachmentPart(d1);
+                a1.setContentId(attachmentName);
+                a1.setMimeHeader("Content-Transfer-Encoding", "base64");
+                a1.setContentType("{http://www.w3.org/2001/XMLSchema}base64Binary");
+                a1.addMimeHeader("Content-Encoding", "gzip");
+                msg.addAttachmentPart(a1);
+                msg.saveChanges();
+            }
+
+            // Teostame päringu
+            call.invoke(msg);
+            Message response = call.getResponseMessage();
+
+            RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
+
+            // Päringu tulemuste täätlemine
+            Node msgBodyNode = null;
+            if (requestVersion < 2) {
+                SOAPBody body = response.getSOAPBody();
+                NodeList nList = body.getElementsByTagName("keha");
+                if (nList.getLength() > 0) {
+                    msgBodyNode = nList.item(0);
+                }
+            } else {
+                AttachmentExtractionResult responseData = CommonMethods.getExtractedFileFromAttachment(response);
+                if (responseData != null) {
+                    String fileName = responseData.getExtractedFileName();
+                    if ((fileName != null) && (fileName.length() > 0) && (new File(fileName)).exists()) {
+                        Document xmlDoc = CommonMethods.xmlDocumentFromFile(fileName, true);
+                        NodeList nList = xmlDoc.getDocumentElement().getElementsByTagName("allyksused");
+                        if (nList.getLength() > 0) {
+                            msgBodyNode = nList.item(0);
+                        }
+                    }
                 }
             }
-        }
+            if (msgBodyNode != null) {
+                requestLog.setResponse(ResponseStatus.OK.toString());
+                NodeList nList = ((Element) msgBodyNode).getElementsByTagName("allyksus");
+                for (int i = 0; i < nList.getLength(); ++i) {
+                    Subdivision item = Subdivision.fromXML((Element) nList.item(i));
+                    if (item != null) {
+                        result.add(item);
+                    }
+                }
+            } else {
+                requestLog.setResponse(ResponseStatus.NOK.toString());
+            }
 
+            LoggingService.logRequest(requestLog);
+        } catch (Exception ex) {
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.ClientAPI" + " getSubdivisionList");
+            errorLog.setOrganizationCode(headerVar.getOrganizationCode());
+            errorLog.setUserCode(headerVar.getPersonalIDCode());
+            RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
+            int errorLogId = LoggingService.logError(errorLog);
+            if (errorLogId != -1){
+                requestLog.setErrorLogId(errorLogId);
+            }
+            requestLog.setResponse(ResponseStatus.NOK.toString());
+            LoggingService.logRequest(requestLog);
+            throw ex;
+        }
         return result;
     }
     
@@ -1486,94 +1736,117 @@ public class ClientAPI {
     
     public ArrayList<Occupation> getOccupationList(HeaderVariables headerVar, ArrayList<String> orgCodes, int requestVersion) throws Exception {
         ArrayList<Occupation> result = new ArrayList<Occupation>();
-            
-        // Päringu nimi
+
         String requestName = this.producerName + ".getOccupationList.v" + String.valueOf(requestVersion);
-        
-        // Päringu ID koostamine
-        queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
-        
-        // Saadetava sänumi päisesse kantavad parameetrid        
-        XHeader header = new XHeader(
-            headerVar.getOrganizationCode(),
-            this.producerName,
-            headerVar.getPersonalIDCode(),
-            queryId,
-            requestName,
-            headerVar.getCaseName(),
-            headerVar.getPIDWithCountryCode());
 
-        // Koostame SOAP sänumi keha
-        String messageData = "";
-        String attachmentName = String.valueOf(System.currentTimeMillis());
-        String attachmentFileName = "";
-        switch (requestVersion) {
-        	case 1:
-        		GetOccupationListBody b = new GetOccupationListBody();        
-        		b.keha = orgCodes;
-        		messageData = (new SoapMessageBuilder(header, b.getBodyContentsAsText())).getMessageAsText();
-        		break;
-        	case 2:
-                GetOccupationListV2Body b2 = new GetOccupationListV2Body();
-                b2.asutusedHref = attachmentName;
-                b2.asutused = orgCodes;
-                attachmentFileName = b2.createAttachmentFile();
-                messageData = (new SoapMessageBuilder(header, b2.getBodyContentsAsText())).getMessageAsText();
-        		break;
-        	default:
-        		throw new Exception("Request getOccupationList does not have version v" + String.valueOf(requestVersion) + "!");
-        }
-        Message msg = new Message(messageData);
-        call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "getOccupationList"));
+        try {
+        // Päringu nimi
+            requestName = this.producerName + ".getOccupationList.v" + String.valueOf(requestVersion);
 
-        // Lisame sänumile manuse
-        if (requestVersion == 2) {
-	        FileDataSource ds = new FileDataSource(attachmentFileName);
-	        DataHandler d1 = new DataHandler(ds);
-	        AttachmentPart a1 = new AttachmentPart(d1);
-	        a1.setContentId(attachmentName);
-	        a1.setMimeHeader("Content-Transfer-Encoding", "base64");
-	        a1.setContentType("{http://www.w3.org/2001/XMLSchema}base64Binary");
-	        a1.addMimeHeader("Content-Encoding", "gzip");
-	        msg.addAttachmentPart(a1);
-	        msg.saveChanges();
-        }
-        
-        // Teostame päringu
-        call.invoke(msg);
+            // Päringu ID koostamine
+            queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
 
-        // Päringu tulemuste täätlemine
-        Message response = call.getResponseMessage();
-        Node msgBodyNode = null;
-        if (requestVersion < 2) {        
-	        SOAPBody body = response.getSOAPBody();
-	        NodeList nList = body.getElementsByTagName("keha");
-	        if (nList.getLength() > 0) {
-	            msgBodyNode = nList.item(0);
-	        }
-        } else {
-        	AttachmentExtractionResult responseData = CommonMethods.getExtractedFileFromAttachment(response);
-        	if (responseData != null) {
-        		String fileName = responseData.getExtractedFileName();
-        		if ((fileName != null) && (fileName.length() > 0) && (new File(fileName)).exists()) {
-        			Document xmlDoc = CommonMethods.xmlDocumentFromFile(fileName, true);
-        	    	NodeList nList = xmlDoc.getDocumentElement().getElementsByTagName("ametikohad");
-        	    	if (nList.getLength() > 0) {
-        	            msgBodyNode = nList.item(0);
-        	    	}
-        		}
-        	}
-        }
-        if (msgBodyNode != null) {
-        	NodeList nList = ((Element)msgBodyNode).getElementsByTagName("ametikoht");
-            for (int i = 0; i < nList.getLength(); ++i) {
-                Occupation item = Occupation.fromXML((Element)nList.item(i));
-                if (item != null) {
-                    result.add(item);
+            // Saadetava sänumi päisesse kantavad parameetrid
+            XHeader header = new XHeader(
+                headerVar.getOrganizationCode(),
+                this.producerName,
+                headerVar.getPersonalIDCode(),
+                queryId,
+                requestName,
+                headerVar.getCaseName(),
+                headerVar.getPIDWithCountryCode());
+
+            // Koostame SOAP sänumi keha
+            String messageData = "";
+            String attachmentName = String.valueOf(System.currentTimeMillis());
+            String attachmentFileName = "";
+            switch (requestVersion) {
+                case 1:
+                    GetOccupationListBody b = new GetOccupationListBody();
+                    b.keha = orgCodes;
+                    messageData = (new SoapMessageBuilder(header, b.getBodyContentsAsText())).getMessageAsText();
+                    break;
+                case 2:
+                    GetOccupationListV2Body b2 = new GetOccupationListV2Body();
+                    b2.asutusedHref = attachmentName;
+                    b2.asutused = orgCodes;
+                    attachmentFileName = b2.createAttachmentFile();
+                    messageData = (new SoapMessageBuilder(header, b2.getBodyContentsAsText())).getMessageAsText();
+                    break;
+                default:
+                    throw new Exception("Request getOccupationList does not have version v" + String.valueOf(requestVersion) + "!");
+            }
+            Message msg = new Message(messageData);
+            call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "getOccupationList"));
+
+            // Lisame sänumile manuse
+            if (requestVersion == 2) {
+                FileDataSource ds = new FileDataSource(attachmentFileName);
+                DataHandler d1 = new DataHandler(ds);
+                AttachmentPart a1 = new AttachmentPart(d1);
+                a1.setContentId(attachmentName);
+                a1.setMimeHeader("Content-Transfer-Encoding", "base64");
+                a1.setContentType("{http://www.w3.org/2001/XMLSchema}base64Binary");
+                a1.addMimeHeader("Content-Encoding", "gzip");
+                msg.addAttachmentPart(a1);
+                msg.saveChanges();
+            }
+
+            // Teostame päringu
+            call.invoke(msg);
+
+            // Päringu tulemuste täätlemine
+            Message response = call.getResponseMessage();
+
+            RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
+
+            Node msgBodyNode = null;
+            if (requestVersion < 2) {
+                SOAPBody body = response.getSOAPBody();
+                NodeList nList = body.getElementsByTagName("keha");
+                if (nList.getLength() > 0) {
+                    msgBodyNode = nList.item(0);
+                }
+            } else {
+                AttachmentExtractionResult responseData = CommonMethods.getExtractedFileFromAttachment(response);
+                if (responseData != null) {
+                    String fileName = responseData.getExtractedFileName();
+                    if ((fileName != null) && (fileName.length() > 0) && (new File(fileName)).exists()) {
+                        Document xmlDoc = CommonMethods.xmlDocumentFromFile(fileName, true);
+                        NodeList nList = xmlDoc.getDocumentElement().getElementsByTagName("ametikohad");
+                        if (nList.getLength() > 0) {
+                            msgBodyNode = nList.item(0);
+                        }
+                    }
                 }
             }
-        }
+            if (msgBodyNode != null) {
+                requestLog.setResponse(ResponseStatus.OK.toString());
+                NodeList nList = ((Element)msgBodyNode).getElementsByTagName("ametikoht");
+                for (int i = 0; i < nList.getLength(); ++i) {
+                    Occupation item = Occupation.fromXML((Element)nList.item(i));
+                    if (item != null) {
+                        result.add(item);
+                    }
+                }
+            } else {
+                requestLog.setResponse(ResponseStatus.NOK.toString());
+            }
 
+            LoggingService.logRequest(requestLog);
+        } catch (Exception ex) {
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.ClientAPI" + " getOccupationList");
+            errorLog.setOrganizationCode(headerVar.getOrganizationCode());
+            errorLog.setUserCode(headerVar.getPersonalIDCode());
+            RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
+            int errorLogId = LoggingService.logError(errorLog);
+            if (errorLogId != -1) {
+                requestLog.setErrorLogId(errorLogId);
+            }
+            requestLog.setResponse(ResponseStatus.NOK.toString());
+            LoggingService.logRequest(requestLog);
+            throw ex;
+        }
         return result;
     }
 }

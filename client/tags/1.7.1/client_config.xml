@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <databases>
   <database>
-    <provider>[MSSQL|MSSQL2005|ORACLE|POSTGRE|SQLANYWHERE]</provider>
+    <provider>[MSSQL|MSSQL2005|ORACLE_10G|ORACLE_11G|POSTGRE|SQLANYWHERE]</provider>
     <server_name>[db_server_name]</server_name>
     <server_port>[db_port]</server_port>
     <database_name>[db_name]</database_name>

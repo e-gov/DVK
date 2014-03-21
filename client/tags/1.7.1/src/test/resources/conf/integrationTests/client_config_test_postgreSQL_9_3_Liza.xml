@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databases>
+  <database>
+    <provider>POSTGRE</provider>
+    <server_name>localhost</server_name>
+    <server_port>5434</server_port>
+    <database_name>ria</database_name>
+    <username>postgres</username>
+    <password>admin</password>
+    <process_name> </process_name>
+    <instance_name />
+    <schema_name>dvk</schema_name>
+    
+    <dvk_settings>
+      <!-- Kui siin service_url väärtus määramata jätta, siis kasutab rakendus antud andmebaasi puhul
+      üldist (dvk_client.properties failis määratud) turvaserveri aadressi -->
+      <service_url>http://srv-xtee.icefire/cgi-bin/consumer_proxy</service_url>
+      
+      <send_documents_ver>4</send_documents_ver> <!-- Võimalikud väärtused: 1, 2, 3, 4 -->
+      <receive_documents_ver>4</receive_documents_ver> <!-- Võimalikud väärtused: 1, 2, 3, 4 -->
+      <mark_documents_received_ver>3</mark_documents_received_ver> <!-- Võimalikud väärtused: 1, 2, 3 -->
+      <get_send_status_ver>2</get_send_status_ver> <!-- Võimalikud väärtused: 1, 2 -->
+      <get_sending_options_ver>3</get_sending_options_ver> <!-- Võimalikud väärtused: 1, 2, 3 -->
+      <get_subdivision_list_ver>2</get_subdivision_list_ver> <!-- Võimalikud väärtused: 1, 2 -->
+      <get_occupation_list_ver>2</get_occupation_list_ver> <!-- Võimalikud väärtused: 1, 2 -->
+
+      <default_status_id>0</default_status_id> <!-- Võimalikud väärtused: 0-11 -->
+    </dvk_settings>
+    
+    <!-- Määrab, mitme päeva vanune peab dokument vähemalt olema, et see dokumentide regulaarse
+    kustutamise käigus automaatselt kustutataks. Kui parameetri väärtuseks määrata < 1, siis
+    jäetakse kõik dokumendid vaikimisi alles (st kui kustutamise käsu andmisel pole dokumendi
+    minimaalset vanust eraldi määratud). -->
+    <delete_old_documents_after_days>-1</delete_old_documents_after_days>
+    
+    <!-- Kui parameetri "db_to_db_communication_only" väärtuseks on "true", siis ei ürita
+    rakendus antud andmebaasi andmeid DVK keskserveriga sünkroniseerida. Selliselt kirjeldatud
+    andmebaasiühendused on kasulikud selleks, et universaalklient saaks vajadusel asutusesiseselt
+    dokumendid otse ühest andmebaasist teise saata. -->
+    <db_to_db_communication_only>false</db_to_db_communication_only>
+  </database>
+</databases>

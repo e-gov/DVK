@@ -1,6 +1,7 @@
 package dvk.client.iostructures;
 
-import dvk.core.CommonMethods;
+import dvk.client.businesslayer.ErrorLog;
+import dvk.client.dhl.service.LoggingService;
 import dvk.core.CommonStructures;
 import javax.xml.rpc.handler.MessageContext;
 import javax.xml.rpc.handler.soap.SOAPMessageContext;
@@ -141,7 +142,8 @@ public class XHeader {
 
             return true;
         } catch (Exception ex) {
-            CommonMethods.logError(ex, this.getClass().getName(), "appendToSOAPHeader");
+            ErrorLog errorLog = new ErrorLog(ex, this.getClass().getName() + " appendToSOAPHeader");
+            LoggingService.logError(errorLog);
             return false;
         }
     }

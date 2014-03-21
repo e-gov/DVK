@@ -1,7 +1,9 @@
 package dvk.client.amphora;
 
+import dvk.client.businesslayer.ErrorLog;
 import dvk.client.conf.OrgSettings;
 import dvk.client.db.UnitCredential;
+import dvk.client.dhl.service.LoggingService;
 import dvk.core.CommonMethods;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -98,10 +100,13 @@ public class Department {
                 cs.close();
                 return true;
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL", this.getClass().getName() + " addOrganization");
+                LoggingService.logError(errorLog);
                 return false;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, this.getClass().getName(), "addOrganization");
+            ErrorLog errorLog = new ErrorLog(ex, this.getClass().getName() + " addOrganization");
+            LoggingService.logError(errorLog);
             return false;
         }
     }
@@ -173,10 +178,14 @@ public class Department {
                 cs.close();
                 return result;
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL", "dvk.client.amphora.Department" + " getDepartmentIDForUnit");
+                LoggingService.logError(errorLog);
                 return 0;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dvk.client.amphora.Organization", "getOrgExistsForUnit");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.amphora.Department" + " getDepartmentIDForUnit");
+            errorLog.setOrganizationCode(orgCode);
+            LoggingService.logError(errorLog);
             return 0;
         }
     }

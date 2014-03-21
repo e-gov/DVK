@@ -2,6 +2,7 @@ package dvk.client.businesslayer;
 
 import dvk.client.conf.OrgSettings;
 import dvk.client.db.DBConnection;
+import dvk.client.dhl.service.LoggingService;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import java.sql.CallableStatement;
@@ -101,13 +102,20 @@ public class Subdivision {
                 return false;
             }
         } catch (Exception ex) {
-            try { conn.rollback(); }
-            catch(SQLException ex1) { logger.error(ex1.getMessage(), ex1); }
-            logger.error(ex.getMessage(), ex);
-            logger.error("Subdivision data: ID: " + String.valueOf(m_id)
-            	+ ", Name: " + m_name + ", Code: " + m_orgCode + ", Short name: "
-            	+ m_shortName + ", Parent subdivision: "
-            	+ m_parentSubdivisionShortName);
+            try {
+                conn.rollback();
+            } catch(SQLException ex1) {
+                ErrorLog errorLog = new ErrorLog(ex1, "dvk.client.businesslayer.Subdivision" + " saveToDb");
+                LoggingService.logError(errorLog);
+            }
+            ErrorLog errorLog = new ErrorLog(ex.getMessage() + " Subdivision data: ID: " + String.valueOf(m_id)
+                    + ", Name: " + m_name + ", Code: " + m_orgCode + ", Short name: "
+                    + m_shortName + ", Parent subdivision: "
+                    + m_parentSubdivisionShortName,
+                    "dvk.client.businesslayer.Subdivision" + " saveToDb");
+            errorLog.setCause(ex);
+            errorLog.setOrganizationCode(this.getOrgCode());
+            LoggingService.logError(errorLog);
             return false;
         }
     }
@@ -141,11 +149,13 @@ public class Subdivision {
         		}
                 return result;
             } else {
-            	logger.error("Database connection is NULL!");
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL", "dvk.client.businesslayer.Subdivision" + " getList");
+                LoggingService.logError(errorLog);
                 return null;
             }
         } catch (Exception ex) {
-        	logger.error(ex);
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.Subdivision" + " getList");
+            LoggingService.logError(errorLog);
             return null;
         }
     }
@@ -166,16 +176,21 @@ public class Subdivision {
                 dbConnection.commit();
                 result = true;
             } else {
-            	logger.error("Database connection is NULL!");
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL", "dvk.client.businesslayer.Subdivision" + " deleteFromDb");
+                errorLog.setOrganizationCode(this.getOrgCode());
+                LoggingService.logError(errorLog);
             	result = false;
             }
         } catch (Exception ex) {
             try {
             	dbConnection.rollback();
             } catch(SQLException ex1) {
-            	logger.error(ex1);
+                ErrorLog errorLog = new ErrorLog(ex1, "dvk.client.businesslayer.Subdivision" + " deleteFromDb");
+                LoggingService.logError(errorLog);
             }
-            logger.error(ex);
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.Subdivision" + " deleteFromDb");
+            errorLog.setOrganizationCode(this.getOrgCode());
+            LoggingService.logError(errorLog);
             result = false;
         }
         return result;
@@ -222,7 +237,8 @@ public class Subdivision {
                 return item;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dvk.client.businesslayer.Subdivision", "fromXML");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.Subdivision" + " fromXML");
+            LoggingService.logError(errorLog);
             return null;
         }
     }
@@ -242,7 +258,9 @@ public class Subdivision {
             	}
             }
         } catch (Exception ex) {
-        	logger.error(ex);
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.Subdivision" + " FindFromList");
+            errorLog.setOrganizationCode(orgCode);
+            LoggingService.logError(errorLog);
             return null;
         }
         return null;

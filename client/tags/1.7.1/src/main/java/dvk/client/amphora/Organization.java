@@ -1,8 +1,9 @@
 package dvk.client.amphora;
 
+import dvk.client.businesslayer.ErrorLog;
 import dvk.client.conf.OrgSettings;
 import dvk.client.db.UnitCredential;
-import dvk.core.CommonMethods;
+import dvk.client.dhl.service.LoggingService;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -57,10 +58,13 @@ public class Organization {
                 cs.close();
                 return true;
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL", "dvk.client.amphora.Organization" + " updateOrgDhlCapability");
+                LoggingService.logError(errorLog);
                 return false;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dvk.client.amphora.Organization", "updateOrgDhlCapability");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.amphora.Organization" + " updateOrgDhlCapability");
+            LoggingService.logError(errorLog);
             return false;
         }
     }
@@ -76,10 +80,13 @@ public class Organization {
                 cs.close();
                 return true;
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL", "dvk.client.amphora.Organization" + " syncOrgDhlCapability");
+                LoggingService.logError(errorLog);
                 return false;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dvk.client.amphora.Organization", "syncOrgDhlCapability");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.amphora.Organization" + " syncOrgDhlCapability");
+            LoggingService.logError(errorLog);
             return false;
         }
     }
@@ -112,6 +119,9 @@ public class Organization {
                                     conn.commit();
                                 }
                                 catch (Exception ex) {
+                                    ErrorLog errorLog = new ErrorLog(ex, "dvk.client.amphora.Organization" + " addOrganization");
+                                    errorLog.setOrganizationCode(orgCode);
+                                    LoggingService.logError(errorLog);
                                     result = false;
                                 }
                             }
@@ -144,10 +154,14 @@ public class Organization {
                 cs.close();
                 return true;
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL", "dvk.client.amphora.Organization" + " addOrganization");
+                LoggingService.logError(errorLog);
                 return false;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, this.getClass().getName(), "addOrganization");
+            ErrorLog errorLog = new ErrorLog(ex, this.getClass().getName() + " addOrganization");
+            errorLog.setOrganizationCode(this.getCode());
+            LoggingService.logError(errorLog);
             return false;
         }
     }
@@ -171,10 +185,13 @@ public class Organization {
                 cs.close();
                 return result;
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL", "dvk.client.amphora.Organization" + " getUnitFirstPersonID");
+                LoggingService.logError(errorLog);
                 return 0;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dvk.client.amphora.Organization", "getUnitFirstPersonID");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.amphora.Organization" + " getUnitFirstPersonID");
+            LoggingService.logError(errorLog);
             return 0;
         }
     }
@@ -206,10 +223,14 @@ public class Organization {
                 cs.close();
                 return (result > 0);
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL", "dvk.client.amphora.Organization" + " getOrgExistsForUnit");
+                LoggingService.logError(errorLog);
                 return false;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dvk.client.amphora.Organization", "getOrgExistsForUnit");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.amphora.Organization" + " getOrgExistsForUnit");
+            errorLog.setOrganizationCode(orgCode);
+            LoggingService.logError(errorLog);
             return false;
         }
     }
@@ -242,10 +263,14 @@ public class Organization {
                 cs.close();
                 return result;
             } else {
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL", "dvk.client.amphora.Organization" + " getOrgID");
+                LoggingService.logError(errorLog);
                 return 0;
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, "dvk.client.amphora.Organization", "getOrgID");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.amphora.Organization" + " getOrgID");
+            errorLog.setOrganizationCode(orgCode);
+            LoggingService.logError(errorLog);
             return 0;
         }
     }

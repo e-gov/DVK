@@ -2,6 +2,7 @@ package dvk.client.businesslayer;
 
 import dvk.client.conf.OrgSettings;
 import dvk.client.db.DBConnection;
+import dvk.client.dhl.service.LoggingService;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import java.sql.CallableStatement;
@@ -99,13 +100,19 @@ public class Occupation {
                 return false;
             }
         } catch (Exception ex) {
-            try { conn.rollback(); }
-            catch(SQLException ex1) { logger.error(ex1.getMessage(), ex1); }
-            logger.error(ex.getMessage(), ex);
-            logger.error("Occupation data: ID: " + String.valueOf(m_id)
-            	+ ", Name: " + m_name + ", Code: " + m_orgCode + ", Short name: "
-            	+ m_shortName + ", Parent subdivision: "
-            	+ m_parentSubdivisionShortName);
+            try {
+                conn.rollback();
+            } catch(SQLException ex1) {
+                ErrorLog errorLog = new ErrorLog(ex1, "dvk.client.businesslayer.Occupation" + " saveToDB");
+                LoggingService.logError(errorLog);
+            }
+            ErrorLog errorLog = new ErrorLog(ex.getMessage() + " Occupation data: ID: " + String.valueOf(m_id)
+                    + ", Name: " + m_name + ", Code: " + m_orgCode + ", Short name: "
+                    + m_shortName + ", Parent subdivision: "
+                    + m_parentSubdivisionShortName , "dvk.client.businesslayer.Occupation" + " saveToDB");
+            errorLog.setCause(ex);
+            errorLog.setOrganizationCode(this.getOrgCode());
+            LoggingService.logError(errorLog);
             return false;
         }
     }
@@ -139,11 +146,13 @@ public class Occupation {
         		}
                 return result;
             } else {
-            	logger.error("Database connection is NULL!");
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL", "dvk.client.businesslayer.Occupation" + " getList");
+                LoggingService.logError(errorLog);
                 return null;
             }
         } catch (Exception ex) {
-        	logger.error(ex);
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.Occupation" + " getList");
+            LoggingService.logError(errorLog);
             return null;
         }
     }
@@ -164,16 +173,20 @@ public class Occupation {
                 dbConnection.commit();
                 result = true;
             } else {
-            	logger.error("Database connection is NULL!");
+                ErrorLog errorLog = new ErrorLog("Database connection is NULL", "dvk.client.businesslayer.Occupation" + " deleteFromDb");
+                LoggingService.logError(errorLog);
             	result = false;
             }
         } catch (Exception ex) {
             try {
             	dbConnection.rollback();
             } catch(SQLException ex1) {
-            	logger.error(ex1);
+                ErrorLog errorLog = new ErrorLog(ex1, "dvk.client.businesslayer.Occupation" + " deleteFromDb");
+                LoggingService.logError(errorLog);
             }
-            logger.error(ex);
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.Occupation" + " deleteFromDb");
+            errorLog.setOrganizationCode(this.getOrgCode());
+            LoggingService.logError(errorLog);
             result = false;
         }
         return result;
@@ -220,7 +233,8 @@ public class Occupation {
                 return item;
             }
         } catch (Exception ex) {
-        	logger.error(ex.getMessage(), ex);
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.occupation" + " fromXML");
+            LoggingService.logError(errorLog);
             return null;
         }
     }
@@ -240,7 +254,9 @@ public class Occupation {
             	}
             }
         } catch (Exception ex) {
-        	logger.error(ex);
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.occupation" + " FindFromList");
+            errorLog.setOrganizationCode(orgCode);
+            LoggingService.logError(errorLog);
             return null;
         }
         return null;

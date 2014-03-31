@@ -2,9 +2,11 @@
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:src="http://www.riik.ee/schemas/deccontainer/vers_2_1/"
+                exclude-result-prefixes="src"
                 xmlns:dhl="http://www.riik.ee/schemas/dhl"
                 xmlns:rkel="http://www.riik.ee/schemas/dhl/rkel_letter"
-                xmlns:mm="http://www.riik.ee/schemas/dhl-meta-manual">
+                xmlns:mm="http://www.riik.ee/schemas/dhl-meta-manual"
+        >
 
     <xsl:output
             method="xml"

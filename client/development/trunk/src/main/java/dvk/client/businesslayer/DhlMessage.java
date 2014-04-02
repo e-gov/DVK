@@ -3,42 +3,28 @@ package dvk.client.businesslayer;
 import dvk.client.ClientAPI;
 import dvk.client.conf.OrgAddressFilter;
 import dvk.client.conf.OrgSettings;
-import dvk.client.dhl.service.DatabaseSessionService;
-import dvk.client.dhl.service.LoggingService;
-import dvk.core.Settings;
 import dvk.client.db.DBConnection;
 import dvk.client.db.UnitCredential;
+import dvk.client.dhl.service.LoggingService;
 import dvk.client.iostructures.Fault;
 import dvk.client.iostructures.GetSendStatusResponseItem;
 import dvk.client.iostructures.SimpleAddressData;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import dvk.core.FileSplitResult;
+import dvk.core.Settings;
+import org.apache.log4j.Logger;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.sql.CallableStatement;
-import java.sql.Clob;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
+import java.io.*;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Stack;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamReader;
-
-import org.apache.log4j.Logger;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 public class DhlMessage implements Cloneable {
 
@@ -2234,11 +2220,16 @@ public class DhlMessage implements Cloneable {
                     if (rec.getRecipientOrgCode().equalsIgnoreCase(xmlRec.getOrgCode()) &&
                             rec.getRecipientPersonCode().equalsIgnoreCase(xmlRec.getPersonCode()) &&
                             (rec.getRecipientDivisionID() == xmlRec.getDivisionID()) &&
-                            (rec.getRecipientDivisionCode() == xmlRec.getDivisionCode()) &&
-                            (rec.getRecipientDivisionCode().equalsIgnoreCase(xmlRec.getDivisionCode())) &&
+                            (
+                             (CommonMethods.isNullOrEmpty(rec.getRecipientDivisionCode()) && CommonMethods.isNullOrEmpty(xmlRec.getDivisionCode())) ||
+                             rec.getRecipientDivisionCode().equalsIgnoreCase(xmlRec.getDivisionCode())
+                            ) &&
                             (rec.getRecipientPositionID() == xmlRec.getPositionID()) &&
-                            (rec.getRecipientPositionCode() == xmlRec.getPositionCode()) &&
-                            (rec.getRecipientPositionCode().equalsIgnoreCase(xmlRec.getPositionCode()))) {
+                            (
+                             (CommonMethods.isNullOrEmpty(rec.getRecipientPositionCode()) && CommonMethods.isNullOrEmpty(xmlRec.getPositionCode())) ||
+                             rec.getRecipientPositionCode().equalsIgnoreCase(xmlRec.getPositionCode())
+                            )
+                        )   {
                         exists = true;
                         rec = null;
                         break;

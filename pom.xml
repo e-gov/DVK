@@ -67,7 +67,7 @@
                 <dvkCoreDir>C:\Projects\RIA_DVK\core\development\trunk</dvkCoreDir>
                 <dvkClientDir>C:\Projects\RIA_DVK\client\development\trunk</dvkClientDir>
                 <dvkServerJettyEnvLocation>C:\Projects\RIA_DVK\server\development\trunk\src\test\resources\jetty-env.xml</dvkServerJettyEnvLocation>
-                <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_Igor.properties, ./conf/integrationTests/dvk_client_MSSQL-V2005_Igor.properties, ./conf/integrationTests/dvk_client_Oracle-V11G_Igor.properties</listOfTestConfigs>
+                <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_Igor.properties</listOfTestConfigs>
                 <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_IgorAndLiza-serverIsMissing.properties</serverIsMissingConfigs>
             </properties>
         </profile>

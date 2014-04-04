@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6" inherit-compiler-output="false">
+    <output url="file://$MODULE_DIR$/target/classes" />
+    <output-test url="file://$MODULE_DIR$/target/test-classes" />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/hibernate" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test/resources" isTestSource="true" />
+      <excludeFolder url="file://$MODULE_DIR$/target" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: java:antlr:2.7.6" level="project" />
+    <orderEntry type="library" name="Maven: java:asm:1.0" level="project" />
+    <orderEntry type="library" name="Maven: java:asm-attrs:1.0" level="project" />
+    <orderEntry type="library" name="Maven: java:c3p0:0.9.0" level="project" />
+    <orderEntry type="library" name="Maven: java:castor:1.3.1" level="project" />
+    <orderEntry type="library" name="Maven: java:castor-core:1.3.1" level="project" />
+    <orderEntry type="library" name="Maven: java:castor-xml:1.3.1" level="project" />
+    <orderEntry type="library" name="Maven: java:cglib:2.1.3" level="project" />
+    <orderEntry type="library" name="Maven: java:commons-collections:3.1" level="project" />
+    <orderEntry type="library" name="Maven: java:commons-logging:1.0.4" level="project" />
+    <orderEntry type="library" name="Maven: java:dom4j:1.6.1" level="project" />
+    <orderEntry type="library" name="Maven: java:hibernate3:1.6.1" level="project" />
+    <orderEntry type="library" name="Maven: java:hsqldb:1.6.1" level="project" />
+    <orderEntry type="library" name="Maven: java:javassist:3.9.0.GA" level="project" />
+    <orderEntry type="library" name="Maven: java:jta:1.1" level="project" />
+    <orderEntry type="library" name="Maven: java:log4j:1.2.13" level="project" />
+    <orderEntry type="library" name="Maven: java:ojdbc:1.4" level="project" />
+    <orderEntry type="library" name="Maven: java:simple-jndi:0.11.4.1" level="project" />
+    <orderEntry type="library" name="Maven: java:slf4j-api:1.5.10" level="project" />
+    <orderEntry type="library" name="Maven: java:slf4j-log4j12:1.5.10" level="project" />
+    <orderEntry type="library" name="Maven: java:velocity-dep:1.5" level="project" />
+    <orderEntry type="library" name="Maven: java:xercesImpl:1.0" level="project" />
+    <orderEntry type="library" name="Maven: java:xercesSamples:1.0" level="project" />
+    <orderEntry type="library" name="Maven: java:xml-apis:1.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.10" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-core:1.1" level="project" />
+  </component>
+</module>
+

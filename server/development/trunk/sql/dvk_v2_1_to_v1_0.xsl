@@ -2,11 +2,12 @@
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:src="http://www.riik.ee/schemas/deccontainer/vers_2_1/"
-                exclude-result-prefixes="src"
                 xmlns:dhl="http://www.riik.ee/schemas/dhl"
                 xmlns:rkel="http://www.riik.ee/schemas/dhl/rkel_letter"
                 xmlns:mm="http://www.riik.ee/schemas/dhl-meta-manual"
-        >
+                xmlns:xalan="http://xml.apache.org/xalan"
+                xmlns:dhl-custom="dhl.xslt.CustomFunctions"
+                exclude-result-prefixes="src xalan dhl-custom">
 
     <xsl:output
             method="xml"
@@ -301,6 +302,7 @@
     </xsl:template>
 
     <xsl:template match="src:File" xmlns="http://www.sk.ee/DigiDoc/v1.3.0#">
+        <xsl:variable name="zip_base64_sisu" select="src:ZipBase64Content" />
         <xsl:element name="DataFile">
             <xsl:attribute name="ContentType">EMBEDDED_BASE64</xsl:attribute>
             <xsl:attribute name="Filename">
@@ -315,7 +317,7 @@
             <xsl:attribute name="Size">
                 <xsl:value-of select="src:FileSize"/>
             </xsl:attribute>
-            <xsl:value-of select="src:ZipBase64Content"/>
+            <xsl:value-of select="dhl-custom:unzip($zip_base64_sisu)" />
         </xsl:element>
     </xsl:template>
 

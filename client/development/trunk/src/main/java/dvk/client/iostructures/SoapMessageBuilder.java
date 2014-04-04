@@ -15,17 +15,11 @@ public class SoapMessageBuilder {
 
     public String getMessageAsText(String producerPrefix, String producerURI) {
         StringBuilder sb = new StringBuilder();
-        sb.append("<env:Envelope xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:"+ producerPrefix +"=\""+ producerURI +"\" xmlns:xtee=\"http://x-tee.riik.ee/xsd/xtee.xsd\">");
+        sb.append("<env:Envelope xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:"+ producerPrefix +"=\""+ producerURI +"\" xmlns:xtee=\"http://x-tee.riik.ee/xsd/xtee.xsd\" xmlns:adit=\"http://producers.ametlikud-dokumendid.xtee.riik.ee/producer/ametlikud-dokumendid\">");
 
         // X-Tee päis
         sb.append("<env:Header>");
-        sb.append("<xtee:asutus>" + m_header.getAsutus() + "</xtee:asutus>");
-        sb.append("<xtee:andmekogu>" + m_header.getAndmekogu() + "</xtee:andmekogu>");
-        sb.append("<xtee:ametnik>" + m_header.getAmetnik() + "</xtee:ametnik>");
-        sb.append("<xtee:nimi>" + m_header.getNimi() + "</xtee:nimi>");
-        sb.append("<xtee:id>" + m_header.getId() + "</xtee:id>");
-        sb.append("<xtee:toimik>" + m_header.getToimik() + "</xtee:toimik>");
-        sb.append("<xtee:isikukood>" + m_header.getIsikukood() + "</xtee:isikukood>");
+        sb.append(m_header.getHeaders());
         sb.append("</env:Header>");
 
         // Keha

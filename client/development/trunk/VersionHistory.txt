@@ -1,5 +1,9 @@
 1.7.1
 -------------------------------------------------------------------------------
+- Lisatud võimalus käivitada GetSendStatus päringut aditisse,
+  nende MessageRecipient'ide kohta, mis on saadetud aditisse ja ei ole veel avatud
+  (Lisatud ka vastavad konfiguratsiooniparameetrid konfifailidesse ja vastavad skriptid)
+- täiendatud ka andmebaasi skeemi vt. update skripte või latest skripte
 - Lisatud päringute ja vigade logimine andmebaasi
 - Integratsioonitestid lisatud toetatud andmebaaside kohta
 - Lisatud puudu olevad jarid

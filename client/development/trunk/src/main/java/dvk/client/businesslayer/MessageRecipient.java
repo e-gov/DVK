@@ -15,6 +15,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
@@ -25,7 +26,7 @@ public class MessageRecipient {
 
 	private static Logger logger = Logger.getLogger(MessageRecipient.class);
 
-    private int m_id;
+    private int m_id; //primary key of MessageRecipient
 	private int m_messageID;
     private String m_recipientOrgCode;
     private String m_recipientOrgName;
@@ -294,7 +295,6 @@ public class MessageRecipient {
             	boolean defaultAutoCommit = dbConnection.getAutoCommit();
         		try {
 	            	dbConnection.setAutoCommit(false);
-	                Calendar cal = Calendar.getInstance();
 	                int parNr = 1;
 	                if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
 	                    parNr++;
@@ -303,32 +303,7 @@ public class MessageRecipient {
 	                cs.setInt(parNr++, messageID);
 	                ResultSet rs = DBConnection.getResultSet(cs, db, 1);
 	                while (rs.next()) {
-	                    MessageRecipient item = new MessageRecipient();
-	                    item.setId(rs.getInt("dhl_message_recipient_id"));
-	                    item.setMessageID(rs.getInt("dhl_message_id"));
-	                    item.setRecipientOrgCode(rs.getString("recipient_org_code"));
-	                    item.setRecipientOrgName(rs.getString("recipient_org_name"));
-	                    item.setRecipientPersonCode(rs.getString("recipient_person_code"));
-	                    item.setRecipientName(rs.getString("recipient_name"));
-	                    item.setSendingDate(rs.getTimestamp("sending_date", cal));
-	                    item.setReceivedDate(rs.getTimestamp("received_date", cal));
-	                    item.setSendingStatusID(rs.getInt("sending_status_id"));
-	                    item.setRecipientStatusID(rs.getInt("recipient_status_id"));
-	                    item.setFaultCode(rs.getString("fault_code"));
-	                    item.setFaultActor(rs.getString("fault_actor"));
-	                    item.setFaultString(rs.getString("fault_string"));
-	                    item.setFaultDetail(rs.getString("fault_detail"));
-	                    item.setMetaXML(rs.getString("metaxml"));
-	                    item.setDhlId(rs.getInt("dhl_id"));
-	                    item.setProducerName(rs.getString("producer_name"));
-	                    item.setServiceURL(rs.getString("service_url"));
-	                    item.setRecipientDivisionID(rs.getInt("recipient_division_id"));
-	                    item.setRecipientDivisionName(rs.getString("recipient_division_name"));
-	                    item.setRecipientPositionID(rs.getInt("recipient_position_id"));
-	                    item.setRecipientPositionName(rs.getString("recipient_position_name"));
-	                    item.setRecipientDivisionCode(rs.getString("recipient_division_code"));
-	                    item.setRecipientPositionCode(rs.getString("recipient_position_code"));
-	                    result.add(item);
+	                    result.add(getMessageRecipientFromResultSet(rs));
 	                }
 	                rs.close();
 	                cs.close();
@@ -348,7 +323,37 @@ public class MessageRecipient {
         }
     }
 
-    public boolean saveToDB(OrgSettings db, Connection dbConnection) {
+    private static MessageRecipient getMessageRecipientFromResultSet(ResultSet rs) throws Exception {
+        Calendar cal = Calendar.getInstance();
+        MessageRecipient item = new MessageRecipient();
+        item.setId(rs.getInt("dhl_message_recipient_id"));
+        item.setMessageID(rs.getInt("dhl_message_id"));
+        item.setRecipientOrgCode(rs.getString("recipient_org_code"));
+        item.setRecipientOrgName(rs.getString("recipient_org_name"));
+        item.setRecipientPersonCode(rs.getString("recipient_person_code"));
+        item.setRecipientName(rs.getString("recipient_name"));
+        item.setSendingDate(rs.getTimestamp("sending_date", cal));
+        item.setReceivedDate(rs.getTimestamp("received_date", cal));
+        item.setSendingStatusID(rs.getInt("sending_status_id"));
+        item.setRecipientStatusID(rs.getInt("recipient_status_id"));
+        item.setFaultCode(rs.getString("fault_code"));
+        item.setFaultActor(rs.getString("fault_actor"));
+        item.setFaultString(rs.getString("fault_string"));
+        item.setFaultDetail(rs.getString("fault_detail"));
+        item.setMetaXML(rs.getString("metaxml"));
+        item.setDhlId(rs.getInt("dhl_id"));
+        item.setProducerName(rs.getString("producer_name"));
+        item.setServiceURL(rs.getString("service_url"));
+        item.setRecipientDivisionID(rs.getInt("recipient_division_id"));
+        item.setRecipientDivisionName(rs.getString("recipient_division_name"));
+        item.setRecipientPositionID(rs.getInt("recipient_position_id"));
+        item.setRecipientPositionName(rs.getString("recipient_position_name"));
+        item.setRecipientDivisionCode(rs.getString("recipient_division_code"));
+        item.setRecipientPositionCode(rs.getString("recipient_position_code"));
+        return item;
+    }
+
+    public int saveToDB(OrgSettings db, Connection dbConnection) {
     	logger.debug("m_messageID: " + m_messageID);
     	logger.debug("m_recipientOrgCode: " + m_recipientOrgCode);
     	logger.debug("m_recipientOrgName: " + m_recipientOrgName);
@@ -433,11 +438,11 @@ public class MessageRecipient {
                 logger.debug("m_id: " + m_id);
                 cs.close();
                 dbConnection.commit();
-                return true;
+                return m_id;
             } else {
                 ErrorLog errorLog = new ErrorLog("Database connection is NULL", "dvk.client.businesslayer.MessageRecipient" + " saveToDB");
                 LoggingService.logError(errorLog);
-                return false;
+                return m_id;
             }
         } catch (Exception ex) {
             if (dbConnection != null) {
@@ -452,7 +457,7 @@ public class MessageRecipient {
             errorLog.setOrganizationCode(this.getRecipientOrgCode());
             errorLog.setUserCode(this.getRecipientPersonCode());
             LoggingService.logError(errorLog);
-            return false;
+            return m_id;
         }
     }
 
@@ -597,5 +602,84 @@ public class MessageRecipient {
             return null;
         }
         return null;
+    }
+
+    /**
+     * Find all MessageRecipients which recipientCode is Adit and which are not opened yet.
+     * @param orgSettings {@link OrgSettings}
+     * @param dbConnection {@link Connection}
+     * @return list of MessageRecipients
+     */
+    public static List<MessageRecipient> findMessageRecipientsRelatedWithAdit(OrgSettings orgSettings, Connection dbConnection) {
+        List<MessageRecipient> results = new ArrayList<MessageRecipient>();
+
+        if (dbConnection != null) {
+
+            try {
+                dbConnection.setAutoCommit(false);
+                CallableStatement cs = DBConnection.getStatementForResultSet(
+                        "Get_NotOpenedInAdit", 0, orgSettings, dbConnection);
+                ResultSet rs = DBConnection.getResultSet(cs, orgSettings, 1);
+                while (rs.next()) {
+                    results.add(getMessageRecipientFromResultSet(rs));
+                }
+                rs.close();
+                cs.close();
+            } catch (Exception e) {
+                ErrorLog errorLog = new ErrorLog(e, "dvk.client.businesslayer.MessageRecipient" + " findMessageRecipientsRelatedWithAdit");
+                LoggingService.logError(errorLog);
+            }
+        }
+
+        return results;
+    }
+
+    /**
+     * Update opened field for MessageRecipient where dhlId and personCode matches.
+     * @param dhlId dhl_id
+     * @param personCode without country code
+     * @param openedDate opened date
+     * @param orgSettings orgsettings
+     * @param dbConnection databaseConnection
+     * @return true if the update was successful otherwise false
+     */
+    public static boolean updateOpenedDate(int dhlId, String personCode, Date openedDate,
+                                           OrgSettings orgSettings, Connection dbConnection) {
+        boolean result = false;
+
+        if (dbConnection != null) {
+            CallableStatement cs = null;
+
+            try {
+                Calendar cal = Calendar.getInstance();
+
+                int parNr = 1;
+                cs = dbConnection.prepareCall("{call Update_MessageRecipientOpened(?,?,?)}");
+                if (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
+                    cs = dbConnection.prepareCall("{? = call \"Update_MessageRecipientOpened\"(?,?,?)}");
+                    cs.registerOutParameter(parNr++, Types.BOOLEAN);
+                }
+
+                cs.setInt(parNr++, dhlId);
+                cs.setString(parNr++, personCode);
+                cs.setTimestamp(parNr++, CommonMethods.sqlDateFromDate(openedDate), cal);
+                cs.execute();
+                dbConnection.commit();
+                result = true;
+            } catch (Exception e) {
+                ErrorLog errorLog = new ErrorLog(e, "dvk.client.businesslayer.MessageRecipient.updateOpenedDate");
+                LoggingService.logError(errorLog);
+            } finally {
+                try {
+                    if (cs != null) {
+                        cs.close();
+                    }
+                } catch (SQLException e) {
+                    ErrorLog errorLog = new ErrorLog(e, "dvk.client.businesslayer.MessageRecipient.updateOpenedDate");
+                    LoggingService.logError(errorLog);
+                }
+            }
+        }
+        return result;
     }
 }

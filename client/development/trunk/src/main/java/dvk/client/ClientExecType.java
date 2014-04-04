@@ -5,5 +5,6 @@ public enum ClientExecType {
     Receive,
     SendReceive,
     UpdateStatus,
-    DeleteOldDocuments
+    DeleteOldDocuments,
+    ADITGetSendStatus
 }

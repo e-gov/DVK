@@ -9,14 +9,11 @@ import java.sql.Types;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.zip.*;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
+import javax.print.attribute.standard.DateTimeAtCompleted;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
@@ -156,6 +153,24 @@ public class CommonMethods {
         }
     }
 
+    /**
+     * Create an empty temporary file.
+     * @param filename possibility to change specify the file name. Default will be UUID.randomUUID
+     * @return created file
+     */
+    public static File createTempFile(String filename) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(System.getProperty("java.io.tmpdir", ""));
+        sb.append(File.separator);
+        if (filename == null) {
+            sb.append(UUID.randomUUID().toString());
+        } else {
+            sb.append(filename);
+        }
+
+        return new File(sb.toString());
+    }
+
     public static boolean gzipUnpackXML(String sourceFile, boolean appendDocumentHeader) {
         if (isNullOrEmpty(sourceFile)) {
         	logger.error("Extracting gzipped XML file failed because file name was not supplied!");
@@ -273,6 +288,21 @@ public class CommonMethods {
         (new File(zipOutFileName)).delete();
 
         return base64OutFileName;
+    }
+
+    /**
+     * Gz the file and encode to base64
+     * @param filePath path to the file
+     * @return path to the changed file
+     */
+    public static String gzipPackXML(String filePath) {
+        long time = Calendar.getInstance().getTimeInMillis();
+        try {
+            return gzipPackXML(filePath, String.valueOf(time), String.valueOf(time + 1));
+        } catch (IOException e) {
+            logger.error("Unable to gzip and encode to base64", e);
+            throw new RuntimeException(e);
+        }
     }
 
     public static byte[] xmlElementToBinary(Element xmlElement) {
@@ -634,6 +664,27 @@ public class CommonMethods {
             }
             return "";
         }
+    }
+
+    public static Boolean getNodeBoolean(Node node) {
+        Boolean result = null;
+
+        if (Node.TEXT_NODE == node.getNodeType()) {
+            result = Boolean.parseBoolean(node.getNodeValue());
+        } else {
+            NodeList nodes = node.getChildNodes();
+            int nodesCount = nodes.getLength();
+            if (nodesCount > 0) {
+                for (int i = 0; i < nodesCount; ++i) {
+                    Boolean tmp = getNodeBoolean(nodes.item(i));
+                    if (tmp != null) {
+                        return tmp;
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
     public static void removeNodeChildren(Node root) {

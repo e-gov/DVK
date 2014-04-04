@@ -7,28 +7,7 @@ import dvk.client.db.DBConnection;
 import dvk.client.db.UnitCredential;
 import dvk.client.dhl.service.DatabaseSessionService;
 import dvk.client.dhl.service.LoggingService;
-import dvk.client.iostructures.GetOccupationListBody;
-import dvk.client.iostructures.GetOccupationListV2Body;
-import dvk.client.iostructures.GetSendStatusBody;
-import dvk.client.iostructures.GetSendStatusResponseItem;
-import dvk.client.iostructures.GetSendStatusV2Body;
-import dvk.client.iostructures.GetSendingOptionsBody;
-import dvk.client.iostructures.GetSendingOptionsV2Body;
-import dvk.client.iostructures.GetSendingOptionsV3Body;
-import dvk.client.iostructures.GetSendingOptionsV3ResponseType;
-import dvk.client.iostructures.GetSubdivisionListBody;
-import dvk.client.iostructures.GetSubdivisionListV2Body;
-import dvk.client.iostructures.MarkDocumentsReceivedBody;
-import dvk.client.iostructures.MarkDocumentsReceivedV3Body;
-import dvk.client.iostructures.ReceiveDocumentsBody;
-import dvk.client.iostructures.ReceiveDocumentsResult;
-import dvk.client.iostructures.ReceiveDocumentsV2Body;
-import dvk.client.iostructures.ReceiveDocumentsV3Body;
-import dvk.client.iostructures.ReceiveDocumentsV4Body;
-import dvk.client.iostructures.SendDocumentsBody;
-import dvk.client.iostructures.SendDocumentsV2Body;
-import dvk.client.iostructures.SoapMessageBuilder;
-import dvk.client.iostructures.XHeader;
+import dvk.client.iostructures.*;
 import dvk.core.AttachmentExtractionResult;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
@@ -112,13 +91,12 @@ public class ClientAPI {
 	}
 	
     public void initClient(String serverURL, String producer) throws Exception {
-    	logger.debug("Initializing SOAP client for URL \"" + serverURL + "\" and x-road producer \""+ producer +"\"");
+    	logger.debug("Initializing SOAP client for URL \"" + serverURL + "\" and x-road producer \"" + producer + "\"");
     	
         // Kui klient on seadistatud töötama HTTPS ühendusega,
         // siis teeme konfiguratsioonis vajalikud muudatused
     	URL url = new URL(serverURL);
-        if (url.getProtocol().equalsIgnoreCase("https"))
-        {
+        if (url.getProtocol().equalsIgnoreCase("https")) {
         	System.setProperty("java.protocol.handler.pkgs", "com.sun.net.ssl.internal.www.protocol");
         	Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
         	
@@ -133,13 +111,13 @@ public class ClientAPI {
     	this.tempFiles = new ArrayList<String>();
         this.service = new Service();
         this.producerName = producer;
-        this.call = (Call)service.createCall();
+        this.call = (Call) service.createCall();
         this.call.setTargetEndpointAddress(new URL(serverURL));
         
         // Otsustame, kas saadame SOAPAction päise
         if ((producerName != null) && !producerName.equalsIgnoreCase("")) {
             this.call.setUseSOAPAction(true);
-            this.call.setSOAPActionURI("http://producers."+ this.producerName +".xtee.riik.ee/producer/"+ this.producerName);
+            this.call.setSOAPActionURI("http://producers." + this.producerName + ".xtee.riik.ee/producer/" + this.producerName);
         } else {
             this.call.setUseSOAPAction(true);
         }
@@ -184,7 +162,7 @@ public class ClientAPI {
                 queryId =  "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
                 
                 // Määrame X-Tee päise väärtused
-                XHeader header = new XHeader(
+                DvkXHeader header = new DvkXHeader(
                     headerVar.getOrganizationCode(),
                     this.producerName,
                     headerVar.getPersonalIDCode(),
@@ -354,7 +332,7 @@ public class ClientAPI {
         queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
         
         // Saadetava sänumi päisesse kantavad parameetrid
-        XHeader header = new XHeader(
+        DvkXHeader header = new DvkXHeader(
             headerVar.getOrganizationCode(),
             this.producerName,
             headerVar.getPersonalIDCode(),
@@ -487,7 +465,7 @@ public class ClientAPI {
     	// Salvestame dokumendi ning tagastame dokumendi ID teises andmebaasis
     	return result;
     }
-    
+
     private int runSendDocumentsRequest(String messageData, String attachmentFile, String attachmentName,
                                         HeaderVariables headerVar, String requestName) throws Exception {
         if ((attachmentFile == null) || (attachmentFile.length() < 1)) {
@@ -618,7 +596,7 @@ public class ClientAPI {
         queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
         
         // Saadetava sänumi päisesse kantavad parameetrid
-        XHeader header = new XHeader(
+        DvkXHeader header = new DvkXHeader(
             headerVar.getOrganizationCode(),
             this.producerName,
             headerVar.getPersonalIDCode(),
@@ -1092,7 +1070,7 @@ public class ClientAPI {
 
         try {
         // Saadetava sänumi päisesse kantavad parameetrid
-            XHeader header = new XHeader(
+            DvkXHeader header = new DvkXHeader(
                 headerVar.getOrganizationCode(),
                 this.producerName,
                 headerVar.getPersonalIDCode(),
@@ -1243,7 +1221,7 @@ public class ClientAPI {
             requestName = this.producerName + ".markDocumentsReceived.v" + String.valueOf(requestVersion);
 
             // Saadetava sänumi päisesse kantavad parameetrid
-            XHeader header = new XHeader(
+            DvkXHeader header = new DvkXHeader(
                 headerVar.getOrganizationCode(),
                 this.producerName,
                 headerVar.getPersonalIDCode(),
@@ -1438,7 +1416,7 @@ public class ClientAPI {
         ArrayList<ShortName> occupations = new ArrayList<ShortName>();
 
         // Gather credentials from all known databases so we can find their
-        // waiting documents with one single query
+        // waiting aditDocuments with one single query
         for (OrgSettings db : dbs) {
         	Connection dbConnection = null;
         	try {
@@ -1501,7 +1479,7 @@ public class ClientAPI {
             this.queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
 
             // Saadetava sänumi päisesse kantavad parameetrid
-            XHeader header = new XHeader(
+            DvkXHeader header = new DvkXHeader(
                 headerVar.getOrganizationCode(),
                 this.producerName,
                 headerVar.getPersonalIDCode(),
@@ -1623,7 +1601,7 @@ public class ClientAPI {
             queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
 
             // Saadetava sänumi päisesse kantavad parameetrid
-            XHeader header = new XHeader(
+            DvkXHeader header = new DvkXHeader(
                     headerVar.getOrganizationCode(),
                     this.producerName,
                     headerVar.getPersonalIDCode(),
@@ -1747,7 +1725,7 @@ public class ClientAPI {
             queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
 
             // Saadetava sänumi päisesse kantavad parameetrid
-            XHeader header = new XHeader(
+            DvkXHeader header = new DvkXHeader(
                 headerVar.getOrganizationCode(),
                 this.producerName,
                 headerVar.getPersonalIDCode(),
@@ -1848,5 +1826,23 @@ public class ClientAPI {
             throw ex;
         }
         return result;
+    }
+
+    public Call getCall() {
+        return call;
+    }
+
+    public Connection getSafeDbConnection(OrgSettings db) {
+        Connection dbConnection = null;
+        try {
+            dbConnection = DBConnection.getConnection(db);
+            DatabaseSessionService.getInstance().setSession(dbConnection, db);
+        } catch (Exception e) {
+            System.out.println("DVK kliendil ebaõnnestus andmebaasiga ühenduse tekitamine! " + e.getMessage());
+            ErrorLog errorLog = new ErrorLog(e, "dvk.client.Client" + " main");
+            LoggingService.logError(errorLog);
+        }
+
+        return dbConnection;
     }
 }

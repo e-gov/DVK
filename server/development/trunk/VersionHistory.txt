@@ -1,3 +1,7 @@
+1.7.1
+- 2.1 container support added
+
+
 1.6.2
 -------------------------------------------------------------------------------
 - ReceiveDocuments päring tagastab nüüd veateate, kui dokumente soovitakse

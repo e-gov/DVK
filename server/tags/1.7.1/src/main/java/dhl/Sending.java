@@ -418,8 +418,8 @@ public class Sending {
                     || user.getPositions().contains(m_sender.getPositionID())
                     || ((m_sender.getOrganizationID() == user.getOrganizationID()) && user.getRoles().contains(CommonStructures.ROLL_ASUTUSE_ADMIN));
 
-            // User can also access documents status data if
-            // - user forwarded the document
+                // User can also access documents status data if
+        // - user forwarded the document
             // - document was forwarded by someone else filling the same role in organization
             // - user is marked as organization admin in DVK (for the org. that forwarded the document)
             if (!result) {

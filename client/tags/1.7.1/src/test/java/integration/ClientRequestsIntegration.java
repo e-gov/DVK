@@ -121,7 +121,7 @@ public class ClientRequestsIntegration {
         String sql = "";
         int messageId = 0;
         String sqlFile = ClientRequestsIntegration.class.getResource("../insert_message").getPath();
-        String sqlFileMSSQL = ClientRequestsIntegration.class.getResource("../insert_messageForMSSQL").getPath();
+
 
         // Before, connect to database to insert a new message
         try {
@@ -139,6 +139,7 @@ public class ClientRequestsIntegration {
             if ((orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_MSSQL))
                 || (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_MSSQL_2005))
                 || (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_SQLANYWHERE))){
+                String sqlFileMSSQL = ClientRequestsIntegration.class.getResource("../insert_messageForMSSQL").getPath();
                 sql = FileUtil.readSQLToString(sqlFileMSSQL);
             } else if (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
                 sql = FileUtil.readSQLToString(sqlFile);

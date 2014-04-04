@@ -16,6 +16,8 @@ public class Settings {
     private static final int Server_DefaultExpiredDocumentGracePeriod = 1;
     private static final String Client_DefaultProducerName = "dhl";
     private static final String Server_DefaultProducerName = "dhl";
+    private static final String CLIENT_DEFAULT_ADIT_PROCUCER_NAME = "adit";
+    private static final String CLIENT_DEFAULT_ADIT_INFORMATION_SYSTEM_NAME = "DHS";
     private static final int Server_DefaultCentralRightsDatabaseSyncPeriod = 120;
 
     public static Properties currentProperties;
@@ -42,6 +44,8 @@ public class Settings {
     public static String Client_TrustStoreFile = "";
     public static String Client_TrustStorePassword = "";
     public static String Client_TrustStoreType = "";
+    public static String Client_AditProducerName = CLIENT_DEFAULT_ADIT_PROCUCER_NAME;
+    public static String CLIENT_ADIT_INFORMATION_SYSTEM_NAME = CLIENT_DEFAULT_ADIT_INFORMATION_SYSTEM_NAME;
 
     // Server settings
     public static String Server_DatabaseEnvironmentVariable = "jdbc/dhloracle";
@@ -156,10 +160,10 @@ public class Settings {
                 Client_StatusReceived = Integer.parseInt(currentProperties.getProperty("client_status_received_id"));
             }
 
-            if ((currentProperties.getProperty("client_integrated_amphora_functions") != null) &&
-                (currentProperties.getProperty("client_integrated_amphora_functions").equalsIgnoreCase("yes") ||
-                currentProperties.getProperty("client_integrated_amphora_functions").equalsIgnoreCase("true") ||
-                currentProperties.getProperty("client_integrated_amphora_functions").equalsIgnoreCase("1"))) {
+            if ((currentProperties.getProperty("client_integrated_amphora_functions") != null)
+                    && (currentProperties.getProperty("client_integrated_amphora_functions").equalsIgnoreCase("yes")
+                        || currentProperties.getProperty("client_integrated_amphora_functions").equalsIgnoreCase("true")
+                        || currentProperties.getProperty("client_integrated_amphora_functions").equalsIgnoreCase("1"))) {
                 Client_IntegratedAmphoraFunctions = true;
             }
 
@@ -167,8 +171,13 @@ public class Settings {
                 Client_ProducerName = currentProperties.getProperty("client_producer_name");
             }
 
+            if (currentProperties.getProperty("adit_producer_name") != null) {
+                Client_AditProducerName = currentProperties.getProperty("adit_producer_name");
+            }
+
             try {
-                Client_SentMessageStatusFollowupDays = Integer.parseInt(currentProperties.getProperty("client_sent_message_status_followup_days"));
+                Client_SentMessageStatusFollowupDays = Integer.parseInt(
+                        currentProperties.getProperty("client_sent_message_status_followup_days"));
             } catch (Exception ex1) {
                 Client_SentMessageStatusFollowupDays = 30;
             }
@@ -185,10 +194,10 @@ public class Settings {
             }
 
             // Kliendipoolsed fragmenteerimise seaded
-            if ((currentProperties.getProperty("client_use_fragmenting") != null) &&
-                (currentProperties.getProperty("client_use_fragmenting").equalsIgnoreCase("yes") ||
-                currentProperties.getProperty("client_use_fragmenting").equalsIgnoreCase("true") ||
-                currentProperties.getProperty("client_use_fragmenting").equalsIgnoreCase("1"))) {
+            if ((currentProperties.getProperty("client_use_fragmenting") != null)
+                    && (currentProperties.getProperty("client_use_fragmenting").equalsIgnoreCase("yes")
+                        || currentProperties.getProperty("client_use_fragmenting").equalsIgnoreCase("true")
+                        || currentProperties.getProperty("client_use_fragmenting").equalsIgnoreCase("1"))) {
                 Client_UseFragmenting = true;
             }
             if (currentProperties.getProperty("client_fragment_size_bytes") != null) {
@@ -209,7 +218,8 @@ public class Settings {
 
             // Kliendi poolt vaikimisi eeldatav spetsifikatsiooni versioon
             if (currentProperties.getProperty("client_specification_version") != null) {
-                Client_SpecificationVersion = currentProperties.getProperty("client_specification_version").replaceAll(",",".");
+                Client_SpecificationVersion = currentProperties.getProperty(
+                        "client_specification_version").replaceAll(",", ".");
             }
 
 			// SSL keystore andmed
@@ -232,7 +242,9 @@ public class Settings {
                 Client_TrustStoreType = currentProperties.getProperty("client_truststore_type");
             }
 
-
+            if (currentProperties.getProperty("client_adit_information_system_name") != null) {
+                CLIENT_ADIT_INFORMATION_SYSTEM_NAME = currentProperties.getProperty("client_adit_information_system_name");
+            }
 
             // Serveri seaded
             if (currentProperties.getProperty("server_producer_name") != null) {
@@ -245,8 +257,10 @@ public class Settings {
             // Dokumendi vaikimisi säilitustähtaeg serveris
             try {
                 if (currentProperties.getProperty("server_document_default_lifetime") != null) {
-                    Server_DocumentDefaultLifetime = Integer.parseInt(currentProperties.getProperty("server_document_default_lifetime"));
-                    Server_DocumentDefaultLifetime = (Server_DocumentDefaultLifetime > 0) ? Server_DocumentDefaultLifetime : Server_DefaultDocumentDefaultLifetime;
+                    Server_DocumentDefaultLifetime = Integer.parseInt(
+                            currentProperties.getProperty("server_document_default_lifetime"));
+                    Server_DocumentDefaultLifetime = (Server_DocumentDefaultLifetime > 0)
+                            ? Server_DocumentDefaultLifetime : Server_DefaultDocumentDefaultLifetime;
                 }
             } catch (Exception ex1) {
                 Server_DocumentDefaultLifetime = Server_DefaultDocumentDefaultLifetime;
@@ -254,67 +268,72 @@ public class Settings {
 
             try {
                 if (currentProperties.getProperty("server_expired_document_grace_period") != null) {
-                    Server_ExpiredDocumentGracePeriod = Integer.parseInt(currentProperties.getProperty("server_expired_document_grace_period"));
-                    Server_ExpiredDocumentGracePeriod = (Server_ExpiredDocumentGracePeriod > 0) ? Server_ExpiredDocumentGracePeriod : Server_DefaultExpiredDocumentGracePeriod;
+                    Server_ExpiredDocumentGracePeriod = Integer.parseInt(
+                            currentProperties.getProperty("server_expired_document_grace_period"));
+                    Server_ExpiredDocumentGracePeriod = (Server_ExpiredDocumentGracePeriod > 0)
+                            ? Server_ExpiredDocumentGracePeriod : Server_DefaultExpiredDocumentGracePeriod;
                 }
             } catch (Exception ex1) {
                 Server_ExpiredDocumentGracePeriod = Server_DefaultExpiredDocumentGracePeriod;
             }
 
-            if ((currentProperties.getProperty("server_validate_container") != null) &&
-                (currentProperties.getProperty("server_validate_container").equalsIgnoreCase("yes") ||
-                currentProperties.getProperty("server_validate_container").equalsIgnoreCase("true") ||
-                currentProperties.getProperty("server_validate_container").equalsIgnoreCase("1"))) {
+            if ((currentProperties.getProperty("server_validate_container") != null)
+                    && (currentProperties.getProperty("server_validate_container").equalsIgnoreCase("yes")
+                        || currentProperties.getProperty("server_validate_container").equalsIgnoreCase("true")
+                        || currentProperties.getProperty("server_validate_container").equalsIgnoreCase("1"))) {
                 Server_ValidateContainer = true;
             }
             if (currentProperties.getProperty("server_validation_schema_file") != null) {
                 Server_ValidationSchemaFile = currentProperties.getProperty("server_validation_schema_file");
             }
-            if ((currentProperties.getProperty("server_ignore_invalid_containers") != null) &&
-                (currentProperties.getProperty("server_ignore_invalid_containers").equalsIgnoreCase("yes") ||
-                currentProperties.getProperty("server_ignore_invalid_containers").equalsIgnoreCase("true") ||
-                currentProperties.getProperty("server_ignore_invalid_containers").equalsIgnoreCase("1"))) {
+            if ((currentProperties.getProperty("server_ignore_invalid_containers") != null)
+                    && (currentProperties.getProperty("server_ignore_invalid_containers").equalsIgnoreCase("yes")
+                        || currentProperties.getProperty("server_ignore_invalid_containers").equalsIgnoreCase("true")
+                        || currentProperties.getProperty("server_ignore_invalid_containers").equalsIgnoreCase("1"))) {
                 Server_IgnoreInvalidContainers = true;
             }
 
             // Kas saadetavaid XML faile valideeritakse?
-            if ((currentProperties.getProperty("server_validate_xml_files") != null) &&
-                (currentProperties.getProperty("server_validate_xml_files").equalsIgnoreCase("yes") ||
-                currentProperties.getProperty("server_validate_xml_files").equalsIgnoreCase("true") ||
+            if ((currentProperties.getProperty("server_validate_xml_files") != null)
+                    &&
+                (currentProperties.getProperty("server_validate_xml_files").equalsIgnoreCase("yes")
+                        ||
+                currentProperties.getProperty("server_validate_xml_files").equalsIgnoreCase("true")
+                        ||
                 currentProperties.getProperty("server_validate_xml_files").equalsIgnoreCase("1"))) {
                 Server_ValidateXmlFiles = true;
             }
 
             // Kas digiallkirjastatud dokuimentide allkirjade kehtivust kontrollitakse?
-            if ((currentProperties.getProperty("server_validate_signatures") != null) &&
-                (currentProperties.getProperty("server_validate_signatures").equalsIgnoreCase("yes") ||
-                currentProperties.getProperty("server_validate_signatures").equalsIgnoreCase("true") ||
-                currentProperties.getProperty("server_validate_signatures").equalsIgnoreCase("1"))) {
+            if ((currentProperties.getProperty("server_validate_signatures") != null)
+                    && (currentProperties.getProperty("server_validate_signatures").equalsIgnoreCase("yes")
+                        || currentProperties.getProperty("server_validate_signatures").equalsIgnoreCase("true")
+                        || currentProperties.getProperty("server_validate_signatures").equalsIgnoreCase("1"))) {
                 Server_ValidateSignatures = true;
             }
 
             // Kas dokumendi saatjaks märgitud asutus peab olema sama, mis x-tee päistes sõnumi saatjaks märgitud asutus?
-            if ((currentProperties.getProperty("server_document_sender_must_match_xroad_header") != null) &&
-                (currentProperties.getProperty("server_document_sender_must_match_xroad_header").equalsIgnoreCase("no") ||
-                currentProperties.getProperty("server_document_sender_must_match_xroad_header").equalsIgnoreCase("false") ||
-                currentProperties.getProperty("server_document_sender_must_match_xroad_header").equalsIgnoreCase("0"))) {
+            if ((currentProperties.getProperty("server_document_sender_must_match_xroad_header") != null)
+                    && (currentProperties.getProperty("server_document_sender_must_match_xroad_header").equalsIgnoreCase("no")
+                        || currentProperties.getProperty("server_document_sender_must_match_xroad_header").equalsIgnoreCase("false")
+                        || currentProperties.getProperty("server_document_sender_must_match_xroad_header").equalsIgnoreCase("0"))) {
                 Server_DocumentSenderMustMatchXroadHeader = false;
             }
 
             // Should the server automatically register senders that are not found in organization database?
-            if ((currentProperties.getProperty("server_auto_register_unknown_senders") != null) &&
-                (currentProperties.getProperty("server_auto_register_unknown_senders").equalsIgnoreCase("yes") ||
-                currentProperties.getProperty("server_auto_register_unknown_senders").equalsIgnoreCase("true") ||
-                currentProperties.getProperty("server_auto_register_unknown_senders").equalsIgnoreCase("1"))) {
+            if ((currentProperties.getProperty("server_auto_register_unknown_senders") != null)
+                    && (currentProperties.getProperty("server_auto_register_unknown_senders").equalsIgnoreCase("yes")
+                    || currentProperties.getProperty("server_auto_register_unknown_senders").equalsIgnoreCase("true")
+                    || currentProperties.getProperty("server_auto_register_unknown_senders").equalsIgnoreCase("1"))) {
                 Server_AutoRegisterUnknownSenders = true;
             }
 
 
             // Õiguste haldamise kesksüsteemi kasutamine
-            if ((currentProperties.getProperty("server_use_central_rights_database") != null) &&
-                (currentProperties.getProperty("server_use_central_rights_database").equalsIgnoreCase("yes") ||
-                currentProperties.getProperty("server_use_central_rights_database").equalsIgnoreCase("true") ||
-                currentProperties.getProperty("server_use_central_rights_database").equalsIgnoreCase("1"))) {
+            if ((currentProperties.getProperty("server_use_central_rights_database") != null)
+                    && (currentProperties.getProperty("server_use_central_rights_database").equalsIgnoreCase("yes")
+                    || currentProperties.getProperty("server_use_central_rights_database").equalsIgnoreCase("true")
+                    || currentProperties.getProperty("server_use_central_rights_database").equalsIgnoreCase("1"))) {
                 Server_UseCentralRightsDatabase = true;
             }
             if (currentProperties.getProperty("server_rights_database_url") != null) {
@@ -328,28 +347,31 @@ public class Settings {
             }
             try {
                 if (currentProperties.getProperty("server_rights_database_sync_period") != null) {
-                    Server_CentralRightsDatabaseSyncPeriod = Integer.parseInt(currentProperties.getProperty("server_rights_database_sync_period"));
-                    Server_CentralRightsDatabaseSyncPeriod = (Server_CentralRightsDatabaseSyncPeriod > 0) ? Server_CentralRightsDatabaseSyncPeriod : Server_DefaultCentralRightsDatabaseSyncPeriod;
+                    Server_CentralRightsDatabaseSyncPeriod = Integer.parseInt(
+                            currentProperties.getProperty("server_rights_database_sync_period"));
+                    Server_CentralRightsDatabaseSyncPeriod =
+                            (Server_CentralRightsDatabaseSyncPeriod > 0)
+                                    ? Server_CentralRightsDatabaseSyncPeriod : Server_DefaultCentralRightsDatabaseSyncPeriod;
                 }
             } catch (Exception ex1) {
                 Server_CentralRightsDatabaseSyncPeriod = Server_DefaultCentralRightsDatabaseSyncPeriod;
             }
 
             // Serveri jooksutamine kliendi andmebaai peal
-            if ((currentProperties.getProperty("server_run_on_client_database") != null) &&
-                (currentProperties.getProperty("server_run_on_client_database").equalsIgnoreCase("yes") ||
-                currentProperties.getProperty("server_run_on_client_database").equalsIgnoreCase("true") ||
-                currentProperties.getProperty("server_run_on_client_database").equalsIgnoreCase("1"))) {
+            if ((currentProperties.getProperty("server_run_on_client_database") != null)
+                    && (currentProperties.getProperty("server_run_on_client_database").equalsIgnoreCase("yes")
+                    || currentProperties.getProperty("server_run_on_client_database").equalsIgnoreCase("true")
+                    || currentProperties.getProperty("server_run_on_client_database").equalsIgnoreCase("1"))) {
                 Server_RunOnClientDatabase = true;
             }
 
 
             // Üldkasutatavad seaded
-            if ((currentProperties.getProperty("log_errors") != null) &&
-                (currentProperties.getProperty("log_errors").equalsIgnoreCase("yes") ||
-                currentProperties.getProperty("log_errors").equalsIgnoreCase("true") ||
-                currentProperties.getProperty("log_errors").equalsIgnoreCase("1"))) {
-                LogErrors = true;
+            if ((currentProperties.getProperty("log_errors") != null)
+                    && (currentProperties.getProperty("log_errors").equalsIgnoreCase("yes")
+                    || currentProperties.getProperty("log_errors").equalsIgnoreCase("true")
+                    || currentProperties.getProperty("log_errors").equalsIgnoreCase("1"))) {
+                        LogErrors = true;
             }
             if (currentProperties.getProperty("error_log_file") != null) {
                 ErrorLogFile = currentProperties.getProperty("error_log_file");

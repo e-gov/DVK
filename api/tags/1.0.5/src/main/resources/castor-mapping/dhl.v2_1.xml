@@ -39,6 +39,10 @@
             <bind-xml name="File" node="element" />
         </field>
 
+        <field name="RecordTypeSpecificMetadata" type="string">
+            <bind-xml name="RecordTypeSpecificMetadata" node="element"/>
+        </field>
+
         <field name="DecMetadata" type="dvk.api.container.v2_1.DecMetadata">
             <bind-xml name="DecMetadata" />
         </field>
@@ -47,12 +51,12 @@
     <class name="dvk.api.container.v2_1.Transport">
         <map-to xml="Transport" ns-uri="http://www.riik.ee/schemas/deccontainer/vers_2_1/"/>
 
-        <field name="DecRecipient" type="dvk.api.container.v2_1.DecRecipient" collection="arraylist">
-            <bind-xml name="DecRecipient" node="element" />
-        </field>
-
         <field name="DecSender" type="dvk.api.container.v2_1.DecSender">
             <bind-xml name="DecSender" />
+        </field>
+
+        <field name="DecRecipient" type="dvk.api.container.v2_1.DecRecipient" collection="arraylist">
+            <bind-xml name="DecRecipient" node="element" />
         </field>
     </class>
 
@@ -424,12 +428,12 @@
             <bind-xml name="FileName" node="element" />
         </field>
 
-        <field name="FileSize" type="integer" >
-            <bind-xml name="FileSize" node="element" />
-        </field>
-
         <field name="MimeType" type="string" >
             <bind-xml name="MimeType" node="element" />
+        </field>
+
+        <field name="FileSize" type="integer" >
+            <bind-xml name="FileSize" node="element" />
         </field>
 
         <field name="ZipBase64Content" type="string" >

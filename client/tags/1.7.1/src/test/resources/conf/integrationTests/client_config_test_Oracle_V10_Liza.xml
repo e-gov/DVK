@@ -25,6 +25,7 @@
             <get_occupation_list_ver>2</get_occupation_list_ver> <!-- Võimalikud väärtused: 1, 2 -->
 
             <default_status_id>0</default_status_id> <!-- Võimalikud väärtused: 0-11 -->
+            <adit_get_send_status>1</adit_get_send_status>
         </dvk_settings>
 
         <!-- Määrab, mitme päeva vanune peab dokument vähemalt olema, et see dokumentide regulaarse

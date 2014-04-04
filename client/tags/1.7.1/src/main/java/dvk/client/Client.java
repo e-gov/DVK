@@ -434,6 +434,23 @@ public class Client {
                     }
                 }
             }
+
+            if (ClientExecType.ADITGetSendStatus.equals(ExecType)) {
+                ClientAPI aditDvkApi = new ClientAPI();
+                try {
+                    aditDvkApi.initClient(Settings.Client_ServiceUrl, Settings.Client_AditProducerName);
+                    aditDvkApi.setAllKnownDatabases(allKnownDatabases);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " main");
+                    LoggingService.logError(errorLog);
+                    return;
+                }
+
+                AditGetSendStatusService aditGetSendStatusService = new AditGetSendStatusService(
+                        Settings.Client_AditProducerName, aditDvkApi);
+                aditGetSendStatusService.updateAditSendStatusFor(currentClientDatabases);
+            }
         } catch (Exception ex) {
             System.out.println("DVK kliendi töös tekkis viga! " + ex.getMessage());
             ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " main");
@@ -487,6 +504,9 @@ public class Client {
                     case 5:
                         ExecType = ClientExecType.DeleteOldDocuments;
                         break;
+                    case 6:
+                        ExecType = ClientExecType.ADITGetSendStatus;
+                        break;
                     default:
                         ExecType = ClientExecType.SendReceive;
                         break;
@@ -508,6 +528,7 @@ public class Client {
         System.out.println("    3 - nii saatmine kui ka vastuvõtmine (1 ja 2)");
         System.out.println("    4 - ainult staatuste uuendamine");
         System.out.println("    5 - vanade dokumentide kustutamine");
+        System.out.println("    6 - uuenda ADIT'isse saadetud dokumentide avamise kuupäevi");
         System.out.println("");
         System.out.println("    Näiteks: java dvk.client.Client -mode=3");
         System.out.println("");

@@ -28,6 +28,7 @@ public class ContainerVer2_1 extends Container {
     private Access access;
     private List<SignatureMetadata> signatureMetadata;
     private List<File> file;
+    private String recordTypeSpecificMetadata;
 
     @Override
     public String getContent() throws MarshalException, ValidationException, IOException, MappingException {
@@ -190,6 +191,14 @@ public class ContainerVer2_1 extends Container {
 
     public List<File> getFile() {
         return file;
+    }
+
+    public String getRecordTypeSpecificMetadata() {
+        return recordTypeSpecificMetadata;
+    }
+
+    public void setRecordTypeSpecificMetadata(String recordTypeSpecificMetadata) {
+        this.recordTypeSpecificMetadata = recordTypeSpecificMetadata;
     }
 
     public void setFile(List<File> file) {

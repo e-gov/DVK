@@ -64,6 +64,7 @@ public class CommonStructures {
     public static final String NS_DHL_URI = "http://www.riik.ee/schemas/dhl";
     public static final String NS_DVK_MAIN = "http://producers.dhl.xtee.riik.ee/producer/dhl";
     public static final String NS_AAR_MAIN = "http://producers.aar.xtee.riik.ee/producer/aar";
+    public static final String NS_ADIT_MAIN = "http://producers.ametlikud-dokumendid.xtee.riik.ee/producer/ametlikud-dokumendid";
 
     // Saatmisviisid
     public static final String SENDING_DHL = "dhl";

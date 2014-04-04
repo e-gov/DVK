@@ -2,12 +2,7 @@ package dvk.client;
 
 import dvk.client.businesslayer.ErrorLog;
 import dvk.client.dhl.service.LoggingService;
-import dvk.client.iostructures.GetSendStatusBody;
-import dvk.client.iostructures.MarkDocumentsReceivedBody;
-import dvk.client.iostructures.ReceiveDocumentsBody;
-import dvk.client.iostructures.SendDocumentsBody;
-import dvk.client.iostructures.SoapMessageBuilder;
-import dvk.client.iostructures.XHeader;
+import dvk.client.iostructures.*;
 import dvk.core.CommonMethods;
 import dvk.core.Settings;
 
@@ -110,7 +105,7 @@ public class TestClient {
                     tmpFile = CommonMethods.gzipPackXML(inputFile, Settings.currentProperties.getProperty("test_org_code"), "test");
                 }
 
-                XHeader header = new XHeader();
+                DvkXHeader header = new DvkXHeader();
                 header.setAmetnik(Settings.currentProperties.getProperty("test_person_id_code"));
                 if (CommonMethods.personalIDCodeHasCountryCode(Settings.currentProperties.getProperty("test_person_id_code"))) {
                     header.setIsikukood(Settings.currentProperties.getProperty("test_person_id_code"));

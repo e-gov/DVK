@@ -78,7 +78,7 @@ public class LoggingService {
 
             cs.setTimestamp(parNr++, CommonMethods.sqlDateFromDate(errorLog.getErrorDateTime()), cal);
             cs.setString(parNr++, errorLog.getOrganizationCode());
-            cs.setString(parNr++, errorLog.getUserCode());
+            cs.setString(parNr++, errorLog.getUserCode().replaceAll("(\r\n|\n)", "<br/>"));
             cs.setString(parNr++, errorLog.getActionName());
             cs.setString(parNr++, errorLog.getErrorMessage());
             if (errorLog.getMessageId() > 0) {

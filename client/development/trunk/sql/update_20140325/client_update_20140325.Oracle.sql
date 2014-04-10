@@ -9,7 +9,7 @@ AS
     FROM    dhl_message_recipient
     WHERE   LOWER(recipient_org_code)='adit' AND opened IS NULL;
   END; 
-  
+/  
 create or replace
 PROCEDURE Update_MessageRecipientOpened(
   p_dhl_id in number,
@@ -21,5 +21,6 @@ AS
     set     opened = p_opened
     where   dhl_id = p_dhl_id and recipient_person_code = p_recipient_person_code;
 END; 
+/
 
 

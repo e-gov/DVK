@@ -24,7 +24,7 @@ import java.util.Hashtable;
 import org.apache.log4j.Logger;
 
 public class Client {
-    static Logger logger = Logger.getLogger(Client.class.getName());
+    static Logger logger = Logger.getLogger(Client.class);
     private static ArrayList<String> tempFiles = new ArrayList<String>();
     private static ClientAPI dvkClient;
     private static ArrayList<OrgSettings> allKnownDatabases;

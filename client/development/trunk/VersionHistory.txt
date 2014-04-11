@@ -18,6 +18,7 @@
     - Delete_DhlOccupation
 
 - Puudu olev insert_new_row protseduur???
+- DVK-21, DVK-29
 
 
 

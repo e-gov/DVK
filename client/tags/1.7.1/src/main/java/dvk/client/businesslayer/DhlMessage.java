@@ -9,14 +9,16 @@ import dvk.client.dhl.service.LoggingService;
 import dvk.client.iostructures.Fault;
 import dvk.client.iostructures.GetSendStatusResponseItem;
 import dvk.client.iostructures.SimpleAddressData;
-import dvk.core.CommonMethods;
-import dvk.core.CommonStructures;
-import dvk.core.FileSplitResult;
-import dvk.core.Settings;
+import dvk.core.*;
 import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import java.io.*;
@@ -1667,7 +1669,7 @@ public class DhlMessage implements Cloneable {
         return newFile;
     }
 
-    public static ArrayList<DhlMessage> getFromXML(String dataFilePath, UnitCredential[] units) throws Exception {
+    public static ArrayList<DhlMessage> getFromXML_V1(String dataFilePath, UnitCredential[] units) throws Exception {
         String TAG_DOKUMENT = "dokument";
         String TAG_DEC_CONTAINER = "DecContainer";
         String TAG_TRANSPORT = "transport";
@@ -1721,8 +1723,8 @@ public class DhlMessage implements Cloneable {
                     } else if (reader.getLocalName().equalsIgnoreCase(TAG_DEC_CONTAINER) && reader.isStartElement()) {
                         hierarchy.push(TAG_DEC_CONTAINER);
                     } else if ((reader.getLocalName().equalsIgnoreCase(TAG_DOKUMENT)
-                                        || reader.getLocalName().equalsIgnoreCase(TAG_DEC_CONTAINER))
-                                && reader.isEndElement()) {
+                            || reader.getLocalName().equalsIgnoreCase(TAG_DEC_CONTAINER))
+                            && reader.isEndElement()) {
                         if (TAG_DOKUMENT.equalsIgnoreCase(hierarchy.peek())
                                 || TAG_DEC_CONTAINER.equalsIgnoreCase(hierarchy.peek())) {
                             hierarchy.pop();
@@ -1760,18 +1762,18 @@ public class DhlMessage implements Cloneable {
                         hierarchy.pop();
                     } else if (reader.getLocalName().equalsIgnoreCase(TAG_TRANSPORT)
                             && reader.isStartElement() && (TAG_DOKUMENT.equalsIgnoreCase(hierarchy.peek())
-                                    || TAG_DEC_CONTAINER.equalsIgnoreCase(hierarchy.peek()))) {
+                            || TAG_DEC_CONTAINER.equalsIgnoreCase(hierarchy.peek()))) {
                         hierarchy.push(TAG_TRANSPORT);
                     } else if (reader.getLocalName().equalsIgnoreCase(TAG_TRANSPORT)
                             && reader.isEndElement() && (TAG_TRANSPORT.equalsIgnoreCase(hierarchy.peek())
-                                    || TAG_DEC_CONTAINER.equalsIgnoreCase(hierarchy.peek()))) {
+                            || TAG_DEC_CONTAINER.equalsIgnoreCase(hierarchy.peek()))) {
                         hierarchy.pop();
                     } else if ((reader.getLocalName().equalsIgnoreCase(TAG_SAATJA)
-                                || reader.getLocalName().equalsIgnoreCase(TAG_DEC_SENDER))
+                            || reader.getLocalName().equalsIgnoreCase(TAG_DEC_SENDER))
                             && reader.isStartElement() && (TAG_TRANSPORT.equalsIgnoreCase(hierarchy.peek()))) {
                         hierarchy.push(TAG_SAATJA);
                     } else if ((reader.getLocalName().equalsIgnoreCase(TAG_SAATJA)
-                                || reader.getLocalName().equalsIgnoreCase(TAG_DEC_SENDER))
+                            || reader.getLocalName().equalsIgnoreCase(TAG_DEC_SENDER))
                             && reader.isEndElement() && (TAG_SAATJA.equalsIgnoreCase(hierarchy.peek()))) {
                         hierarchy.pop();
                     } else if (reader.getLocalName().equalsIgnoreCase(TAG_VAHENDAJA)
@@ -1787,7 +1789,7 @@ public class DhlMessage implements Cloneable {
                             && reader.isEndElement() && (TAG_RK_LETTERMETADATA_V1.equalsIgnoreCase(hierarchy.peek()))) {
                         hierarchy.pop();
                     } else if ((reader.getLocalName().equalsIgnoreCase(TAG_SAAJA)
-                                || reader.getLocalName().equalsIgnoreCase(TAG_DEC_RECIPIENT))
+                            || reader.getLocalName().equalsIgnoreCase(TAG_DEC_RECIPIENT))
                             && reader.isStartElement() && (TAG_TRANSPORT.equalsIgnoreCase(hierarchy.peek()))) {
                         hierarchy.push(TAG_SAAJA);
                         recipientOrgCode = "";
@@ -1807,7 +1809,7 @@ public class DhlMessage implements Cloneable {
                         recipientDivisionShortName = "";
                         recipientPositionShortName = "";
                     } else if ((reader.getLocalName().equalsIgnoreCase(TAG_SAAJA)
-                                || reader.getLocalName().equalsIgnoreCase(TAG_DEC_RECIPIENT))
+                            || reader.getLocalName().equalsIgnoreCase(TAG_DEC_RECIPIENT))
                             && reader.isEndElement() && (TAG_SAAJA.equalsIgnoreCase(hierarchy.peek()))) {
                         hierarchy.pop();
                         for (int i = 0; i < units.length; ++i) {
@@ -1856,7 +1858,7 @@ public class DhlMessage implements Cloneable {
                         }
                     } else if ((reader.getLocalName().equalsIgnoreCase("dhl_id") || reader.getLocalName().equalsIgnoreCase("DecId"))
                             && reader.isStartElement() && (TAG_METAINFO.equalsIgnoreCase(hierarchy.peek())
-                                        || TAG_DEC_METADATA.equalsIgnoreCase(hierarchy.peek()))) {
+                            || TAG_DEC_METADATA.equalsIgnoreCase(hierarchy.peek()))) {
                         reader.next();
                         if (reader.isCharacters()) {
                             templateMessage.m_dhlID = Integer.parseInt(reader.getText().trim());
@@ -1870,17 +1872,17 @@ public class DhlMessage implements Cloneable {
                             logger.debug("Setting message GUID to: " + templateMessage.m_dhlGuid);
                         }
                     } else if ((reader.getLocalName().equalsIgnoreCase("dhl_kaust")
-                                    || reader.getLocalName().equalsIgnoreCase("DecFolder"))
+                            || reader.getLocalName().equalsIgnoreCase("DecFolder"))
                             && reader.isStartElement() && (TAG_METAINFO.equalsIgnoreCase(hierarchy.peek())
-                                    || TAG_DEC_METADATA.equalsIgnoreCase(hierarchy.peek()))) {
+                            || TAG_DEC_METADATA.equalsIgnoreCase(hierarchy.peek()))) {
                         reader.next();
                         if (reader.isCharacters()) {
                             templateMessage.m_dhlFolderName = reader.getText().trim();
                         }
                     } else if ((reader.getLocalName().equalsIgnoreCase("dhl_saabumisaeg")
-                                        || reader.getLocalName().equalsIgnoreCase("DecReceiptDate"))
+                            || reader.getLocalName().equalsIgnoreCase("DecReceiptDate"))
                             && reader.isStartElement() && (TAG_METAINFO.equalsIgnoreCase(hierarchy.peek())
-                                        || TAG_DEC_METADATA.equalsIgnoreCase(hierarchy.peek()))) {
+                            || TAG_DEC_METADATA.equalsIgnoreCase(hierarchy.peek()))) {
                         reader.next();
                         if (reader.isCharacters()) {
                             templateMessage.m_sendingDate = CommonMethods.getDateFromXML(reader.getText().trim());
@@ -2120,6 +2122,309 @@ public class DhlMessage implements Cloneable {
         return result;
     }
 
+    private static Element getFirstElementNode(Element element, String tagName) {
+        Element resultNode = null;
+        try {
+            if (element != null) {
+                NodeList nodeList = element.getElementsByTagName(tagName);
+                for (int i = 0; i < nodeList.getLength(); i++) {
+                    if (nodeList.item(i) instanceof Element) {
+                        resultNode = (Element) nodeList.item(i);
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return resultNode;
+    }
+
+    private static String getFirstElementNodeText(Element element, String tagName) {
+        String resultTxt = "";
+        try {
+            if (element != null) {
+                NodeList nodeList = element.getElementsByTagName(tagName);
+                for (int i = 0; i < nodeList.getLength(); i++) {
+                    if (nodeList.item(i) instanceof Element) {
+                        resultTxt = nodeList.item(i).getTextContent().trim();
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return resultTxt;
+    }
+
+    public static ArrayList<DhlMessage> getFromXML_V2(String dataFilePath, UnitCredential[] units) throws Exception {
+
+        String TAG_DEC_CONTAINER = "DecContainer";
+        String CONTAINER_ENCODING = "UTF-8";
+
+        String TAG_CONTACT_DATA = "ContactData";
+        String TAG_DEC_FILE = "File";
+        String TAG_DEC_FOLDER = "DecFolder";
+        String TAG_DEC_ID = "DecId";
+        String TAG_DEC_METADATA = "DecMetadata";
+        String TAG_DEC_RECEIPT_DATA = "DecReceiptDate";
+        String TAG_DEC_RECIPIENT = "DecRecipient";
+        String TAG_DEC_SENDER = "DecSender";
+        String TAG_EMAIL = "Email";
+        String TAG_INITIATOR = "Initiator";
+        String TAG_MESSAGE_FOR_RECIPIENT = "MessageForRecipient";
+        String TAG_NAME = "Name";
+        String TAG_ORGANISATION = "Organisation";
+        String TAG_ORGANISATION_CODE = "OrganisationCode";
+        String TAG_PERSON = "Person";
+        String TAG_PERSONAL_CODE = "PersonalIdCode";
+        String TAG_POSITION_TITLE = "PositionTitle";
+        String TAG_RECIPIENT = "Recipient";
+        String TAG_RECORD_CREATOR = "RecordCreator";
+        String TAG_RECORD_GUID = "RecordGuid";
+        String TAG_RECORD_METADATA = "RecordMetadata";
+        String TAG_RECORD_SENDER_TO_DEC = "RecordSenderToDec";
+        String TAG_RECORD_TITLE = "RecordTitle";
+        String TAG_STRUCTURAL_UNIT = "StructuralUnit";
+        String TAG_TRANSPORT = "Transport";
+
+        String recipientOrgCode = "";
+        String recipientPersonCode = "";
+        boolean fyi = false; // we haven't <teadmiseks> in 2.1
+        int containerVersion = 21;
+
+        ArrayList<SimpleAddressData> addr = new ArrayList<SimpleAddressData>();
+
+        DhlMessage templateMessage = new DhlMessage();
+        templateMessage.setFilePath(dataFilePath);
+        templateMessage.setContainerVersion(containerVersion);
+
+        FileSplitResult splitResult = CommonMethods.splitOutTags(dataFilePath, TAG_DEC_FILE, false, false, false);
+        File fXmlFile = new File(splitResult.mainFile);
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        InputStream inputStream = new FileInputStream(fXmlFile);
+
+        try {
+
+            Document doc = dBuilder.parse(new InputSource(new InputStreamReader(inputStream, CONTAINER_ENCODING)));
+            doc.getDocumentElement().normalize();
+
+            Element elementNodeContainer = doc.getDocumentElement();
+
+            // TAG_TRANSPORT
+            Element nodeElementTransport = getFirstElementNode(elementNodeContainer, TAG_TRANSPORT);
+
+            //      TAG_DEC_SENDER
+            Element nodeElementDecSender = getFirstElementNode(nodeElementTransport, TAG_DEC_SENDER);
+
+            //          TAG_ORGANISATION_CODE
+            templateMessage.m_senderOrgCode = getFirstElementNodeText(nodeElementDecSender, TAG_ORGANISATION_CODE);
+
+            //          TAG_PERSONAL_CODE
+            templateMessage.m_senderPersonCode = getFirstElementNodeText(nodeElementDecSender, TAG_PERSONAL_CODE);
+
+            //      TAG_DEC_RECIPIENT
+            NodeList nodeListDecRecipients = nodeElementTransport.getElementsByTagName(TAG_DEC_RECIPIENT);
+            for (int i = 0; i < nodeListDecRecipients.getLength(); i++) {
+                SimpleAddressData a = new SimpleAddressData();
+                Element nodeElementDecRecipient = (Element) nodeListDecRecipients.item(i);
+
+                //      TAG_ORGANISATION_CODE
+                recipientOrgCode = getFirstElementNodeText(nodeElementDecRecipient, TAG_ORGANISATION_CODE);
+                for (int m = 0; m < units.length; m++) {
+                    logger.debug("recipientOrgCode: " + recipientOrgCode);
+                    logger.debug("units[m].getInstitutionCode(): " + units[m].getInstitutionCode());
+                    if (recipientOrgCode.equalsIgnoreCase(units[m].getInstitutionCode())) {
+                        a.setOrgCode(recipientOrgCode);
+                        a.setUnitID(units[m].getUnitID());
+                    }
+                }
+
+                //      TAG_PERSONAL_CODE
+                a.setPersonCode(getFirstElementNodeText(nodeElementDecRecipient, TAG_PERSONAL_CODE));
+
+                //      TAG_STRUCTURAL_UNIT
+                a.setDivisionName(getFirstElementNodeText(nodeElementDecRecipient, TAG_STRUCTURAL_UNIT));
+
+                if (!CommonMethods.isNullOrEmpty(a.getOrgCode())) {
+                    logger.debug("Adding address data to array.");
+                    addr.add(a);
+                }
+            }
+
+
+            // TAG_RECORD_CREATOR
+            Element nodeElementRecordCreator = getFirstElementNode(elementNodeContainer, TAG_RECORD_CREATOR);
+
+            //      TAG_ORGANISATION
+            Element nodeElementOrganisation = getFirstElementNode(nodeElementRecordCreator, TAG_ORGANISATION);
+
+            //          TAG_NAME
+            templateMessage.m_senderOrgName = getFirstElementNodeText(nodeElementOrganisation, TAG_NAME);
+
+            //      TAG_PERSON
+            Element nodeElementPerson = getFirstElementNode(nodeElementRecordCreator, TAG_PERSON);
+
+            //          TAG_NAME
+            templateMessage.m_senderName = getFirstElementNodeText(nodeElementPerson, TAG_NAME);
+
+            //      TAG_CONTACT_DATA
+            Element nodeElementContactData = getFirstElementNode(nodeElementRecordCreator, TAG_CONTACT_DATA);
+
+            // TAG_RECIPIENT
+            NodeList nodeListRecipients = elementNodeContainer.getElementsByTagName(TAG_RECIPIENT);
+            for (int i = 0; i < nodeListRecipients.getLength(); i++) {
+                Element nodeElementRecipient = (Element) nodeListRecipients.item(i);
+
+                // TAG_ORGANISATION
+                nodeElementOrganisation = getFirstElementNode(nodeElementRecipient, TAG_ORGANISATION);
+                //      TAG_ORGANISATION_CODE
+                recipientOrgCode = getFirstElementNodeText(nodeElementOrganisation, TAG_ORGANISATION_CODE);
+
+                // TAG_PERSON
+                nodeElementPerson = getFirstElementNode(nodeElementRecipient, TAG_PERSON);
+                //      TAG_PERSONAL_CODE
+                recipientPersonCode = getFirstElementNodeText(nodeElementPerson, TAG_PERSONAL_CODE);
+
+                //Find addr element by Organisation and PersonCode Code
+                for (int j = 0; j < addr.size(); j++) {
+                    if (addr.get(j).getOrgCode().equalsIgnoreCase(recipientOrgCode)
+                            && addr.get(j).getPersonCode().equalsIgnoreCase(recipientPersonCode)) {
+                        // Append data to recipient
+                        //      TAG_NAME
+                        addr.get(j).setOrgName(getFirstElementNodeText(nodeElementOrganisation, TAG_NAME));
+                        //      TAG_STRUCTURAL_UNIT allready taken from Transport
+                        //addr.get(j).setDivisionName(getFirstElementNodeText(nodeElementOrganisation, TAG_STRUCTURAL_UNIT));
+                        //      TAG_POSITION_TITLE
+                        addr.get(j).setPositionName(getFirstElementNodeText(nodeElementOrganisation, TAG_POSITION_TITLE));
+
+                        //      TAG_NAME
+                        addr.get(j).setPersonName(getFirstElementNodeText(nodeElementPerson, TAG_NAME));
+
+                        // TAG_CONTACT_DATA
+                        nodeElementContactData = getFirstElementNode(nodeElementRecipient, TAG_CONTACT_DATA);
+                        //      TAG_EMAIL
+                        addr.get(j).setEmail(getFirstElementNodeText(nodeElementContactData, TAG_EMAIL));
+                    }
+                }
+            }
+
+            // TAG_RECORD_METADATA
+            Element nodeElementRecordMetaData = getFirstElementNode(elementNodeContainer, TAG_RECORD_METADATA);
+            //      TAG_RECORD_GUID
+            templateMessage.m_dhlGuid = getFirstElementNodeText(nodeElementRecordMetaData, TAG_RECORD_GUID);
+            //      TAG_RECORD_TITLE
+            templateMessage.m_title = getFirstElementNodeText(nodeElementRecordMetaData, TAG_RECORD_TITLE);
+
+
+            // TAG_DEC_METADATA
+            Element nodeElementDecMetaData = getFirstElementNode(elementNodeContainer, TAG_DEC_METADATA);
+            //      TAG_DEC_ID
+            templateMessage.m_dhlID = Integer.parseInt(getFirstElementNodeText(nodeElementDecMetaData, TAG_DEC_ID));
+            //      TAG_DEC_FOLDER
+            templateMessage.m_dhlFolderName = getFirstElementNodeText(nodeElementDecMetaData, TAG_DEC_FOLDER);
+            //      TAG_DEC_RECEIPT_DATA
+            templateMessage.m_sendingDate = CommonMethods.getDateFromXML(getFirstElementNodeText(nodeElementDecMetaData, TAG_DEC_RECEIPT_DATA));
+
+
+            // Esimese leitud kohaliku adressaadi andmed kirjutame ka sõnumi külge.
+            SimpleAddressData firstAddrData = addr.get(0);
+            templateMessage.m_recipientOrgCode = firstAddrData.getOrgCode();
+            templateMessage.m_recipientOrgName = firstAddrData.getOrgName();
+            templateMessage.m_recipientPersonCode = firstAddrData.getPersonCode();
+            templateMessage.m_recipientName = firstAddrData.getPersonName();
+            templateMessage.m_recipientEmail = firstAddrData.getEmail();
+            templateMessage.m_recipientDepartmentNr = firstAddrData.getDepartmentNr();
+            templateMessage.m_recipientDepartmentName = firstAddrData.getDepartmentName();
+            templateMessage.m_recipientDivisionID = firstAddrData.getDivisionID();
+            templateMessage.m_recipientDivisionCode = firstAddrData.getDivisionCode(); // always empty because we don't use DivisionCode in 2.1
+            templateMessage.m_recipientDivisionName = firstAddrData.getDivisionName();
+            templateMessage.m_recipientPositionID = firstAddrData.getPositionID();
+            templateMessage.m_recipientPositionCode = firstAddrData.getPositionCode(); // always empty because we don't use PositionCode in 2.1
+            templateMessage.m_recipientPositionName = firstAddrData.getPositionName();
+            templateMessage.setFyi(fyi); // always false because we don't use <teadmiseks> in 2.1
+            templateMessage.m_unitID = firstAddrData.getUnitID();
+
+        } catch (IOException e) {
+            logger.error("IOException with FileSplitResult.mainFile. " + e.getMessage());
+            throw new RuntimeException(e);
+        } catch (SAXException e) {
+            logger.error("SAXException in DVK xml container. Not well-formed XML. " + e.getMessage());
+            throw new RuntimeException(e);
+        } catch (IllegalArgumentException e) {
+            logger.error("DocumentBuilder.parse(InputStream) argument is null. " + e.getMessage());
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            inputStream.close();
+        }
+
+        ArrayList<DhlMessage> result = new ArrayList<DhlMessage>();
+        result.add(templateMessage);
+        if (addr.size() > 1) {
+            for (int i = 1; i < addr.size(); ++i) {
+                SimpleAddressData a = addr.get(i);
+                DhlMessage tmpMsg = (DhlMessage) templateMessage.clone();
+                tmpMsg.m_recipientOrgCode = a.getOrgCode();
+                tmpMsg.m_recipientOrgName = a.getOrgName();
+                tmpMsg.m_recipientPersonCode = a.getPersonCode();
+                tmpMsg.m_unitID = a.getUnitID();
+                result.add(tmpMsg);
+            }
+        } else {
+            logger.debug("No addressee defined.");
+        }
+
+        return result;
+    }
+
+    public static ArrayList<DhlMessage> getFromXML(String dataFilePath, UnitCredential[] units) throws Exception {
+        String TAG_DOKUMENT = "dokument";
+        String TAG_DEC_CONTAINER = "DecContainer";
+        String CONTAINER_ENCODING = "UTF-8";
+
+        String containerVersion = "";
+
+        XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+        XMLStreamReader reader = inputFactory.createXMLStreamReader(new FileInputStream(dataFilePath), CONTAINER_ENCODING);
+
+        try {
+            while (reader.hasNext()) {
+                reader.next();
+                if (reader.hasName()) {
+                    if (reader.getLocalName().equalsIgnoreCase(TAG_DOKUMENT)) {
+                        containerVersion = ContainerVersion.VERSION_1_0.toString();
+                        break;
+                    } else if (reader.getLocalName().equalsIgnoreCase(TAG_DEC_CONTAINER)) {
+                        containerVersion = ContainerVersion.VERSION_2_1.toString();
+                        break;
+                    }
+                }
+            }
+            if (containerVersion.isEmpty()) {
+                String errMsg = "Failed to parse container or find TAG_DOKUMENT or TAG_DEC_CONTAINER. Unknown container format.";
+                logger.error(errMsg);
+                throw new RuntimeException(errMsg);
+            }
+        } finally {
+            reader.close();
+        }
+
+        ArrayList<DhlMessage> result = new ArrayList<DhlMessage>();
+
+        if (containerVersion.equalsIgnoreCase(ContainerVersion.VERSION_1_0.toString())) {
+            result.addAll(getFromXML_V1(dataFilePath, units));
+        } else if (containerVersion.equalsIgnoreCase(ContainerVersion.VERSION_2_1.toString())) {
+            result.addAll(getFromXML_V2(dataFilePath, units));
+        }
+
+        return result;
+    }
+
     private static String getReadersNextElementText(XMLStreamReader reader) throws Exception {
         reader.next();
         if (reader.isCharacters()) {
@@ -2144,7 +2449,7 @@ public class DhlMessage implements Cloneable {
         try {
             recipients = extractRecipientData(this.m_filePath);
         } catch (Exception ex) {
-            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.DhlMessage" +" loadRecipientsFromXML");
+            ErrorLog errorLog = new ErrorLog(ex, "dvk.client.businesslayer.DhlMessage" + " loadRecipientsFromXML");
             errorLog.setOrganizationCode(this.getSenderOrgCode());
             errorLog.setUserCode(this.getSenderPersonCode());
             errorLog.setMessageId(this.getId());
@@ -2178,8 +2483,8 @@ public class DhlMessage implements Cloneable {
         for (int i = 0; i < messages.size(); ++i) {
             DhlMessage msg = messages.get(i);
 
-            // Kui saadetava sõnumi GUID on mõõramata, siis anname sõnumile GUID-i
-            // ja salvestame selle kohe ka andmebaasi.
+// Kui saadetava sõnumi GUID on mõõramata, siis anname sõnumile GUID-i
+// ja salvestame selle kohe ka andmebaasi.
             if ((msg.getDhlGuid() == null) || (msg.getDhlGuid().length() < 1)) {
                 msg.setDhlGuid(generateGUID());
                 msg.updateDhlID(db, dbConnection);
@@ -2221,15 +2526,15 @@ public class DhlMessage implements Cloneable {
                             rec.getRecipientPersonCode().equalsIgnoreCase(xmlRec.getPersonCode()) &&
                             (rec.getRecipientDivisionID() == xmlRec.getDivisionID()) &&
                             (
-                             (CommonMethods.isNullOrEmpty(rec.getRecipientDivisionCode()) && CommonMethods.isNullOrEmpty(xmlRec.getDivisionCode())) ||
-                             rec.getRecipientDivisionCode().equalsIgnoreCase(xmlRec.getDivisionCode())
+                                    (CommonMethods.isNullOrEmpty(rec.getRecipientDivisionCode()) && CommonMethods.isNullOrEmpty(xmlRec.getDivisionCode())) ||
+                                            rec.getRecipientDivisionCode().equalsIgnoreCase(xmlRec.getDivisionCode())
                             ) &&
                             (rec.getRecipientPositionID() == xmlRec.getPositionID()) &&
                             (
-                             (CommonMethods.isNullOrEmpty(rec.getRecipientPositionCode()) && CommonMethods.isNullOrEmpty(xmlRec.getPositionCode())) ||
-                             rec.getRecipientPositionCode().equalsIgnoreCase(xmlRec.getPositionCode())
+                                    (CommonMethods.isNullOrEmpty(rec.getRecipientPositionCode()) && CommonMethods.isNullOrEmpty(xmlRec.getPositionCode())) ||
+                                            rec.getRecipientPositionCode().equalsIgnoreCase(xmlRec.getPositionCode())
                             )
-                        )   {
+                            ) {
                         exists = true;
                         rec = null;
                         break;
@@ -2261,6 +2566,52 @@ public class DhlMessage implements Cloneable {
     }
 
     public static ArrayList<SimpleAddressData> extractRecipientData(String xmlFilePath) throws Exception {
+        String TAG_DOKUMENT = "dokument";
+        String TAG_DEC_CONTAINER = "DecContainer";
+        String CONTAINER_ENCODING = "UTF-8";
+
+        String containerVersion = "";
+
+        XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+        XMLStreamReader reader = inputFactory.createXMLStreamReader(new FileInputStream(xmlFilePath), CONTAINER_ENCODING);
+
+        logger.debug("Starting to read XML.");
+
+        try {
+            while (reader.hasNext()) {
+                reader.next();
+                if (reader.hasName()) {
+                    if (reader.getLocalName().equalsIgnoreCase(TAG_DOKUMENT)) {
+                        containerVersion = ContainerVersion.VERSION_1_0.toString();
+                        break;
+                    } else if (reader.getLocalName().equalsIgnoreCase(TAG_DEC_CONTAINER)) {
+                        containerVersion = ContainerVersion.VERSION_2_1.toString();
+                        break;
+                    }
+                }
+            }
+            if (containerVersion.isEmpty()) {
+                String errMsg = "Failed to parse container or find TAG_DOKUMENT or TAG_DEC_CONTAINER. Unknown container format.";
+                logger.error(errMsg);
+                throw new RuntimeException(errMsg);
+            }
+
+        } finally {
+            reader.close();
+        }
+
+        ArrayList<SimpleAddressData> result = new ArrayList<SimpleAddressData>();
+
+        if (containerVersion.equalsIgnoreCase(ContainerVersion.VERSION_1_0.toString())) {
+            result.addAll(extractRecipientData_V1(xmlFilePath));
+        } else if (containerVersion.equalsIgnoreCase(ContainerVersion.VERSION_2_1.toString())) {
+            result.addAll(extractRecipientData_V2(xmlFilePath));
+        }
+
+        return result;
+    }
+
+    public static ArrayList<SimpleAddressData> extractRecipientData_V1(String xmlFilePath) throws Exception {
         String TAG_DOKUMENT = "dokument";
         String TAG_TRANSPORT = "transport";
         String TAG_SAAJA = "saaja";
@@ -2413,6 +2764,120 @@ public class DhlMessage implements Cloneable {
         return result;
     }
 
+    public static ArrayList<SimpleAddressData> extractRecipientData_V2(String xmlFilePath) throws Exception {
+
+        String TAG_CONTACT_DATA = "ContactData";
+        String TAG_DEC_RECIPIENT = "DecRecipient";
+        String TAG_EMAIL = "Email";
+        String TAG_NAME = "Name";
+        String TAG_ORGANISATION = "Organisation";
+        String TAG_ORGANISATION_CODE = "OrganisationCode";
+        String TAG_PERSON = "Person";
+        String TAG_PERSONAL_CODE = "PersonalIdCode";
+        String TAG_POSITION_TITLE = "PositionTitle";
+        String TAG_RECIPIENT = "Recipient";
+        String TAG_STRUCTURAL_UNIT = "StructuralUnit";
+        String TAG_TRANSPORT = "Transport";
+
+        String recipientOrgCode = "";
+        String recipientPersonCode = "";
+
+        ArrayList<SimpleAddressData> result = new ArrayList<SimpleAddressData>();
+        SimpleAddressData item = null;
+
+        logger.debug("Starting to read XML.");
+
+        FileSplitResult splitResult = CommonMethods.splitOutTags(xmlFilePath, "File", false, false, false);
+        File fXmlFile = new File(splitResult.mainFile);
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        InputStream inputStream = new FileInputStream(fXmlFile);
+
+        try {
+
+            Document doc = dBuilder.parse(new InputSource(new InputStreamReader(inputStream, "UTF-8")));
+            doc.getDocumentElement().normalize();
+
+            Element elementNodeContainer = doc.getDocumentElement();
+
+            // TAG_TRANSPORT
+            Element nodeElementTransport = getFirstElementNode(elementNodeContainer, TAG_TRANSPORT);
+
+            //      TAG_DEC_RECIPIENT
+            NodeList nodeListDecRecipients = nodeElementTransport.getElementsByTagName(TAG_DEC_RECIPIENT);
+            for (int i = 0; i < nodeListDecRecipients.getLength(); i++) {
+                item = new SimpleAddressData();
+                Element nodeElementDecRecipient = (Element) nodeListDecRecipients.item(i);
+
+                //      TAG_ORGANISATION_CODE
+                item.setOrgCode(getFirstElementNodeText(nodeElementDecRecipient, TAG_ORGANISATION_CODE));
+
+                //      TAG_PERSONAL_CODE
+                item.setPersonCode(getFirstElementNodeText(nodeElementDecRecipient, TAG_PERSONAL_CODE));
+
+                //      TAG_STRUCTURAL_UNIT
+                item.setDivisionName(getFirstElementNodeText(nodeElementDecRecipient, TAG_STRUCTURAL_UNIT));
+
+                if (!CommonMethods.isNullOrEmpty(item.getOrgCode())) {
+                    result.add(item);
+                }
+            }
+
+            // TAG_RECIPIENT
+            NodeList nodeListRecipients = elementNodeContainer.getElementsByTagName(TAG_RECIPIENT);
+            for (int i = 0; i < nodeListRecipients.getLength(); i++) {
+                Element nodeElementRecipient = (Element) nodeListRecipients.item(i);
+
+                // TAG_ORGANISATION
+                Element nodeElementOrganisation = getFirstElementNode(nodeElementRecipient, TAG_ORGANISATION);
+                //      TAG_ORGANISATION_CODE
+                recipientOrgCode = getFirstElementNodeText(nodeElementOrganisation, TAG_ORGANISATION_CODE);
+
+                // TAG_PERSON
+                Element nodeElementPerson = getFirstElementNode(nodeElementRecipient, TAG_PERSON);
+                //      TAG_PERSONAL_CODE
+                recipientPersonCode = getFirstElementNodeText(nodeElementPerson, TAG_PERSONAL_CODE);
+
+                //Find addr element by Organisation and PersonCode Code
+                for (int j = 0; j < result.size(); j++) {
+                    if (result.get(j).getOrgCode().equalsIgnoreCase(recipientOrgCode)
+                            && result.get(j).getPersonCode().equalsIgnoreCase(recipientPersonCode)) {
+                        // Append data to recipient
+                        //      TAG_NAME
+                        result.get(j).setOrgName(getFirstElementNodeText(nodeElementOrganisation, TAG_NAME));
+                        //      TAG_STRUCTURAL_UNIT already taken from Transport
+                        //result.get(j).setDivisionName(getFirstElementNodeText(nodeElementOrganisation, TAG_STRUCTURAL_UNIT));
+                        //      TAG_POSITION_TITLE
+                        result.get(j).setPositionName(getFirstElementNodeText(nodeElementOrganisation, TAG_POSITION_TITLE));
+
+                        //      TAG_NAME
+                        result.get(j).setPersonName(getFirstElementNodeText(nodeElementPerson, TAG_NAME));
+
+                        // TAG_CONTACT_DATA
+                        Element nodeElementContactData = getFirstElementNode(nodeElementRecipient, TAG_CONTACT_DATA);
+                        //      TAG_EMAIL
+                        result.get(j).setEmail(getFirstElementNodeText(nodeElementContactData, TAG_EMAIL));
+                    }
+                }
+            }
+        } catch (IOException e) {
+            logger.error("IOException with FileSplitResult.mainFile. " + e.getMessage());
+            throw new RuntimeException(e);
+        } catch (SAXException e) {
+            logger.error("SAXException in DVK xml container. Not well-formed XML. " + e.getMessage());
+            throw new RuntimeException(e);
+        } catch (IllegalArgumentException e) {
+            logger.error("DocumentBuilder.parse(InputStream) argument is null. " + e.getMessage());
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            inputStream.close();
+        }
+
+        return result;
+    }
+
     /**
      * Eemaldab DVK konteineri <transport> plokist need asutused, kellele pole
      * antud dokumenti enam vaja edastada.
@@ -2422,7 +2887,7 @@ public class DhlMessage implements Cloneable {
         org.w3c.dom.Document currentXmlContent = CommonMethods.xmlDocumentFromFile(filePath, true);
         Element transportNode = null;
 
-        // Tuvastame katse-eksituse meetodil õige nimeruumi.
+// Tuvastame katse-eksituse meetodil õige nimeruumi.
         String namespaceUri = CommonStructures.DhlNamespace;
         NodeList foundNodes = currentXmlContent.getDocumentElement().getElementsByTagNameNS(namespaceUri, "transport");
         if (foundNodes.getLength() < 1) {
@@ -2436,8 +2901,8 @@ public class DhlMessage implements Cloneable {
 
             logger.info("Leitud adressaate: " + String.valueOf(foundNodes.getLength()));
 
-            // Eemaldame saajate hulgast nende asutuste/isikute andmed,
-            // kellele on dokument antud serveri piires juba kohale toimetatud
+// Eemaldame saajate hulgast nende asutuste/isikute andmed,
+// kellele on dokument antud serveri piires juba kohale toimetatud
             int recipientIndex = 0;
             while (recipientIndex < foundNodes.getLength()) {
                 Element recipientRoot = (Element) foundNodes.item(recipientIndex);
@@ -2450,7 +2915,7 @@ public class DhlMessage implements Cloneable {
                 String subdivisionShortName = "";
                 String occupationShortName = "";
 
-                // Adressaadi asutuse registrikood XML konteineris
+// Adressaadi asutuse registrikood XML konteineris
                 NodeList regNrNodes = recipientRoot.getElementsByTagNameNS(namespaceUri, "regnr");
                 if (regNrNodes.getLength() > 0) {
                     regNr = CommonMethods.getNodeText(regNrNodes.item(0));
@@ -2592,13 +3057,13 @@ public class DhlMessage implements Cloneable {
         }
         logger.info("Minuga samas asutuses on " + String.valueOf(myOrgRecipients.size()) + " adressaati.");
 
-        // Kui mõni adressaat on saatjaga samas asutuses, siis tuvastame,
-        // kas meil on teada andmebaasiõhendus dokumendi otse saatmiseks.
-        //
-        // Isegi juhul, kui sama dokument lõheb samas andmebaasis mitmele
-        // adressaadile, saadame ta sinna mitmes eksemplaris. Vastasel juhul
-        // ei saa adressaadipõhiselt jõlgida, milline adressaat on dokumendi
-        // kõtte saanud ja milline mitte.
+// Kui mõni adressaat on saatjaga samas asutuses, siis tuvastame,
+// kas meil on teada andmebaasiõhendus dokumendi otse saatmiseks.
+//
+// Isegi juhul, kui sama dokument lõheb samas andmebaasis mitmele
+// adressaadile, saadame ta sinna mitmes eksemplaris. Vastasel juhul
+// ei saa adressaadipõhiselt jõlgida, milline adressaat on dokumendi
+// kõtte saanud ja milline mitte.
         for (OrgSettings db : allKnownDatabases) {
             // Never-ever send anything back to the same database it
             // originally came from.
@@ -2649,19 +3114,19 @@ public class DhlMessage implements Cloneable {
             String centralServerFilePath = centralServerMessage.createNewFile(centralServerRecipients, containerVersion);
             centralServerMessage.setFilePath(centralServerFilePath);
 
-            // Uuendame objektis olevat adressaatide nimekirja vastavalt
-            // XML konteineris tehtud muudatustele.
+// Uuendame objektis olevat adressaatide nimekirja vastavalt
+// XML konteineris tehtud muudatustele.
             centralServerMessage.loadRecipientsFromXML();
 
-            // Leiame nimekirja erinevatest serveritest, kuhu antud dokument tuleks saata.
-            // S.t. kui dokument peab jõudma erinevatele adressaatidele erinevate serverite kaudu
+// Leiame nimekirja erinevatest serveritest, kuhu antud dokument tuleks saata.
+// S.t. kui dokument peab jõudma erinevatele adressaatidele erinevate serverite kaudu
             ArrayList<DhlCapability> destinationServers = DhlCapability.getListByMessageID(centralServerMessage.getId(), myDatabase, dbConnection);
 
-            // Võtame filtreerimiseks võlja kõigi teadaolevate asutuste nimekirja
+// Võtame filtreerimiseks võlja kõigi teadaolevate asutuste nimekirja
             ArrayList<DhlCapability> allKnownOrgs = DhlCapability.getList(myDatabase, dbConnection);
 
-            // Kui serverite massiiv on tõhi, siis lisame sinna
-            // õhe tõhja võõrtuse DVK keskserveri jaoks
+// Kui serverite massiiv on tõhi, siis lisame sinna
+// õhe tõhja võõrtuse DVK keskserveri jaoks
             if (destinationServers == null) {
                 destinationServers = new ArrayList<DhlCapability>();
             }
@@ -2718,8 +3183,8 @@ public class DhlMessage implements Cloneable {
                     newMessage.getDeliveryChannel().setServiceUrl(currentServiceUrl);
                     newMessage.getDeliveryChannel().setProducerName(currentProducer);
 
-                    // Paneme keskserveri kaudu saadetavad sõnumid ettepoole,
-                    // et saatmisel saaks keskserveri ID võimalikult kiiresti kõtte.
+// Paneme keskserveri kaudu saadetavad sõnumid ettepoole,
+// et saatmisel saaks keskserveri ID võimalikult kiiresti kõtte.
                     result.add(0, newMessage);
                     logger.info("Added message clone for central server delivery");
                 }

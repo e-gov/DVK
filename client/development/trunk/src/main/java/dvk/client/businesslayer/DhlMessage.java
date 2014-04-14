@@ -315,6 +315,9 @@ public class DhlMessage implements Cloneable {
     }
 
     public void setFaultString(String faultString) {
+        if (!CommonMethods.isNullOrEmpty(faultString)) {
+            faultString.replaceAll("(\r\n|\n)", "<br/>");
+        }
         m_faultString = faultString;
     }
 

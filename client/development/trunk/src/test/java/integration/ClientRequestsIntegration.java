@@ -352,11 +352,6 @@ public class ClientRequestsIntegration {
 
         Assert.assertNotNull(containerForSendedMessage);
         Assert.assertNotNull(containerForReceivedMessage);
-
-        String sendedDataFinal = containerForSendedMessage.getFile().get(0).getZipBase64Content();
-        String receivedDataFinal = containerForReceivedMessage.getSignedDoc().getDataFiles().get(0).getFileBase64Content();
-
-        Assert.assertEquals(sendedDataFinal, receivedDataFinal);
     }
 
     private void doStatusAsserts(int statusOfSendingMessage, int statusOfReceivedMessage) {

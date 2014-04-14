@@ -600,8 +600,8 @@ public class DhlMessage implements Cloneable {
                         this.setSendingStatusID(rs.getInt("sending_status_id"));
                         this.setUnitID(rs.getInt("unit_id"));
                         this.setDhlID(rs.getInt("dhl_id"));
-                        this.setSendingDate(rs.getDate("sending_date", cal));
-                        this.setReceivedDate(rs.getDate("received_date", cal));
+                        this.setSendingDate(rs.getTimestamp("sending_date", cal));
+                        this.setReceivedDate(rs.getTimestamp("received_date", cal));
                         this.setLocalItemID(rs.getInt("local_item_id"));
                         this.setRecipientStatusID(rs.getInt("recipient_status_id"));
                         this.setFaultCode(rs.getString("fault_code"));
@@ -726,8 +726,8 @@ public class DhlMessage implements Cloneable {
                         item.setDhlFolderName(rs.getString("dhl_folder_name"));
                         item.setSendingStatusID(rs.getInt("sending_status_id"));
                         item.setUnitID(rs.getInt("unit_id"));
-                        item.setSendingDate(rs.getDate("sending_date", cal));
-                        item.setReceivedDate(rs.getDate("received_date", cal));
+                        item.setSendingDate(rs.getTimestamp("sending_date", cal));
+                        item.setReceivedDate(rs.getTimestamp("received_date", cal));
                         item.setLocalItemID(rs.getInt("local_item_id"));
                         item.setRecipientStatusID(rs.getInt("recipient_status_id"));
                         item.setFaultCode(rs.getString("fault_code"));
@@ -1404,8 +1404,8 @@ public class DhlMessage implements Cloneable {
                         item.setSendingStatusID(rs.getInt("sending_status_id"));
                         item.setUnitID(rs.getInt("unit_id"));
                         item.setDhlID(rs.getInt("dhl_id"));
-                        item.setSendingDate(rs.getDate("sending_date", cal));
-                        item.setReceivedDate(rs.getDate("received_date", cal));
+                        item.setSendingDate(rs.getTimestamp("sending_date", cal));
+                        item.setReceivedDate(rs.getTimestamp("received_date", cal));
                         item.setLocalItemID(rs.getInt("local_item_id"));
                         item.setRecipientStatusID(rs.getInt("recipient_status_id"));
                         item.setFaultCode(rs.getString("fault_code"));
@@ -1521,8 +1521,8 @@ public class DhlMessage implements Cloneable {
                         item.setSendingStatusID(rs.getInt("sending_status_id"));
                         item.setUnitID(rs.getInt("unit_id"));
                         item.setDhlID(rs.getInt("dhl_id"));
-                        item.setSendingDate(rs.getDate("sending_date", cal));
-                        item.setReceivedDate(rs.getDate("received_date", cal));
+                        item.setSendingDate(rs.getTimestamp("sending_date", cal));
+                        item.setReceivedDate(rs.getTimestamp("received_date", cal));
                         item.setLocalItemID(rs.getInt("local_item_id"));
                         item.setRecipientStatusID(rs.getInt("recipient_status_id"));
                         item.setFaultCode(rs.getString("fault_code"));

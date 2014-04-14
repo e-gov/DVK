@@ -21,7 +21,32 @@
     	<level value="DEBUG"></level>
     	<appender-ref ref="console" />
     </logger>
-    
+
+    <logger name="dvk.client.ClientAPI">
+        <level value="DEBUG"></level>
+        <appender-ref ref="console" />
+    </logger>
+
+    <logger name="dvk.client.OrgCapabilityChecker">
+        <level value="DEBUG"></level>
+        <appender-ref ref="console" />
+    </logger>
+
+    <logger name="dvk.client.TestClient">
+        <level value="DEBUG"></level>
+        <appender-ref ref="console" />
+    </logger>
+
+    <logger name="dvk.client.test.CommunicationTestClient">
+        <level value="DEBUG"></level>
+        <appender-ref ref="console" />
+    </logger>
+
+    <logger name="dvk.client.AditGetSendStatusService">
+        <level value="DEBUG"></level>
+        <appender-ref ref="console" />
+    </logger>
+
     <root>
 		<level value="info" />
 		<appender-ref ref="file" />

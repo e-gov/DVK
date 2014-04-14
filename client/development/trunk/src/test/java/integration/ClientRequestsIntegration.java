@@ -29,7 +29,7 @@ public class ClientRequestsIntegration {
     private static Logger logger = Logger.getLogger(ClientRequestsIntegration.class);
 
     @Test
-    public void sendAndReceiveAndGetSendStatusRequestsTest() throws Exception {
+    public void sendAndReceiveAndGetSendStatusRequestsAndMarkDocumentsReceivedTest() throws Exception {
         List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCases();
 
         for (String path: configFilePaths) {

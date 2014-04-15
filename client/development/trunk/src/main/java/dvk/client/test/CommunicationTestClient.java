@@ -44,7 +44,7 @@ public class CommunicationTestClient {
             dvkClient.setOrgSettings(dvkSet);
             
             // Debug information
-            System.out.println("Producer: "+ Settings.Client_ProducerName);
+            logger.debug("Producer: "+ Settings.Client_ProducerName);
             
             // Create X-Road header
             HeaderVariables header = new HeaderVariables(
@@ -60,74 +60,74 @@ public class CommunicationTestClient {
             int failedCount = 0;
             
             // Running tests
-            System.out.println("\nRunning tests:");
-            System.out.print("1) Send correct document to organization (v1):\t");
+            logger.debug("\nRunning tests:");
+            logger.debug("1) Send correct document to organization (v1):\t");
             ok = runTest1(dvkClient, header);
-            System.out.println(ok ? "OK" : "Failed!");
+            logger.debug(ok ? "OK" : "Failed!");
             okCount += ok ? 1 : 0;
             failedCount += ok ? 0 : 1;
-            
-            System.out.print("2) Send correct document to division (v1):\t");
+
+            logger.debug("2) Send correct document to division (v1):\t");
             ok = runTest2(dvkClient, header);
-            System.out.println(ok ? "OK" : "Failed!");
+            logger.debug(ok ? "OK" : "Failed!");
             okCount += ok ? 1 : 0;
             failedCount += ok ? 0 : 1;
 
-            System.out.print("3) Send correct document to occupation (v1):\t");
+            logger.debug("3) Send correct document to occupation (v1):\t");
             ok = runTest3(dvkClient, header);
-            System.out.println(ok ? "OK" : "Failed!");
+            logger.debug(ok ? "OK" : "Failed!");
             okCount += ok ? 1 : 0;
             failedCount += ok ? 0 : 1;
 
-            System.out.print("4) Send correct document to division and occupation (v1):\t");
+            logger.debug("4) Send correct document to division and occupation (v1):\t");
             ok = runTest4(dvkClient, header);
-            System.out.println(ok ? "OK" : "Failed!");
+            logger.debug(ok ? "OK" : "Failed!");
             okCount += ok ? 1 : 0;
             failedCount += ok ? 0 : 1;
-            
-            System.out.print("5) Receiving all documents as administrator (v3):\t");
+
+            logger.debug("5) Receiving all documents as administrator (v3):\t");
             ok = runTest5(dvkClient, header);
-            System.out.println(ok ? "OK" : "Failed!");
+            logger.debug(ok ? "OK" : "Failed!");
             okCount += ok ? 1 : 0;
             failedCount += ok ? 0 : 1;
 
-            System.out.print("6) Receiving division documents as administrator (v3):\t");
+            logger.debug("6) Receiving division documents as administrator (v3):\t");
             ok = runTest6(dvkClient, header);
-            System.out.println(ok ? "OK" : "Failed!");
+            logger.debug(ok ? "OK" : "Failed!");
             okCount += ok ? 1 : 0;
             failedCount += ok ? 0 : 1;
-            
-            System.out.print("7) Receiving occupation documents as administrator (v3):\t");
+
+            logger.debug("7) Receiving occupation documents as administrator (v3):\t");
             ok = runTest7(dvkClient, header);
-            System.out.println(ok ? "OK" : "Failed!");
+            logger.debug(ok ? "OK" : "Failed!");
             okCount += ok ? 1 : 0;
             failedCount += ok ? 0 : 1;
 
-            System.out.print("8) Receiving division and occupation documents as administrator (v3):\t");
+            logger.debug("8) Receiving division and occupation documents as administrator (v3):\t");
             ok = runTest8(dvkClient, header);
-            System.out.println(ok ? "OK" : "Failed!");
-            okCount += ok ? 1 : 0;
-            failedCount += ok ? 0 : 1;
-            
-            System.out.print("9) Receiving all documents as employee with specific occupation (v3):\t");
-            ok = runTest9(dvkClient, header);
-            System.out.println(ok ? "OK" : "Failed!");
+            logger.debug(ok ? "OK" : "Failed!");
             okCount += ok ? 1 : 0;
             failedCount += ok ? 0 : 1;
 
-            System.out.print("10) Receiving all documents as employee in specific division (v3):\t");
+            logger.debug("9) Receiving all documents as employee with specific occupation (v3):\t");
+            ok = runTest9(dvkClient, header);
+            logger.debug(ok ? "OK" : "Failed!");
+            okCount += ok ? 1 : 0;
+            failedCount += ok ? 0 : 1;
+
+            logger.debug("10) Receiving all documents as employee in specific division (v3):\t");
             ok = runTest10(dvkClient, header);
-            System.out.println(ok ? "OK" : "Failed!");
+            logger.debug(ok ? "OK" : "Failed!");
             okCount += ok ? 1 : 0;
             failedCount += ok ? 0 : 1;            
             
             // Cleanup
-            System.out.print("\nCleaning up:\t");
+            logger.debug("\nCleaning up:\t");
             try {
                 //dvkClient.markDocumentsReceived(header, pendingDocuments, 0, null, "", "", false, null, null);
-                System.out.println("OK");
+                logger.debug("OK");
             } catch (Exception ex) {
-                System.out.println("Failed!");
+                logger.debug("Failed!");
                 ex.printStackTrace();
             }
         }
@@ -151,7 +151,7 @@ public class CommunicationTestClient {
                 return false;
             }
         } catch (Exception ex) {
-            System.out.print(ex.getMessage()+"\t");
+            logger.error(ex.getMessage()+"\t");
             return false;
         }
     }
@@ -169,7 +169,7 @@ public class CommunicationTestClient {
                 return false;
             }
         } catch (Exception ex) {
-            System.out.print(ex.getMessage()+"\t");
+            logger.error(ex.getMessage()+"\t");
             return false;
         }
     }
@@ -187,7 +187,7 @@ public class CommunicationTestClient {
                 return false;
             }
         } catch (Exception ex) {
-            System.out.print(ex.getMessage()+"\t");
+            logger.error(ex.getMessage()+"\t");
             return false;
         }
     }
@@ -205,7 +205,7 @@ public class CommunicationTestClient {
                 return false;
             }
         } catch (Exception ex) {
-            System.out.print(ex.getMessage()+"\t");
+            logger.error(ex.getMessage()+"\t");
             return false;
         }
     }
@@ -216,11 +216,11 @@ public class CommunicationTestClient {
             if (result.documents.size() == 4) {
                 return true;
             } else {
-                System.out.print("Incorrect amount of documents received (got "+ String.valueOf(result.documents.size()) +", expected 4)\t");
+                logger.error("Incorrect amount of documents received (got "+ String.valueOf(result.documents.size()) +", expected 4)\t");
                 return false;
             }
         } catch (Exception ex) {
-            System.out.print(ex.getMessage()+"\t");
+            logger.error(ex.getMessage()+"\t");
             return false;
         }
     }
@@ -243,11 +243,11 @@ public class CommunicationTestClient {
                 }
                 return true;
             } else {
-                System.out.print("Incorrect amount of documents received (got "+ String.valueOf(result.documents.size()) +", expected 2)\t");
+                logger.error("Incorrect amount of documents received (got "+ String.valueOf(result.documents.size()) +", expected 2)\t");
                 return false;
             }
         } catch (Exception ex) {
-            System.out.print(ex.getMessage()+"\t");
+            logger.error(ex.getMessage()+"\t");
             return false;
         }
     }
@@ -270,11 +270,11 @@ public class CommunicationTestClient {
                 }
                 return true;
             } else {
-                System.out.print("Incorrect amount of documents received (got "+ String.valueOf(result.documents.size()) +", expected 2)\t");
+                logger.error("Incorrect amount of documents received (got "+ String.valueOf(result.documents.size()) +", expected 2)\t");
                 return false;
             }
         } catch (Exception ex) {
-            System.out.print(ex.getMessage()+"\t");
+            logger.error(ex.getMessage()+"\t");
             return false;
         }
     }
@@ -290,11 +290,11 @@ public class CommunicationTestClient {
                 }
                 return true;
             } else {
-                System.out.print("Incorrect amount of documents received (got "+ String.valueOf(result.documents.size()) +", expected 1)\t");
+                logger.error("Incorrect amount of documents received (got "+ String.valueOf(result.documents.size()) +", expected 1)\t");
                 return false;
             }
         } catch (Exception ex) {
-            System.out.print(ex.getMessage()+"\t");
+            logger.error(ex.getMessage()+"\t");
             return false;
         }
     }
@@ -316,11 +316,11 @@ public class CommunicationTestClient {
                     success = true;
                 }
             } else {
-                System.out.print("Incorrect amount of documents received (got "+ String.valueOf(result.documents.size()) +", expected 1)\t");
+                logger.error("Incorrect amount of documents received (got "+ String.valueOf(result.documents.size()) +", expected 1)\t");
                 success = false;
             }
         } catch (Exception ex) {
-            System.out.print(ex.getMessage()+"\t");
+            logger.error(ex.getMessage()+"\t");
             success = false;
         } finally {
             header.setPersonalIDCode(defaultPersonalID);
@@ -346,11 +346,11 @@ public class CommunicationTestClient {
                     success = true;
                 }
             } else {
-                System.out.print("Incorrect amount of documents received (got "+ String.valueOf(result.documents.size()) +", expected 1)\t");
+                logger.error("Incorrect amount of documents received (got "+ String.valueOf(result.documents.size()) +", expected 1)\t");
                 success = false;
             }
         } catch (Exception ex) {
-            System.out.print(ex.getMessage()+"\t");
+            logger.error(ex.getMessage()+"\t");
             success = false;
         } finally {
             header.setPersonalIDCode(defaultPersonalID);

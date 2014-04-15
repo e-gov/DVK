@@ -40,7 +40,7 @@ public class OrgCapabilityChecker {
 
 	        // Kontrollime seaded üle
 	        if (!(new File(propertiesFile)).exists()) {
-	            System.out.println("Application properties file " + propertiesFile + " does not exist!");
+	            logger.error("Application properties file " + propertiesFile + " does not exist!");
 	            return;
 	        }
 
@@ -62,7 +62,7 @@ public class OrgCapabilityChecker {
 	        // Kontrollime, et seadetes on märgitud vähemalt üks andmebaas, kus
 	        // andmeid saaks uuendada.
 	        if ((databases == null) || (databases.size() < 1)) {
-	            System.out.println("No database configured in configuration file "+ Settings.Client_ConfigFile +"!");
+                logger.error("No database configured in configuration file "+ Settings.Client_ConfigFile +"!");
 	            return;
 	        }
 
@@ -81,11 +81,11 @@ public class OrgCapabilityChecker {
 	        dvkClient.setOrgSettings(databases.get(0).getDvkSettings());
 
 	        // Tutvustame ennast kasutajale
-	        System.out.println("DVK Client started organization data syncronization with DVK central server. Syncronized databases: " + String.valueOf(databases.size()));
-	        System.out.println("Local X-Road secure server: " + Settings.Client_ServiceUrl);
-	        System.out.println("DVK version: " + Settings.Client_SpecificationVersion);
+            logger.info("DVK Client started organization data syncronization with DVK central server. Syncronized databases: " + String.valueOf(databases.size()));
+            logger.debug("Local X-Road secure server: " + Settings.Client_ServiceUrl);
+            logger.debug("DVK version: " + Settings.Client_SpecificationVersion);
 
-	        System.out.println("    Preparing request for DVK server...");
+            logger.info("    Preparing request for DVK server...");
 
 	        GetSendingOptionsV3ResponseType result = new GetSendingOptionsV3ResponseType();
 
@@ -114,7 +114,8 @@ public class OrgCapabilityChecker {
 	            try {
                     connection = DBConnection.getConnection(firstKnownDatabase);
                     DatabaseSessionService.getInstance().setSession(connection, firstKnownDatabase);
-	            	result = dvkClient.getSendingOptions(headerVar, null, null, null, false, -1, -1, databases.get(0).getDvkSettings().getGetSendingOptionsRequestVersion());
+                    logger.info("Current database: " + firstKnownDatabase.getDatabaseName());
+                    result = dvkClient.getSendingOptions(headerVar, null, null, null, false, -1, -1, databases.get(0).getDvkSettings().getGetSendingOptionsRequestVersion());
                     RequestLog requestLog = new RequestLog(".getSendingOptions.v" +
                             databases.get(0).getDvkSettings().getGetSendingOptionsRequestVersion(), "default_org", "default_user_code");
                     if (result != null) {
@@ -126,14 +127,14 @@ public class OrgCapabilityChecker {
 	            } catch (Exception ex) {
                     ErrorLog errorLog = new ErrorLog(ex, "dvk.client.OrgCapabilityChecker" + " main");
                     LoggingService.logError(errorLog);
-                    System.out.println("    Exception occured while exchanging data: " + ex.getMessage());
-	                System.out.println("Canceling work...");
+                    logger.error("    Exception occured while exchanging data: " + ex.getMessage());
+                    logger.info("Canceling work...");
 	                return;
 	            } finally {
                     CommonMethods.safeCloseDatabaseConnection(connection);
                     DatabaseSessionService.getInstance().clearSession();
                 }
-	            System.out.println("    Got response from DVK server...");
+                logger.info("    Got response from DVK server...");
 
 	            // Kui andmete vahetamisel kasutatava DVK serveri versioon on vähemalt 1.5, siis
 	            // küsime andmed ka allüksuste ja ametikohtade kohta.
@@ -147,12 +148,12 @@ public class OrgCapabilityChecker {
 		                }
 
 		                if ((result.allyksused == null) || (result.allyksused.size() < 1)) {
-			                System.out.println("    Requesting subdivision data...");
+                            logger.info("    Requesting subdivision data...");
 			                try {
                                 DatabaseSessionService.getInstance().setSession(dbConnection, firstKnownDatabase);
 			                	result.allyksused = dvkClient.getSubdivisionList(headerVar, orgCodes);
 			                } catch (Exception ex) {
-			                    System.out.println("    Exception occured while getting subdivision data...");
+                                logger.error("    Exception occured while getting subdivision data...");
                                 LoggingService.logError(new ErrorLog(ex, "dvk.client.OrgCapabilityChecker" + " main"));
 			                    result.allyksused = new ArrayList<Subdivision>();
 			                } finally {
@@ -161,12 +162,12 @@ public class OrgCapabilityChecker {
 		                }
 
 		                if ((result.ametikohad == null) || (result.ametikohad.size() < 1)) {
-			                System.out.println("    Requesting occupation data...");
+                            logger.info("    Requesting occupation data...");
 			                try {
                                 DatabaseSessionService.getInstance().setSession(dbConnection, firstKnownDatabase);
 			                	result.ametikohad = dvkClient.getOccupationList(headerVar, orgCodes);
 			                } catch (Exception ex) {
-			                    System.out.println("    Exception occured while getting occupation data...");
+                                logger.error("    Exception occured while getting occupation data...");
                                 LoggingService.logError(new ErrorLog(ex, "dvk.client.OrgCapabilityChecker" + " main"));
 			                    result.ametikohad = new ArrayList<Occupation>();
 			                } finally {
@@ -179,7 +180,7 @@ public class OrgCapabilityChecker {
 	        	logger.warn("No credentials.");
 	        }
 
-	        System.out.println("    Updating data in databases...");
+            logger.info("    Updating data in databases...");
 	        Runtime r = Runtime.getRuntime();
 	        for (int i = 0; i < databases.size(); ++i) {
 	            OrgSettings db = databases.get(i);
@@ -188,7 +189,8 @@ public class OrgCapabilityChecker {
 	            try {
 	            	dbConnection = DBConnection.getConnection(db);
                     DatabaseSessionService.getInstance().setSession(dbConnection, db);
-		            if (dbConnection == null) {
+                    logger.info("Current database: " + db.getDatabaseName());
+                    if (dbConnection == null) {
                         ErrorLog errorLog = new ErrorLog("Database connection is NULL " + db.getDatabaseName(), "dvk.client.OrgCapabilityChecker" + " main");
                         LoggingService.logError(errorLog);
 		            } else {
@@ -303,15 +305,15 @@ public class OrgCapabilityChecker {
 	            	CommonMethods.safeCloseDatabaseConnection(dbConnection);
 	            }
 	        }
-	        System.out.println("    Processing response data completed successfully!");
+            logger.info("    Processing response data completed successfully!");
         } catch (Exception ex) {
             ErrorLog errorLog = new ErrorLog(ex, "dvk.client.OrgCapabilityChecker" + " main");
             LoggingService.logError(errorLog);
-            System.out.println("    Exception occurred! " + ex.getMessage());
+            logger.error("    Exception occurred! " + ex.getMessage());
         }
 
         Date endDate = new Date();
-        System.out.println("\nWork complete. Client shutting down.");
-        System.out.println("Time elapsed: " + String.valueOf((double)(endDate.getTime() - startDate.getTime()) / 1000f) + " seconds.");
+        logger.info("\nWork complete. Client shutting down.");
+        logger.debug("Time elapsed: " + String.valueOf((double)(endDate.getTime() - startDate.getTime()) / 1000f) + " seconds.");
     }
 }

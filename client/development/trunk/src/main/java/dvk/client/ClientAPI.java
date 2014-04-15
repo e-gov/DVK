@@ -153,7 +153,7 @@ public class ClientAPI {
         try {
             // Manuse ID
             String attachmentName = String.valueOf(System.currentTimeMillis());
-            
+
             if (!messages.isEmpty()) {
                 // Päringu nimi
                 requestName = this.producerName + ".getSendStatus.v" + String.valueOf(requestVersion);
@@ -176,7 +176,7 @@ public class ClientAPI {
                 outStream = new FileOutputStream(attachmentFile, false);
                 outWriter = new OutputStreamWriter(outStream, "UTF-8");
                 writer = new BufferedWriter(outWriter);
-                
+
                 // Koostame sänumi sisu
                 ArrayList<Integer> processedIDs = new ArrayList<Integer>();
                 for (int i = 0; i < messages.size(); ++i) {
@@ -1838,7 +1838,7 @@ public class ClientAPI {
             dbConnection = DBConnection.getConnection(db);
             DatabaseSessionService.getInstance().setSession(dbConnection, db);
         } catch (Exception e) {
-            System.out.println("DVK kliendil ebaõnnestus andmebaasiga ühenduse tekitamine! " + e.getMessage());
+            logger.error("DVK kliendil ebaõnnestus andmebaasiga ühenduse tekitamine! " + e.getMessage());
             ErrorLog errorLog = new ErrorLog(e, "dvk.client.Client" + " main");
             LoggingService.logError(errorLog);
         }

@@ -106,7 +106,7 @@ public class AditGetSendStatusService {
                         }
                     }
                 } catch (Exception e) {
-                    System.out.println("DVK kliendi töös tekkis viga! " + e.getMessage());
+                    logger.error("DVK kliendi töös tekkis viga! " + e.getMessage());
                     ErrorLog errorLog = new ErrorLog(e, "dvk.client.Client" + " main");
                     LoggingService.logError(errorLog);
                 } finally {

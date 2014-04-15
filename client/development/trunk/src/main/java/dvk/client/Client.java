@@ -56,11 +56,11 @@ public class Client {
 
             int documentLifetimeInDays = CommonMethods.toIntSafe(documentLifetimeString, -1);
             InitExecType(runningMode);
-            System.out.println("\n\nKäivitamise reziim: " + ExecType);
+            logger.info("\n\nKäivitamise reziim: " + ExecType);
 
             // Check if application properties file exists
             if (!(new File(propertiesFile)).exists()) {
-                System.out.println("Application properties file " + propertiesFile + " does not exist!");
+                logger.error("Application properties file " + propertiesFile + " does not exist!");
                 return;
             }
 
@@ -81,10 +81,10 @@ public class Client {
 
             // Quit if no client databases are defined
             if (currentClientDatabases.isEmpty()) {
-                System.out.println("DVK kliendi seadistuses pole ühtegi andmebaasi!");
+                logger.error("DVK kliendi seadistuses pole ühtegi andmebaasi!");
                 return;
             } else {
-                System.out.println("DVK klient alustab andmete uuendamist " + String.valueOf(currentClientDatabases.size()) + " andmebaasis");
+                logger.info("DVK klient alustab andmete uuendamist " + String.valueOf(currentClientDatabases.size()) + " andmebaasis");
             }
 
             dvkClient = new ClientAPI();
@@ -92,7 +92,7 @@ public class Client {
                 dvkClient.initClient(Settings.Client_ServiceUrl, Settings.Client_ProducerName);
                 dvkClient.setAllKnownDatabases(allKnownDatabases);
             } catch (Exception ex) {
-                ex.printStackTrace();
+                logger.error(ex.getStackTrace());
                 ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " main");
                 LoggingService.logError(errorLog);
                 return;
@@ -119,6 +119,8 @@ public class Client {
                         dbConnection = DBConnection.getConnection(db);
                         DatabaseSessionService.getInstance().setSession(dbConnection, db);
 
+                        logger.info("Current database: " + db.getDatabaseName());
+
                         dvkClient.setOrgSettings(db.getDvkSettings());
                         UnitCredential[] credentials = UnitCredential.getCredentials(db, dbConnection);
 
@@ -128,8 +130,8 @@ public class Client {
                                 if ((secureServer == null) || secureServer.equalsIgnoreCase("")) {
                                     secureServer = Settings.Client_ServiceUrl;
                                 }
-                                System.out.println("\nAsutus: " + credentials[i].getInstitutionName());
-                                System.out.println("Asutuse turvaserver: " + secureServer);
+                                logger.info("\nAsutus: " + credentials[i].getInstitutionName());
+                                logger.info("Asutuse turvaserver: " + secureServer);
                                 dvkClient.setServiceURL(secureServer);
 
                                 // Saadame DHL poole teele saatmist ootavad dokumendid
@@ -137,21 +139,21 @@ public class Client {
 
                                 if (sentMessages > 0) {
                                     // Uuendame saatmisel olevate dokumentide staatust
-                                    System.out.println("\nUuendan välja saadetud sõnumite staatusi...");
+                                    logger.info("\nUuendan välja saadetud sõnumite staatusi...");
                                     int updatedMessages = UpdateSendStatus(credentials[i], db, dbConnection);
-                                    System.out.println("Välja saadetud sõnumite (" + updatedMessages + ") staatused uuendatud!");
+                                    logger.info("Välja saadetud sõnumite (" + updatedMessages + ") staatused uuendatud!");
                                 }
 
                                 // Saadame vastuvõetud sõnumite staatusemuudatused ja veateated
                                 if (db.getDvkSettings().getMarkDocumentsReceivedRequestVersion() > 1) {
-                                    System.out.println("\nUuendan vastuvõetud sõnumite staatusi ja veateateid...");
+                                    logger.info("\nUuendan vastuvõetud sõnumite staatusi ja veateateid...");
                                     int updatedMessages = UpdateClientStatus(credentials[i], db, dbConnection);
-                                    System.out.println("Vastuvõetud sõnumite (" + updatedMessages + ") staatused ja veateated uuendatud!");
+                                    logger.info("Vastuvõetud sõnumite (" + updatedMessages + ") staatused ja veateated uuendatud!");
                                 }
                             } catch (Exception ex) {
                                 ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " main");
                                 LoggingService.logError(errorLog);
-                                System.out.println("Viga DVK andmevahetuses (väljuvad): " + ex.getMessage());
+                                logger.error("Viga DVK andmevahetuses (väljuvad): " + ex.getMessage());
                             }
                         }
                     } finally {
@@ -188,6 +190,7 @@ public class Client {
                         try {
                             dbConnection = DBConnection.getConnection(db);
                             DatabaseSessionService.getInstance().setSession(dbConnection, db);
+                            logger.info("Current database: " + db.getDatabaseName());
                             dvkClient.setOrgSettings(db.getDvkSettings());
                             UnitCredential[] credentials = UnitCredential.getCredentials(db, dbConnection);
 
@@ -197,31 +200,31 @@ public class Client {
                                     if ((secureServer == null) || secureServer.equalsIgnoreCase("")) {
                                         secureServer = Settings.Client_ServiceUrl;
                                     }
-                                    System.out.println("\nAsutus: " + credentials[i].getInstitutionName());
-                                    System.out.println("Asutuse turvaserver: " + secureServer);
+                                    logger.info("\nAsutus: " + credentials[i].getInstitutionName());
+                                    logger.info("Asutuse turvaserver: " + secureServer);
                                     dvkClient.setServiceURL(secureServer);
 
                                     // Küsime DHL-st meile saadetud dokumendid
-                                    System.out.println("\nVõtan vastu saabuvaid sõnumeid...");
+                                    logger.info("\nVõtan vastu saabuvaid sõnumeid...");
                                     //// Küsime DHL-st meile saadetud dokumendid
                                     ReceiveNewMessages(credentials[i], db, dbConnection);
-                                    System.out.println("Saabuvad sõnumid vastu võetud!");
+                                    logger.info("Saabuvad sõnumid vastu võetud!");
 
                                     // Saadame vastuvõetud sõnumite staatusemuudatused ja veateated
                                     if (db.getDvkSettings().getMarkDocumentsReceivedRequestVersion() > 1) {
-                                        System.out.println("\nUuendan vastuvõetud sõnumite staatusi ja veateateid...");
+                                        logger.info("\nUuendan vastuvõetud sõnumite staatusi ja veateateid...");
                                         int updatedMessages = UpdateClientStatus(credentials[i], db, dbConnection);
-                                        System.out.println("Vastuvõetud sõnumite (" + updatedMessages + ") staatused ja veateated uuendatud!");
+                                        logger.info("Vastuvõetud sõnumite (" + updatedMessages + ") staatused ja veateated uuendatud!");
                                     }
 
                                     // Uuendame saatmisel olevate dokumentide staatust - vajalik selleks, et saatja dokumendi staatus saaks muudetud
-                                    System.out.println("\nUuendan välja saadetud sõnumite staatusi...");
+                                    logger.info("\nUuendan välja saadetud sõnumite staatusi...");
                                     int updatedMessages = UpdateSendStatus(credentials[i], db, dbConnection);
-                                    System.out.println("Välja saadetud sõnumite (" + updatedMessages + ") staatused uuendatud!");
+                                    logger.info("Välja saadetud sõnumite (" + updatedMessages + ") staatused uuendatud!");
                                 } catch (Exception ex) {
                                     ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " main");
                                     LoggingService.logError(errorLog);
-                                    System.out.println("Viga DVK andmevahetuses (saabuvad): " + ex.getMessage());
+                                    logger.error("Viga DVK andmevahetuses (saabuvad): " + ex.getMessage());
                                 }
                             }
                         } finally {
@@ -231,7 +234,7 @@ public class Client {
                     }
                 } else {
 
-                    logger.debug("Laeme asutuste nimekrija, kellel on alla laadimist ootavaid dokumente.");
+                    logger.info("Laeme asutuste nimekrija, kellel on alla laadimist ootavaid dokumente.");
 
                     // Laeme asutuste nimekrija, kellel on alla laadimist ootavaid dokumente
                     try {
@@ -243,13 +246,13 @@ public class Client {
                         LoggingService.logMarkDocumentsRequestToDataBases(currentClientDatabases, requestLog);
 
                         if ((waitingInstitutions != null) && (!waitingInstitutions.asutused.isEmpty())) {
-                            logger.debug("Asutuste nimekiri käes. Alustame töötlemist.");
+                            logger.info("Asutuste nimekiri käes. Alustame töötlemist.");
                             for (OrgSettings db : currentClientDatabases) {
                                 Connection dbConnection = null;
                                 try {
                                     dbConnection = DBConnection.getConnection(db);
                                     DatabaseSessionService.getInstance().setSession(dbConnection, db);
-
+                                    logger.info("Current database: " + db.getDatabaseName());
                                     dvkClient.setOrgSettings(db.getDvkSettings());
                                     UnitCredential[] credentials = UnitCredential.getCredentials(db, dbConnection);
                                     for (int i = 0; i < credentials.length; ++i) {
@@ -311,33 +314,33 @@ public class Client {
                                                 if ((secureServer == null) || secureServer.equalsIgnoreCase("")) {
                                                     secureServer = Settings.Client_ServiceUrl;
                                                 }
-                                                System.out.println("\nAsutus: " + credentials[i].getInstitutionName());
-                                                System.out.println("Asutuse turvaserver: " + secureServer);
+                                                logger.info("\nAsutus: " + credentials[i].getInstitutionName());
+                                                logger.info("Asutuse turvaserver: " + secureServer);
                                                 dvkClient.setServiceURL(secureServer);
 
                                                 // Küsime DHL-st meile saadetud dokumendid
-                                                System.out.println("\nVõtan vastu saabuvaid sõnumeid...");
-                                                System.out.println("\nSõnumite alla laadimist ootavate asutuste arv: " + waitingInstitutions.asutused.size());
+                                                logger.info("\nVõtan vastu saabuvaid sõnumeid...");
+                                                logger.info("\nSõnumite alla laadimist ootavate asutuste arv: " + waitingInstitutions.asutused.size());
                                                 //// Küsime DHL-st meile saadetud dokumendid
                                                 ReceiveNewMessages(credentials[i], db, dbConnection);
-                                                System.out.println("Saabuvad sõnumid vastu võetud!");
+                                                logger.info("Saabuvad sõnumid vastu võetud!");
 
                                                 // Saadame vastuvõetud sõnumite staatusemuudatused ja veateated
                                                 if (db.getDvkSettings().getMarkDocumentsReceivedRequestVersion() > 1) {
-                                                    System.out.println("\nUuendan vastuvõetud sõnumite staatusi ja veateateid...");
+                                                    logger.info("\nUuendan vastuvõetud sõnumite staatusi ja veateateid...");
                                                     int updatedMessages = UpdateClientStatus(credentials[i], db, dbConnection);
-                                                    System.out.println("Vastuvõetud sõnumite (" + updatedMessages + ") staatused ja veateated uuendatud!");
+                                                    logger.info("Vastuvõetud sõnumite (" + updatedMessages + ") staatused ja veateated uuendatud!");
                                                 }
 
                                                 // Uuendame saatmisel olevate dokumentide staatust - vajalik selleks, et saatja dokumendi staatus saaks muudetud
-                                                System.out.println("\nUuendan välja saadetud sõnumite staatusi...");
+                                                logger.info("\nUuendan välja saadetud sõnumite staatusi...");
                                                 int updatedMessages = UpdateSendStatus(credentials[i], db, dbConnection);
-                                                System.out.println("Välja saadetud sõnumite (" + updatedMessages + ") staatused uuendatud!");
+                                                logger.info("Välja saadetud sõnumite (" + updatedMessages + ") staatused uuendatud!");
                                             }
                                         } catch (Exception ex) {
                                                 ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " main");
                                                 LoggingService.logError(errorLog);
-                                                System.out.println("Viga DVK andmevahetuses (saabuvad): " + ex.getMessage());
+                                                logger.error("Viga DVK andmevahetuses (saabuvad): " + ex.getMessage());
                                         }
                                     }
                                 } finally {
@@ -367,6 +370,7 @@ public class Client {
                     try {
                         dbConnection = DBConnection.getConnection(db);
                         DatabaseSessionService.getInstance().setSession(dbConnection, db);
+                        logger.info("Current database: " + db.getDatabaseName());
                         dvkClient.setOrgSettings(db.getDvkSettings());
                         UnitCredential[] credentials = UnitCredential.getCredentials(db, dbConnection);
                         for (int i = 0; i < credentials.length; ++i) {
@@ -376,25 +380,25 @@ public class Client {
                                 if ((secureServer == null) || secureServer.equalsIgnoreCase("")) {
                                     secureServer = Settings.Client_ServiceUrl;
                                 }
-                                System.out.println("\nAsutus: " + credentials[i].getInstitutionName());
-                                System.out.println("Asutuse turvaserver: " + secureServer);
+                                logger.info("\nAsutus: " + credentials[i].getInstitutionName());
+                                logger.info("Asutuse turvaserver: " + secureServer);
                                 dvkClient.setServiceURL(secureServer);
 
                                 // Saadame vastuvõetud sõnumite staatusemuudatused ja veateated
                                 if (db.getDvkSettings().getMarkDocumentsReceivedRequestVersion() > 1) {
-                                    System.out.println("\nUuendan vastuvõetud sõnumite staatusi ja veateateid...");
+                                    logger.info("\nUuendan vastuvõetud sõnumite staatusi ja veateateid...");
                                     int updatedMessages = UpdateClientStatus(credentials[i], db, dbConnection);
-                                    System.out.println("Vastuvõetud sõnumite (" + updatedMessages + ") staatused ja veateated uuendatud!");
+                                    logger.info("Vastuvõetud sõnumite (" + updatedMessages + ") staatused ja veateated uuendatud!");
                                 }
 
                                 // Uuendame saatmisel olevate dokumentide staatust - vajalik selleks, et saatja dokumendi staatus saaks muudetud
-                                System.out.println("\nUuendan sõnumite staatusi...");
+                                logger.info("\nUuendan sõnumite staatusi...");
                                 int updatedMessages = UpdateSendStatus(credentials[i], db, dbConnection);
-                                System.out.println("Sõnumite (" + updatedMessages + ") staatused uuendatud!");
+                                logger.info("Sõnumite (" + updatedMessages + ") staatused uuendatud!");
                             } catch (Exception ex) {
                                 ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " main");
                                 LoggingService.logError(errorLog);
-                                System.out.println("Viga DVK andmevahetuses (staatuse uuendamine): " + ex.getMessage());
+                                logger.error("Viga DVK andmevahetuses (staatuse uuendamine): " + ex.getMessage());
                             }
                         }
                     } finally {
@@ -419,9 +423,10 @@ public class Client {
                             try {
                                 dbConnection = DBConnection.getConnection(db);
                                 DatabaseSessionService.getInstance().setSession(dbConnection, db);
-                                System.out.println("\nKustutan andmebaasist \"" + db.getDatabaseName() + "\" kõik " + currentDbDocLifetimeInDays + " päevast vanemad dokumendid");
+                                logger.info("Current database: " + db.getDatabaseName());
+                                logger.info("\nKustutan andmebaasist \"" + db.getDatabaseName() + "\" kõik " + currentDbDocLifetimeInDays + " päevast vanemad dokumendid");
                                 int deletedDocumentCount = DhlMessage.deleteOldDocuments(currentDbDocLifetimeInDays, db, dbConnection);
-                                System.out.println("Kustutatud kokku " + deletedDocumentCount + " dokumenti.");
+                                logger.info("Kustutatud kokku " + deletedDocumentCount + " dokumenti.");
 
                                 logger.info("Deleted " + deletedDocumentCount + " old documents from database \"" + db.getDatabaseName() + "\". Application was configured to delete all documents older than " + currentDbDocLifetimeInDays + " days.");
                             } finally {
@@ -429,7 +434,7 @@ public class Client {
                                 DatabaseSessionService.getInstance().clearSession();
                             }
                         } else {
-                            System.out.println("Andmebaasist \"" + db.getDatabaseName() + "\" ei kustutata ühtegi dokumenti.");
+                            logger.info("Andmebaasist \"" + db.getDatabaseName() + "\" ei kustutata ühtegi dokumenti.");
                         }
                     }
                 }
@@ -441,7 +446,7 @@ public class Client {
                     aditDvkApi.initClient(Settings.Client_ServiceUrl, Settings.Client_AditProducerName);
                     aditDvkApi.setAllKnownDatabases(allKnownDatabases);
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    logger.error(ex.getStackTrace());
                     ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " main");
                     LoggingService.logError(errorLog);
                     return;
@@ -452,13 +457,13 @@ public class Client {
                 aditGetSendStatusService.updateAditSendStatusFor(currentClientDatabases);
             }
         } catch (Exception ex) {
-            System.out.println("DVK kliendi töös tekkis viga! " + ex.getMessage());
+            logger.error("DVK kliendi töös tekkis viga! " + ex.getMessage());
             ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " main");
             LoggingService.logError(errorLog);
         }
 
         // Kustutame ajutised failid
-        System.out.println("\n\nKustutan loodud ajutised failid...");
+        logger.info("\n\nKustutan loodud ajutised failid...");
         if (!tempFiles.isEmpty()) {
             for (int i = 0; i < tempFiles.size(); ++i) {
                 try {
@@ -473,11 +478,11 @@ public class Client {
             }
         }
         CommonMethods.deleteOldPipelineFiles(2500, true);
-        System.out.println("Ajutised failid kustutatud!");
+        logger.info("Ajutised failid kustutatud!");
 
         Date endDate = new Date();
-        System.out.println("\n\nDVK klient lõpetab töö.");
-        System.out.println("Andmete uuendamiseks kulus " + String.valueOf((double) (endDate.getTime() - startDate.getTime()) / 1000f) + " sekundit.");
+        logger.info("\n\nDVK klient lõpetab töö.");
+        logger.info("Andmete uuendamiseks kulus " + String.valueOf((double) (endDate.getTime() - startDate.getTime()) / 1000f) + " sekundit.");
     }
 
     // Kuvab juhised programmi käivitamiseks. Valede parameetrite korral kuvatakse alati juhised
@@ -520,34 +525,34 @@ public class Client {
     }
 
     private static void ShowHelp() {
-        System.out.println("Programmi käivitamise parameetrid:");
-        System.out.println("  -mode=X");
-        System.out.println("    Parameetri võimalikud väärtused:");
-        System.out.println("    1 - ootel dokumentide välja saatmine");
-        System.out.println("    2 - saatmisel olevate dokumentide alla laadimine (sissetulevad)");
-        System.out.println("    3 - nii saatmine kui ka vastuvõtmine (1 ja 2)");
-        System.out.println("    4 - ainult staatuste uuendamine");
-        System.out.println("    5 - vanade dokumentide kustutamine");
-        System.out.println("    6 - uuenda ADIT'isse saadetud dokumentide avamise kuupäevi");
-        System.out.println("");
-        System.out.println("    Näiteks: java dvk.client.Client -mode=3");
-        System.out.println("");
-        System.out.println("");
-        System.out.println("  -prop=X");
-        System.out.println("    Kliendi seadete faili dvk_client.properties asukoha etteandmine");
-        System.out.println("");
-        System.out.println("    Näiteks: java dvk.client.Client -prop=\"C:\\dvk\\dvk_client.properties\"");
-        System.out.println("");
-        System.out.println("");
-        System.out.println("  -docLifetimeDays=X");
-        System.out.println("    Määrab, mitu päeva peab dokument vana olema selleks, et see maha kustutataks");
-        System.out.println("");
-        System.out.println("    Näiteks: java dvk.client.Client -mode=5 -docLifetimeDays=7");
-        System.out.println("");
-        System.out.println("    Näitena toodud käsk kustutab DVK kliendi andmebaasist kõik rohkem kui 7 päeva vanad dokumendid");
-        System.out.println("");
-        System.out.println("");
-        System.out.println("Parameetrite puudumisel teostatakse saatmine, vastuvõtmine ja staatuste uuendamine");
+        logger.info("Programmi käivitamise parameetrid:");
+        logger.info("  -mode=X");
+        logger.info("    Parameetri võimalikud väärtused:");
+        logger.info("    1 - ootel dokumentide välja saatmine");
+        logger.info("    2 - saatmisel olevate dokumentide alla laadimine (sissetulevad)");
+        logger.info("    3 - nii saatmine kui ka vastuvõtmine (1 ja 2)");
+        logger.info("    4 - ainult staatuste uuendamine");
+        logger.info("    5 - vanade dokumentide kustutamine");
+        logger.info("    6 - uuenda ADIT'isse saadetud dokumentide avamise kuupäevi");
+        logger.info("");
+        logger.info("    Näiteks: java dvk.client.Client -mode=3");
+        logger.info("");
+        logger.info("");
+        logger.info("  -prop=X");
+        logger.info("    Kliendi seadete faili dvk_client.properties asukoha etteandmine");
+        logger.info("");
+        logger.info("    Näiteks: java dvk.client.Client -prop=\"C:\\dvk\\dvk_client.properties\"");
+        logger.info("");
+        logger.info("");
+        logger.info("  -docLifetimeDays=X");
+        logger.info("    Määrab, mitu päeva peab dokument vana olema selleks, et see maha kustutataks");
+        logger.info("");
+        logger.info("    Näiteks: java dvk.client.Client -mode=5 -docLifetimeDays=7");
+        logger.info("");
+        logger.info("    Näitena toodud käsk kustutab DVK kliendi andmebaasist kõik rohkem kui 7 päeva vanad dokumendid");
+        logger.info("");
+        logger.info("");
+        logger.info("Parameetrite puudumisel teostatakse saatmine, vastuvõtmine ja staatuste uuendamine");
     }
 
     private static int UpdateSendStatus(UnitCredential masterCredential, OrgSettings db, Connection dbConnection) {
@@ -559,7 +564,7 @@ public class Client {
             messages.addAll(messages2);
 
             messages2 = null;
-            System.out.println("    Saatmisel olevaid sõnumeid: " + String.valueOf(messages.size()));
+            logger.info("    Saatmisel olevaid sõnumeid: " + String.valueOf(messages.size()));
             if (!messages.isEmpty()) {
                 HeaderVariables header = new HeaderVariables(
                         masterCredential.getInstitutionCode(),
@@ -620,9 +625,9 @@ public class Client {
                         }
                     }
                     dvkClient.initClient(realServiceURL, realProducerName);
-                    System.out.println("    Suhtlen DVK serveriga...");
+                    logger.info("    Suhtlen DVK serveriga...");
                     ArrayList<GetSendStatusResponseItem> result = dvkClient.getSendStatus(header, dhlIDs, true);
-                    System.out.println("    Töötlen DVKst saadud vastust...");
+                    logger.info("    Töötlen DVKst saadud vastust...");
 
                     // Teeme vastussõnumi andmetest omad järeldused
                     UpdateStatusChangesInDB(result, producerName, serviceURL, db, dbConnection);
@@ -633,7 +638,7 @@ public class Client {
         } catch (Exception ex) {
             ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " UpdateSendStatus");
             LoggingService.logError(errorLog);
-            System.out.println("    Staatuste uuendamisel tekkis viga: " + ex.getMessage());
+            logger.error("    Staatuste uuendamisel tekkis viga: " + ex.getMessage());
         }
 
         // Taastame seadistuse, et klient oleks vaikimisi seadistatud päringuid saatma konfiguratsioonifailis
@@ -668,7 +673,7 @@ public class Client {
         int resultCounter = 0;
         try {
             ArrayList<DhlMessage> messages = DhlMessage.getList(true, Settings.Client_StatusReceived, masterCredential.getUnitID(), true, true, db, dbConnection);
-            System.out.println("    Staatuse uuendamist vajavaid sõnumeid: " + String.valueOf(messages.size()));
+            logger.info("    Staatuse uuendamist vajavaid sõnumeid: " + String.valueOf(messages.size()));
             if ((messages != null) && !messages.isEmpty()) {
                 MarkDocumentsReceived(messages, masterCredential, "", db, dbConnection);
                 resultCounter = messages.size();
@@ -682,7 +687,7 @@ public class Client {
         } catch (Exception ex) {
             ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " UpdateClientStatus");
             LoggingService.logError(errorLog);
-            System.out.println("    Staatuste uuendamisel tekkis viga: " + ex.getMessage());
+            logger.error("    Staatuste uuendamisel tekkis viga: " + ex.getMessage());
         }
         return resultCounter;
     }
@@ -698,11 +703,11 @@ public class Client {
 
             ArrayList<DhlMessage> messages = DhlMessage.getList(false, Settings.Client_StatusWaiting, masterCredential.getUnitID(), false, false, db, dbConnection);
             if (messages.size() == 0) {
-                System.out.println("Saatmist ootavaid sõnumeid ei leitud!");
+                logger.info("Saatmist ootavaid sõnumeid ei leitud!");
                 return resultCounter;
             } else {
-                System.out.println("\nSaadan väljuvaid sõnumeid...");
-                System.out.println("    Saatmist ootavaid sõnumeid: " + String.valueOf(messages.size()));
+                logger.info("\nSaadan väljuvaid sõnumeid...");
+                logger.info("    Saatmist ootavaid sõnumeid: " + String.valueOf(messages.size()));
             }
 
             HeaderVariables header = new HeaderVariables(
@@ -799,7 +804,7 @@ public class Client {
 
                     errorLog.setMessageId(msg.getId());
                     LoggingService.logError(errorLog);
-                    System.out.println("    Sõnumite saatmisel tekkis viga: " + ex1.getMessage());
+                    logger.error("    Sõnumite saatmisel tekkis viga: " + ex1.getMessage());
                     if (msg != null) {
                         try {
                             //msg.setFilePath(originalFilePath);
@@ -813,17 +818,17 @@ public class Client {
                             errorLog1.setUserCode(msg.getSenderPersonCode());
                             errorLog1.setMessageId(msg.getId());
                             LoggingService.logError(errorLog1);
-                            System.out.println("    Sõnumite saatmisel tekkis viga: " + ex2.getMessage());
+                            logger.error("    Sõnumite saatmisel tekkis viga: " + ex2.getMessage());
                         }
                     }
                 }
             }
-            System.out.println("Väljuvad sõnumid saadetud!");
+            logger.info("Väljuvad sõnumid saadetud!");
 
         } catch (Exception ex) {
             ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " SendUnsentMessages");
             LoggingService.logError(errorLog);
-            System.out.println("    Sõnumite saatmisel tekkis viga: " + ex.getMessage());
+            logger.error("    Sõnumite saatmisel tekkis viga: " + ex.getMessage());
         }
         return resultCounter;
     }
@@ -843,7 +848,7 @@ public class Client {
             ArrayList<DhlMessage> receivedDocs = new ArrayList<DhlMessage>();
             ArrayList<DhlMessage> failedDocs = new ArrayList<DhlMessage>();
 
-            System.out.println("    Saadud " + String.valueOf(resultFiles.documents.size()) + " dokumenti.");
+            logger.info("    Saadud " + String.valueOf(resultFiles.documents.size()) + " dokumenti.");
             for (int i = 0; i < resultFiles.documents.size(); ++i) {
                 DhlMessage message = new DhlMessage(resultFiles.documents.get(i), masterCredential);
                 message.setIsIncoming(true);
@@ -890,7 +895,7 @@ public class Client {
         } catch (Exception ex) {
             ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " ReceiveNewMessages");
             LoggingService.logError(errorLog);
-            System.out.println("Dokumentide vastuvõtmisel tekkis viga: " + ex.getMessage());
+            logger.error("Dokumentide vastuvõtmisel tekkis viga: " + ex.getMessage());
         }
     }
 
@@ -916,7 +921,7 @@ public class Client {
         } catch (Exception ex) {
             ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " MarkDocumentsReceived");
             LoggingService.logError(errorLog);
-            System.out.println("    Dokumentide staatuste uuendamisel tekkis viga: " + ex.getMessage());
+            logger.error("    Dokumentide staatuste uuendamisel tekkis viga: " + ex.getMessage());
             return;
         }
     }

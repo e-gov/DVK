@@ -23,11 +23,14 @@ import org.apache.axis.Message;
 import org.apache.axis.attachments.AttachmentPart;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public class TestClient {
+    static Logger logger = Logger.getLogger(TestClient.class.getName());
+
     public static void main(String[] args) {
         try {
             // Laeme seaded
@@ -51,13 +54,13 @@ public class TestClient {
                 call.setTimeout(60 * 60 * 1000);
             } catch (Exception ex) {
                 CommonMethods.logError(ex, "clnt.DhlTestClient", "main");
-                System.out.println("Viga teenuse proksi loomisel: " + ex.getMessage());
-                System.out.println("Katkestan tõõ...");
+                logger.error("Viga teenuse proksi loomisel: " + ex.getMessage());
+                logger.error("Katkestan tõõ...");
                 return;
             }
 
             // Debug information
-            System.out.println("Producer: " + Settings.Client_ProducerName);
+            logger.debug("Producer: " + Settings.Client_ProducerName);
 
             FileInputStream configStream = new FileInputStream(Settings.currentProperties.getProperty("test_config_file"));
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

@@ -315,9 +315,6 @@ public class DhlMessage implements Cloneable {
     }
 
     public void setFaultString(String faultString) {
-        if (!CommonMethods.isNullOrEmpty(faultString)) {
-            faultString.replaceAll("(\r\n|\n)", "<br/>");
-        }
         m_faultString = faultString;
     }
 
@@ -821,7 +818,7 @@ public class DhlMessage implements Cloneable {
                 cs.setInt(parNr++, m_recipientStatusID);
                 cs.setString(parNr++, m_faultCode);
                 cs.setString(parNr++, m_faultActor);
-                cs.setString(parNr++, m_faultString);
+                cs.setString(parNr++, CommonMethods.replaceAllSpecialCharactersInString(m_faultString));
                 cs.setString(parNr++, m_faultDetail);
                 cs.setInt(parNr++, (m_statusUpdateNeeded ? 1 : 0));
                 cs.setString(parNr++, m_metaXML);
@@ -915,7 +912,7 @@ public class DhlMessage implements Cloneable {
                 cs.setInt(parNr++, m_recipientStatusID);
                 cs.setString(parNr++, m_faultCode);
                 cs.setString(parNr++, m_faultActor);
-                cs.setString(parNr++, m_faultString);
+                cs.setString(parNr++, CommonMethods.replaceAllSpecialCharactersInString(m_faultString));
                 cs.setString(parNr++, m_faultDetail);
                 cs.setInt(parNr++, (m_statusUpdateNeeded ? 1 : 0));
                 cs.setString(parNr++, m_metaXML);
@@ -994,7 +991,7 @@ public class DhlMessage implements Cloneable {
                 cs.setInt(parNr++, m_recipientStatusID);
                 cs.setString(parNr++, m_faultCode);
                 cs.setString(parNr++, m_faultActor);
-                cs.setString(parNr++, m_faultString);
+                cs.setString(parNr++, CommonMethods.replaceAllSpecialCharactersInString(m_faultString));
                 cs.setString(parNr++, m_faultDetail);
                 cs.setInt(parNr++, (m_statusUpdateNeeded ? 1 : 0));
                 cs.setString(parNr++, m_metaXML);

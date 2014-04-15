@@ -80,7 +80,7 @@ public class LoggingService {
             cs.setString(parNr++, errorLog.getOrganizationCode());
             cs.setString(parNr++, errorLog.getUserCode().replaceAll("(\r\n|\n)", "<br/>"));
             cs.setString(parNr++, errorLog.getActionName());
-            cs.setString(parNr++, errorLog.getErrorMessage());
+            cs.setString(parNr++, CommonMethods.replaceAllSpecialCharactersInString(errorLog.getErrorMessage()));
             if (errorLog.getMessageId() > 0) {
                 cs.setInt(parNr++, errorLog.getMessageId());
             } else {

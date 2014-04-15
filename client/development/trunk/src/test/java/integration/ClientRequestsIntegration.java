@@ -270,7 +270,7 @@ public class ClientRequestsIntegration {
         try {
             setUpFromConfigFile(propertiesFile);
         } catch (Exception ex) {
-            System.out.println("Can't get connection to DB");
+            logger.error("Can't get connection to DB");
             throw ex;
         }
 
@@ -314,7 +314,7 @@ public class ClientRequestsIntegration {
         try {
             setUpFromConfigFile(propertiesFile);
         } catch (Exception ex) {
-            System.out.println("Can't get connection to DB");
+            logger.error("Can't get connection to DB");
             throw ex;
         }
 

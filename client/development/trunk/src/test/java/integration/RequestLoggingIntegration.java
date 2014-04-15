@@ -10,6 +10,7 @@ import dvk.core.CommonMethods;
 import dvk.core.Settings;
 import ee.ria.dvk.client.testutil.IntegrationTestsConfigUtil;
 import junit.framework.Assert;
+import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import java.sql.Connection;
@@ -26,11 +27,13 @@ public class RequestLoggingIntegration {
     static String userCode = "39105200028";
     static String response = ResponseStatus.OK.toString();
 
+    static Logger logger = Logger.getLogger(RequestLoggingIntegration.class.getName());
+
     public Connection setUpFromConfigFile(String path) {
         Connection connection = null;
 
         if ("".equals(path)) {
-            System.out.println("Can't find properties file");
+            logger.error("Can't find properties file");
         }
 
         // Load settings from config file and start using this database
@@ -39,7 +42,7 @@ public class RequestLoggingIntegration {
         try {
             connection = DBConnection.getConnection(allKnownDatabases.get(0));
         } catch (Exception ex) {
-            System.out.println("Can't get a connection to DB");
+            logger.error("Can't get a connection to DB");
         }
         DatabaseSessionService.getInstance().setSession(connection, allKnownDatabases.get(0));
 

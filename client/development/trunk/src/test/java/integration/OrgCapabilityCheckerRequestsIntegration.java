@@ -13,6 +13,7 @@ import dvk.core.HeaderVariables;
 import dvk.core.Settings;
 import ee.ria.dvk.client.testutil.IntegrationTestsConfigUtil;
 import junit.framework.Assert;
+import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import java.sql.Connection;
@@ -22,6 +23,8 @@ import java.util.List;
 public class OrgCapabilityCheckerRequestsIntegration {
 
     private ClientAPI dvkClient;
+
+    static Logger logger = Logger.getLogger(OrgCapabilityCheckerRequestsIntegration.class.getName());
 
     @Test
     public void getOccupationListAndGetSendingOptionsAndGetSubdivionListRequestsTest() {
@@ -46,7 +49,7 @@ public class OrgCapabilityCheckerRequestsIntegration {
                 credList = UnitCredential.getCredentials(DatabaseSessionService.getInstance().getOrgSettings(),
                         DatabaseSessionService.getInstance().getConnection());
             } catch (Exception ex) {
-                System.out.println("Unable to find credential");
+                logger.error("Unable to find credential");
                 DatabaseSessionService.getInstance().clearSession();
                 CommonMethods.safeCloseDatabaseConnection(DatabaseSessionService.getInstance().getConnection());
                 Assert.fail();
@@ -68,7 +71,7 @@ public class OrgCapabilityCheckerRequestsIntegration {
                 resultOfGetSendingOptions = dvkClient.getSendingOptions(headerVar, null, null, null, false, -1, -1,
                         DatabaseSessionService.getInstance().getOrgSettings().getDvkSettings().getGetSendingOptionsRequestVersion());
             } catch (Exception ex) {
-                System.out.println("Problems in getSendingOptions request");
+                logger.error("Problems in getSendingOptions request");
                 CommonMethods.safeCloseDatabaseConnection(DatabaseSessionService.getInstance().getConnection());
                 DatabaseSessionService.getInstance().clearSession();
                 Assert.fail();
@@ -90,7 +93,7 @@ public class OrgCapabilityCheckerRequestsIntegration {
                 resultOfGetOccupationList = dvkClient.getOccupationList(headerVar, orgCodes,
                         DatabaseSessionService.getInstance().getOrgSettings().getDvkSettings().getGetSendStatusRequestVersion());
             } catch (Exception ex) {
-                System.out.println("Problems in getOccupationList request");
+                logger.error("Problems in getOccupationList request");
                 CommonMethods.safeCloseDatabaseConnection(DatabaseSessionService.getInstance().getConnection());
                 DatabaseSessionService.getInstance().clearSession();
                 Assert.fail();
@@ -104,7 +107,7 @@ public class OrgCapabilityCheckerRequestsIntegration {
             try {
                 resultOfGetSubdivisionList = dvkClient.getSubdivisionList(headerVar, orgCodes);
             } catch (Exception ex) {
-                System.out.println("Problems in getSendingOptions request");
+                logger.error("Problems in getSendingOptions request");
                 CommonMethods.safeCloseDatabaseConnection(DatabaseSessionService.getInstance().getConnection());
                 DatabaseSessionService.getInstance().clearSession();
                 Assert.fail();

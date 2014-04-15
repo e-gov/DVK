@@ -80,9 +80,7 @@ public class ErrorLog {
     }
 
     public void setMessageId(int messageId){
-        if (messageId != 0) {
             this.messageId = messageId;
-        }
     }
 
     public int getMessageId(){

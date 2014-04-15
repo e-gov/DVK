@@ -33,7 +33,7 @@ public class ErrorLoggingIntegration {
 
 
         if ("".equals(path)) {
-            System.out.println("Can't find properties file");
+            logger.error("Can't find properties file");
         }
 
         // Load settings from config file and start using this database
@@ -42,7 +42,7 @@ public class ErrorLoggingIntegration {
         try {
             connection = DBConnection.getConnection(allKnownDatabases.get(0));
         } catch (Exception ex) {
-            System.out.println("Can't get a connection to DB");
+            logger.error("Can't get a connection to DB");
             logger.error(ex.getMessage());
         }
         DatabaseSessionService.getInstance().setSession(connection, allKnownDatabases.get(0));

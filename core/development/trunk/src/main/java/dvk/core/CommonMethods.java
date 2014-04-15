@@ -1666,4 +1666,21 @@ public class CommonMethods {
     	}
     	return buffer.toString();
     }
+
+    /**
+     * Remove special characters from String.
+     *
+     * @param string
+     *     String in which need to remove special characters
+     * @return
+     *     String without special characters
+     */
+    public static String replaceAllSpecialCharactersInString(String string) {
+        if (!CommonMethods.isNullOrEmpty(string)) {
+            if (!CommonMethods.isNullOrEmpty(string)) {
+                string = string.replaceAll("(\r\n|\n)", "<br/>");
+            }
+        }
+        return string;
+    }
 }

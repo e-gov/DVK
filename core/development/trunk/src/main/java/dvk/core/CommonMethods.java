@@ -1678,7 +1678,7 @@ public class CommonMethods {
     public static String replaceAllSpecialCharactersInString(String string) {
         if (!CommonMethods.isNullOrEmpty(string)) {
             if (!CommonMethods.isNullOrEmpty(string)) {
-                string = string.replaceAll("(\r\n|\n)", "<br/>");
+                string = string.replaceAll("(\r\n|\n)", " ");
             }
         }
         return string;

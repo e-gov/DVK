@@ -1,0 +1,28 @@
+create or replace FUNCTION dvk."insert_new_row"(table_type character varying, args character varying) RETURNS refcursor
+AS $$
+DECLARE
+    RC1 refcursor;
+BEGIN
+    IF (table_type = 'msg') THEN
+      INSERT INTO dvk.dhl_message(dhl_message_id, is_incoming, data, sending_status_id, unit_id)
+            VALUES(DEFAULT, 0, '', 0, 0);
+      open RC1 for
+      SELECT * FROM dvk.dhl_message WHERE dhl_message_id = currval('dvk.sq_dhl_message_id');
+    ELSIF (table_type = 'sf') THEN
+      INSERT INTO dvk.dhl_settings_folders(ID, DHL_SETTINGS_ID, FOLDER_NAME)
+            VALUES(nextval('dvk.dhl_settings_folders_id_seq'::regclass), to_number(args, '99G999D9S'), 'Folder');
+      OPEN RC1 FOR
+            SELECT * FROM dvk.dhl_settings_folders WHERE id = currval('dvk.dhl_settings_folders_id_seq');
+
+    ELSIF (table_type = 'msgrecip') THEN
+      INSERT INTO dvk.dhl_message_recipient(DHL_MESSAGE_RECIPIENT_ID, DHL_MESSAGE_ID, RECIPIENT_ORG_CODE, RECIPIENT_PERSON_CODE,
+          		RECIPIENT_DIVISION_ID, RECIPIENT_POSITION_ID, SENDING_STATUS_ID)
+            VALUES(nextval('dvk.sq_dhl_message_recipient_id'::regclass), to_number(args, '99G999D9S'), 'org_code', 'person_code', 1, 1, 1);
+      OPEN RC1 FOR
+            SELECT * FROM dvk.dhl_message_recipient WHERE DHL_MESSAGE_RECIPIENT_ID = currval('dvk.sq_dhl_message_recipient_id');
+
+    END IF;
+
+    RETURN  RC1;
+END; $$
+    LANGUAGE plpgsql;

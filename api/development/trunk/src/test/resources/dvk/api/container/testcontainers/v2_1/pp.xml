@@ -1,0 +1,185 @@
+<DecContainer xmlns="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
+	<Transport>
+		<DecSender>
+			<OrganisationCode>wmpp</OrganisationCode>
+			<StructuralUnit/>
+			<PersonalIdCode/>
+		</DecSender>
+		<DecRecipient>
+			<OrganisationCode>nortaltest1</OrganisationCode>
+			<StructuralUnit/>
+			<PersonalIdCode/>
+		</DecRecipient>
+	</Transport>
+	<SignatureMetadata>
+		<SignatureType/>
+		<Signer>Udo Maiste</Signer>
+		<Verified/>
+		<SignatureVerificationDate tagformat="yyyy-mm-ddThh:mm:ss"/>
+	</SignatureMetadata>
+	<File>
+		<FileGuid>bf476ff4-7e3c-5ba9-e311-6ac5361c3c30</FileGuid>
+		<ZipBase64Content>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</ZipBase64Content>
+		<MimeType>image/png</MimeType>
+		<FileName>IMG_09042014_142541.png</FileName>
+		<FileSize/>
+		<RecordMainComponent/>
+	</File>
+	<RecordTypeSpecificMetadata/>
+	<DecMetadata>
+		<DecId>10200</DecId>
+		<DecFolder>/</DecFolder>
+		<DecReceiptDate>2014-04-16T16:23:18+03:00</DecReceiptDate>
+	</DecMetadata>
+	<RecordMetadata>
+		<RecordGuid>bf476ff4-7e3c-5ba9-e311-6ac509eb2d30</RecordGuid>
+		<RecordType>KIK Kiri</RecordType>
+		<RecordOriginalIdentifier>3-2-7/13/201</RecordOriginalIdentifier>
+		<RecordDateRegistered tagformat="yyyy-mm-ddThh:mm:ss">2013-03-06T00:00:00</RecordDateRegistered>
+		<RecordTitle>605 Atmosfäärikaitse projekt 2011_09</RecordTitle>
+		<RecordLanguage/>
+		<RecordAbstract>Atmosfääriõhu kaitse
+E-N test
+taotlus
+Taotluse teatis kliendile</RecordAbstract>
+		<ReplyDueDate tagformat="yyyy-mm-ddThh:mm:ss"/>
+	</RecordMetadata>
+	<Access>
+		<AccessConditionsCode>AVALIK</AccessConditionsCode>
+		<AccessRestriction>
+			<RestrictionIdentifier/>
+			<RestrictionBeginDate tagformat="yyyy-mm-ddThh:mm:ss"/>
+			<RestrictionEndDate tagformat="yyyy-mm-ddThh:mm:ss"/>
+			<RestrictionEndEvent/>
+			<RestrictionInvalidSince/>
+			<RestrictionBasis/>
+			<InformationOwner>Hiie PP</InformationOwner>
+		</AccessRestriction>
+	</Access>
+	<Initiator>
+		<InitiatorRecordOriginalIdentifier/>
+		<InitiatorRecordDate/>
+		<Organisation>
+			<Name/>
+			<OrganisationCode/>
+			<StructuralUnit/>
+			<PositionTitle/>
+			<Residency/>
+		</Organisation>
+		<Person>
+			<Name/>
+			<GivenName/>
+			<Surname/>
+			<PersonalIdCode/>
+			<Residency/>
+		</Person>
+		<ContactData>
+			<Adit/>
+			<Phone/>
+			<Email/>
+			<WebPage/>
+			<MessagingAddress/>
+			<PostalAddress>
+				<Country/>
+				<County/>
+				<LocalGovernment/>
+				<AdministrativeUnit/>
+				<SmallPlace/>
+				<LandUnit/>
+				<Street/>
+				<HouseNumber/>
+				<BuildingPartNumber/>
+				<PostalCode/>
+			</PostalAddress>
+		</ContactData>
+	</Initiator>
+	<Recipient>
+		<Person>
+			<Name/>
+			<GivenName/>
+			<Surname/>
+			<Residency/>
+		</Person>
+		<RecipientRecordGuid/>
+		<RecipientRecordOriginalIdentifier/>
+		<MessageForRecipient>Atmosfääriõhu kaitse
+E-N test
+taotlus
+Taotluse teatis kliendile</MessageForRecipient>
+		<Organisation>
+			<Name>Kärdla Linnavalitsus</Name>
+			<OrganisationCode/>
+			<Residency/>
+		</Organisation>
+	</Recipient>
+	<RecordCreator>
+		<Organisation>
+			<Name>Hiie PP</Name>
+			<OrganisationCode>wmpp</OrganisationCode>
+			<StructuralUnit/>
+			<PositionTitle>Spetsialist</PositionTitle>
+			<Residency/>
+		</Organisation>
+		<Person>
+			<Name>Hiie Viigipuu (Spetsialist)</Name>
+			<GivenName>Hiie</GivenName>
+			<Surname>Viigipuu</Surname>
+			<PersonalIdCode>47107020310</PersonalIdCode>
+			<Residency/>
+		</Person>
+		<ContactData>
+			<Adit/>
+			<Phone/>
+			<Email>hiie_mott@hotmail.com</Email>
+			<WebPage/>
+			<MessagingAddress/>
+			<PostalAddress>
+				<Country/>
+				<County/>
+				<LocalGovernment/>
+				<AdministrativeUnit/>
+				<SmallPlace/>
+				<LandUnit/>
+				<Street/>
+				<HouseNumber/>
+				<BuildingPartNumber/>
+				<PostalCode/>
+			</PostalAddress>
+		</ContactData>
+	</RecordCreator>
+	<RecordSenderToDec>
+		<ContactData>
+			<Adit/>
+			<Phone/>
+			<Email/>
+			<WebPage/>
+			<MessagingAddress/>
+			<PostalAddress>
+				<Country/>
+				<County/>
+				<LocalGovernment/>
+				<AdministrativeUnit/>
+				<SmallPlace/>
+				<LandUnit/>
+				<Street/>
+				<HouseNumber/>
+				<BuildingPartNumber/>
+				<PostalCode/>
+			</PostalAddress>
+		</ContactData>
+		<Organisation>
+			<Name>Hiie PP</Name>
+			<OrganisationCode>wmpp</OrganisationCode>
+			<StructuralUnit/>
+			<PositionTitle/>
+			<Residency/>
+		</Organisation>
+		<Person>
+			<GivenName/>
+			<Surname/>
+			<PersonalIdCode/>
+			<Residency/>
+			<Name/>
+		</Person>
+	</RecordSenderToDec>
+</DecContainer>

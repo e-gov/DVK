@@ -80,8 +80,8 @@ public class OrgCapabilityCheckerRequestsIntegration {
             // Assert getSendingOptions response
             Assert.assertNotNull(resultOfGetSendingOptions);
             Assert.assertEquals(4, resultOfGetSendingOptions.allyksused.size());
-            Assert.assertEquals(4, resultOfGetSendingOptions.asutused.size());
-            Assert.assertEquals(5, resultOfGetSendingOptions.ametikohad.size());
+            Assert.assertEquals(5, resultOfGetSendingOptions.asutused.size());
+            Assert.assertEquals(6, resultOfGetSendingOptions.ametikohad.size());
 
             // Get org codes from getSendingOptions response (for getOccupationList)
             for (int i = 0; i < resultOfGetSendingOptions.asutused.size(); ++i) {

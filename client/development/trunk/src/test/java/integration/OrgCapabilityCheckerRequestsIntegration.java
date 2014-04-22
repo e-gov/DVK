@@ -101,7 +101,7 @@ public class OrgCapabilityCheckerRequestsIntegration {
 
             // Assert getOccupationList response
             Assert.assertNotNull(resultOfGetOccupationList);
-            Assert.assertEquals(5, resultOfGetOccupationList.size());
+            Assert.assertEquals(6, resultOfGetOccupationList.size());
 
             // Execute getSubdivisionList request with all necessary parameters
             try {

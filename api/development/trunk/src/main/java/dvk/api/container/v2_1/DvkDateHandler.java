@@ -1,8 +1,6 @@
 package dvk.api.container.v2_1;
 
-import org.apache.commons.lang.StringUtils;
-import org.exolab.castor.mapping.FieldHandler;
-import org.exolab.castor.mapping.ValidityException;
+import org.apache.commons.lang3.StringUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

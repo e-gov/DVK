@@ -17,10 +17,6 @@ import junit.framework.Assert;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.InputStreamReader;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +28,7 @@ public class ClientRequestsIntegration {
     public void sendAndReceiveAndGetSendStatusRequestsAndMarkDocumentsReceivedTest() throws Exception {
         List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCases();
 
-        for (String path: configFilePaths) {
+        for (String path : configFilePaths) {
             int messageId = 0;
 
             // Before test, insert a new message to DB
@@ -51,7 +47,7 @@ public class ClientRequestsIntegration {
             // Execute the client for sending and receiving our message
 
             try {
-                String[] args = new String[]{"-mode=3", "-prop="+path};
+                String[] args = new String[]{"-mode=3", "-prop=" + path};
                 Client.main(args);
             } catch (Exception e) {
                 logger.error(e.getMessage());
@@ -137,8 +133,8 @@ public class ClientRequestsIntegration {
         // Different syntax of INSERT command for different databases
         try {
             if ((orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_MSSQL))
-                || (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_MSSQL_2005))
-                || (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_SQLANYWHERE))){
+                    || (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_MSSQL_2005))
+                    || (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_SQLANYWHERE))) {
                 String sqlFileMSSQL = ClientRequestsIntegration.class.getResource("../insert_messageForMSSQL").getPath();
                 sql = FileUtil.readSQLToString(sqlFileMSSQL);
             } else if (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
@@ -165,11 +161,11 @@ public class ClientRequestsIntegration {
 
         // Different syntax of SELECT for different databases
         if ((orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_MSSQL))
-           || (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_MSSQL_2005))
-           || (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_SQLANYWHERE))) {
+                || (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_MSSQL_2005))
+                || (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_SQLANYWHERE))) {
             preparedStatement = dbConnection.prepareStatement("SELECT TOP 1 * FROM dhl_message " +
                     "ORDER BY dhl_message_id DESC");
-        } else if (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)){
+        } else if (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
             preparedStatement = dbConnection.prepareStatement("SELECT dhl_message_id FROM " +
                     "dvk.dhl_message ORDER BY dhl_message_id DESC LIMIT 1");
         }
@@ -232,10 +228,10 @@ public class ClientRequestsIntegration {
         if (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_10G)
                 || orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_11G)) {
             preparedStatement = dbConnection.prepareStatement("SELECT * FROM dhl_message" +
-                                                                " WHERE rownum = 1 ORDER BY dhl_message_id DESC");
+                    " WHERE rownum = 1 ORDER BY dhl_message_id DESC");
         } else if (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
             preparedStatement = dbConnection.prepareStatement("SELECT * FROM dvk.dhl_message ORDER BY " +
-                                                                "dhl_message_id DESC LIMIT 1");
+                    "dhl_message_id DESC LIMIT 1");
         } else if (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_MSSQL)
                 || (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_MSSQL_2005))
                 || (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_SQLANYWHERE))) {
@@ -295,7 +291,7 @@ public class ClientRequestsIntegration {
         if (resultSet.next()) {
 
             if (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_10G)
-               || orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_11G)) {
+                    || orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_11G)) {
                 dataClob = resultSet.getClob("data");
                 data = FileUtil.parseClobData(dataClob);
             } else {

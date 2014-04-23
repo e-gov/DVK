@@ -22,8 +22,10 @@
             <dhl:metainfo>
                 <mm:koostaja_asutuse_nr>
                     <xsl:call-template name="alternative">
-                        <xsl:with-param name="primeValue" select="src:RecordCreator/src:Organisation/src:OrganisationCode"/>
-                        <xsl:with-param name="value1" select="src:RecordSenderToDec/src:Organisation/src:OrganisationCode"/>
+                        <xsl:with-param name="primeValue"
+                                        select="src:RecordCreator/src:Organisation/src:OrganisationCode"/>
+                        <xsl:with-param name="value1"
+                                        select="src:RecordSenderToDec/src:Organisation/src:OrganisationCode"/>
                         <xsl:with-param name="value2" select="src:RecordCreator/src:Organisation/src:Name"/>
                     </xsl:call-template>
                 </mm:koostaja_asutuse_nr>
@@ -40,10 +42,7 @@
                     <xsl:value-of select="src:RecordMetadata/src:RecordOriginalIdentifier"/>
                 </mm:koostaja_dokumendinr>
                 <mm:koostaja_kokkuvote>
-                    <xsl:call-template name="alternative">
-                        <xsl:with-param name="primeValue" select="src:Recipient/src:MessageForRecipient"/>
-                        <xsl:with-param name="value1" select="src:RecordMetadata/src:RecordAbstract"/>
-                    </xsl:call-template>
+                    <xsl:value-of select="src:RecordMetadata/src:RecordAbstract"/>
                 </mm:koostaja_kokkuvote>
                 <mm:koostaja_kuupaev>
                     <xsl:value-of select="src:RecordMetadata/src:RecordDateRegistered"/>
@@ -99,15 +98,17 @@
             <!-- Metaxml -->
             <dhl:metaxml>
                 <xsl:apply-templates select="src:RecordCreator"/>
-                <xsl:apply-templates select="src:Recipient"/>
+                <rkel:Addressees>
+                    <xsl:apply-templates select="src:Recipient"/>
+                </rkel:Addressees>
                 <xsl:apply-templates select="src:RecordMetadata"/>
                 <xsl:apply-templates select="src:SignatureMetadata"/>
             </dhl:metaxml>
             <!-- //Metaxml -->
 
-             <SignedDoc xmlns="http://www.sk.ee/DigiDoc/v1.3.0#" format="DIGIDOC-XML" version="1.3">
-                 <xsl:apply-templates select="src:File"/>
-             </SignedDoc>
+            <SignedDoc xmlns="http://www.sk.ee/DigiDoc/v1.3.0#" format="DIGIDOC-XML" version="1.3">
+                <xsl:apply-templates select="src:File"/>
+            </SignedDoc>
 
         </dhl:dokument>
     </xsl:template>
@@ -168,6 +169,18 @@
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:apply-templates select="../src:RecordSenderToDec/src:Organisation"/>
+                </xsl:otherwise>
+            </xsl:choose>
+            <xsl:choose>
+                <xsl:when test="src:Person">
+                    <xsl:apply-templates select="src:Person">
+                        <xsl:with-param name="person" select="'Person'"/>
+                    </xsl:apply-templates>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:apply-templates select="../src:RecordSenderToDec/src:Person">
+                        <xsl:with-param name="person" select="'Person'"/>
+                    </xsl:apply-templates>
                 </xsl:otherwise>
             </xsl:choose>
         </rkel:Author>
@@ -234,14 +247,12 @@
     </xsl:template>
 
     <xsl:template match="src:Recipient">
-        <rkel:Addressees>
-            <rkel:Addressee>
-                <xsl:apply-templates select="src:Organisation"/>
-                <xsl:apply-templates select="src:Person">
-                    <xsl:with-param name="person" select="'Person'"/>
-                </xsl:apply-templates>
-            </rkel:Addressee>
-        </rkel:Addressees>
+        <rkel:Addressee>
+            <xsl:apply-templates select="src:Organisation"/>
+            <xsl:apply-templates select="src:Person">
+                <xsl:with-param name="person" select="'Person'"/>
+            </xsl:apply-templates>
+        </rkel:Addressee>
     </xsl:template>
 
     <xsl:template match="src:RecordMetadata">
@@ -276,14 +287,16 @@
             <rkel:Restriction>
                 <xsl:value-of select="src:AccessConditionsCode"/>
             </rkel:Restriction>
+            <!--Use src:AccessRestriction/ instead of template, because source maxoccurs=unbounded and
+            destination maxoccurs=1, so we take source data only from 1st occur-->
             <rkel:BeginDate>
-                <xsl:value-of select="src:RestrictionBeginDate"/>
+                <xsl:value-of select="src:AccessRestriction/src:RestrictionBeginDate"/>
             </rkel:BeginDate>
             <rkel:EndDate>
-                <xsl:value-of select="src:RestrictionEndDate"/>
+                <xsl:value-of select="src:AccessRestriction/src:RestrictionEndDate"/>
             </rkel:EndDate>
             <rkel:Reason>
-                <xsl:value-of select="src:RestrictionBasis"/>
+                <xsl:value-of select="src:AccessRestriction/src:RestrictionBasis"/>
             </rkel:Reason>
         </rkel:AccessRights>
     </xsl:template>
@@ -302,7 +315,7 @@
     </xsl:template>
 
     <xsl:template match="src:File" xmlns="http://www.sk.ee/DigiDoc/v1.3.0#">
-        <xsl:variable name="zip_base64_sisu" select="src:ZipBase64Content" />
+        <xsl:variable name="zip_base64_sisu" select="src:ZipBase64Content"/>
         <xsl:element name="DataFile">
             <xsl:attribute name="ContentType">EMBEDDED_BASE64</xsl:attribute>
             <xsl:attribute name="Filename">
@@ -317,7 +330,7 @@
             <xsl:attribute name="Size">
                 <xsl:value-of select="src:FileSize"/>
             </xsl:attribute>
-            <xsl:value-of select="dhl-custom:unzip($zip_base64_sisu)" />
+            <xsl:value-of select="dhl-custom:unzip($zip_base64_sisu)"/>
         </xsl:element>
     </xsl:template>
 

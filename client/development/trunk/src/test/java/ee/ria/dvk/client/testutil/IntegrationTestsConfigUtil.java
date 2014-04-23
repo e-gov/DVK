@@ -17,6 +17,7 @@ public class IntegrationTestsConfigUtil {
     private static Logger logger = Logger.getLogger(IntegrationTestsConfigUtil.class);
     private static final String TEST_CONFIGS_POSITIVE_CASES = "listOfTestConfigs";
     private static final String TEST_CONFIGS_SERVER_MISSING = "serverIsMissingConfigs";
+    private static final String TEST_CONFIGS_POSITIVE_CASES_CAPSULE_VERSION_1_0 = "capsuleVer1Configs";
 
     private IntegrationTestsConfigUtil() {
         //because its a utility class
@@ -59,6 +60,10 @@ public class IntegrationTestsConfigUtil {
 
     public static List<String> getAllConfigFilesAbsolutePathsForNegativeCases() {
         return getAllConfigFilesAbsolutePaths(TEST_CONFIGS_SERVER_MISSING);
+    }
+
+    public static List<String> getAllConfigFilesAbsolutePathsForPositiveCasesCapsuleVer1() {
+        return getAllConfigFilesAbsolutePaths(TEST_CONFIGS_POSITIVE_CASES_CAPSULE_VERSION_1_0);
     }
 
     private static Properties findPropertiesFile() {

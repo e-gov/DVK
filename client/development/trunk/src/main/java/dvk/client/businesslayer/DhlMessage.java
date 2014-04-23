@@ -2766,6 +2766,7 @@ public class DhlMessage implements Cloneable {
 
     public static ArrayList<SimpleAddressData> extractRecipientData_V2(String xmlFilePath) throws Exception {
 
+        String TAG_ADIT = "Adit";
         String TAG_CONTACT_DATA = "ContactData";
         String TAG_DEC_RECIPIENT = "DecRecipient";
         String TAG_EMAIL = "Email";
@@ -2838,6 +2839,12 @@ public class DhlMessage implements Cloneable {
                 //      TAG_PERSONAL_CODE
                 recipientPersonCode = getFirstElementNodeText(nodeElementPerson, TAG_PERSONAL_CODE);
 
+                // TAG_CONTACT_DATA
+                Element nodeElementContactData = getFirstElementNode(nodeElementRecipient, TAG_CONTACT_DATA);
+                //      TAG_ADIT
+                // To match recipient with Transport.OrganisationCode = adit and empty OrganisationCode in Recipient
+                recipientOrgCode = getFirstElementNodeText(nodeElementContactData, TAG_ADIT).equalsIgnoreCase("1")? "adit" : recipientOrgCode;
+
                 //Find addr element by Organisation and PersonCode Code
                 for (int j = 0; j < result.size(); j++) {
                     if (result.get(j).getOrgCode().equalsIgnoreCase(recipientOrgCode)
@@ -2853,8 +2860,6 @@ public class DhlMessage implements Cloneable {
                         //      TAG_NAME
                         result.get(j).setPersonName(getFirstElementNodeText(nodeElementPerson, TAG_NAME));
 
-                        // TAG_CONTACT_DATA
-                        Element nodeElementContactData = getFirstElementNode(nodeElementRecipient, TAG_CONTACT_DATA);
                         //      TAG_EMAIL
                         result.get(j).setEmail(getFirstElementNodeText(nodeElementContactData, TAG_EMAIL));
                     }

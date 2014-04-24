@@ -1,3 +1,8 @@
+1.7.2
+-------------------------------------------------------------------------------
+- DVK-41 (DVK konverteerimisel ei kandu üle juurdepääsupiirangu andmed)
+- DVK-42 (DVK UK kaotab baasist saatmise kellaaja ja saaja nime)
+
 1.7.1
 -------------------------------------------------------------------------------
 - Lisatud võimalus käivitada GetSendStatus päringut aditisse,

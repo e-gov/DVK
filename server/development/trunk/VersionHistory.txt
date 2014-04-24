@@ -1,4 +1,10 @@
+1.7.2
+-------------------------------------------------------------------------------
+- DVK-10 (Vana kapsli saatmine ebaõnnestub teatud manustega) - lisatud logimist
+- Parandatud DVK-41 (DVK konverteerimisel ei kandu üle juurdepääsupiirangu andmed)
+
 1.7.1
+-------------------------------------------------------------------------------
 - 2.1 container support added
 
 

@@ -1,3 +1,7 @@
+1.0.7
+-------------------------------------------------------------------------------
+- Container.getInternalVersion() now public API method.
+
 1.0.6
 -------------------------------------------------------------------------------
 - DVK-37 - SignatureDate and SignatureTime may be null, Metaxml.signeddoc is now mapped. Issue mapping 1.0 container to api classes.

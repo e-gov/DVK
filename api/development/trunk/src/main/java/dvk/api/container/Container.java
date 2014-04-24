@@ -135,7 +135,11 @@ public abstract class Container {
 		Util.writeFileContent(filePath, getContent());
 	}
 
-	protected abstract Version getInternalVersion();
+    /**
+     * Get the version of the container.
+     * @return {@link Version}
+     */
+	public abstract Version getInternalVersion();
 
 	public static Container marshal(Reader reader, Version version) throws MappingException, MarshalException,
 		ValidationException, IOException {

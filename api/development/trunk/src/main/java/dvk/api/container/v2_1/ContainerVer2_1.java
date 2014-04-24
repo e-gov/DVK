@@ -48,7 +48,7 @@ public class ContainerVer2_1 extends Container {
     }
 
     @Override
-    protected Version getInternalVersion() {
+    public Version getInternalVersion() {
         return Version.Ver2_1;
     }
 

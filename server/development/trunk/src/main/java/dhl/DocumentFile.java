@@ -312,6 +312,7 @@ public class DocumentFile {
                 ddocFactory = ConfigManager.instance().getDigiDocFactory();
             }
 
+            logger.debug("localFileFullname: " + this.m_localFileFullName);
             SignedDoc container = ddocFactory.readSignedDoc(this.m_localFileFullName);
             int dataFileCount = container.countDataFiles();
             for (int i = 0; i < dataFileCount; i++) {

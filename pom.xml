@@ -53,6 +53,7 @@
                 <dvkServerJettyEnvLocation>C:\Work\Dev\DVK\server\development\trunk\src\test\resources\jetty-env.xml</dvkServerJettyEnvLocation>
                 <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_hendrik.properties</listOfTestConfigs>
                 <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_serverIsMissing.properties</serverIsMissingConfigs>
+                <capsuleVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_hendrik_container_1_0.properties</capsuleVer1Configs>
             </properties>
         </profile>
         <profile>
@@ -89,6 +90,7 @@
                 <dvkServerJettyEnvLocation>${dvkServerJettyEnvLocation}</dvkServerJettyEnvLocation>
                 <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI.properties</listOfTestConfigs>
                 <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_CI_serverIsMissing.properties</serverIsMissingConfigs>
+                <capsuleVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_CI_container_1_0.properties</capsuleVer1Configs>
             </properties>
         </profile>
     </profiles>

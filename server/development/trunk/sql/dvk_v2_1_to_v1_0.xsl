@@ -29,9 +29,9 @@
                         <xsl:with-param name="value2" select="src:RecordCreator/src:Organisation/src:Name"/>
                     </xsl:call-template>
                 </mm:koostaja_asutuse_nr>
-                <mm:saaja_asutuse_nr>
+                <!-- 29.04            <mm:saaja_asutuse_nr>
                     <xsl:value-of select="src:Recipient/src:Organisation/src:OrganisationCode"/>
-                </mm:saaja_asutuse_nr>
+                             </mm:saaja_asutuse_nr>-->
                 <mm:koostaja_dokumendinimi>
                     <xsl:value-of select="src:RecordMetadata/src:RecordTitle"/>
                 </mm:koostaja_dokumendinimi>
@@ -79,7 +79,7 @@
                 <mm:seotud_dokumendinr_saajal>
                     <xsl:value-of select="src:Recipient/src:RecipientRecordOriginalIdentifier"/>
                 </mm:seotud_dokumendinr_saajal>
-                <mm:saaja_isikukood>
+<!--  29.04              <mm:saaja_isikukood>
                     <xsl:value-of select="src:Recipient/src:Person/src:PersonalIdCode"/>
                 </mm:saaja_isikukood>
                 <mm:saaja_nimi>
@@ -87,7 +87,7 @@
                 </mm:saaja_nimi>
                 <mm:saaja_osakond>
                     <xsl:value-of select="src:Recipient/src:Organisation/src:StructuralUnit"/>
-                </mm:saaja_osakond>
+                </mm:saaja_osakond>-->
             </dhl:metainfo>
             <!-- //Metainfo -->
 
@@ -97,7 +97,14 @@
 
             <!-- Metaxml -->
             <dhl:metaxml>
+                <xsl:choose>
+                    <xsl:when test="src:RecordCreator">
                 <xsl:apply-templates select="src:RecordCreator"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:apply-templates select="src:RecordSenderToDec"/>
+                    </xsl:otherwise>
+                </xsl:choose>
                 <rkel:Addressees>
                     <xsl:apply-templates select="src:Recipient"/>
                 </rkel:Addressees>
@@ -161,7 +168,7 @@
         </dhl:isikukood>
     </xsl:template>
 
-    <xsl:template match="src:RecordCreator">
+    <xsl:template match="src:RecordCreator |src:RecordSenderToDec">
         <rkel:Author>
             <xsl:choose>
                 <xsl:when test="src:Organisation">
@@ -198,7 +205,62 @@
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template match="src:Organisation">
+    <xsl:template match="src:RecordCreator/src:Organisation">
+        <rkel:Organisation>
+            <rkel:organisationName>
+                <xsl:call-template name="alternative">
+                    <xsl:with-param name="primeValue" select="src:Name"/>
+                    <xsl:with-param name="value1" select="../../src:RecordSenderToDec/src:Organisation/src:Name"/>
+                </xsl:call-template>
+            </rkel:organisationName>
+            <rkel:departmentName>
+                <xsl:call-template name="alternative">
+                    <xsl:with-param name="primeValue" select="src:StructuralUnit"/>
+                    <xsl:with-param name="value1"
+                                    select="../../src:RecordSenderToDec/src:Organisation/src:StructuralUnit"/>
+                </xsl:call-template>
+            </rkel:departmentName>
+        </rkel:Organisation>
+    </xsl:template>
+
+    <xsl:template match="src:RecordCreator/src:Person">
+        <xsl:param name="person"/>
+        <xsl:element name="rkel:{$person}">
+            <rkel:jobtitle>
+                <xsl:call-template name="alternative">
+                    <xsl:with-param name="primeValue" select="../src:Organisation/src:PositionTitle"/>
+                    <xsl:with-param name="value1"
+                                    select="../../src:RecordSenderToDec/src:Organisation/src:PositionTitle"/>
+                </xsl:call-template>
+            </rkel:jobtitle>
+            <xsl:element name="rkel:firstname">
+                <xsl:call-template name="alternative">
+                    <xsl:with-param name="primeValue" select="src:GivenName"/>
+                    <xsl:with-param name="value1" select="../../src:RecordSenderToDec/src:Person/src:GivenName"/>
+                </xsl:call-template>
+            </xsl:element>
+            <xsl:element name="rkel:surname">
+                <xsl:call-template name="alternative">
+                    <xsl:with-param name="primeValue" select="src:Surname"/>
+                    <xsl:with-param name="value1" select="../../src:RecordSenderToDec/src:Person/src:Surname"/>
+                </xsl:call-template>
+            </xsl:element>
+            <xsl:element name="rkel:telephone">
+                <xsl:call-template name="alternative">
+                    <xsl:with-param name="primeValue" select="../src:ContactData/src:Phone"/>
+                    <xsl:with-param name="value1" select="../../src:RecordSenderToDec/src:ContactData/src:Phone"/>
+                </xsl:call-template>
+            </xsl:element>
+            <xsl:element name="rkel:email">
+                <xsl:call-template name="alternative">
+                    <xsl:with-param name="primeValue" select="../src:ContactData/src:Email"/>
+                    <xsl:with-param name="value1" select="../../src:RecordSenderToDec/src:ContactData/src:Email"/>
+                </xsl:call-template>
+            </xsl:element>
+        </xsl:element>
+    </xsl:template>
+
+    <xsl:template match="src:Recipient/src:Organisation |src:RecordSenderToDec/src:Organisation">
         <rkel:Organisation>
             <rkel:organisationName>
                 <xsl:apply-templates select="src:Name"/>
@@ -209,23 +271,7 @@
         </rkel:Organisation>
     </xsl:template>
 
-    <xsl:template match="src:RecordCreator/*/*">
-        <xsl:variable name="nodeName" select="name()"/>
-        <xsl:choose>
-            <xsl:when test=".">
-                <xsl:value-of select="."/>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="//src:RecordSenderToDec//*[name()=$nodeName]"/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-
-    <xsl:template match="src:Recipient/*/* |src:RecordSenderToDec/*/*">
-        <xsl:value-of select="."/>
-    </xsl:template>
-
-    <xsl:template match="src:Person">
+    <xsl:template match="src:Recipient/src:Person |src:RecordSenderToDec/src:Person">
         <xsl:param name="person"/>
         <xsl:element name="rkel:{$person}">
             <rkel:jobtitle>
@@ -244,6 +290,10 @@
                 <xsl:apply-templates select="../src:ContactData/src:Email"/>
             </xsl:element>
         </xsl:element>
+    </xsl:template>
+
+    <xsl:template match="src:Recipient/*/* |src:RecordSenderToDec/*/*">
+        <xsl:value-of select="."/>
     </xsl:template>
 
     <xsl:template match="src:Recipient">

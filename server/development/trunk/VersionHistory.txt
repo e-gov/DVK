@@ -1,3 +1,8 @@
+1.7.3
+-------------------------------------------------------------------------------
+- DVK-43 - DVK uuest kapslist vanale konverteerimisel mitu source-elemendi on vaja mappida ühele destination-elemendile
+
+
 1.7.2
 -------------------------------------------------------------------------------
 - DVK-10 (Vana kapsli saatmine ebaõnnestub teatud manustega) - lisatud logimist

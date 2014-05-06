@@ -4,7 +4,7 @@
     <groupId>dvk</groupId>
     <artifactId>server</artifactId>
     <packaging>war</packaging>
-    <version>1.7.2</version>
+    <version>1.7.3</version>
     <name>dvk-server</name>
     <parent>
         <groupId>dvk</groupId>

@@ -619,7 +619,7 @@ public class MessageRecipient {
                 dbConnection.setAutoCommit(false);
                 CallableStatement cs = DBConnection.getStatementForResultSet(
                         "Get_NotOpenedInAdit", 0, orgSettings, dbConnection);
-                ResultSet rs = DBConnection.getResultSet(cs, orgSettings, 1);
+                ResultSet rs = DBConnection.getResultSet(cs, orgSettings, 0);
                 while (rs.next()) {
                     results.add(getMessageRecipientFromResultSet(rs));
                 }

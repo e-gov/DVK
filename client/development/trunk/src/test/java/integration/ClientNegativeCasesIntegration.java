@@ -9,6 +9,8 @@ import dvk.client.dhl.service.DatabaseSessionService;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import dvk.core.Settings;
+import ee.ria.dvk.client.testutil.ClientTestUtil;
+import ee.ria.dvk.client.testutil.DBTestUtil;
 import ee.ria.dvk.client.testutil.FileUtil;
 import ee.ria.dvk.client.testutil.IntegrationTestsConfigUtil;
 import junit.framework.Assert;
@@ -26,42 +28,34 @@ import java.util.List;
 
 public class ClientNegativeCasesIntegration {
     private static Logger logger = Logger.getLogger(ClientRequestsIntegration.class);
+    private static final int SEND_RECEIVE_MODE = 3;
 
     @Test
     public void serverIsMissingTest() {
         List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForNegativeCases();
         for (String path: configFilePaths) {
             // Execute Client with valid configuration, but with the wrong URL to the server
-            try {
-                String[] args = new String[]{"-mode=3", "-prop="+path};
-                Client.main(args);
-            } catch (Exception e) {
-                logger.error(e.getMessage());
-                Assert.fail();
-            }
-
+            ClientTestUtil.executeTheClient(path, SEND_RECEIVE_MODE);
+            // Expect to get (404) Not Found error (because, we're using the wrong server URL
             String errorMessageActual = "";
             String errorMessageExpected = "(404)Not Found";
-
             // Get the error message from the last error_log entry
             try {
-                errorMessageActual = getTheLastErrorsMessage(path);
+                errorMessageActual = DBTestUtil.getTheLastErrorsMessage(path);
             } catch (Exception e) {
-                logger.error(e.getMessage());
                 Assert.fail();
             }
-
+            // Do asserts - Is an actual error is the same with the expected one?
             Assert.assertEquals(errorMessageExpected, errorMessageActual);
         }
     }
 
     @Test
-    public void sendersOrgCodeInsideTheMessageDoesNotMatchWithTheSendersOrgCodeInsideTheConfigFileTest() {
+    public void sendersOrgCodeInsideTheMessageDoesNotMatchWithTheSendersOrgCodeInsideTheConfigFileTest()  {
         List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCases();
 
         for (String path: configFilePaths) {
             int messageId = 0;
-
             // Before test, insert a new message to DB
             try {
                 messageId = insertNewMessageToDB(path);
@@ -69,32 +63,18 @@ public class ClientNegativeCasesIntegration {
                 logger.error("Can't insert a new message", ex);
                 Assert.fail();
             }
-
-            if (messageId == -1) {
-                logger.error("Can't insert a new message");
-                Assert.fail();
-            }
-
             // Execute the client for sending and receiving our message
-
-            try {
-                String[] args = new String[]{"-mode=3", "-prop="+path};
-                Client.main(args);
-            } catch (Exception e) {
-                logger.error(e.getMessage());
-                Assert.fail();
-            }
-
+            ClientTestUtil.executeTheClient(path, SEND_RECEIVE_MODE);
+            // Expect to get VIGA_SAATJA_ASUTUSED_ERINEVAD error
             String errorMessageActual = "";
-
+            String errorMessageExpected = CommonStructures.VIGA_SAATJA_ASUTUSED_ERINEVAD;
             try {
-                errorMessageActual = getTheLastErrorsMessage(path);
-            } catch (Exception e) {
-                logger.error(e.getMessage());
+                errorMessageActual = DBTestUtil.getTheLastErrorsMessage(path);
+            } catch (Exception ex) {
                 Assert.fail();
             }
-
-            Assert.assertEquals(errorMessageActual, CommonStructures.VIGA_SAATJA_ASUTUSED_ERINEVAD);
+            // Do asserts - Is an actual error is the same with the expected one?
+            Assert.assertEquals(errorMessageActual, errorMessageExpected);
         }
     }
 
@@ -105,12 +85,7 @@ public class ClientNegativeCasesIntegration {
         String sqlFileMSSQL = ClientRequestsIntegration.class.getResource("../insert_messageForMSSQL_other_sender").getPath();
 
         // Before, connect to database to insert a new message
-        try {
-            setUpFromConfigFile(propertiesFile);
-        } catch (Exception ex) {
-            logger.error("Can't get a connection to DB");
-            throw ex;
-        }
+        IntegrationTestsConfigUtil.setUpFromTheConfigurationFile(propertiesFile);
 
         Connection dbConnection = DatabaseSessionService.getInstance().getConnection();
         OrgSettings orgSettings = DatabaseSessionService.getInstance().getOrgSettings();
@@ -135,38 +110,13 @@ public class ClientNegativeCasesIntegration {
             throw ex;
         }
 
-        // Insert a new message
-        CallableStatement cs = dbConnection.prepareCall(sql);
-        cs.execute();
-        cs.close();
-        dbConnection.commit();
+        messageId = DBTestUtil.executeSQLToInsertTheMessage(sql, dbConnection, orgSettings);
 
-        PreparedStatement preparedStatement = null;
-
-        // Different syntax of SELECT for different databases
-        if ((orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_MSSQL))
-                || (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_MSSQL_2005))
-                || (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_SQLANYWHERE))) {
-            preparedStatement = dbConnection.prepareStatement("SELECT TOP 1 * FROM dhl_message " +
-                    "ORDER BY dhl_message_id DESC");
-        } else if (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)){
-            preparedStatement = dbConnection.prepareStatement("SELECT dhl_message_id FROM " +
-                    "dvk.dhl_message ORDER BY dhl_message_id DESC LIMIT 1");
+        if (messageId == -1) {
+            logger.error("Can't insert the message to the DB");
+            Assert.fail();
         }
 
-        ResultSet resultSet;
-        try {
-            resultSet = preparedStatement.executeQuery();
-        } catch (NullPointerException ex) {
-            throw ex;
-        }
-
-        if (resultSet.next()) {
-            messageId = resultSet.getInt("dhl_message_id");
-        }
-
-        CommonMethods.safeCloseDatabaseConnection(dbConnection);
-        DatabaseSessionService.getInstance().clearSession();
         return messageId;
     }
 
@@ -184,70 +134,8 @@ public class ClientNegativeCasesIntegration {
         newMessage.setFilePath(xmlFileForMessage);
         messageID = newMessage.addToDB(orgSettings, dbConnection);
 
-        CommonMethods.safeCloseDatabaseConnection(dbConnection);
-        DatabaseSessionService.getInstance().clearSession();
+        DBTestUtil.closeTheConnectionAndDoClearTheSession(dbConnection);
 
         return messageID;
-    }
-
-    private String getTheLastErrorsMessage(String path) throws Exception {
-        String errorMessage = "";
-        int receivedMessageId = 0;
-
-        // Before, connect to the database
-        try {
-            setUpFromConfigFile(path);
-        } catch (Exception ex) {
-            logger.error("Can't get connection to DB", ex);
-            throw ex;
-        }
-
-        Connection dbConnection = DatabaseSessionService.getInstance().getConnection();
-        OrgSettings orgSettings = DatabaseSessionService.getInstance().getOrgSettings();
-
-        PreparedStatement preparedStatement = null;
-
-        // Different syntax for different databases
-        if (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_10G)
-                || orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_11G)) {
-            preparedStatement = dbConnection.prepareStatement("SELECT * FROM dhl_error_log" +
-                    " WHERE rownum = 1 ORDER BY dhl_error_log_id DESC");
-        } else if (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-            preparedStatement = dbConnection.prepareStatement("SELECT * FROM dvk.dhl_error_log ORDER BY " +
-                    "dhl_error_log_id DESC LIMIT 1");
-        } else if (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_MSSQL)
-                || (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_MSSQL_2005))
-                || (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_SQLANYWHERE))) {
-            preparedStatement = dbConnection.prepareStatement("SELECT TOP 1 * FROM dhl_error_log " +
-                    "ORDER BY dhl_error_log_id DESC");
-        } else {
-            throw new Exception("Can't recognize the database");
-        }
-
-        ResultSet resultSet = preparedStatement.executeQuery();
-
-        if (resultSet.next()) {
-            errorMessage = resultSet.getString("error_message");
-        }
-
-        CommonMethods.safeCloseDatabaseConnection(dbConnection);
-        DatabaseSessionService.getInstance().clearSession();
-
-        return errorMessage;
-    }
-
-    private void setUpFromConfigFile(String configFile) throws Exception {
-        if (configFile == null) {
-            throw new Exception("configFile is null");
-        }
-
-        ArrayList<OrgSettings> allKnownDatabases = null;
-        Connection connection = null;
-
-        // Load settings from config file and start using this database
-        Settings.loadProperties(configFile);
-        allKnownDatabases = OrgSettings.getSettings(Settings.Client_ConfigFile);
-        connection = DBConnection.getConnection(allKnownDatabases.get(0));
-        DatabaseSessionService.getInstance().setSession(connection, allKnownDatabases.get(0));
     }
 }

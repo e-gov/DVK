@@ -1,3 +1,7 @@
+1.7.4
+-------------------------------------------------------------------------------
+- New client available
+
 1.7.3
 -------------------------------------------------------------------------------
 - DVK-43 - DVK uuest kapslist vanale konverteerimisel mitu source-elemendi on vaja mappida ühele destination-elemendile

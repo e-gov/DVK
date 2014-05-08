@@ -29,10 +29,10 @@
 		<property name="recipientName" type="string">
 			<column name="RECIPIENT_NAME" length="100" />
 		</property>
-		<property name="sendingDate" type="date">
+		<property name="sendingDate" type="java.util.Date">
 			<column name="SENDING_DATE" length="7" />
 		</property>
-		<property name="receivedDate" type="date">
+		<property name="receivedDate" type="java.util.Date">
 			<column name="RECEIVED_DATE" length="7" />
 		</property>
 		<property name="sendingStatusId" type="long">

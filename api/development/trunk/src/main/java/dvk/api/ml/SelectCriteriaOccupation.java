@@ -1,28 +1,27 @@
 package dvk.api.ml;
 
-import java.math.BigDecimal;
-
 import dvk.api.SelectCriteria;
 
-public class SelectCriteriaOccupation extends SelectCriteria
-{
-	@SuppressWarnings("unused")
-	private BigDecimal occupationCode;
-	@SuppressWarnings("unused")
-	private String occupationName;
-	@SuppressWarnings("unused")
-	private String orgCode;
+import java.math.BigDecimal;
 
-	public void setOccupationCode(BigDecimal occupationCode) {
-		this.occupationCode = occupationCode;
-	}
+public class SelectCriteriaOccupation extends SelectCriteria {
+    @SuppressWarnings("unused")
+    private BigDecimal occupationCode;
+    @SuppressWarnings("unused")
+    private String occupationName;
+    @SuppressWarnings("unused")
+    private String orgCode;
 
-	public void setOccupationName(String occupationName) {
-		this.occupationName = occupationName;
-	}
+    public void setOccupationCode(BigDecimal occupationCode) {
+        this.occupationCode = occupationCode;
+    }
 
-	public void setOrgCode(String orgCode) {
-		this.orgCode = orgCode;
-	}
+    public void setOccupationName(String occupationName) {
+        this.occupationName = occupationName;
+    }
+
+    public void setOrgCode(String orgCode) {
+        this.orgCode = orgCode;
+    }
 
 }

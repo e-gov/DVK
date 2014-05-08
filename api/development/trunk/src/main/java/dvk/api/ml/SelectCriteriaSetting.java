@@ -1,53 +1,52 @@
 package dvk.api.ml;
 
-import java.math.BigDecimal;
-
 import dvk.api.SelectCriteria;
 
-public class SelectCriteriaSetting extends SelectCriteria
-{
+import java.math.BigDecimal;
 
-	@SuppressWarnings("unused")
-	private Long id;
-	@SuppressWarnings("unused")
-	private String institutionCode;
-	@SuppressWarnings("unused")
-	private String institutionName;
-	@SuppressWarnings("unused")
-	private String personalIdCode;
-	@SuppressWarnings("unused")
-	private Long unitId;
-	@SuppressWarnings("unused")
-	private BigDecimal subdivisionCode;
-	@SuppressWarnings("unused")
-	private BigDecimal occupationCode;
+public class SelectCriteriaSetting extends SelectCriteria {
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    @SuppressWarnings("unused")
+    private Long id;
+    @SuppressWarnings("unused")
+    private String institutionCode;
+    @SuppressWarnings("unused")
+    private String institutionName;
+    @SuppressWarnings("unused")
+    private String personalIdCode;
+    @SuppressWarnings("unused")
+    private Long unitId;
+    @SuppressWarnings("unused")
+    private BigDecimal subdivisionCode;
+    @SuppressWarnings("unused")
+    private BigDecimal occupationCode;
 
-	public void setInstitutionCode(String institutionCode) {
-		this.institutionCode = institutionCode;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setInstitutionName(String institutionName) {
-		this.institutionName = institutionName;
-	}
+    public void setInstitutionCode(String institutionCode) {
+        this.institutionCode = institutionCode;
+    }
 
-	public void setPersonalIdCode(String personalIdCode) {
-		this.personalIdCode = personalIdCode;
-	}
+    public void setInstitutionName(String institutionName) {
+        this.institutionName = institutionName;
+    }
 
-	public void setUnitId(Long unitId) {
-		this.unitId = unitId;
-	}
+    public void setPersonalIdCode(String personalIdCode) {
+        this.personalIdCode = personalIdCode;
+    }
 
-	public void setSubdivisionCode(BigDecimal subdivisionCode) {
-		this.subdivisionCode = subdivisionCode;
-	}
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
+    }
 
-	public void setOccupationCode(BigDecimal occupationCode) {
-		this.occupationCode = occupationCode;
-	}
+    public void setSubdivisionCode(BigDecimal subdivisionCode) {
+        this.subdivisionCode = subdivisionCode;
+    }
+
+    public void setOccupationCode(BigDecimal occupationCode) {
+        this.occupationCode = occupationCode;
+    }
 
 }

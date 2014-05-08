@@ -1,188 +1,186 @@
 package dvk.api.ml;
 
+import dvk.api.DVKAPI.DvkType;
+import dvk.api.IDvkElement;
+import dvk.api.IElementObserver;
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 
-import dvk.api.IDvkElement;
-import dvk.api.IElementObserver;
-import dvk.api.DVKAPI.DvkType;
+public abstract class PojoFacade<T extends IElementObserver> implements IDvkElement {
+    public enum PendingState {
+        Add, Undefined
+    }
 
-public abstract class PojoFacade<T extends IElementObserver> implements IDvkElement
-{
-	public enum PendingState {
-		Add, Undefined
-	}
-	
-	private boolean isDirty = true;// new object is dirty
-	private State state = State.New;
-	private DvkSessionCacheBox cacheBox;
+    private boolean isDirty = true;// new object is dirty
+    private State state = State.New;
+    private DvkSessionCacheBox cacheBox;
 
-	public PojoFacade(DvkSessionCacheBox cacheBox, boolean isNew) {
-		isDirty = isNew;
-		state = isNew ? State.New : State.Persistent;
-		this.cacheBox = cacheBox;
-	}
+    public PojoFacade(DvkSessionCacheBox cacheBox, boolean isNew) {
+        isDirty = isNew;
+        state = isNew ? State.New : State.Persistent;
+        this.cacheBox = cacheBox;
+    }
 
-	public void delete() {
-		if (!allowDelete()) {
-			return;
-		}
+    public void delete() {
+        if (!allowDelete()) {
+            return;
+        }
 
-		Transaction tx = cacheBox.beginTransaction();
+        Transaction tx = cacheBox.beginTransaction();
 
-		try {
-			delete(tx);
-			//
-			tx.commit();
-			//
-			commitChanges(State.Deleted);
-		} catch (RuntimeException ex) {
-			cacheBox.rollbackTransaction(tx);
-			throw ex;
-		}
-	}
+        try {
+            delete(tx);
+            //
+            tx.commit();
+            //
+            commitChanges(State.Deleted);
+        } catch (RuntimeException ex) {
+            cacheBox.rollbackTransaction(tx);
+            throw ex;
+        }
+    }
 
-	void delete(Transaction tx) {
-		if (allowDelete()) {
-			cacheBox.delete(this, tx);
+    void delete(Transaction tx) {
+        if (allowDelete()) {
+            cacheBox.delete(this, tx);
 
-			if (tx == null) {
-				commitChanges(State.Deleted);
-			}
-		}
-	}
+            if (tx == null) {
+                commitChanges(State.Deleted);
+            }
+        }
+    }
 
-	public void save() {
-		Transaction tx = cacheBox.beginTransaction();
+    public void save() {
+        Transaction tx = cacheBox.beginTransaction();
 
-		try {
-			save(tx);
-			//
-			tx.commit();
-			//
-			commitChanges(State.Persistent);
-		} catch (RuntimeException ex) {
-			cacheBox.rollbackTransaction(tx);
-			throw ex;
-		}
-	}
+        try {
+            save(tx);
+            //
+            tx.commit();
+            //
+            commitChanges(State.Persistent);
+        } catch (RuntimeException ex) {
+            cacheBox.rollbackTransaction(tx);
+            throw ex;
+        }
+    }
 
-	void save(Transaction tx) throws HibernateException {
-		if (allowSave()) {
-			cacheBox.save(this, tx);
+    void save(Transaction tx) throws HibernateException {
+        if (allowSave()) {
+            cacheBox.save(this, tx);
 
-			saveDescendants(tx);
+            saveDescendants(tx);
 
-			if (tx == null) {
-				commitChanges(State.Persistent);
-			}
-		}
-	}
+            if (tx == null) {
+                commitChanges(State.Persistent);
+            }
+        }
+    }
 
-	public void destroy() {
-		cacheBox = null;
-	}
+    public void destroy() {
+        cacheBox = null;
+    }
 
-	public boolean isDirty() {
-		return isDirty;
-	}
+    public boolean isDirty() {
+        return isDirty;
+    }
 
-	protected void setDirty(boolean dirty) {
-		this.isDirty = dirty;
-	}
+    protected void setDirty(boolean dirty) {
+        this.isDirty = dirty;
+    }
 
-	public State getState() {
-		return state;
-	}
+    public State getState() {
+        return state;
+    }
 
-	abstract T getPojo();
+    abstract T getPojo();
 
-	public boolean isNew() {
-		return state == State.New;
-	}
+    public boolean isNew() {
+        return state == State.New;
+    }
 
-	protected abstract T clonePojo();
+    protected abstract T clonePojo();
 
-	public boolean isPersistent() {
-		return state == State.Persistent;
-	}
+    public boolean isPersistent() {
+        return state == State.Persistent;
+    }
 
-	public boolean isDeleted() {
-		return state == State.Deleted;
-	}
+    public boolean isDeleted() {
+        return state == State.Deleted;
+    }
 
-	abstract Object getPojoId();
+    abstract Object getPojoId();
 
-	protected static boolean hasSameValue(Object a, Object b) {
-		if (a == null && b == null) {
-			return true;
-		}
+    protected static boolean hasSameValue(Object a, Object b) {
+        if (a == null && b == null) {
+            return true;
+        }
 
-		if (a == b) {
-			return true;
-		}
+        if (a == b) {
+            return true;
+        }
 
-		return ((a != null) && a.equals(b));
-	}
+        return ((a != null) && a.equals(b));
+    }
 
-	public void reload() {
-		if (isPersistent()) {
-			cacheBox.refresh(this);
-		}
-	}
+    public void reload() {
+        if (isPersistent()) {
+            cacheBox.refresh(this);
+        }
+    }
 
-	void commitChanges(State state) {
-		isDirty = false;
+    void commitChanges(State state) {
+        isDirty = false;
 
-		if (!hasSameValue(state, this.state)) {
-			this.state = state;
-		}
-	}
+        if (!hasSameValue(state, this.state)) {
+            this.state = state;
+        }
+    }
 
-	protected boolean allowSave() {
-		return isDirty();
-	}
+    protected boolean allowSave() {
+        return isDirty();
+    }
 
-	protected boolean allowDelete() {
-		return !isDeleted();
-	}
+    protected boolean allowDelete() {
+        return !isDeleted();
+    }
 
-	void saveDescendants(Transaction tx) {
-	}
+    void saveDescendants(Transaction tx) {
+    }
 
-	protected Object createNewRecord(DvkType t) {
-		return cacheBox.createNewRecord(t, null);
-	}
+    protected Object createNewRecord(DvkType t) {
+        return cacheBox.createNewRecord(t, null);
+    }
 
-	protected Object createNewRecord(DvkType t, String args) {
-		return cacheBox.createNewRecord(t, args);
-	}
+    protected Object createNewRecord(DvkType t, String args) {
+        return cacheBox.createNewRecord(t, args);
+    }
 
-	protected void substituteInCache() {
-		cacheBox.replicate(this);
-	}
+    protected void substituteInCache() {
+        cacheBox.replicate(this);
+    }
 
-	protected DvkSessionCacheBox getCacheBox() {
-		return cacheBox;
-	}
+    protected DvkSessionCacheBox getCacheBox() {
+        return cacheBox;
+    }
 
-	@SuppressWarnings("unchecked")
-	public T getOrigin() {
-		if (!isPersistent()) {
-			return null;
-		}
+    @SuppressWarnings("unchecked")
+    public T getOrigin() {
+        if (!isPersistent()) {
+            return null;
+        }
 
-		cacheBox.evict(this);
+        cacheBox.evict(this);
 
-		T pojo = (T) cacheBox.getCacheProxy(getType()).getOriginVersion(getPojoId());
+        T pojo = (T) cacheBox.getCacheProxy(getType()).getOriginVersion(getPojoId());
 
-		cacheBox.evictObject(pojo);
+        cacheBox.evictObject(pojo);
 
-		return pojo;
-	}
+        return pojo;
+    }
 
-	public boolean isOriginActual() {
-		return isPersistent() && isDirty;
-	}
+    public boolean isOriginActual() {
+        return isPersistent() && isDirty;
+    }
 }
 

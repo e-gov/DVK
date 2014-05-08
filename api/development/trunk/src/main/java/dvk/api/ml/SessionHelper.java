@@ -1,205 +1,201 @@
 package dvk.api.ml;
 
-import java.io.Serializable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.HibernateException;
-import org.hibernate.Query;
-import org.hibernate.ReplicationMode;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.hibernate.*;
 
-public class SessionHelper
-{
-	private Session sess;
-	private static Log log = LogFactory.getLog(SessionHelper.class);
+import java.io.Serializable;
 
-	public SessionHelper(Session sess) {
-		this.sess = sess;
-	}
+public class SessionHelper {
+    private Session sess;
+    private static Log log = LogFactory.getLog(SessionHelper.class);
 
-	public Object get(Class<?> clazz, Serializable id) throws HibernateException {
-		assertSession();
+    public SessionHelper(Session sess) {
+        this.sess = sess;
+    }
 
-		return sess.get(clazz, id);
-	}
+    public Object get(Class<?> clazz, Serializable id) throws HibernateException {
+        assertSession();
 
-	public Object get(String entityName, Serializable id) throws HibernateException {
-		assertSession();
+        return sess.get(clazz, id);
+    }
 
-		return sess.get(entityName, id);
-	}
+    public Object get(String entityName, Serializable id) throws HibernateException {
+        assertSession();
 
-	public void assertSession() {
-		if (sess == null) {
-			String msg = "Session cannot be null";
+        return sess.get(entityName, id);
+    }
 
-			if (log.isErrorEnabled()) {
-				log.error(msg);
-			}
+    public void assertSession() {
+        if (sess == null) {
+            String msg = "Session cannot be null";
 
-			throw new NullPointerException(msg);
-		}
+            if (log.isErrorEnabled()) {
+                log.error(msg);
+            }
 
-		if (!sess.isConnected()) {
-			String msg = "Session is disconnected";
+            throw new NullPointerException(msg);
+        }
 
-			if (log.isErrorEnabled()) {
-				log.error(msg);
-			}
+        if (!sess.isConnected()) {
+            String msg = "Session is disconnected";
 
-			throw new RuntimeException(msg);
-		}
+            if (log.isErrorEnabled()) {
+                log.error(msg);
+            }
 
-		if (!sess.isOpen()) {
-			String msg = "Session cannot be null";
+            throw new RuntimeException(msg);
+        }
 
-			if (log.isErrorEnabled()) {
-				log.error(msg);
-			}
+        if (!sess.isOpen()) {
+            String msg = "Session cannot be null";
 
-			throw new RuntimeException(msg);
-		}
-	}
+            if (log.isErrorEnabled()) {
+                log.error(msg);
+            }
 
-	public Transaction beginTransaction() throws HibernateException {
-		assertSession();
+            throw new RuntimeException(msg);
+        }
+    }
 
-		return sess.beginTransaction();
-	}
+    public Transaction beginTransaction() throws HibernateException {
+        assertSession();
 
-	public void rollback(Transaction tx) throws HibernateException {
-		if (tx != null && tx.isActive()) {
-			try {
-				tx.rollback();
-			} catch (HibernateException ex) {
-				if (log != null) {
-					if (log.isErrorEnabled()) {
-						log.error("Error rolling back transaction", ex);
-					}
-				}
-				throw ex;
-			}
-		}
-	}
+        return sess.beginTransaction();
+    }
 
-	public Query createQuery(String queryString) throws HibernateException {
-		assertSession();
+    public void rollback(Transaction tx) throws HibernateException {
+        if (tx != null && tx.isActive()) {
+            try {
+                tx.rollback();
+            } catch (HibernateException ex) {
+                if (log != null) {
+                    if (log.isErrorEnabled()) {
+                        log.error("Error rolling back transaction", ex);
+                    }
+                }
+                throw ex;
+            }
+        }
+    }
 
-		return sess.createQuery(queryString);
-	}
+    public Query createQuery(String queryString) throws HibernateException {
+        assertSession();
 
-	public int delete(Query query, Transaction tx) throws HibernateException {
-		boolean commit = false;
+        return sess.createQuery(queryString);
+    }
 
-		if (tx == null) {
-			assertSession();
-			tx = sess.beginTransaction();
-			commit = true;
-		}
+    public int delete(Query query, Transaction tx) throws HibernateException {
+        boolean commit = false;
 
-		int res;
+        if (tx == null) {
+            assertSession();
+            tx = sess.beginTransaction();
+            commit = true;
+        }
 
-		try {
-			res = query.executeUpdate();
+        int res;
 
-			if (commit) {
-				tx.commit();
-			}
-		} catch (RuntimeException re) {
-			if (commit) {
-				rollback(tx);
-			}
-			// throw again the first exception
-			throw re;
-		}
+        try {
+            res = query.executeUpdate();
 
-		return res;
-	}
+            if (commit) {
+                tx.commit();
+            }
+        } catch (RuntimeException re) {
+            if (commit) {
+                rollback(tx);
+            }
+            // throw again the first exception
+            throw re;
+        }
 
-	public void save(Object instance, Transaction tx) throws HibernateException {
+        return res;
+    }
 
-		boolean commit = false;
+    public void save(Object instance, Transaction tx) throws HibernateException {
 
-		if (tx == null) {
-			assertSession();
-			tx = sess.beginTransaction();
-			commit = true;
-		}
+        boolean commit = false;
 
-		try {
-			sess.saveOrUpdate(instance);
+        if (tx == null) {
+            assertSession();
+            tx = sess.beginTransaction();
+            commit = true;
+        }
 
-			if (commit) {
-				tx.commit();
-			}
-		} catch (RuntimeException re) {
-			if (commit) {
-				rollback(tx);
-			}
-			// throw again the first exception
-			throw re;
-		}
-	}
+        try {
+            sess.saveOrUpdate(instance);
 
-	public void delete(Object instance, Transaction tx) throws HibernateException {
+            if (commit) {
+                tx.commit();
+            }
+        } catch (RuntimeException re) {
+            if (commit) {
+                rollback(tx);
+            }
+            // throw again the first exception
+            throw re;
+        }
+    }
 
-		boolean commit = false;
+    public void delete(Object instance, Transaction tx) throws HibernateException {
 
-		if (tx == null) {
-			assertSession();
-			tx = sess.beginTransaction();
-			commit = true;
-		}
+        boolean commit = false;
 
-		try {
-			sess.delete(instance);
+        if (tx == null) {
+            assertSession();
+            tx = sess.beginTransaction();
+            commit = true;
+        }
 
-			if (commit) {
-				tx.commit();
-			}
-		} catch (RuntimeException re) {
-			if (commit) {
-				rollback(tx);
-			}
-			// throw again the first exception
-			throw re;
-		}
-	}
+        try {
+            sess.delete(instance);
 
-	public void refresh(Object instance) {
-		assertSession();
+            if (commit) {
+                tx.commit();
+            }
+        } catch (RuntimeException re) {
+            if (commit) {
+                rollback(tx);
+            }
+            // throw again the first exception
+            throw re;
+        }
+    }
 
-		sess.refresh(instance);
-	}
+    public void refresh(Object instance) {
+        assertSession();
 
-	public void clearCache() {
-		assertSession();
+        sess.refresh(instance);
+    }
 
-		sess.clear();
-	}
+    public void clearCache() {
+        assertSession();
 
-	public void evictClass(Class<?> clazz) {
-		assertSession();
+        sess.clear();
+    }
 
-		sess.getSessionFactory().evict(clazz);
-	}
+    public void evictClass(Class<?> clazz) {
+        assertSession();
 
-	public void destroy() {
-		sess.clear();
+        sess.getSessionFactory().evict(clazz);
+    }
 
-		sess = null;
-	}
+    public void destroy() {
+        sess.clear();
 
-	public void evict(Object instance) throws HibernateException {
-		sess.evict(instance);
-	}
+        sess = null;
+    }
 
-	public Query getNamedQuery(String queryName) throws HibernateException {
-		return sess.getNamedQuery(queryName);
-	}
+    public void evict(Object instance) throws HibernateException {
+        sess.evict(instance);
+    }
 
-	public void replicate(Object instane) {
-		sess.replicate(instane, ReplicationMode.OVERWRITE);
-	}
+    public Query getNamedQuery(String queryName) throws HibernateException {
+        return sess.getNamedQuery(queryName);
+    }
+
+    public void replicate(Object instane) {
+        sess.replicate(instane, ReplicationMode.OVERWRITE);
+    }
 }

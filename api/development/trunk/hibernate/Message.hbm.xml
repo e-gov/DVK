@@ -58,10 +58,10 @@
         <property name="dhlId" type="java.lang.Long">
             <column name="DHL_ID" precision="10" scale="0" />
         </property>
-        <property name="sendingDate" type="date">
+        <property name="sendingDate" type="java.util.Date">
             <column name="SENDING_DATE" length="7" />
         </property>
-        <property name="receivedDate" type="date">
+        <property name="receivedDate" type="java.util.Date">
             <column name="RECEIVED_DATE" length="7" />
         </property>
         <property name="localItemId" type="java.lang.Long">

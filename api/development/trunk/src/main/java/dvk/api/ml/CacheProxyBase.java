@@ -1,193 +1,187 @@
 package dvk.api.ml;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
+import dvk.api.IElementObserver;
+import dvk.api.SelectCriteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Transaction;
 
-import dvk.api.IElementObserver;
-import dvk.api.SelectCriteria;
+import java.util.*;
 
-public abstract class CacheProxyBase<ID, FACADE, POJO extends IElementObserver> implements ICacheProxy<FACADE>
-{
-	protected HashMap<ID, FACADE> cache = new HashMap<ID, FACADE>();
-	protected DvkSessionCacheBox cacheBox;
-	protected SelectCriteria selectCriteria;
-	private static final String IdRequestTemplate = "select %s from %s where %s = %s";
-	private static final String IdRequestTemplateOfTypeText = "select %s from %s where %s = '%s'";
+public abstract class CacheProxyBase<ID, FACADE, POJO extends IElementObserver> implements ICacheProxy<FACADE> {
+    protected HashMap<ID, FACADE> cache = new HashMap<ID, FACADE>();
+    protected DvkSessionCacheBox cacheBox;
+    protected SelectCriteria selectCriteria;
+    private static final String IdRequestTemplate = "select %s from %s where %s = %s";
+    private static final String IdRequestTemplateOfTypeText = "select %s from %s where %s = '%s'";
 
-	public CacheProxyBase(DvkSessionCacheBox cacheBox) {
-		this.cacheBox = cacheBox;
-	}
+    public CacheProxyBase(DvkSessionCacheBox cacheBox) {
+        this.cacheBox = cacheBox;
+    }
 
-	protected abstract String getPojoName();
+    protected abstract String getPojoName();
 
-	protected abstract ID getPojoId(POJO pojo);
+    protected abstract ID getPojoId(POJO pojo);
 
-	public abstract String getIdFieldName();
+    public abstract String getIdFieldName();
 
-	public void destroy() {
-		cache.clear();
-		cache = null;
+    public void destroy() {
+        cache.clear();
+        cache = null;
 
-		cacheBox = null;
+        cacheBox = null;
 
-		if (selectCriteria != null) {
-			selectCriteria.reset();
-			selectCriteria = null;
-		}
-	}
+        if (selectCriteria != null) {
+            selectCriteria.reset();
+            selectCriteria = null;
+        }
+    }
 
-	@SuppressWarnings("unchecked")
-	public void clearCache() {
-		if (cache.size() == 0) {
-			return;
-		}
+    @SuppressWarnings("unchecked")
+    public void clearCache() {
+        if (cache.size() == 0) {
+            return;
+        }
 
-		for (FACADE facade : cache.values()) {
-			cacheBox.evict((PojoFacade<POJO>) facade);
-		}
+        for (FACADE facade : cache.values()) {
+            cacheBox.evict((PojoFacade<POJO>) facade);
+        }
 
-		cache.clear();
-	}
+        cache.clear();
+    }
 
-	public List<FACADE> select(SelectCriteria criteria) {
-		String query = getDefaultQuery() + " where " + criteria.getWhereClause();
-		return select(query);
-	}
+    public List<FACADE> select(SelectCriteria criteria) {
+        String query = getDefaultQuery() + " where " + criteria.getWhereClause();
+        return select(query);
+    }
 
-	@SuppressWarnings("unchecked")
-	public void stateChanged(PojoFacade<?> facade) {
-		switch (facade.getState())
-			{
-			case Deleted:
-				if (cache.containsKey(facade.getPojoId())) {
-					cacheBox.evict(facade);
-					cache.remove(facade);
-				}
-				break;
-			case Persistent:
-				Object id = facade.getPojoId();
-				if (!cache.containsKey(id)) {
-					cache.put((ID) id, (FACADE) facade);
-				}
-				break;
-			}
-	}
+    @SuppressWarnings("unchecked")
+    public void stateChanged(PojoFacade<?> facade) {
+        switch (facade.getState()) {
+            case Deleted:
+                if (cache.containsKey(facade.getPojoId())) {
+                    cacheBox.evict(facade);
+                    cache.remove(facade);
+                }
+                break;
+            case Persistent:
+                Object id = facade.getPojoId();
+                if (!cache.containsKey(id)) {
+                    cache.put((ID) id, (FACADE) facade);
+                }
+                break;
+        }
+    }
 
-	public Iterator<FACADE> elements() {
-		return cache.values().iterator();
-	}
+    public Iterator<FACADE> elements() {
+        return cache.values().iterator();
+    }
 
-	public FACADE lookupLocal(Object id) {
-		return cache.get(id);
-	}
+    public FACADE lookupLocal(Object id) {
+        return cache.get(id);
+    }
 
-	@SuppressWarnings("unchecked")
-	public void delete(Object id, Transaction tx, Object... extraArgs) throws HibernateException {
-		FACADE facade = lookup(id, false);
+    @SuppressWarnings("unchecked")
+    public void delete(Object id, Transaction tx, Object... extraArgs) throws HibernateException {
+        FACADE facade = lookup(id, false);
 
-		if (facade != null) {
-			((PojoFacade<POJO>) facade).delete(tx);
-		} else {
-			String query = "delete from " + PojoCounter.PojoName + " where " + getIdFieldName() + " = " + id;
-			cacheBox.execDeleteQuery(query, null);
-		}
-	}
+        if (facade != null) {
+            ((PojoFacade<POJO>) facade).delete(tx);
+        } else {
+            String query = "delete from " + PojoCounter.PojoName + " where " + getIdFieldName() + " = " + id;
+            cacheBox.execDeleteQuery(query, null);
+        }
+    }
 
-	public String getDefaultQuery() {
-		return "from " + getPojoName();
-	}
+    public String getDefaultQuery() {
+        return "from " + getPojoName();
+    }
 
-	public SelectCriteria getSelectCriteria(boolean reset) {
-		if (selectCriteria != null && reset) {
-			selectCriteria.reset();
-		}
+    public SelectCriteria getSelectCriteria(boolean reset) {
+        if (selectCriteria != null && reset) {
+            selectCriteria.reset();
+        }
 
-		return selectCriteria;
-	}
+        return selectCriteria;
+    }
 
-	@SuppressWarnings("unchecked")
-	public List<FACADE> select(String query) {
-		List<POJO> selectList = null;
-		List<FACADE> retList = new ArrayList<FACADE>();
+    @SuppressWarnings("unchecked")
+    public List<FACADE> select(String query) {
+        List<POJO> selectList = null;
+        List<FACADE> retList = new ArrayList<FACADE>();
 
-		if (query == null) {
-			// select all
-			selectList = cacheBox.createQuery(getDefaultQuery()).list();
-		} else {
-			selectList = cacheBox.createQuery(query).list();
-		}
+        if (query == null) {
+            // select all
+            selectList = cacheBox.createQuery(getDefaultQuery()).list();
+        } else {
+            selectList = cacheBox.createQuery(query).list();
+        }
 
-		if (Util.isEmpty(selectList)) {
-			return retList;
-		}
+        if (Util.isEmpty(selectList)) {
+            return retList;
+        }
 
-		for (POJO pojo : selectList) {
-			retList.add(lookup(getPojoId(pojo), false));
-		}
+        for (POJO pojo : selectList) {
+            retList.add(lookup(getPojoId(pojo), false));
+        }
 
-		selectList.clear();
+        selectList.clear();
 
-		return retList;
-	}
+        return retList;
+    }
 
-	public boolean isExistingId(ID id) {
-		String template = (id instanceof String) ? IdRequestTemplateOfTypeText : IdRequestTemplate;
-		String queryString = String.format(template, getIdFieldName(), getPojoName(), getIdFieldName(), id);
+    public boolean isExistingId(ID id) {
+        String template = (id instanceof String) ? IdRequestTemplateOfTypeText : IdRequestTemplate;
+        String queryString = String.format(template, getIdFieldName(), getPojoName(), getIdFieldName(), id);
 
-		Query q = cacheBox.createQuery(queryString);
+        Query q = cacheBox.createQuery(queryString);
 
-		Object res = q.uniqueResult();
+        Object res = q.uniqueResult();
 
-		return res != null;
-	}
+        return res != null;
+    }
 
-	@SuppressWarnings("unchecked")
-	public List<ID> getExistingIdList() {
-		String q = String.format("select %s from %s", getIdFieldName(), getPojoName());
+    @SuppressWarnings("unchecked")
+    public List<ID> getExistingIdList() {
+        String q = String.format("select %s from %s", getIdFieldName(), getPojoName());
 
-		return cacheBox.createQuery(q).list();
-	}
+        return cacheBox.createQuery(q).list();
+    }
 
-	@SuppressWarnings("unchecked")
-	public List<ID> getExistingIdList(SelectCriteria criteria) {
-		String q = String.format("select %s from %s where %s", getIdFieldName(), getPojoName(), criteria.getWhereClause());
+    @SuppressWarnings("unchecked")
+    public List<ID> getExistingIdList(SelectCriteria criteria) {
+        String q = String.format("select %s from %s where %s", getIdFieldName(), getPojoName(), criteria.getWhereClause());
 
-		return cacheBox.createQuery(q).list();
-	}
+        return cacheBox.createQuery(q).list();
+    }
 
-	@SuppressWarnings("unchecked")
-	protected Object getArgumet(Object hash, String key, boolean isMandatory) {
-		Hashtable<String, Object> hashtable = (Hashtable<String, Object>) hash;
+    @SuppressWarnings("unchecked")
+    protected Object getArgumet(Object hash, String key, boolean isMandatory) {
+        Hashtable<String, Object> hashtable = (Hashtable<String, Object>) hash;
 
-		Object value = hashtable.get(key);
+        Object value = hashtable.get(key);
 
-		if (value == null && isMandatory) {
-			throw new NullPointerException("Expected argument '" + key + "' is absent");
-		}
+        if (value == null && isMandatory) {
+            throw new NullPointerException("Expected argument '" + key + "' is absent");
+        }
 
-		return value;
-	}
+        return value;
+    }
 
-	protected void asserExtraArgs(Object[] args) {
-		if (args == null) {
-			throw new NullPointerException("Expected argument 'extraArgs' cannot be null");
-		}
+    protected void asserExtraArgs(Object[] args) {
+        if (args == null) {
+            throw new NullPointerException("Expected argument 'extraArgs' cannot be null");
+        }
 
-		if (args.length == 0) {
-			throw new NullPointerException("Expected mandatory arguments");
-		}
-	}
+        if (args.length == 0) {
+            throw new NullPointerException("Expected mandatory arguments");
+        }
+    }
 
-	@SuppressWarnings("unchecked")
-	public POJO getOriginVersion(Object id) {
-		Long idSettingsFolder = Util.getLong(id);
+    @SuppressWarnings("unchecked")
+    public POJO getOriginVersion(Object id) {
+        Long idSettingsFolder = Util.getLong(id);
 
-		return (POJO) cacheBox.getFromHibernateCache(getPojoName(), idSettingsFolder);
-	}
+        return (POJO) cacheBox.getFromHibernateCache(getPojoName(), idSettingsFolder);
+    }
 }

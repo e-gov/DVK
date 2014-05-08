@@ -1,35 +1,34 @@
 package dvk.api.ml;
 
-import java.util.Iterator;
-import java.util.List;
+import dvk.api.SelectCriteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 
-import dvk.api.SelectCriteria;
+import java.util.Iterator;
+import java.util.List;
 
-public interface ICacheProxy<E>
-{
-	E lookup(Object id, boolean allowCreateNew, Object... extraArgs);
+public interface ICacheProxy<E> {
+    E lookup(Object id, boolean allowCreateNew, Object... extraArgs);
 
-	void destroy();
+    void destroy();
 
-	void delete(Object id, Transaction tx, Object... extraArgs) throws HibernateException;
+    void delete(Object id, Transaction tx, Object... extraArgs) throws HibernateException;
 
-	void clearCache();
+    void clearCache();
 
-	List<? extends E> select(String query);
+    List<? extends E> select(String query);
 
-	List<? extends E> select(SelectCriteria criteria);
+    List<? extends E> select(SelectCriteria criteria);
 
-	String getDefaultQuery();
+    String getDefaultQuery();
 
-	void stateChanged(PojoFacade<?> facade);
+    void stateChanged(PojoFacade<?> facade);
 
-	Iterator<E> elements();
+    Iterator<E> elements();
 
-	E lookupLocal(Object id);
+    E lookupLocal(Object id);
 
-	SelectCriteria getSelectCriteria(boolean reset);
+    SelectCriteria getSelectCriteria(boolean reset);
 
-	Object getOriginVersion(Object id);
+    Object getOriginVersion(Object id);
 }

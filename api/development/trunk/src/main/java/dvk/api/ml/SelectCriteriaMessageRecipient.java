@@ -1,65 +1,65 @@
 package dvk.api.ml;
 
-import java.math.BigDecimal;
 import dvk.api.SelectCriteria;
 
-public class SelectCriteriaMessageRecipient extends SelectCriteria
-{
-	private Long dhlMessageId;
-	private String recipientOrgCode;
-	private String recipientPersonCode;
-	private BigDecimal recipientDivisionId;
-	private BigDecimal recipientPositionId;
-	private Long sendingStatusId;
+import java.math.BigDecimal;
 
-	public SelectCriteriaMessageRecipient() {
-	}
+public class SelectCriteriaMessageRecipient extends SelectCriteria {
+    private Long dhlMessageId;
+    private String recipientOrgCode;
+    private String recipientPersonCode;
+    private BigDecimal recipientDivisionId;
+    private BigDecimal recipientPositionId;
+    private Long sendingStatusId;
 
-	public Long getDhlMessageId() {
-		return dhlMessageId;
-	}
+    public SelectCriteriaMessageRecipient() {
+    }
 
-	public void setDhlMessageId(Long dhlMessageId) {
-		this.dhlMessageId = dhlMessageId;
-	}
+    public Long getDhlMessageId() {
+        return dhlMessageId;
+    }
 
-	public String getRecipientOrgCode() {
-		return recipientOrgCode;
-	}
+    public void setDhlMessageId(Long dhlMessageId) {
+        this.dhlMessageId = dhlMessageId;
+    }
 
-	public void setRecipientOrgCode(String recipientOrgCode) {
-		this.recipientOrgCode = recipientOrgCode;
-	}
+    public String getRecipientOrgCode() {
+        return recipientOrgCode;
+    }
 
-	public String getRecipientPersonCode() {
-		return recipientPersonCode;
-	}
+    public void setRecipientOrgCode(String recipientOrgCode) {
+        this.recipientOrgCode = recipientOrgCode;
+    }
 
-	public void setRecipientPersonCode(String recipientPersonCode) {
-		this.recipientPersonCode = recipientPersonCode;
-	}
+    public String getRecipientPersonCode() {
+        return recipientPersonCode;
+    }
 
-	public BigDecimal getRecipientDivisionId() {
-		return recipientDivisionId;
-	}
+    public void setRecipientPersonCode(String recipientPersonCode) {
+        this.recipientPersonCode = recipientPersonCode;
+    }
 
-	public void setRecipientDivisionId(BigDecimal recipientDivisionId) {
-		this.recipientDivisionId = recipientDivisionId;
-	}
+    public BigDecimal getRecipientDivisionId() {
+        return recipientDivisionId;
+    }
 
-	public BigDecimal getRecipientPositionId() {
-		return recipientPositionId;
-	}
+    public void setRecipientDivisionId(BigDecimal recipientDivisionId) {
+        this.recipientDivisionId = recipientDivisionId;
+    }
 
-	public void setRecipientPositionId(BigDecimal recipientPositionId) {
-		this.recipientPositionId = recipientPositionId;
-	}
+    public BigDecimal getRecipientPositionId() {
+        return recipientPositionId;
+    }
 
-	public Long getSendingStatusId() {
-		return sendingStatusId;
-	}
+    public void setRecipientPositionId(BigDecimal recipientPositionId) {
+        this.recipientPositionId = recipientPositionId;
+    }
 
-	public void setSendingStatusId(Long sendingStatusId) {
-		this.sendingStatusId = sendingStatusId;
-	}
+    public Long getSendingStatusId() {
+        return sendingStatusId;
+    }
+
+    public void setSendingStatusId(Long sendingStatusId) {
+        this.sendingStatusId = sendingStatusId;
+    }
 }

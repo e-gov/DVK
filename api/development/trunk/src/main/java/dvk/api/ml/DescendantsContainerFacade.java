@@ -1,82 +1,80 @@
 package dvk.api.ml;
 
-import java.util.List;
-
+import dvk.api.IDvkElement;
+import dvk.api.IElementObserver;
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 
-import dvk.api.IDvkElement;
-import dvk.api.IElementObserver;
+import java.util.List;
 
-public abstract class DescendantsContainerFacade<POJO extends IElementObserver> extends PojoFacade<POJO>
-{
-	public DescendantsContainerFacade(DvkSessionCacheBox cacheBox, boolean isNew) {
-		super(cacheBox, isNew);
-	}
+public abstract class DescendantsContainerFacade<POJO extends IElementObserver> extends PojoFacade<POJO> {
+    public DescendantsContainerFacade(DvkSessionCacheBox cacheBox, boolean isNew) {
+        super(cacheBox, isNew);
+    }
 
-	@Override
-	abstract void saveDescendants(Transaction tx);
+    @Override
+    abstract void saveDescendants(Transaction tx);
 
-	abstract void removePending(PojoFacade<POJO> pojo);
+    abstract void removePending(PojoFacade<POJO> pojo);
 
-	protected abstract boolean hasDirtyDescendants();
+    protected abstract boolean hasDirtyDescendants();
 
-	abstract void commitPendingChanges(State state);
+    abstract void commitPendingChanges(State state);
 
-	@Override
-	protected boolean allowSave() {
-		return isDirty() || hasDirtyDescendants();
-	}
+    @Override
+    protected boolean allowSave() {
+        return isDirty() || hasDirtyDescendants();
+    }
 
-	@Override
-	void save(Transaction tx) throws HibernateException {
-		if (allowSave()) {
-			if (isDirty()) {
-				getCacheBox().save(this, tx);
-			}
+    @Override
+    void save(Transaction tx) throws HibernateException {
+        if (allowSave()) {
+            if (isDirty()) {
+                getCacheBox().save(this, tx);
+            }
 
-			if (hasDirtyDescendants()) {
-				saveDescendants(tx);
-			}
+            if (hasDirtyDescendants()) {
+                saveDescendants(tx);
+            }
 
-			if (tx == null) {
-				commitChanges(State.Persistent);
+            if (tx == null) {
+                commitChanges(State.Persistent);
 
-				commitPendingChanges(State.Persistent);
-			}
-		}
-	}
+                commitPendingChanges(State.Persistent);
+            }
+        }
+    }
 
-	@Override
-	public void delete(Transaction tx) throws HibernateException {
-		if (!allowDelete()) {
-			return;
-		}
+    @Override
+    public void delete(Transaction tx) throws HibernateException {
+        if (!allowDelete()) {
+            return;
+        }
 
-		deleteDescendants(tx);
+        deleteDescendants(tx);
 
-		getCacheBox().delete(this, tx);
+        getCacheBox().delete(this, tx);
 
-		if (tx == null) {
-			commitChanges(State.Deleted);
+        if (tx == null) {
+            commitChanges(State.Deleted);
 
-			commitPendingChanges(State.Deleted);
-		}
-	}
+            commitPendingChanges(State.Deleted);
+        }
+    }
 
-	abstract void deleteDescendants(Transaction tx);
+    abstract void deleteDescendants(Transaction tx);
 
-	protected static void commitPendingDescendants(List<? extends IDvkElement> descendantList, State state) {
-		if (Util.isEmpty(descendantList)) {
-			return;
-		}
+    protected static void commitPendingDescendants(List<? extends IDvkElement> descendantList, State state) {
+        if (Util.isEmpty(descendantList)) {
+            return;
+        }
 
-		for (IDvkElement e : descendantList) {
-			DescendantFacade<?> desc = (DescendantFacade<?>) e;
-			desc.desrtoyPendingState();
-			desc.commitChanges(state);
-		}
+        for (IDvkElement e : descendantList) {
+            DescendantFacade<?> desc = (DescendantFacade<?>) e;
+            desc.desrtoyPendingState();
+            desc.commitChanges(state);
+        }
 
-		descendantList.clear();
-	}
+        descendantList.clear();
+    }
 }

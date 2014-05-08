@@ -1,3 +1,10 @@
+1.0.8
+-------------------------------------------------------------------------------
+- some checkstyle and formatting errors fixed
+- DVK-49 - Fixed Date fields losing time part.
+- DVK-39 - SessionFactory can now be created from a File
+
+
 1.0.7
 -------------------------------------------------------------------------------
 - Container.getInternalVersion() now public API method.

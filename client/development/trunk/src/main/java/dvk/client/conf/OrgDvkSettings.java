@@ -16,6 +16,7 @@ public class OrgDvkSettings {
     private int m_getOccupationListRequestVersion;
     private int m_defaultStatusID;
     private int aditGetSendStatusRequestVersion;
+    private int receiveDocumentsAmount;
 
     public void setServiceUrl(String serviceUrl) {
         if (serviceUrl == null) {
@@ -129,6 +130,18 @@ public class OrgDvkSettings {
         this.aditGetSendStatusRequestVersion = aditGetSendStatusRequestVersion;
     }
 
+    public int getReceiveDocumentsAmount() {
+        return receiveDocumentsAmount;
+    }
+
+    public void setReceiveDocumentsAmount(int receiveDocumentsAmount) {
+        if (receiveDocumentsAmount < 1) {
+            this.receiveDocumentsAmount = 1;
+        } else {
+            this.receiveDocumentsAmount = receiveDocumentsAmount;
+        }
+    }
+
     public OrgDvkSettings() {
         m_serviceUrl = Settings.Client_ServiceUrl;
         m_sendDocumentsRequestVersion = 1;
@@ -140,6 +153,7 @@ public class OrgDvkSettings {
         m_getOccupationListRequestVersion = 1;
         m_defaultStatusID = 0;
         aditGetSendStatusRequestVersion = 1;
+        receiveDocumentsAmount = 10;
     }
 
     /**
@@ -179,6 +193,8 @@ public class OrgDvkSettings {
                         result.setDefaultStatusID(Integer.parseInt(nodeText));
                     } else if (n.getLocalName().equalsIgnoreCase("adit_get_send_status")) {
                         result.setAditGetSendStatusRequestVersion(Integer.parseInt(nodeText));
+                    } else if (n.getLocalName().equalsIgnoreCase("receive_documents_amount")) {
+                        result.setReceiveDocumentsAmount(Integer.parseInt(nodeText));
                     }
                 }
             }

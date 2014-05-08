@@ -844,7 +844,8 @@ public class Client {
                     masterCredential.getPersonalIdCode(),
                     "",
                     (CommonMethods.personalIDCodeHasCountryCode(masterCredential.getPersonalIdCode()) ? masterCredential.getPersonalIdCode() : "EE" + masterCredential.getPersonalIdCode()));
-            ReceiveDocumentsResult resultFiles = dvkClient.receiveDocuments(header, 10, masterCredential.getFolders(), masterCredential.getDivisionID(), masterCredential.getDivisionShortName(), masterCredential.getOccupationID(), masterCredential.getOccupationShortName());
+
+            ReceiveDocumentsResult resultFiles = dvkClient.receiveDocuments(header, db.getDvkSettings().getReceiveDocumentsAmount(), masterCredential.getFolders(), masterCredential.getDivisionID(), masterCredential.getDivisionShortName(), masterCredential.getOccupationID(), masterCredential.getOccupationShortName());
             ArrayList<DhlMessage> receivedDocs = new ArrayList<DhlMessage>();
             ArrayList<DhlMessage> failedDocs = new ArrayList<DhlMessage>();
 

@@ -1,3 +1,8 @@
+1.7.3
+-------------------------------------------------------------------------------
+- DVK-44 ReceiveDocuments päringu vastuvõetavate dokumentide arv on nüüd konfifailis seadistatav (receive_documents_amount)
+
+
 1.7.2
 -------------------------------------------------------------------------------
 - DVK-41 (DVK konverteerimisel ei kandu üle juurdepääsupiirangu andmed)

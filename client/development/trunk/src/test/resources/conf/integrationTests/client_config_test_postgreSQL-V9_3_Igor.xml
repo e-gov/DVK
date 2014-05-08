@@ -19,6 +19,7 @@
       <send_documents_ver>4</send_documents_ver> <!-- Võimalikud väärtused: 1, 2, 3, 4 -->
       <receive_documents_ver>4</receive_documents_ver> <!-- Võimalikud väärtused: 1, 2, 3, 4 -->
       <mark_documents_received_ver>3</mark_documents_received_ver> <!-- Võimalikud väärtused: 1, 2, 3 -->
+      <receive_documents_amount>10</receive_documents_amount> <!-- Ühe päringu vastuvõetavate dokumentide maksimaalne arv. -->
       <get_send_status_ver>2</get_send_status_ver> <!-- Võimalikud väärtused: 1, 2 -->
       <get_sending_options_ver>3</get_sending_options_ver> <!-- Võimalikud väärtused: 1, 2, 3 -->
       <get_subdivision_list_ver>2</get_subdivision_list_ver> <!-- Võimalikud väärtused: 1, 2 -->

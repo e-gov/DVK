@@ -2,6 +2,7 @@
 -------------------------------------------------------------------------------
 - DVK-44 - ReceiveDocuments päringu vastuvõetavate dokumentide arv on nüüd konfifailis seadistatav (receive_documents_amount)
 - DVK-47 - Query methods default versions updated
+- DVK-51 - AditGetSendStatus request should add dhlId not messageId to the request.
 
 1.7.2
 -------------------------------------------------------------------------------

@@ -22,7 +22,7 @@ public class AditGetSendStatusRequest {
         sb.append("<item>");
         for (MessageRecipient messageRecipient: messageRecipients) {
             sb.append("<dhl_id>");
-            sb.append(messageRecipient.getMessageID());
+            sb.append(messageRecipient.getDhlID());
             sb.append("</dhl_id>");
         }
         sb.append("</item>");

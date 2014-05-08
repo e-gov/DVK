@@ -1,7 +1,7 @@
 1.7.3
 -------------------------------------------------------------------------------
-- DVK-44 ReceiveDocuments päringu vastuvõetavate dokumentide arv on nüüd konfifailis seadistatav (receive_documents_amount)
-
+- DVK-44 - ReceiveDocuments päringu vastuvõetavate dokumentide arv on nüüd konfifailis seadistatav (receive_documents_amount)
+- DVK-47 - Query methods default versions updated
 
 1.7.2
 -------------------------------------------------------------------------------

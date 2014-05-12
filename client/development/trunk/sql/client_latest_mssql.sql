@@ -1490,11 +1490,9 @@ GO
 ALTER TABLE dhl_message_recipient ADD opened DATETIME NULL;
 GO
 
-CREATE PROCEDURE [dbo].[Get_NotOpenedInAdit]
-@cursor CURSOR VARYING OUTPUT
-AS
-    SET @cursor = CURSOR FOR
-    select  recipient.*
+create procedure [dbo].[Get_NotOpenedInAdit]
+as
+  select  recipient.*
     from    dhl_message_recipient as recipient, dhl_message as message
     where   LOWER(recipient.recipient_org_code)='adit'
       and recipient.opened is null
@@ -1502,7 +1500,6 @@ AS
       and message.is_incoming=0
       and recipient.dhl_id is not null
       and message.dhl_id is not null;
-    OPEN @cursor;
 GO
 
 CREATE PROCEDURE [dbo].[Update_MessageRecipientOpened]

@@ -1,3 +1,5 @@
+DROP PROCEDURE [dbo].[Get_NotOpenedInAdit];
+GO
 
 CREATE PROCEDURE [dbo].[Get_NotOpenedInAdit] 
 @cursor CURSOR VARYING OUTPUT

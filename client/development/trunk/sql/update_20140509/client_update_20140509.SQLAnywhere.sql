@@ -1,4 +1,3 @@
-
 CREATE PROCEDURE "Get_NotOpenedInAdit"()
 BEGIN
     select  recipient.*

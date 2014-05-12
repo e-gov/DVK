@@ -176,7 +176,6 @@
             <scope>system</scope>
             <systemPath>${basedir}/lib/xml-apis.jar</systemPath>
         </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -189,6 +188,8 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.3.2</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/commons-lang3-3.3.2.jar</systemPath>
         </dependency>
     </dependencies>
 
@@ -206,6 +207,13 @@
                 <directory>src/main/resources</directory>
                 <includes>
                     <include>**/**</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>hibernate</directory>
+                <targetPath>hibernate</targetPath>
+                <includes>
+                    <include>*.xml</include>
                 </includes>
             </resource>
         </resources>

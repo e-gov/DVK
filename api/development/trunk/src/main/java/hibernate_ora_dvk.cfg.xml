@@ -21,13 +21,13 @@
 		<property name="hibernate.connection.pool_size">10</property>
 		<!-- <property name="hibernate.hbm2ddl.auto">update</property> -->
 		<!-- Mapping files -->
-		<mapping resource="dvkapi/Counter.hbm.xml"/>
-		<mapping resource="dvkapi/Subdivision.hbm.xml"/>
-		<mapping resource="dvkapi/Occupation.hbm.xml"/>
-		<mapping resource="dvkapi/Organization.hbm.xml"/>
-		<mapping resource="dvkapi/SettingsFolders.hbm.xml"/>
-		<mapping resource="dvkapi/Settings.hbm.xml"/>
-		<mapping resource="dvkapi/Message.hbm.xml"/>
-		<mapping resource="dvkapi/MessageRecipient.hbm.xml"/>
+		<mapping resource="hibernate/Counter.hbm.xml"/>
+		<mapping resource="hibernate/Subdivision.hbm.xml"/>
+		<mapping resource="hibernate/Occupation.hbm.xml"/>
+		<mapping resource="hibernate/Organization.hbm.xml"/>
+		<mapping resource="hibernate/SettingsFolders.hbm.xml"/>
+		<mapping resource="hibernate/Settings.hbm.xml"/>
+		<mapping resource="hibernate/Message.hbm.xml"/>
+		<mapping resource="hibernate/MessageRecipient.hbm.xml"/>
 	</session-factory>
 </hibernate-configuration>

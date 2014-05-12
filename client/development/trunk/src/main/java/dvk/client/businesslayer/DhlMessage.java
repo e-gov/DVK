@@ -2483,14 +2483,20 @@ public class DhlMessage implements Cloneable {
         for (int i = 0; i < messages.size(); ++i) {
             DhlMessage msg = messages.get(i);
 
-// Kui saadetava sõnumi GUID on mõõramata, siis anname sõnumile GUID-i
-// ja salvestame selle kohe ka andmebaasi.
+        // Kui saadetava sõnumi GUID on mõõramata, siis anname sõnumile GUID-i
+        // ja salvestame selle kohe ka andmebaasi.
             if ((msg.getDhlGuid() == null) || (msg.getDhlGuid().length() < 1)) {
                 msg.setDhlGuid(generateGUID());
                 msg.updateDhlID(db, dbConnection);
             }
-
-            extractAndSaveMessageRecipients(msg, db, dbConnection);
+            try {
+                extractAndSaveMessageRecipients(msg, db, dbConnection);
+            } catch (Exception ex) {
+                // If something goes wrong with recipients, set a status of this message to CANCELLED
+                msg.setSendingStatusID(Settings.Client_StatusCanceled);
+                msg.setFaultString(CommonMethods.replaceAllSpecialCharactersInString(ex.getMessage()));
+                msg.updateMetaDataInDB(db, dbConnection);
+            }
         }
     }
 
@@ -2503,7 +2509,7 @@ public class DhlMessage implements Cloneable {
      * @param dbConnection Active database connection
      */
     public static void extractAndSaveMessageRecipients(DhlMessage message,
-                                                       OrgSettings db, Connection dbConnection) {
+                                                       OrgSettings db, Connection dbConnection) throws Exception {
 
         ArrayList<MessageRecipient> msgRec = MessageRecipient.getList(message.getId(), db, dbConnection);
         ArrayList<SimpleAddressData> recipients = null;

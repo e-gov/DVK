@@ -353,7 +353,7 @@ public class MessageRecipient {
         return item;
     }
 
-    public int saveToDB(OrgSettings db, Connection dbConnection) {
+    public int saveToDB(OrgSettings db, Connection dbConnection) throws Exception {
     	logger.debug("m_messageID: " + m_messageID);
     	logger.debug("m_recipientOrgCode: " + m_recipientOrgCode);
     	logger.debug("m_recipientOrgName: " + m_recipientOrgName);
@@ -457,7 +457,7 @@ public class MessageRecipient {
             errorLog.setOrganizationCode(this.getRecipientOrgCode());
             errorLog.setUserCode(this.getRecipientPersonCode());
             LoggingService.logError(errorLog);
-            return m_id;
+            throw ex;
         }
     }
 

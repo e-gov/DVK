@@ -1,3 +1,5 @@
+DROP PROCEDURE "Get_NotOpenedInAdit";
+
 CREATE PROCEDURE "Get_NotOpenedInAdit"()
 BEGIN
     SELECT  *

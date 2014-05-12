@@ -97,6 +97,26 @@
                 <containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_CI_container_1_0.properties</containerVer1Configs>
             </properties>
         </profile>
+        <profile>
+            <id>latest</id>
+            <modules>
+                <module>core/tags/1.7.1</module>
+                <module>client/tags/1.7.3</module>
+                <module>server/tags/1.7.4</module>
+                <module>api/tags/1.0.8</module>
+            </modules>
+            <properties>
+                <!-- e.g. C:\Work\Dev\DVK\core\development\trunk -->
+                <dvkCoreDir>${dvkCoreDir}</dvkCoreDir>
+                <!-- e.g. C:\Work\Dev\DVK\client\development\trunk -->
+                <dvkClientDir>${dvkClientDir}</dvkClientDir>
+                <!-- e.g. C:\Work\Dev\DVK\server\development\trunk\src\test\resources\jetty-env-jenkins.xml -->
+                <dvkServerJettyEnvLocation>${dvkServerJettyEnvLocation}</dvkServerJettyEnvLocation>
+                <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI.properties</listOfTestConfigs>
+                <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_CI_serverIsMissing.properties</serverIsMissingConfigs>
+                <containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_CI_container_1_0.properties</containerVer1Configs>
+            </properties>
+        </profile>
     </profiles>
 
     <dependencies>

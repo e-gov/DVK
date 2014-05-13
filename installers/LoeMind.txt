@@ -14,7 +14,7 @@ Selles failis on kirjeldatud ära rakenduse kasutatavad teegid (dependencies) ja
 3.Lisa [MAVEN2_HOME]/bin kataloog keskkonnamuutujasse „PATH“.
 
 
-Ehitamisjuhend versioonide 1.7.1 ning hilisemate jaoks:
+Ehitamisjuhend versioonide kõige hilisema rakendustekomplekti jaoks (alates 1.7 versioonist):
 
 1. Käivitage juurkataloogis järgmine käsk
 
@@ -22,7 +22,9 @@ mvn -P {profiili nimi} clean package -DdvkCoreDir="/path/to/coredir" -DdvkClient
 
 -D võtmega lisatud parameetrid asendatakse war'i ehitamise käigus automaatselt serveri konfiguratsioonis
 
-N: mvn -P 1.7.1 clean package -DdvkCoreDir="/var/lib/jenkins/workspace/DVK_trunk_tests/core/development/trunk" -DdvkClientDir="/var/lib/jenkins/workspace/DVK_trunk_tests/client/development/trunk" -Ddhl.properties="/home/tomcat/conf/dhl.properties" -Dattachments.directory="/home/jenkins/attachments" -Dserver.log.file="/usr/share/tomcat6/logs/dvkServer.log"
+N: mvn -P latestRelease clean package -DdvkCoreDir="/var/lib/jenkins/workspace/DVK_trunk_tests/core/development/trunk" -DdvkClientDir="/var/lib/jenkins/workspace/DVK_trunk_tests/client/development/trunk" -Ddhl.properties="/home/tomcat/conf/dhl.properties" -Dattachments.directory="/home/jenkins/attachments" -Dserver.log.file="/usr/share/tomcat6/logs/dvkServer.log"
+
+NB! vajadusel muuta parent pom'is olevat profiili latestRelease
 
 2. Vastavad failid luuakse iga projekti õigesse kataloogi target kausta
 N: server/tags/1.7.1/target/dhl.war, client/tags/1.7.1/target/dvk-client.jar, core/tags/1.7.1/target/dvk-core.jar

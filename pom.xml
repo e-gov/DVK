@@ -101,9 +101,9 @@
             <id>latestRelease</id>
             <modules>
                 <module>core/tags/1.7.2</module>
-                <module>client/tags/1.7.3</module>
-                <module>server/tags/1.7.4</module>
-                <module>api/tags/1.0.8</module>
+                <module>client/tags/1.7.4</module>
+                <module>server/tags/1.7.5</module>
+                <module>api/tags/1.0.9</module>
             </modules>
             <properties>
                 <!-- e.g. C:\Work\Dev\DVK\core\development\trunk -->

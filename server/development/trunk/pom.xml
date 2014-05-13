@@ -4,7 +4,7 @@
     <groupId>dvk</groupId>
     <artifactId>server</artifactId>
     <packaging>war</packaging>
-    <version>1.7.4</version>
+    <version>1.7.5</version>
     <name>dvk-server</name>
     <parent>
         <groupId>dvk</groupId>
@@ -21,12 +21,12 @@
         <dependency>
             <groupId>dvk</groupId>
             <artifactId>core</artifactId>
-            <version>1.7.1</version>
+            <version>1.7.2</version>
         </dependency>
         <dependency>
             <groupId>dvk</groupId>
             <artifactId>client</artifactId>
-            <version>1.7.3</version>
+            <version>1.7.4</version>
         </dependency>
         <dependency>
             <groupId>java</groupId>

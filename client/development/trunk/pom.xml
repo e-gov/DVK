@@ -11,7 +11,7 @@
         <version>1.7.1</version>
         <relativePath>../../..</relativePath>
     </parent>
-    <version>1.7.3</version>
+    <version>1.7.4</version>
 
     <!-- Dependencies -->
     <dependencies>
@@ -32,12 +32,12 @@
         <dependency>
             <groupId>dvk</groupId>
             <artifactId>core</artifactId>
-            <version>1.7.1</version>
+            <version>1.7.2</version>
         </dependency>
         <dependency>
             <groupId>dvk</groupId>
             <artifactId>api</artifactId>
-            <version>1.0.8</version>
+            <version>1.0.9</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.castor</groupId>

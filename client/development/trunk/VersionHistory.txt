@@ -1,3 +1,10 @@
+1.7.4
+-------------------------------------------------------------------------------
+- DVK-53 - AditGetSendStatus must be done only for messages sent to adit
+- DVK-54 - AditGetSendStatus must be done only for those messages where dhl_id != null
+- DVK-35 - UK should handle SQL exception on MessageRecipient.saveToDB as error
+- DVK-58 - adit_producer_name in configuration default value is now "ametlikud-dokumendid"
+
 1.7.3
 -------------------------------------------------------------------------------
 - DVK-44 - ReceiveDocuments päringu vastuvõetavate dokumentide arv on nüüd konfifailis seadistatav (receive_documents_amount)

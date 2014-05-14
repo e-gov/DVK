@@ -364,7 +364,7 @@ public class Client {
             }
 
             // UPDATE STATUS
-            if (ExecType == ClientExecType.UpdateStatus || ExecType == ClientExecType.SendReceive) {
+            if (ExecType == ClientExecType.UpdateStatus) {
                 for (OrgSettings db : currentClientDatabases) {
                     Connection dbConnection = null;
                     try {

@@ -37,7 +37,7 @@ public class AditReciever {
                 } else if (n.getLocalName().equalsIgnoreCase("avatud")) {
                     result.opened = CommonMethods.getNodeBoolean(n);
                 } else if (n.getLocalName().equalsIgnoreCase("avamiseAeg")) {
-                    result.openedDate = CommonMethods.getDateFromXML("avamiseAeg");
+                    result.openedDate = CommonMethods.getDateFromXML(CommonMethods.getNodeText(n).trim());
                 }
             }
         }

@@ -92,12 +92,13 @@ public class AditGetSendStatusService {
                         Message response = sendAndRecieveRequestToAdit(
                                 messageRecipients, xHeader, headerVar, requestName);
 
-                        AttachmentExtractionResult responseData = CommonMethods.getExtractedFileFromAttachment(response);
+                        AttachmentExtractionResult responseData = CommonMethods.
+                                getExtractedFileFromAttachmentWithoutDocumentHeader(response);
                         if (responseData != null) {
                             String fileName = responseData.getExtractedFileName();
                             if ((fileName != null) && (fileName.length() > 0) && (new File(fileName)).exists()) {
                                 Document xmlDoc = CommonMethods.xmlDocumentFromFile(fileName, true);
-                                AditGetSendStatusResponse parsedResponse = AditGetSendStatusResponse.fromXML((Element) xmlDoc);
+                                AditGetSendStatusResponse parsedResponse = AditGetSendStatusResponse.fromXML(xmlDoc.getDocumentElement());
 
                                 if (parsedResponse != null) {
                                     updateOpenedDateFor(parsedResponse, db, dbConnection);
@@ -124,10 +125,8 @@ public class AditGetSendStatusService {
              for (AditReciever aditReciever: aditDocument.aditRecievers) {
                  if (aditReciever.opened && aditReciever.openedDate != null) {
                      int dhlId = aditDocument.dhlId;
-                     String personIdCode = aditReciever.personIdCode.substring(2);
-
                      MessageRecipient.updateOpenedDate(
-                             dhlId, personIdCode, aditReciever.openedDate, orgSettings, dbConnection);
+                             dhlId, aditReciever.personIdCode, aditReciever.openedDate, orgSettings, dbConnection);
                  }
              }
          }

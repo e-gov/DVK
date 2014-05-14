@@ -637,7 +637,7 @@ public class MessageRecipient {
     /**
      * Update opened field for MessageRecipient where dhlId and personCode matches.
      * @param dhlId dhl_id
-     * @param personCode without country code
+     * @param personCode with country code
      * @param openedDate opened date
      * @param orgSettings orgsettings
      * @param dbConnection databaseConnection
@@ -654,13 +654,18 @@ public class MessageRecipient {
                 Calendar cal = Calendar.getInstance();
 
                 int parNr = 1;
-                cs = dbConnection.prepareCall("{call Update_MessageRecipientOpened(?,?,?)}");
+                cs = dbConnection.prepareCall("{call Update_MessageRecipientOpened(?,?,?,?)}");
                 if (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    cs = dbConnection.prepareCall("{? = call \"Update_MessageRecipientOpened\"(?,?,?)}");
+                    cs = dbConnection.prepareCall("{? = call \"Update_MessageRecipientOpened\"(?,?,?,?)}");
                     cs.registerOutParameter(parNr++, Types.BOOLEAN);
                 }
 
                 cs.setInt(parNr++, dhlId);
+                String personCodeWithoutEEPrefix = personCode;
+                if (personCode != null && personCode.toUpperCase().startsWith("EE")) {
+                    personCodeWithoutEEPrefix = personCode.substring(2);
+                }
+                cs.setString(parNr++, personCodeWithoutEEPrefix);
                 cs.setString(parNr++, personCode);
                 cs.setTimestamp(parNr++, CommonMethods.sqlDateFromDate(openedDate), cal);
                 cs.execute();

@@ -1477,8 +1477,8 @@ CREATE TABLE dhl_message (
     sending_status_id integer NOT NULL,
     unit_id integer NOT NULL,
     dhl_id integer,
-    sending_date date,
-    received_date date,
+    sending_date timestamp,
+    received_date timestamp,
     local_item_id integer,
     recipient_status_id integer,
     fault_code character varying(50),
@@ -1547,8 +1547,8 @@ CREATE TABLE dhl_message_recipient (
     recipient_org_name character varying(100),
     recipient_person_code character varying(20) NOT NULL,
     recipient_name character varying(100),
-    sending_date date,
-    received_date date,
+    sending_date timestamp,
+    received_date timestamp,
     sending_status_id integer not null,
     recipient_status_id integer,
     fault_code character varying(50),
@@ -1622,7 +1622,7 @@ create table dhl_status_history(
     server_side_id int not null,
     dhl_message_recipient_id int not null,
     sending_status_id int not null,
-    status_date date null,
+    status_date timestamp null,
     fault_code character varying(50) null,
     fault_actor character varying(250) null,
     fault_string character varying(500) null,
@@ -1805,7 +1805,7 @@ begin
 end; $$
 language plpgsql;
 
-ALTER TABLE dhl_message_recipient ADD COLUMN opened timestamp without time zone;
+ALTER TABLE dhl_message_recipient ADD COLUMN opened timestamp;
 
 CREATE OR REPLACE FUNCTION "Get_NotOpenedInAdit"() RETURNS refcursor
 AS $$
@@ -1830,7 +1830,7 @@ function "Update_MessageRecipientOpened"(
     p_dhl_id integer,
     p_recipient_person_code character varying,
     p_person_code_with_prefix character varying,
-    p_opened timestamp with time zone)
+    p_opened timestamp)
 returns boolean
 as $$
 begin

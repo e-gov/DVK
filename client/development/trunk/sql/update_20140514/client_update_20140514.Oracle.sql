@@ -3,7 +3,7 @@ PROCEDURE Update_MessageRecipientOpened(
   p_dhl_id in number,
   p_recipient_person_code in varchar2,
   p_person_code_with_prefix in varchar2,
-  p_opened in timestamp with time zone)
+  p_opened in timestamp)
 AS
   BEGIN
     update  dhl_message_recipient

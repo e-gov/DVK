@@ -1,3 +1,6 @@
+DROP PROCEDURE [dbo].[Update_MessageRecipientOpened]
+GO
+
 CREATE PROCEDURE [dbo].[Update_MessageRecipientOpened]
     @p_dhl_id int,
     @p_recipient_person_code nvarchar(100),

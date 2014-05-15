@@ -1,3 +1,5 @@
+DROP PROCEDURE "Update_MessageRecipientOpened";
+
 CREATE PROCEDURE "Update_MessageRecipientOpened"
 (
 	in _p_dhl_id int,

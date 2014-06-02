@@ -559,11 +559,7 @@ public class Client {
         int resultCounter = 0;
         try {
             ArrayList<DhlMessage> messages = DhlMessage.getList(false, Settings.Client_StatusSending, masterCredential.getUnitID(), false, true, db, dbConnection);
-            ArrayList<DhlMessage> messages2 = DhlMessage.getList(false, 0, masterCredential.getUnitID(), true, true, db, dbConnection);
 
-            messages.addAll(messages2);
-
-            messages2 = null;
             logger.info("    Saatmisel olevaid sõnumeid: " + String.valueOf(messages.size()));
             if (!messages.isEmpty()) {
                 HeaderVariables header = new HeaderVariables(

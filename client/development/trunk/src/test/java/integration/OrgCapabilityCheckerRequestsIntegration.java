@@ -14,12 +14,14 @@ import dvk.core.Settings;
 import ee.ria.dvk.client.testutil.IntegrationTestsConfigUtil;
 import junit.framework.Assert;
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
+@Ignore
 public class OrgCapabilityCheckerRequestsIntegration {
 
     private ClientAPI dvkClient;

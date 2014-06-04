@@ -14,11 +14,13 @@ import ee.ria.dvk.client.testutil.FileUtil;
 import ee.ria.dvk.client.testutil.IntegrationTestsConfigUtil;
 import junit.framework.Assert;
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.sql.*;
 import java.util.List;
 
+@Ignore
 public class ClientRequestsIntegration {
     private static Logger logger = Logger.getLogger(ClientRequestsIntegration.class);
     private static final double CONTAINER_VERSION_1_0 = 1.0;

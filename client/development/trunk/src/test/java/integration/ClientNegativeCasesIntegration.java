@@ -15,6 +15,7 @@ import ee.ria.dvk.client.testutil.FileUtil;
 import ee.ria.dvk.client.testutil.IntegrationTestsConfigUtil;
 import junit.framework.Assert;
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -26,6 +27,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+@Ignore
 public class ClientNegativeCasesIntegration {
     private static Logger logger = Logger.getLogger(ClientRequestsIntegration.class);
     private static final int SEND_RECEIVE_MODE = 3;

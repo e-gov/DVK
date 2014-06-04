@@ -20,6 +20,7 @@ import org.junit.Test;
 import java.sql.*;
 import java.util.List;
 
+@Ignore
 public class ClientRequestsIntegration {
     private static Logger logger = Logger.getLogger(ClientRequestsIntegration.class);
     private static final double CONTAINER_VERSION_1_0 = 1.0;

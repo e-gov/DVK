@@ -107,7 +107,7 @@ public class ClientRequestsIntegration {
         if (containerVersion == CONTAINER_VERSION_2_1) {
             sqlFile = ClientRequestsIntegration.class.getResource("../insert_message").getPath();
         } else if (containerVersion == CONTAINER_VERSION_1_0) {
-            sqlFile = ClientRequestsIntegration.class.getResource("../insert_message_other_asutus").getPath();
+            sqlFile = ClientRequestsIntegration.class.getResource("../insert_message_container_v1_0_testdok").getPath();
         } else {
             throw new Exception("Can't recognize the containers version");
         }
@@ -436,6 +436,19 @@ public class ClientRequestsIntegration {
 
         public void setXmlData(String xmlData) {
             this.xmlData = xmlData;
+        }
+    }
+
+    @Test
+    public void justSend1_0Capsule() {
+        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCases();
+        // Execute the test for all DB (with each of a config. file)
+        for (String path : configFilePaths) {
+            // Before the test, insert a new message to the DB
+            insertNewMessage(path, CONTAINER_VERSION_1_0);
+            // Execute the client to send and receive the message
+            ClientTestUtil.executeTheClient(path, SEND_RECEIVE_MODE);
+            // Get an information, that was sent and received
         }
     }
 }

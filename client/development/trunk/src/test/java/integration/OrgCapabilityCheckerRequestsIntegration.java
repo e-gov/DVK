@@ -21,7 +21,6 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
-@Ignore
 public class OrgCapabilityCheckerRequestsIntegration {
 
     private ClientAPI dvkClient;

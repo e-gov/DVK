@@ -27,7 +27,6 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-@Ignore
 public class ClientNegativeCasesIntegration {
     private static Logger logger = Logger.getLogger(ClientRequestsIntegration.class);
     private static final int SEND_RECEIVE_MODE = 3;

@@ -2,6 +2,7 @@
 -------------------------------------------------------------------------------
 - DVK-57 - AditGetSendStatus task now receives and parses response from ADIT correctly.
 - DVK-52 - DVK client should not update already received document statuses.
+- DVK-55
 
 1.7.4
 -------------------------------------------------------------------------------

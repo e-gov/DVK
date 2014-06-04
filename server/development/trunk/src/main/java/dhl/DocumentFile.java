@@ -299,12 +299,19 @@ public class DocumentFile {
         return result;
     }
 
+    private void initJdigiDoc() {
+        String jdigidocConfigPath = System.getProperty("jdigidoc.config");
+        if (jdigidocConfigPath == null) {
+            jdigidocConfigPath = "jar://jdigidoc.cfg";
+        }
+        ConfigManager.init(jdigidocConfigPath);
+    }
+
     public ArrayList<String> getFilesFromDdocBdoc(String extensionFilter) throws Exception {
         ArrayList<String> result = new ArrayList<String>();
 
         if (this.m_fileName.toLowerCase().endsWith("ddoc") || this.m_fileName.toLowerCase().endsWith("bdoc")) {
-            ConfigManager.init("jar://jdigidoc.cfg");
-
+            initJdigiDoc();
             DigiDocFactory ddocFactory = null;
             if (this.m_fileName.toLowerCase().endsWith("bdoc")) {
                 ddocFactory = ConfigManager.instance().getBDigiDocFactory();
@@ -357,8 +364,7 @@ public class DocumentFile {
 
         if (this.m_fileName.toLowerCase().endsWith("ddoc") || this.m_fileName.toLowerCase().endsWith("bdoc")) {
             logger.info("Validating signatures of file " + this.m_fileName + " (" + this.m_localFileFullName + ").");
-            ConfigManager.init("jar://jdigidoc.cfg");
-
+            initJdigiDoc();
             DigiDocFactory ddocFactory = null;
             try {
                 if (this.m_fileName.toLowerCase().endsWith("bdoc")) {

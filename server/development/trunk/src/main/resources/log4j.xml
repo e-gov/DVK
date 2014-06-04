@@ -33,6 +33,10 @@
         <appender-ref ref="stdout"/>
     </logger>
 
+    <logger name="ee.sk.digidoc">
+        <level value="debug"></level>
+        <appender-ref ref="file"/>
+    </logger>
 
     <logger name="org.apache.axis">
         <level value="error"></level>

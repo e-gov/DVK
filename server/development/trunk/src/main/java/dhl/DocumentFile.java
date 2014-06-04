@@ -304,6 +304,7 @@ public class DocumentFile {
         if (jdigidocConfigPath == null) {
             jdigidocConfigPath = "jar://jdigidoc.cfg";
         }
+        logger.debug("jdigidocConfigPath: " + jdigidocConfigPath);
         ConfigManager.init(jdigidocConfigPath);
     }
 

@@ -1,3 +1,7 @@
+1.7.6
+-------------------------------------------------------------------------------
+- Jdigidoc config file is now configurable with server_jdigidoc_config_location if necessary
+
 1.7.5
 -------------------------------------------------------------------------------
 - Now uses dvk-client-1.7.4 and dvk-core-1.7.2

@@ -300,10 +300,7 @@ public class DocumentFile {
     }
 
     private void initJdigiDoc() {
-        String jdigidocConfigPath = System.getProperty("jdigidoc.config");
-        if (jdigidocConfigPath == null) {
-            jdigidocConfigPath = "jar://jdigidoc.cfg";
-        }
+        String jdigidocConfigPath = Settings.serverJdigidocConfigLocation;
         logger.debug("jdigidocConfigPath: " + jdigidocConfigPath);
         ConfigManager.init(jdigidocConfigPath);
     }

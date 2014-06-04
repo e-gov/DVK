@@ -65,6 +65,7 @@ public class Settings {
     public static boolean Server_ValidateSignatures = false;
     public static boolean Server_DocumentSenderMustMatchXroadHeader = true;
     public static boolean Server_AutoRegisterUnknownSenders = false;
+    public static String serverJdigidocConfigLocation = "jar://jdigidoc.cfg";
 
     // General settings (both client and server)
     public static boolean LogErrors = false;
@@ -383,6 +384,10 @@ public class Settings {
             // Testkliendi seaded
             if (currentProperties.getProperty("test_log_file") != null) {
                 Test_LogFile = currentProperties.getProperty("test_log_file");
+            }
+
+            if (currentProperties.getProperty("server_jdigidoc_config_location") != null) {
+                serverJdigidocConfigLocation = currentProperties.getProperty("server_jdigidoc_config_location");
             }
         } catch (Exception ex) {
         	logger.error(ex);

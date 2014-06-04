@@ -386,6 +386,7 @@ public class Settings {
                 Test_LogFile = currentProperties.getProperty("test_log_file");
             }
 
+            logger.debug("server_jdigidoc_config_location conf value: " + currentProperties.getProperty("server_jdigidoc_config_location"));
             if (currentProperties.getProperty("server_jdigidoc_config_location") != null) {
                 serverJdigidocConfigLocation = currentProperties.getProperty("server_jdigidoc_config_location");
             }

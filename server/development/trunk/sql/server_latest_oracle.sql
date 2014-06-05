@@ -713,7 +713,7 @@ create table vastuvotja
     asutuse_nimi varchar2(500) null,
     allyksus_id number(38,0) null,
     dok_id_teises_serveris number(38,0) null,
-    allyksuse_lyhinimetus varchar2(25) null,
+    allyksuse_lyhinimetus varchar2(60) null,
     ametikoha_lyhinimetus varchar2(25) null
 )
 /

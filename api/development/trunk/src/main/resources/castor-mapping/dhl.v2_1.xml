@@ -187,7 +187,7 @@
             <bind-xml name="Adit" node="element" />
         </field>
 
-        <field name="Phone" type="string" handler="dvk.api.container.v2_1.ContactDataTypePhoneTypeHandler">
+        <field name="Phone" type="string">
             <bind-xml name="Phone" node="element" />
         </field>
 

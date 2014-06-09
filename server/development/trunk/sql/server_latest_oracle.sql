@@ -18,7 +18,7 @@ CREATE TABLE allyksus
     username varchar2(11),
     muutm_arv number(38,0) DEFAULT 0 NOT NULL,
     aar_id number(38,0) null,
-	lyhinimetus varchar2(25) null,
+	lyhinimetus varchar2(60) null,
     adr_uri varchar2(500) null
 )
 /
@@ -645,7 +645,7 @@ create table saatja
     osakonna_nimi varchar2(500) null,
     asutuse_nimi varchar2(500) null,
     allyksus_id number(38,0) null,
-    allyksuse_lyhinimetus varchar2(25) null,
+    allyksuse_lyhinimetus varchar2(60) null,
     ametikoha_lyhinimetus varchar2(25) null
 )
 /
@@ -1198,7 +1198,7 @@ table   vastuvotja_mall
     asutuse_nimi varchar2(500),
     allyksus_id number(38,0),
     tingimus_xpath varchar2(4000),
-    allyksuse_lyhinimetus varchar2(25) null,
+    allyksuse_lyhinimetus varchar2(60) null,
     ametikoha_lyhinimetus varchar2(25) null,
     primary key (vastuvotja_mall_id),
     constraint fk_vastuvotja_mall_1 foreign key (saatmisviis_id) references klassifikaator (klassifikaator_id),
@@ -1260,7 +1260,7 @@ table   vahendaja
     osakonna_nimi VARCHAR2(500),
     asutuse_nimi VARCHAR2(500),
     allyksus_id NUMBER(38,0),
-    allyksuse_lyhinimetus varchar2(25) null,
+    allyksuse_lyhinimetus varchar2(60) null,
     ametikoha_lyhinimetus varchar2(25) null,
     PRIMARY KEY (vahendaja_id),
     CONSTRAINT fk_vahendaja_1 FOREIGN KEY (transport_id)

@@ -2799,7 +2799,6 @@ public class DhlMessage implements Cloneable {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
         InputStream inputStream = new FileInputStream(fXmlFile);
-        inputStream = CommonMethods.replaceAmpersandSymbolInInputStream(inputStream);
 
         try {
 

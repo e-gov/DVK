@@ -1,6 +1,7 @@
 1.7.6
 -------------------------------------------------------------------------------
-- Jdigidoc config file is now configurable with server_jdigidoc_config_location if necessary
+- DVK-10 - Jdigidoc config file is now configurable with server_jdigidoc_config_location if necessary
+- DVK-61 - Suurendada DVK.VASTUVOTJA.ALLYKSUSE_LYHINIMETUS veeru lubatud suurust
 
 1.7.5
 -------------------------------------------------------------------------------

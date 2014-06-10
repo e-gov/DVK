@@ -1,0 +1,20 @@
+
+id number(38,0) NOT NULL
+-------------------------------------------------------------------
+create sequence dhl_message_recipient_id
+start with 1
+increment by 1
+minvalue 1
+nomaxvalue
+nocache
+-------------------------------------------------------------------
+create trigger tr_dhl_message_recipient_id
+    before insert
+    on dhl_message_recipient
+    for each row
+begin
+    select  dhl_message_recipient_id.nextval
+    into    globalPkg.identity
+    from    dual;
+    :new.id := globalPkg.identity;
+end;

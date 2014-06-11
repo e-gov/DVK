@@ -54,8 +54,7 @@ public class ClientRequestsIntegration {
         }
     }
 
-    //@Test
-    //This test must be fixed
+    @Test
     public void sendAndReceiveAndGetSendStatusRequestsAndMarkDocumentsReceivedVersion1_0Test() throws Exception {
         // Get all configuration files from pom.xml
         List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCasesContainerVer1();
@@ -78,7 +77,7 @@ public class ClientRequestsIntegration {
                 DhlResultRow receivedRow = getReceivedInformation(path);
                 String receivedXMLData = receivedRow.getXmlData();
                 // Create the containers ver 2.1 for sent message, ver 1.0 for received message, based on the XML
-                ContainerVer2_1 containerForSentMessage = createTheContainerVer2_1(sentXMLData);
+                ContainerVer1 containerForSentMessage = createTheContainerVer1(sentXMLData);
                 ContainerVer1 containerForReceivedMessage = createTheContainerVer1(receivedXMLData);
                 // Do asserts
                 doDataAsserts(sentXMLData, receivedXMLData, containerForSentMessage, containerForReceivedMessage);
@@ -108,7 +107,7 @@ public class ClientRequestsIntegration {
         if (containerVersion == CONTAINER_VERSION_2_1) {
             sqlFile = ClientRequestsIntegration.class.getResource("../insert_message").getPath();
         } else if (containerVersion == CONTAINER_VERSION_1_0) {
-            sqlFile = ClientRequestsIntegration.class.getResource("../insert_message_container_v1_0_testdok").getPath();
+            sqlFile = ClientRequestsIntegration.class.getResource("../insert_message_container_v1_0").getPath();
         } else {
             throw new Exception("Can't recognize the containers version");
         }
@@ -298,7 +297,7 @@ public class ClientRequestsIntegration {
         Assert.assertNotNull(containerForReceivedMessage.getDecMetadata());
     }
 
-    private void doDataAsserts(String sentXMLData, String receivedXMLData, ContainerVer2_1 containerForSentMessage,
+    private void doDataAsserts(String sentXMLData, String receivedXMLData, ContainerVer1 containerForSentMessage,
                                ContainerVer1 containerForReceivedMessage) {
         Assert.assertNotNull(sentXMLData);
         Assert.assertNotNull(receivedXMLData);
@@ -310,7 +309,6 @@ public class ClientRequestsIntegration {
         Assert.assertNotNull(containerForReceivedMessage);
         Assert.assertNotNull(containerForSentMessage.getTransport());
         Assert.assertNotNull(containerForReceivedMessage.getTransport());
-        Assert.assertNotNull(containerForSentMessage.getDecMetadata());
         Assert.assertNotNull(containerForReceivedMessage.getMetainfo());
     }
 
@@ -439,17 +437,4 @@ public class ClientRequestsIntegration {
             this.xmlData = xmlData;
         }
     }
-
-   /* @Test
-    public void justSend1_0Capsule() {
-        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCases();
-        // Execute the test for all DB (with each of a config. file)
-        for (String path : configFilePaths) {
-            // Before the test, insert a new message to the DB
-            insertNewMessage(path, CONTAINER_VERSION_1_0);
-            // Execute the client to send and receive the message
-            ClientTestUtil.executeTheClient(path, SEND_RECEIVE_MODE);
-            // Get an information, that was sent and received
-        }
-    }*/
 }

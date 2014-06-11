@@ -65,13 +65,13 @@ VALUES  (DEFAULT,
          </dhl:metainfo>
          <dhl:transport>
          <dhl:saatja>
-         <dhl:regnr>10885324</dhl:regnr>
+         <dhl:regnr>icefire-test1</dhl:regnr>
          <dhl:allyksuse_nimetus/>
          <dhl:isikukood>36212240216</dhl:isikukood>
-         <dhl:nimi>Icefire OÜ</dhl:nimi>
+         <dhl:nimi>Dmitri Timofejev</dhl:nimi>
          </dhl:saatja>
          <dhl:saaja>
-         <dhl:regnr>10885324</dhl:regnr>
+         <dhl:regnr>icefire-test1</dhl:regnr>
          <dhl:allyksuse_nimetus/>
          <dhl:isikukood>36212240216</dhl:isikukood>
          <dhl:nimi>Dmitri Timofejev</dhl:nimi>
@@ -225,7 +225,7 @@ VALUES  (DEFAULT,
          </dhl:dokument>',
            'OldVersion',
            '10885324',
-           'Icefire OÜ',
+           'icefire-test1',
            '12345678901',
            'Hendrik Pärna',
            '10885324',

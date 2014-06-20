@@ -27,7 +27,7 @@ public class OrgCapabilityCheckerRequestsIntegration {
 
     static Logger logger = Logger.getLogger(OrgCapabilityCheckerRequestsIntegration.class.getName());
 
-    @Test
+//    @Test
     public void getOccupationListAndGetSendingOptionsAndGetSubdivionListRequestsTest() {
         List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCases();
 

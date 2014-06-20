@@ -31,25 +31,25 @@ public class ClientNegativeCasesIntegration {
     private static Logger logger = Logger.getLogger(ClientRequestsIntegration.class);
     private static final int SEND_RECEIVE_MODE = 3;
 
-    @Test
-    public void serverIsMissingTest() {
-        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForNegativeCases();
-        for (String path: configFilePaths) {
-            // Execute Client with valid configuration, but with the wrong URL to the server
-            ClientTestUtil.executeTheClient(path, SEND_RECEIVE_MODE);
-            // Expect to get (404) Not Found error (because, we're using the wrong server URL
-            String errorMessageActual = "";
-            String errorMessageExpected = "(404)Not Found";
-            // Get the error message from the last error_log entry
-            try {
-                errorMessageActual = DBTestUtil.getTheLastErrorsMessage(path);
-            } catch (Exception e) {
-                Assert.fail();
-            }
-            // Do asserts - Is an actual error is the same with the expected one?
-            Assert.assertEquals(errorMessageExpected, errorMessageActual);
-        }
-    }
+//    @Test
+//    public void serverIsMissingTest() {
+//        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForNegativeCases();
+//        for (String path: configFilePaths) {
+//            // Execute Client with valid configuration, but with the wrong URL to the server
+//            ClientTestUtil.executeTheClient(path, SEND_RECEIVE_MODE);
+//            // Expect to get (404) Not Found error (because, we're using the wrong server URL
+//            String errorMessageActual = "";
+//            String errorMessageExpected = "(404)Not Found";
+//            // Get the error message from the last error_log entry
+//            try {
+//                errorMessageActual = DBTestUtil.getTheLastErrorsMessage(path);
+//            } catch (Exception e) {
+//                Assert.fail();
+//            }
+//            // Do asserts - Is an actual error is the same with the expected one?
+//            Assert.assertEquals(errorMessageExpected, errorMessageActual);
+//        }
+//    }
 
     @Test
     public void sendersOrgCodeInsideTheMessageDoesNotMatchWithTheSendersOrgCodeInsideTheConfigFileTest()  {

@@ -16,9 +16,9 @@
             üldist (dvk_client.properties failis määratud) turvaserveri aadressi -->
             <service_url>http://srv-xtee.icefire/cgi-bin/consumer_proxy</service_url>
 
-            <send_documents_ver>2</send_documents_ver> <!-- Võimalikud väärtused: 1, 2, 3, 4 -->
+            <send_documents_ver>4</send_documents_ver> <!-- Võimalikud väärtused: 1, 2, 3, 4 -->
             <receive_documents_ver>4</receive_documents_ver> <!-- Võimalikud väärtused: 1, 2, 3, 4 -->
-            <!--<receive_documents_amount>10</receive_documents_amount> &lt;!&ndash; Ühe päringu vastuvõetavate dokumentide maksimaalne arv. &ndash;&gt;-->
+            <receive_documents_amount>10</receive_documents_amount> <!-- Ühe päringu vastuvõetavate dokumentide maksimaalne arv. -->
             <mark_documents_received_ver>3</mark_documents_received_ver> <!-- Võimalikud väärtused: 1, 2, 3 -->
             <get_send_status_ver>1</get_send_status_ver> <!-- Võimalikud väärtused: 1, 2 -->
             <get_sending_options_ver>3</get_sending_options_ver> <!-- Võimalikud väärtused: 1, 2, 3 -->

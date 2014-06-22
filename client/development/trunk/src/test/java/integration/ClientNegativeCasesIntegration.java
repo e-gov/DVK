@@ -1,12 +1,9 @@
 package integration;
 
-import dvk.client.Client;
 import dvk.client.businesslayer.DhlMessage;
 import dvk.client.conf.OrgSettings;
-import dvk.client.db.DBConnection;
 import dvk.client.db.UnitCredential;
 import dvk.client.dhl.service.DatabaseSessionService;
-import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import dvk.core.Settings;
 import ee.ria.dvk.client.testutil.ClientTestUtil;
@@ -15,41 +12,35 @@ import ee.ria.dvk.client.testutil.FileUtil;
 import ee.ria.dvk.client.testutil.IntegrationTestsConfigUtil;
 import junit.framework.Assert;
 import org.apache.log4j.Logger;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ClientNegativeCasesIntegration {
     private static Logger logger = Logger.getLogger(ClientRequestsIntegration.class);
     private static final int SEND_RECEIVE_MODE = 3;
 
-//    @Test
-//    public void serverIsMissingTest() {
-//        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForNegativeCases();
-//        for (String path: configFilePaths) {
-//            // Execute Client with valid configuration, but with the wrong URL to the server
-//            ClientTestUtil.executeTheClient(path, SEND_RECEIVE_MODE);
-//            // Expect to get (404) Not Found error (because, we're using the wrong server URL
-//            String errorMessageActual = "";
-//            String errorMessageExpected = "(404)Not Found";
-//            // Get the error message from the last error_log entry
-//            try {
-//                errorMessageActual = DBTestUtil.getTheLastErrorsMessage(path);
-//            } catch (Exception e) {
-//                Assert.fail();
-//            }
-//            // Do asserts - Is an actual error is the same with the expected one?
-//            Assert.assertEquals(errorMessageExpected, errorMessageActual);
-//        }
-//    }
+    @Test
+    public void serverIsMissingTest() {
+        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForNegativeCases();
+        for (String path: configFilePaths) {
+            // Execute Client with valid configuration, but with the wrong URL to the server
+            ClientTestUtil.executeTheClient(path, SEND_RECEIVE_MODE);
+            // Expect to get (404) Not Found error (because, we're using the wrong server URL
+            String errorMessageActual = "";
+            String errorMessageExpected = "(404)Not Found";
+            // Get the error message from the last error_log entry
+            try {
+                errorMessageActual = DBTestUtil.getTheLastErrorsMessage(path);
+            } catch (Exception e) {
+                Assert.fail();
+            }
+            // Do asserts - Is an actual error is the same with the expected one?
+            Assert.assertEquals(errorMessageExpected, errorMessageActual);
+        }
+    }
 
     @Test
     public void sendersOrgCodeInsideTheMessageDoesNotMatchWithTheSendersOrgCodeInsideTheConfigFileTest()  {
@@ -76,6 +67,13 @@ public class ClientNegativeCasesIntegration {
             }
             // Do asserts - Is an actual error is the same with the expected one?
             Assert.assertEquals(errorMessageActual, errorMessageExpected);
+            try {
+                if (messageId > 0) {
+                    putStatusCancelledToMessage(messageId, path);
+                }
+            } catch (Exception ex) {
+                logger.error(ex);
+            }
         }
     }
 
@@ -138,5 +136,26 @@ public class ClientNegativeCasesIntegration {
         DBTestUtil.closeTheConnectionAndDoClearTheSession(dbConnection);
 
         return messageID;
+    }
+
+    private void putStatusCancelledToMessage(int messageId, String propertiesFile) throws Exception {
+        IntegrationTestsConfigUtil.setUpFromTheConfigurationFile(propertiesFile);
+
+        Connection dbConnection = DatabaseSessionService.getInstance().getConnection();
+
+        String sql = "UPDATE dvk.DHL_MESSAGE SET sending_status_id = " + Settings.Client_StatusCanceled + "WHERE " +
+                "dhl_message_id = " + messageId;
+
+        try {
+            CallableStatement cs = dbConnection.prepareCall(sql);
+            cs.execute();
+            cs.close();
+            dbConnection.commit();
+        } catch (Exception ex) {
+            logger.error(ex);
+            throw ex;
+        } finally {
+            DBTestUtil.closeTheConnectionAndDoClearTheSession(dbConnection);
+        }
     }
 }

@@ -26,78 +26,78 @@ public class ClientRequestsIntegration {
     private static final double CONTAINER_VERSION_2_1 = 2.1;
     private static final int SEND_RECEIVE_MODE = 3;
 
-//    @Test
-//    public void sendAndReceiveAndGetSendStatusRequestsAndMarkDocumentsReceivedContainer2_1Test() throws Exception {
-//        // Get all configuration files from pom.xml
-//        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCases();
-//        // Execute the test for all DB (with each of a config. file)
-//        for (String path : configFilePaths) {
-//            // Before the test, insert a new message to the DB
-//            int messageId = insertNewMessage(path, CONTAINER_VERSION_2_1);
-//            // Execute the client to send and receive the message
-//            ClientTestUtil.executeTheClient(path, SEND_RECEIVE_MODE);
-//            // Get an information, that was sent and received
-//            String sentXMLData = getSentXML(path, messageId);
-//            DhlResultRow receivedRow = getReceivedInformation(path);
-//            String receivedXMLData = receivedRow.getXmlData();
-//            // Create the containers ver 2.1 for sent message, ver 2.1 for received message, based on the XML
-//            ContainerVer2_1 containerForSentMessage = createTheContainerVer2_1(sentXMLData);
-//            ContainerVer2_1 containerForReceivedMessage = createTheContainerVer2_1(receivedXMLData);
-//            // Do asserts
-//            doDataAsserts(sentXMLData, receivedXMLData, containerForSentMessage, containerForReceivedMessage);
-//            // Get a status (getSendStatusRequest) of the sent message
-//            int statusOfSentMessage = getMessagesStatus(messageId, path);
-//            // Get a status (markDocumentReceived) of the received message
-//            int statusOfReceivedMessage = getMessagesStatus(receivedRow.getId(), path);
-//            // Do asserts
-//            doStatusAsserts(statusOfSentMessage, statusOfReceivedMessage);
-//        }
-//    }
-//
-//    @Test
-//    public void sendAndReceiveAndGetSendStatusRequestsAndMarkDocumentsReceivedVersion1_0Test() throws Exception {
-//        // Get all configuration files from pom.xml
-//        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCasesContainerVer1();
-//        // Execute the test for all DB (with each of a config. file)
-//        for (String path : configFilePaths) {
-//            try {
-//                // Before the test, update an information in DHL_SETTING table (using another organization for this test)
-//                try {
-//                    updateAnInformationInDhlSettings(path);
-//                } catch (Exception ex) {
-//                    logger.error("Can't update an information in DHL_SETTINGS table");
-//                    Assert.fail();
-//                }
-//                // Before the test, insert a new message to the DB
-//                int messageId = insertNewMessage(path, CONTAINER_VERSION_1_0);
-//                // Execute the client to send and receive the message
-//                ClientTestUtil.executeTheClient(path, SEND_RECEIVE_MODE);
-//                // Get an information, that was sent and received
-//                String sentXMLData = getSentXML(path, messageId);
-//                DhlResultRow receivedRow = getReceivedInformation(path);
-//                String receivedXMLData = receivedRow.getXmlData();
-//                // Create the containers ver 2.1 for sent message, ver 1.0 for received message, based on the XML
-//                ContainerVer1 containerForSentMessage = createTheContainerVer1(sentXMLData);
-//                ContainerVer1 containerForReceivedMessage = createTheContainerVer1(receivedXMLData);
-//                // Do asserts
-//                doDataAsserts(sentXMLData, receivedXMLData, containerForSentMessage, containerForReceivedMessage);
-//                // Get a status (getSendStatusRequest) of sent message
-//                int statusOfSentMessage = getMessagesStatus(messageId, path);
-//                // Get a status (markDocumentReceived) of received message
-//                int statusOfReceivedMessage = getMessagesStatus(receivedRow.getId(), path);
-//                // Do asserts
-//                doStatusAsserts(statusOfSentMessage, statusOfReceivedMessage);
-//            } finally {
-//                // After the test was completed, restore an information in DHL_SETTINGS table (back to the default org.)
-//                try {
-//                    restoreAnInformationInDhlSettings(path);
-//                } catch (Exception ex) {
-//                    logger.error("Can't update an information in DHL_SETTINGS table");
-//                    Assert.fail();
-//                }
-//            }
-//        }
-//    }
+    @Test
+    public void sendAndReceiveAndGetSendStatusRequestsAndMarkDocumentsReceivedContainer2_1Test() throws Exception {
+        // Get all configuration files from pom.xml
+        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCases();
+        // Execute the test for all DB (with each of a config. file)
+        for (String path : configFilePaths) {
+            // Before the test, insert a new message to the DB
+            int messageId = insertNewMessage(path, CONTAINER_VERSION_2_1);
+            // Execute the client to send and receive the message
+            ClientTestUtil.executeTheClient(path, SEND_RECEIVE_MODE);
+            // Get an information, that was sent and received
+            String sentXMLData = getSentXML(path, messageId);
+            DhlResultRow receivedRow = getReceivedInformation(path);
+            String receivedXMLData = receivedRow.getXmlData();
+            // Create the containers ver 2.1 for sent message, ver 2.1 for received message, based on the XML
+            ContainerVer2_1 containerForSentMessage = createTheContainerVer2_1(sentXMLData);
+            ContainerVer2_1 containerForReceivedMessage = createTheContainerVer2_1(receivedXMLData);
+            // Do asserts
+            doDataAsserts(sentXMLData, receivedXMLData, containerForSentMessage, containerForReceivedMessage);
+            // Get a status (getSendStatusRequest) of the sent message
+            int statusOfSentMessage = getMessagesStatus(messageId, path);
+            // Get a status (markDocumentReceived) of the received message
+            int statusOfReceivedMessage = getMessagesStatus(receivedRow.getId(), path);
+            // Do asserts
+            doStatusAsserts(statusOfSentMessage, statusOfReceivedMessage);
+        }
+    }
+
+    @Test
+    public void sendAndReceiveAndGetSendStatusRequestsAndMarkDocumentsReceivedVersion1_0Test() throws Exception {
+        // Get all configuration files from pom.xml
+        List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCasesContainerVer1();
+        // Execute the test for all DB (with each of a config. file)
+        for (String path : configFilePaths) {
+            try {
+                // Before the test, update an information in DHL_SETTING table (using another organization for this test)
+                try {
+                    updateAnInformationInDhlSettings(path);
+                } catch (Exception ex) {
+                    logger.error("Can't update an information in DHL_SETTINGS table");
+                    Assert.fail();
+                }
+                // Before the test, insert a new message to the DB
+                int messageId = insertNewMessage(path, CONTAINER_VERSION_1_0);
+                // Execute the client to send and receive the message
+                ClientTestUtil.executeTheClient(path, SEND_RECEIVE_MODE);
+                // Get an information, that was sent and received
+                String sentXMLData = getSentXML(path, messageId);
+                DhlResultRow receivedRow = getReceivedInformation(path);
+                String receivedXMLData = receivedRow.getXmlData();
+                // Create the containers ver 2.1 for sent message, ver 1.0 for received message, based on the XML
+                ContainerVer1 containerForSentMessage = createTheContainerVer1(sentXMLData);
+                ContainerVer1 containerForReceivedMessage = createTheContainerVer1(receivedXMLData);
+                // Do asserts
+                doDataAsserts(sentXMLData, receivedXMLData, containerForSentMessage, containerForReceivedMessage);
+                // Get a status (getSendStatusRequest) of sent message
+                int statusOfSentMessage = getMessagesStatus(messageId, path);
+                // Get a status (markDocumentReceived) of received message
+                int statusOfReceivedMessage = getMessagesStatus(receivedRow.getId(), path);
+                // Do asserts
+                doStatusAsserts(statusOfSentMessage, statusOfReceivedMessage);
+            } finally {
+                // After the test was completed, restore an information in DHL_SETTINGS table (back to the default org.)
+                try {
+                    restoreAnInformationInDhlSettings(path);
+                } catch (Exception ex) {
+                    logger.error("Can't update an information in DHL_SETTINGS table");
+                    Assert.fail();
+                }
+            }
+        }
+    }
 
     private int insertNewMessageToDB(String configFile, double containerVersion) throws Exception {
         String sql = "";

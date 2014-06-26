@@ -20,6 +20,9 @@ import org.junit.Test;
 import java.sql.*;
 import java.util.List;
 
+//TODO: remove unnecessary comments
+// fix the searching part of inserted messages
+// remove try and catch blocks where possible
 public class ClientRequestsIntegration {
     private static Logger logger = Logger.getLogger(ClientRequestsIntegration.class);
     private static final double CONTAINER_VERSION_1_0 = 1.0;
@@ -55,6 +58,7 @@ public class ClientRequestsIntegration {
     }
 
     @Test
+    //This test must be fixed
     public void sendAndReceiveAndGetSendStatusRequestsAndMarkDocumentsReceivedVersion1_0Test() throws Exception {
         // Get all configuration files from pom.xml
         List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCasesContainerVer1();

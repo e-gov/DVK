@@ -1452,7 +1452,7 @@ unique ("dhl_error_log_id");
 alter table dhl_error_log
 add constraint FK_dhl_message_id
 foreign key ("dhl_message_id")
-references dhl_message ("dhl_message_id");
+references dhl_message ("dhl_message_id") on delete cascade;
 
 alter table dhl_request_log
 add constraint UQ_dhl_request_log_id
@@ -1461,7 +1461,7 @@ unique ("dhl_request_log_id");
 alter table dhl_request_log
 add constraint FK_dhl_error_log_id
 foreign key ("dhl_error_log_id")
-references dhl_error_log ("dhl_error_log_id");
+references dhl_error_log ("dhl_error_log_id") on delete cascade;
 
 create procedure "Add_DhlErrorLog"
 (

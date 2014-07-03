@@ -1533,19 +1533,35 @@ public class CommonMethods {
     }
 
     public static AttachmentExtractionResult getExtractedFileFromAttachment(final org.apache.axis.MessageContext context, final String attachmentReference) throws AxisFault {
-        return getExtractedFileFromAttachmentPart((org.apache.axis.attachments.AttachmentPart) context.getCurrentMessage().getAttachmentsImpl().getAttachmentByReference(attachmentReference));
+        return getExtractedFileFromAttachmentPart((org.apache.axis.attachments.AttachmentPart) context.getCurrentMessage().getAttachmentsImpl().getAttachmentByReference(attachmentReference), true);
     }
 
     public static AttachmentExtractionResult getExtractedFileFromAttachment(org.apache.axis.Message response) throws AxisFault {
-    	AttachmentExtractionResult result = new AttachmentExtractionResult();
-    	Iterator attachments = response.getAttachments();
-        if (attachments.hasNext()) {
-        	result = getExtractedFileFromAttachmentPart((AttachmentPart)attachments.next());
-        }
-    	return result;
+    	return getExtractedFileFromAttachmentWithHeaderSpecified(response, true);
     }
 
-    private static AttachmentExtractionResult getExtractedFileFromAttachmentPart(org.apache.axis.attachments.AttachmentPart attachmentPart) throws AxisFault {
+    private static AttachmentExtractionResult getExtractedFileFromAttachmentWithHeaderSpecified(org.apache.axis.Message response, Boolean appendDocumentHeader) throws AxisFault {
+        AttachmentExtractionResult result = new AttachmentExtractionResult();
+        Iterator attachments = response.getAttachments();
+        if (attachments.hasNext()) {
+            result = getExtractedFileFromAttachmentPart((AttachmentPart)attachments.next(), appendDocumentHeader);
+        }
+        return result;
+    }
+
+    /**
+     * Get extracted file from the soap attachment without auto generated header.
+     * @param response {@link org.apache.axis.Message}
+     * @return {@link AttachmentExtractionResult}
+     * @throws AxisFault exception
+     */
+    public static AttachmentExtractionResult
+            getExtractedFileFromAttachmentWithoutDocumentHeader(org.apache.axis.Message response) throws AxisFault {
+        return getExtractedFileFromAttachmentWithHeaderSpecified(response, false);
+    }
+
+    private static AttachmentExtractionResult getExtractedFileFromAttachmentPart(
+            AttachmentPart attachmentPart, Boolean appendDocumentHeader) throws AxisFault {
     	AttachmentExtractionResult result = new AttachmentExtractionResult();
 
     	// Leiame sõnumi kehas olnud viite alusels MIME lisast vajalikud andmed
@@ -1573,7 +1589,7 @@ public class CommonMethods {
         }
 
         // Pakime andmed GZIPiga lahti
-        if (!CommonMethods.gzipUnpackXML(pipelineDataFile, true)) {
+        if (!CommonMethods.gzipUnpackXML(pipelineDataFile, appendDocumentHeader)) {
             throw new AxisFault(CommonStructures.VIGA_VIGANE_MIME_LISA);
         }
 

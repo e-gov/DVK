@@ -1,3 +1,7 @@
+1.7.7
+------------------------------------------------------------------------------
+- DVK-66 - DVK kapsli konverteerimisel osade failide sisu kaob
+
 1.7.6
 -------------------------------------------------------------------------------
 - DVK-10 - Jdigidoc config file is now configurable with server_jdigidoc_config_location if necessary

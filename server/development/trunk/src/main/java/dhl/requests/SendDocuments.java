@@ -1,6 +1,5 @@
 package dhl.requests;
 
-import dvk.core.*;
 import dhl.Document;
 import dhl.DocumentFile;
 import dhl.DocumentFragment;
@@ -21,12 +20,21 @@ import dhl.iostructures.sendDocumentsV2RequestType;
 import dhl.sys.Timer;
 import dhl.users.Asutus;
 import dhl.users.UserProfile;
+import dvk.api.container.v2_1.ContainerVer2_1;
+import dvk.api.container.v2_1.DecRecipient;
 import dvk.client.ClientAPI;
 import dvk.client.businesslayer.Counter;
 import dvk.client.businesslayer.DhlMessage;
 import dvk.client.conf.OrgSettings;
 import dvk.client.db.UnitCredential;
-
+import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
+import dvk.core.ContainerVersion;
+import dvk.core.Fault;
+import dvk.core.FileSplitResult;
+import dvk.core.HeaderVariables;
+import dvk.core.Settings;
+import dvk.core.XmlValidator;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,9 +45,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.List;
 import javax.activation.DataSource;
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
 import org.apache.log4j.Logger;
@@ -1059,6 +1067,49 @@ public class SendDocuments {
         return result;
     }
 
+    private static void fillRecipientDataFor2_1ContainerIfNecessary(FileSplitResult docFiles, int i, Document doc) throws Exception {
+        try {
+            ContainerVer2_1 containerVer2_1 = ContainerVer2_1.parseFile(docFiles.subFiles.get(i));
+            if (containerVer2_1 != null && containerVer2_1.getTransport() != null) {
+                fillRecipientDataFor2_1Container(containerVer2_1, doc);
+            }
+        } catch (Exception e) {
+            logger.error("unable to fill RecipientData for 2.1 container: " + e);
+        }
+
+    }
+
+    private static void fillRecipientDataFor2_1Container(ContainerVer2_1 containerVer2_1, Document document) {
+        for (DecRecipient decRecipient : containerVer2_1.getTransport().getDecRecipient()) {
+            dvk.api.container.v2_1.Recipient recipientFromXml = containerVer2_1.getRecipient(decRecipient);
+
+            if (recipientFromXml != null) {
+
+                for (Recipient recipient : getRecipientByOrgCodeAndPersonalId(document, decRecipient, containerVer2_1)) {
+                    if (recipientFromXml.getOrganisation() != null) {
+                        recipient.setOrganizationName(recipientFromXml.getOrganisation().getName());
+                    }
+                }
+            }
+        }
+    }
+
+    private static List<Recipient> getRecipientByOrgCodeAndPersonalId(Document document, DecRecipient decRecipient, ContainerVer2_1 containerVer2_1) {
+        List<Recipient> result = new ArrayList<Recipient>();
+
+        for (Sending sending : document.getSendingList()) {
+            for (Recipient recipient : sending.getRecipients()) {
+                if (containerVer2_1.isDecRecipientRelatedWithRecipient(
+                        decRecipient, recipient.getOrganizationCode(), recipient.getPersonalIdCode())) {
+                    result.add(recipient);
+                }
+            }
+        }
+
+        return result;
+    }
+
+
     // Edastab dokumendi teise DVK serverisse
     private static ArrayList<Sending> ForwardDocument(dhl.Document doc, String kaust, Connection conn, int requestVersion, XHeader xTeePais) throws Exception {
         ArrayList<Sending> sendingList = doc.getSendingList();
@@ -1252,7 +1303,6 @@ public class SendDocuments {
      * @param hostOrgSettings - host
      * @param xTeePais        - header
      * @return {@link RequestInternalResult}
-     *
      * @throws Exception exception
      */
     public static RequestInternalResult v4(
@@ -1466,6 +1516,8 @@ public class SendDocuments {
                             }
                         } else {
                             Document doc = Document.fromXML(docFiles.subFiles.get(i), user.getOrganizationID(), (Settings.Server_ValidateXmlFiles || Settings.Server_ValidateSignatures), conn, xTeePais);
+
+                            fillRecipientDataFor2_1ContainerIfNecessary(docFiles, i, doc);
 
                             // Vajadusel valideerime saadetavad XML dokumendid
                             validateXmlFiles(doc.getFiles());

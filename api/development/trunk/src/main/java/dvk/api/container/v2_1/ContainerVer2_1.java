@@ -3,11 +3,7 @@ package dvk.api.container.v2_1;
 import dvk.api.container.Container;
 import dvk.api.ml.Util;
 import org.apache.log4j.Logger;
-import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.Marshaller;
-import org.exolab.castor.xml.ValidationException;
-
 import java.io.*;
 import java.util.List;
 
@@ -31,7 +27,7 @@ public class ContainerVer2_1 extends Container {
     private String recordTypeSpecificMetadata;
 
     @Override
-    public String getContent() throws MarshalException, ValidationException, IOException, MappingException {
+    public String getContent() {
         StringWriter sw = new StringWriter();
 
         try {
@@ -39,11 +35,14 @@ public class ContainerVer2_1 extends Container {
             marshaller.marshal(this);
 
             return sw.toString();
-        } catch (RuntimeException e) {
-            logger.error(e.getMessage());
-            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         } finally {
-            sw.close();
+            try {
+                sw.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -53,19 +52,64 @@ public class ContainerVer2_1 extends Container {
     }
 
     /**
+     * Get the corresponding {@link Recipient} from container.
+     * OrgCode and PersonalId codes must match.
+     *
+     * @param decRecipient {@link DecRecipient}
+     * @return recipient
+     */
+    public Recipient getRecipient(DecRecipient decRecipient) {
+        Recipient result = null;
+
+        if (recipient != null) {
+            for (Recipient rec : recipient) {
+                if (rec.getOrganisation() != null && rec.getPerson() != null
+                        && isDecRecipientRelatedWithRecipient(
+                        decRecipient,
+                        rec.getOrganisation().getOrganisationCode(),
+                        rec.getPerson().getPersonalIdCode())) {
+                    result = rec;
+                    break;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Is this {@link DecRecipient} related with {@link Recipient}?
+     *
+     * @param decRecipient            {@link DecRecipient}
+     * @param recipientOrgCode        orgCode
+     * @param recipientPersonalIdCode personalIdCode
+     * @return true if related otherwise false
+     */
+    public boolean isDecRecipientRelatedWithRecipient(DecRecipient decRecipient,
+                                                      String recipientOrgCode, String recipientPersonalIdCode) {
+        boolean result = false;
+
+        if (recipientOrgCode != null && recipientPersonalIdCode != null) {
+            if (recipientOrgCode.equalsIgnoreCase("adit")
+                    && recipientPersonalIdCode.equalsIgnoreCase(decRecipient.getPersonalIdCode())) {
+                result = true;
+            } else if (recipientOrgCode.equalsIgnoreCase(decRecipient.getOrganisationCode())
+                    && recipientPersonalIdCode.equalsIgnoreCase(decRecipient.getPersonalIdCode())) {
+                result = true;
+            }
+        }
+        return result;
+    }
+
+    /**
      * Parse 2.1 container from xml.
      *
      * @param xml String
      * @return 2.1 container object representation.
-     * @throws MappingException
-     * @throws MarshalException
-     * @throws ValidationException
-     * @throws IOException
      */
-    public static ContainerVer2_1 parse(String xml)
-            throws MappingException, MarshalException, ValidationException, IOException {
+    public static ContainerVer2_1 parse(String xml) {
         if (Util.isEmpty(xml)) {
-           return null;
+            return null;
         }
 
         StringReader in = new StringReader(xml);
@@ -73,6 +117,8 @@ public class ContainerVer2_1 extends Container {
         try {
             return (ContainerVer2_1) Container.marshal(in, Version.Ver2_1);
 
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         } finally {
             in.close();
         }
@@ -80,40 +126,46 @@ public class ContainerVer2_1 extends Container {
 
     /**
      * Parse 2.1 container from file.
+     *
      * @param fileName filename
-     * @return
-     * @throws MappingException
-     * @throws MarshalException
-     * @throws ValidationException
+     * @return {@link ContainerVer2_1}
      * @throws IOException
      */
-    public static ContainerVer2_1 parseFile(String fileName)
-            throws MappingException, MarshalException, ValidationException, IOException {
+    public static ContainerVer2_1 parseFile(String fileName) {
         if (fileName == null || (fileName != null && fileName.trim().equals(""))) {
             logger.error("Cannot parse DVK container: empty filename.");
             throw new RuntimeException("Cannot parse DVK container: empty filename.");
         }
 
         ContainerVer2_1 result = null;
-        FileReader fileReader = new FileReader(fileName);
 
         try {
-            result = (ContainerVer2_1) Container.marshal(fileReader, Version.Ver2_1);
-        } finally {
-            fileReader.close();
+
+            FileReader fileReader = new FileReader(fileName);
+
+            try {
+                result = (ContainerVer2_1) Container.marshal(fileReader, Version.Ver2_1);
+            } finally {
+                fileReader.close();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
         return result;
     }
 
-    public static ContainerVer2_1 parse(Reader reader)
-            throws MappingException, MarshalException, ValidationException, IOException {
+    public static ContainerVer2_1 parse(Reader reader) {
         if (reader == null) {
             logger.error("Cannot parse DVK Container: reader not initialized");
             throw new RuntimeException("Cannot parse DVK Container: reader not initialized");
         }
 
-        return (ContainerVer2_1) Container.marshal(reader, Version.Ver2_1);
+        try {
+            return (ContainerVer2_1) Container.marshal(reader, Version.Ver2_1);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

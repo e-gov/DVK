@@ -1,30 +1,20 @@
 package dhl.xslt;
 
-import com.google.common.io.BaseEncoding;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.Random;
 import java.util.zip.GZIPInputStream;
-
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import javax.xml.transform.stream.StreamResult;
-
 import org.apache.axis.AxisFault;
-import org.apache.axis.encoding.Base64;
-
 import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.commons.io.IOUtils;

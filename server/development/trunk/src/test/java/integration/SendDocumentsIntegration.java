@@ -93,6 +93,12 @@ public class SendDocumentsIntegration {
         sendMessageWithAttachment(attachmentNames, xHeaderBuilder.setNimi("dhl.sendDocuments.v4").build());
     }
 
+    @Test
+    public void whenContainer_V2_1_isSentTo_sendDocument_V4_then_service_shouldMatchRecipient() throws Exception {
+        List<String> attachmentNames = Arrays.asList("../testcontainers/v2_1/Dvk_kapsel_vers_2_1_n2ide1Transport.xml.gz");
+        sendMessageWithAttachment(attachmentNames, xHeaderBuilder.setNimi("dhl.sendDocuments.v4").build());
+    }
+
     private void sendMessageWithAttachment(List<String> attachmentNames, XHeader xHeader) throws Exception {
         for(String attachmentName: attachmentNames) {
             sendMessageWithAttachment(attachmentName, xHeader);

@@ -241,9 +241,9 @@
         <dependency>
             <groupId>apache</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.3</version>
+            <version>1.9</version>
             <scope>system</scope>
-            <systemPath>${basedir}/lib/commons-codec-1.3.jar</systemPath>
+            <systemPath>${basedir}/lib/commons-codec-1.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>apache</groupId>
@@ -503,6 +503,13 @@
             <scope>system</scope>
             <systemPath>${basedir}/lib/xmlsec-1.3.0.jar</systemPath>
         </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>17.0</version>
+        </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -511,6 +518,7 @@
             <scope>test</scope>
             <optional>true</optional>
         </dependency>
+
     </dependencies>
 
     <build>

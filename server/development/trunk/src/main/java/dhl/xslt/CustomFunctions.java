@@ -1,5 +1,6 @@
 package dhl.xslt;
 
+import com.google.common.io.BaseEncoding;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -23,6 +24,10 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.encoding.Base64;
+
+import org.apache.commons.codec.binary.Base64InputStream;
+import org.apache.commons.codec.binary.Base64OutputStream;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.xml.dtm.ref.DTMNodeIterator;
 import org.w3c.dom.DOMException;
@@ -126,7 +131,7 @@ public class CustomFunctions {
             if (nl.getLength() > 0) {
                 Node contentNode = nl.item(0);
                 if (contentNode != null) {
-
+                    // siin läheb midagi sisendfailiga valesti.
                     // Generate file names
                     String decodedZipFileName = tmpDir + generateRandomFileName();
                     String unzippedDataFileName = tmpDir + generateRandomFileName();
@@ -137,43 +142,33 @@ public class CustomFunctions {
                     ByteArrayInputStream xsltContentInputStream = new ByteArrayInputStream(
                             contentNode.getTextContent().getBytes("UTF-8"));
 
-                    // Open an outputStream to the decoded file
-                    FileOutputStream decodedFileOutputStream = new FileOutputStream(
-                            decodedZipFileName);
-                    decodeBase64(xsltContentInputStream, decodedFileOutputStream);
-
-                    // Open an inputStream to the decoded file
-                    FileInputStream decodedFileInputSream = new FileInputStream(
-                            decodedZipFileName);
+                    Base64InputStream base64InputStream = new Base64InputStream(xsltContentInputStream);
 
                     // Open an outputStream to the unzipped datafile
                     FileOutputStream unzippedDataFileOutputStream = new FileOutputStream(
                             unzippedDataFileName);
 
                     // Open a ZipInputStream (Unzips)
-                    GZIPInputStream gzipInputStream = new GZIPInputStream(decodedFileInputSream);
+                    GZIPInputStream gzipInputStream = new GZIPInputStream(base64InputStream);
 
-                    // Unzip dataFile
-                    while ((len = gzipInputStream.read(buf)) > 0) {
-                        unzippedDataFileOutputStream.write(buf, 0, len);
-                    }
+                    IOUtils.copy(gzipInputStream, unzippedDataFileOutputStream);
 
                     // Open an inputStream for the base64 encoding
                     FileInputStream unzippedDataFileInputStream = new FileInputStream(
                             unzippedDataFileName);
-
+                    System.out.println("unzippedDataFileName: " + unzippedDataFileName);
                     // Open an outputStream for base64 encoding
                     ByteArrayOutputStream encodedByteArrayOutputStream = new ByteArrayOutputStream();
                     // Base64 encode
-                    encodeBase64(unzippedDataFileInputStream, encodedByteArrayOutputStream);
+                    Base64OutputStream base64OutputStream = new Base64OutputStream(encodedByteArrayOutputStream);
+                    IOUtils.copy(unzippedDataFileInputStream, base64OutputStream);
 
                     // Close the streams
                     encodedByteArrayOutputStream.close();
                     unzippedDataFileInputStream.close();
                     gzipInputStream.close();
                     unzippedDataFileOutputStream.close();
-                    decodedFileInputSream.close();
-                    decodedFileOutputStream.close();
+                    base64InputStream.close();
                     xsltContentInputStream.close();
 
                     // Write the result back to the XSLT
@@ -183,6 +178,7 @@ public class CustomFunctions {
 
         } catch (Exception e) {
             logger.error("Error unzipping file data: ", e);
+            throw new RuntimeException(e);
         }
         return result;
     }
@@ -195,29 +191,6 @@ public class CustomFunctions {
         }
         result.append(".dat");
         return result.toString();
-    }
-
-    public void decodeBase64(InputStream is, OutputStream os)
-            throws IOException {
-        StringBuffer sb = new StringBuffer();
-        byte[] buf = new byte[66000]; // Puhvri pikkus peaks jaguma 3-ga
-        int len;
-        String base64String = null;
-        while ((len = is.read(buf)) > 0) {
-            base64String = new String(buf, 0, len);
-            os.write(Base64.decode(base64String));
-        }
-    }
-
-    public void encodeBase64(InputStream is, OutputStream os)
-            throws IOException {
-        byte[] buf = new byte[66000]; // Puhvri pikkus peaks jaguma 3-ga
-        int len;
-        while ((len = is.read(buf)) > 0) {
-            os.write(Base64.encode(buf, 0, len).getBytes());
-        }
-        is.close();
-        os.close();
     }
 
     public String getDataFileID(String jrkNr) throws Exception {

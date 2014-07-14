@@ -446,7 +446,7 @@ public class Document {
                     item.setContainerVersion(rs.getString("kapsli_versioon"));
 
                     // Loeme CLOB-ist dokumendi andmed
-                    Clob tmpBlob = rs.getClob("sisu");
+                     Clob tmpBlob = rs.getClob("sisu");
                     Reader r = tmpBlob.getCharacterStream();
                     String itemDataFile = CommonMethods.createPipelineFile(docCounter);
                     item.setFilePath(itemDataFile);

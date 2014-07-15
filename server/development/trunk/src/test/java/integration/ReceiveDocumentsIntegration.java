@@ -1,8 +1,8 @@
 package integration;
 
+import Utills.IntegrationTestUtills;
 import dvk.core.CommonStructures;
 import oracle.jdbc.pool.OracleDataSource;
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.Constants;
@@ -15,18 +15,13 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import javax.xml.namespace.QName;
 import java.io.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.UUID;
-import java.util.zip.GZIPInputStream;
 
 /**
  * Integration tests for receiveDocuments.v1-v4 webservice methods.
@@ -84,30 +79,12 @@ public class ReceiveDocumentsIntegration {
         logger.info("response: "+receiveDocumentsResponse.toString());
         Assert.assertTrue(receiveDocumentsResponse.toString().contains("keha href=\"cid"));
 
-        String contentID = getContentID(receiveDocumentsResponse.getBody().getFirstElement());
-        InputStream input = new FileInputStream(decodeBase64FileFrom(receiveDocumentsMessageContext.getAttachment(contentID).getInputStream()));
-        String xml = FileUtils.readFileToString(gunzip(input));
+        String contentID = IntegrationTestUtills.getContentID(receiveDocumentsResponse.getBody().getFirstElement());
+        InputStream input = new FileInputStream(IntegrationTestUtills.decodeBase64FileFrom(receiveDocumentsMessageContext.getAttachment(contentID).getInputStream()));
+        String xml = FileUtils.readFileToString(IntegrationTestUtills.gunzip(input));
         logger.debug("xml: "+xml);
         Assert.assertTrue(xml.contains("<ma:dhl_id>"));
         Assert.assertTrue(xml.contains("<mm:koostaja_asutuse_nr>87654321</mm:koostaja_asutuse_nr>"));
-    }
-
-    private String getContentID(OMElement omElement) {
-        Iterator it = omElement.getChildren();
-        QName href = new QName("href");
-
-        String contentID = "";
-
-        while (it.hasNext()) {
-            OMElement element = (OMElement) it.next();
-            if (element.getLocalName().equals("keha") && element.getAttribute(href) != null) {
-                contentID = element.getAttributeValue(href).substring(4);
-            } else if (element.getLocalName().equals("keha"))  {
-                contentID = element.getFirstChildWithName(new QName("dokumendid")).getAttributeValue(href).substring(4);
-            }
-        }
-
-        return contentID;
     }
 
     @Test
@@ -130,9 +107,9 @@ public class ReceiveDocumentsIntegration {
         logger.info("response: "+receiveDocumentsResponse.toString());
         Assert.assertTrue(receiveDocumentsResponse.toString().contains("keha href=\"cid"));
 
-        String contentID = getContentID(receiveDocumentsResponse.getBody().getFirstElement());
-        InputStream input = new FileInputStream(decodeBase64FileFrom(receiveDocumentsMessageContext.getAttachment(contentID).getInputStream()));
-        String xml = FileUtils.readFileToString(gunzip(input));
+        String contentID = IntegrationTestUtills.getContentID(receiveDocumentsResponse.getBody().getFirstElement());
+        InputStream input = new FileInputStream(IntegrationTestUtills.decodeBase64FileFrom(receiveDocumentsMessageContext.getAttachment(contentID).getInputStream()));
+        String xml = FileUtils.readFileToString(IntegrationTestUtills.gunzip(input));
         logger.debug("xml: "+xml);
         Assert.assertTrue(!xml.contains("<DecMetadata>"));
         Assert.assertTrue(!xml.contains("<DecFolder>"));
@@ -159,9 +136,9 @@ public class ReceiveDocumentsIntegration {
         logger.info("response: "+receiveDocumentsResponse.toString());
         Assert.assertTrue(receiveDocumentsResponse.toString().contains("keha href=\"cid"));
 
-        String contentID = getContentID(receiveDocumentsResponse.getBody().getFirstElement());
-        InputStream input = new FileInputStream(decodeBase64FileFrom(receiveDocumentsMessageContext.getAttachment(contentID).getInputStream()));
-        String xml = FileUtils.readFileToString(gunzip(input));
+        String contentID = IntegrationTestUtills.getContentID(receiveDocumentsResponse.getBody().getFirstElement());
+        InputStream input = new FileInputStream(IntegrationTestUtills.decodeBase64FileFrom(receiveDocumentsMessageContext.getAttachment(contentID).getInputStream()));
+        String xml = FileUtils.readFileToString(IntegrationTestUtills.gunzip(input));
         logger.info("xml: "+xml);
         Assert.assertTrue(!xml.contains("<DecMetadata>"));
         Assert.assertTrue(!xml.contains("<DecFolder>"));
@@ -191,10 +168,10 @@ public class ReceiveDocumentsIntegration {
         logger.info("response: "+receiveDocumentsResponse.toString());
         Assert.assertTrue(receiveDocumentsResponse.toString().contains("dokumendid href=\"cid"));
 
-        String contentID = getContentID(receiveDocumentsResponse.getBody().getFirstElement());
+        String contentID = IntegrationTestUtills.getContentID(receiveDocumentsResponse.getBody().getFirstElement());
         logger.info("contentID: "+contentID);
-        InputStream input = new FileInputStream(decodeBase64FileFrom(receiveDocumentsMessageContext.getAttachment(contentID).getInputStream()));
-        String xml = FileUtils.readFileToString(gunzip(input));
+        InputStream input = new FileInputStream(IntegrationTestUtills.decodeBase64FileFrom(receiveDocumentsMessageContext.getAttachment(contentID).getInputStream()));
+        String xml = FileUtils.readFileToString(IntegrationTestUtills.gunzip(input));
         logger.info("xml: "+xml);
         Assert.assertNotNull(xml);
         Assert.assertTrue(xml.length() > 0);
@@ -202,65 +179,6 @@ public class ReceiveDocumentsIntegration {
         Assert.assertTrue(xml.contains("<DecFolder>"));
         Assert.assertTrue(xml.contains("<DecReceiptDate>"));
         Assert.assertTrue(!xml.contains("dhl_id"));
-    }
-
-    private File decodeBase64FileFrom(InputStream inputStream) throws Exception {
-        byte[] bytes = new byte[65536];
-        File file = new File("target", UUID.randomUUID().toString());
-
-        logger.info("decodedbase64File: " + file.getAbsolutePath());
-        OutputStream outputStream = null;
-        InputStream base64DecoderStream = javax.mail.internet.MimeUtility.decode(inputStream, "base64");
-
-        try {
-            outputStream = new FileOutputStream(file);
-            int len = 0;
-            while ((len = base64DecoderStream.read(bytes, 0, bytes.length)) > 0) {
-                outputStream.write(bytes, 0, len);
-            }
-            outputStream.flush();
-        } catch (FileNotFoundException e) {
-            logger.error("file not found: ", e);
-        } catch (IOException e) {
-            logger.error("Exception", e);
-        } finally {
-            try {
-                outputStream.close();
-                inputStream.close();
-            } catch (IOException e) {
-                logger.error("Closing streams failed: ", e);
-            }
-        }
-
-        return file;
-    }
-
-    private File gunzip(InputStream inputStream) throws Exception {
-        byte[] buffer = new byte[1024];
-        File output = new File("target", UUID.randomUUID().toString());
-        output.createNewFile();
-
-        try {
-            GZIPInputStream gZIPInputStream = new GZIPInputStream(inputStream);
-            FileOutputStream fileOutputStream = new FileOutputStream(output);
-
-            int bytes_read;
-
-            while ((bytes_read = gZIPInputStream.read(buffer)) > 0) {
-                fileOutputStream.write(buffer, 0, bytes_read);
-            }
-
-            fileOutputStream.flush();
-            gZIPInputStream.close();
-            fileOutputStream.close();
-
-            logger.info("The file was decompressed successfully!");
-
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
-        return output;
     }
 
     @SuppressWarnings(value = "all")

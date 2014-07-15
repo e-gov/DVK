@@ -1,6 +1,7 @@
 package dvk.client.iostructures;
 
 import dvk.core.CommonMethods;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -65,7 +66,7 @@ public class Fault {
         result += "<faultcode>" + m_faultCode + "</faultcode>";
         result += "<faultactor>" + m_faultActor + "</faultactor>";
         result += "<faultstring>" + m_faultString + "</faultstring>";
-        result += "<faultdetail>" + m_faultDetail + "</faultdetail>";
+        result += "<faultdetail>" + StringEscapeUtils.escapeXml11(m_faultDetail) + "</faultdetail>";
         result += "</fault>";
 
         return result;

@@ -13,7 +13,6 @@ import java.util.*;
 import java.util.zip.*;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
-import javax.print.attribute.standard.DateTimeAtCompleted;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
@@ -246,35 +245,15 @@ public class CommonMethods {
     }
 
     public static String gzipPackXML(String filePath, String orgCode, String requestName) throws IllegalArgumentException, IOException {
-        if (!(new File(filePath)).exists()) {
-        	logger.debug("Input file \""+ filePath +"\" does not exist!");
-            throw new IllegalArgumentException("Data file does not exist!");
-        }
-
+        String zipOutFileName = gzipFile(filePath);
         String tmpDir = System.getProperty("java.io.tmpdir", "");
-
-        // Pakime andmed kokku
-        String zipOutFileName = tmpDir + File.separator + "dhl_" + requestName + "_" + orgCode + "_" + String.valueOf((new Date()).getTime()) + "_zipOutBuffer.dat";
-        InputStream in = new BufferedInputStream(new FileInputStream(filePath));
-        OutputStream zipOutFile = new BufferedOutputStream(new FileOutputStream(zipOutFileName, false));
-        GZIPOutputStream out = new GZIPOutputStream(zipOutFile);
-        byte[] buf = new byte[Settings.getBinaryBufferSize()];
-        int len;
-        try {
-	        while ((len = in.read(buf)) > 0) {
-	            out.write(buf, 0, len);
-	        }
-        } finally {
-	        in.close();
-	        out.finish();
-	        out.close();
-        }
 
         // Kodeerime pakitud andmed base64 kujule
         String base64OutFileName = tmpDir + File.separator + "dhl_" + requestName + "_" + orgCode + "_" + String.valueOf((new Date()).getTime()) + "_base64OutBuffer.dat";
-        in = new BufferedInputStream(new FileInputStream(zipOutFileName));
+        InputStream in = new BufferedInputStream(new FileInputStream(zipOutFileName));
         OutputStream b64out = new BufferedOutputStream(new FileOutputStream(base64OutFileName, false));
-        buf = new byte[66000];  // Puhvri pikkus peaks jaguma 3-ga
+        byte[] buf = new byte[66000];  // Puhvri pikkus peaks jaguma 3-ga
+        int len;
         try {
 	        while ((len = in.read(buf)) > 0) {
 	            b64out.write(Base64.encode(buf, 0, len).getBytes());
@@ -1698,5 +1677,36 @@ public class CommonMethods {
             }
         }
         return string;
+    }
+
+    public static String gzipFile(String filePath) {
+        if (!(new File(filePath)).exists()) {
+            logger.debug("Input file \""+ filePath +"\" does not exist!");
+            throw new IllegalArgumentException("Data file does not exist!");
+        }
+
+        String tmpDir = System.getProperty("java.io.tmpdir", "");
+        try {
+            // Pakime andmed kokku
+            String zipOutFileName = tmpDir + File.separator + "dhl_" + UUID.randomUUID().toString() + "_" + String.valueOf((new Date()).getTime()) + "_zipOutBuffer.dat";
+            InputStream in = new BufferedInputStream(new FileInputStream(filePath));
+            OutputStream zipOutFile = new BufferedOutputStream(new FileOutputStream(zipOutFileName, false));
+            GZIPOutputStream out = new GZIPOutputStream(zipOutFile);
+            byte[] buf = new byte[Settings.getBinaryBufferSize()];
+            int len;
+            try {
+                while ((len = in.read(buf)) > 0) {
+                    out.write(buf, 0, len);
+                }
+            } finally {
+                in.close();
+                out.finish();
+                out.close();
+            }
+
+            return zipOutFileName;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

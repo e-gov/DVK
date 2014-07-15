@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.axis.AxisFault;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
 
 public class Recipient {
@@ -618,7 +619,8 @@ public class Recipient {
 
             // Asutuse nimi
             if ((m_organizationName != null) && (!m_organizationName.equalsIgnoreCase(""))) {
-                xmlWriter.write("<asutuse_nimi>" + m_organizationName + "</asutuse_nimi>");
+                xmlWriter.write("<asutuse_nimi>" + StringEscapeUtils.escapeXml11(m_organizationName)
+                                                 + "</asutuse_nimi>");
             }
 
             // Osakonna kood

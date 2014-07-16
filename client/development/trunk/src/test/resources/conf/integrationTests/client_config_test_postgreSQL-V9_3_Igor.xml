@@ -3,10 +3,10 @@
   <database>
     <provider>POSTGRE</provider>
     <server_name>localhost</server_name>
-    <server_port>5433</server_port>
-    <database_name>postgres</database_name>
+    <server_port>5432</server_port>
+    <database_name>RIA_DVK</database_name>
     <username>postgres</username>
-    <password>md52f10098c7591bc0cde71f67cb5f3b2b0</password>
+    <password>admiral91</password>
     <process_name> </process_name>
     <instance_name />
     <schema_name>dvk</schema_name>

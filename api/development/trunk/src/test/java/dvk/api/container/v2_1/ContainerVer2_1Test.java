@@ -410,4 +410,15 @@ public class ContainerVer2_1Test {
         ContainerVer2_1 containerVer2_1 = ContainerVer2_1.parse(TestingFileUtils.getInputStreamContents(inputStream));
         Assert.assertNotNull(containerVer2_1);
     }
+
+    @Test
+    public void parse_2_1_standard_date_format() throws Exception {
+        InputStream inputStream = ContainerVer2_1Test.class.getResourceAsStream("../testcontainers/v2_1/2_1_n2ide1_new_date_format.xml");
+        ContainerVer2_1 containerVer2_1 = ContainerVer2_1.parse(TestingFileUtils.getInputStreamContents(inputStream));
+        Assert.assertNotNull(containerVer2_1);
+        Assert.assertNotNull(containerVer2_1.getRecordMetadata().getReplyDueDate());
+        Assert.assertNotNull(containerVer2_1.getAccess().getAccessRestriction().get(0).getRestrictionBeginDate());
+        Assert.assertNotNull(containerVer2_1.getAccess().getAccessRestriction().get(0).getRestrictionEndDate());
+        Assert.assertNotNull(containerVer2_1.getAccess().getAccessRestriction().get(0).getRestrictionInvalidSince());
+    }
 }

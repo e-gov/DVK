@@ -1,23 +1,22 @@
 package dvk.api.container;
 
 import dvk.api.ml.Util;
-import org.apache.log4j.Logger;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.ValidityException;
-import java.text.ParseException;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * FieldHandler for SignatureInfo signatureDate field.
+ * FieldHandler for LetterMetadata signDate field.
  **/
-public class SignatureDateHandler implements FieldHandler {
+public class LetterMetadataDeadlineHandler implements FieldHandler {
     private static final String FORMAT = "yyyy-MM-dd";
 
     /**
-     * Creates a new SignatureDateHandler instance.
+     * Creates a new LetterMetadataDeadlineHandler instance.
      */
-    public SignatureDateHandler() {
+    public LetterMetadataDeadlineHandler() {
         super();
     }
 
@@ -33,8 +32,8 @@ public class SignatureDateHandler implements FieldHandler {
      *      this handler, or the handler is not compatible with the Java object
      */
     public Object getValue(Object object) throws IllegalStateException {
-        SignatureInfo sigInfo = (SignatureInfo) object;
-        Date value = (Date) sigInfo.getSignatureDate();
+        LetterMetaData metadata = (LetterMetaData) object;
+        Date value = (Date) metadata.getDeadline();
         if (value == null) {
             return null;
         }
@@ -56,7 +55,7 @@ public class SignatureDateHandler implements FieldHandler {
      *      The value passed is not of a supported type
      */
     public void setValue(Object object, Object value) throws IllegalStateException, IllegalArgumentException {
-        ((SignatureInfo) object).setSignatureDate(Util.parseDate((String) value));
+        ((LetterMetaData) object).setDeadline(Util.parseDate((String) value));
     }
 
     /**
@@ -88,7 +87,7 @@ public class SignatureDateHandler implements FieldHandler {
      *      this handler, or the handler is not compatible with the Java object
      */
     public void resetValue(Object object) throws IllegalStateException, IllegalArgumentException {
-        ((SignatureInfo) object).setSignatureDate(null);
+        ((LetterMetaData) object).setDeadline(null);
     }
 
     /**

@@ -1,5 +1,6 @@
 package dvk.api.container;
 
+import dvk.api.ml.Util;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.ValidityException;
 import java.text.ParseException;
@@ -54,16 +55,7 @@ public class SignatureTimeHandler implements FieldHandler {
      *      The value passed is not of a supported type
      */
     public void setValue(Object object, Object value) throws IllegalStateException, IllegalArgumentException {
-        SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);
-        if (value != null) {
-            Date date = null;
-            try {
-                date = formatter.parse((String) value);
-            } catch (ParseException px) {
-                throw new IllegalArgumentException(px.getMessage());
-            }
-            ((SignatureInfo) object).setSignatureDate(date);
-        }
+        ((SignatureInfo) object).setSignatureTime(Util.parseDate((String) value));
     }
 
     /**

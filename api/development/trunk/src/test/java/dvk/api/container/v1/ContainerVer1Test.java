@@ -324,4 +324,17 @@ public class ContainerVer1Test {
         Assert.assertNull(container_dvk_37.getMetaxml().getSignatures().getSignature().get(0).getSignatureInfo().getSignatureTime());
         Assert.assertEquals("", container_dvk_37.getMetaxml().getSigneddoc());
     }
+
+    @Test
+    public void parse_1_0_standard_date_format() throws Exception {
+        InputStream inputStream = ContainerVer1Test.class.getResourceAsStream("../testcontainers/v1_0/DVK_new_date_format.xml");
+        ContainerVer1 container = ContainerVer1.parse(TestingFileUtils.getInputStreamContents(inputStream));
+        Assert.assertNotNull(container);
+        Assert.assertNotNull(container.getMetaxml().getLetterMetaData().getSignDate());
+        Assert.assertNotNull(container.getMetaxml().getLetterMetaData().getDeadline());
+        Assert.assertNotNull(container.getMetaxml().getLetterMetaData().getAccessRights().getBeginDate());
+        Assert.assertNotNull(container.getMetaxml().getLetterMetaData().getAccessRights().getEndDate());
+        Assert.assertNotNull(container.getMetaxml().getLetterMetaData().getIntellectualPropertyRights().getCopyrightEndDate());
+        Assert.assertNotNull(container.getMetaxml().getSignatures().getSignature().get(0).getSignatureInfo().getSignatureDate());
+    }
 }

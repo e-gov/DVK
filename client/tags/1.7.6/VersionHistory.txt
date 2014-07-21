@@ -1,0 +1,92 @@
+1.7.6
+------------------------------------------------------------------------------
+- DVK-50 - DVK UK sõnumi kustutamine ebaõnnestub kui leidub seotud kirje vigade tabelis
+- DVK-68 - DVK staatuse päringu vastus annab ebakorrektse veateate
+- DVK-67 - DVK UK paigaldusjuhendisse info ADIT getSendStatus päringu käivitamise kohta
+
+
+1.7.5
+-------------------------------------------------------------------------------
+- DVK-57 - AditGetSendStatus task now receives and parses response from ADIT correctly.
+- DVK-52 - DVK client should not update already received document statuses.
+- DVK-55
+
+1.7.4
+-------------------------------------------------------------------------------
+- DVK-53 - AditGetSendStatus must be done only for messages sent to adit
+- DVK-54 - AditGetSendStatus must be done only for those messages where dhl_id != null
+- DVK-35 - UK should handle SQL exception on MessageRecipient.saveToDB as error
+- DVK-58 - adit_producer_name in configuration default value is now "ametlikud-dokumendid"
+
+1.7.3
+-------------------------------------------------------------------------------
+- DVK-44 - ReceiveDocuments päringu vastuvõetavate dokumentide arv on nüüd konfifailis seadistatav (receive_documents_amount)
+- DVK-47 - Query methods default versions updated
+- DVK-51 - AditGetSendStatus request should add dhlId not messageId to the request.
+- DVK-46 - AditGetSendStatus invoke error when using Oracle database fixed
+
+1.7.2
+-------------------------------------------------------------------------------
+- DVK-41 (DVK konverteerimisel ei kandu üle juurdepääsupiirangu andmed)
+- DVK-42 (DVK UK kaotab baasist saatmise kellaaja ja saaja nime)
+
+1.7.1
+-------------------------------------------------------------------------------
+- Lisatud võimalus käivitada GetSendStatus päringut aditisse,
+  nende MessageRecipient'ide kohta, mis on saadetud aditisse ja ei ole veel avatud
+  (Lisatud ka vastavad konfiguratsiooniparameetrid konfifailidesse ja vastavad skriptid)
+- täiendatud ka andmebaasi skeemi vt. update skripte või latest skripte
+- Lisatud päringute ja vigade logimine andmebaasi
+- Integratsioonitestid lisatud toetatud andmebaaside kohta
+- Lisatud puudu olevad jarid
+- Täiendatud pidevintegratsiooniga seotut
+- Nüüdsest eristatakse konfiguratsioonis Oracle 10G ja Oracle 11G baase
+- Kapsli versiooni 2.1 tugi lisatud
+- 2.1 kapsli versiooni konverteerimine 1.0 lisatud
+- Lisatud puuduolevad protseduurid MSSQL'i jaoks
+    - Get_DhlOccupationList
+    - Get_DhlSubdivisionList
+    - Delete_DhlSubdivision
+    - Delete_DhlOccupation
+
+- Puudu olev insert_new_row protseduur???
+- DVK-21, DVK-29
+
+
+
+1.6.3
+-------------------------------------------------------------------------------
+- Universaalklient kustutab nüüd igal käivitamisel ajutisest kaustast rohkem kui
+  10 minutit vanad "dhl_" prefiksiga failid. St universaalkliendi loodud
+  ajutiused failid ei kogune enam piiramatult ajutisse kataloogi.
+- Kui DVK konteineri versioon ei ole teada, siis käsitleb universaalklient nüüd
+  konteinerit alati vastavalt v1 versioonile.
+- Parandatud viga, mis põhjustas vastuvõetud DVK ümbriku poolikut töötlemist
+  olukottas, kus ümbriku <metaxml> osas sisaldus element <dokument>.
+- Täiendatud SQL skriptides Oracle trigereid, et need toimiksid korrektselt koos
+  DVK API-ga.
+- Parandatud SQL skriptides protseduur Get_DhlCapabilityByMessageID.
+- Muudetud universaalkiliendi käivitamiseks kasutatavaid skripte.
+  Windowsi skriptid muudetud lühemaks ja lihtsamaks.
+  Linuxi skriptide puhul muudetud kodeering BOM-ga UTF8-st ASCII-ks.
+- Lisatud Oracle täieliku skripti hulka protseduur Get_DhlMessageByGUID, mis oli
+  2010. aastal skriptist välja jäänud.
+
+
+1.6.2
+-------------------------------------------------------------------------------
+- Andmebaaside vahel otse saatmise korral ei saadeta enam ühelgi juhul dokumenti
+  tagasi samasse andmebaasi, kust see pärineb.
+- Andmebaaside vahel otse saatmise korral ei ole enam nõutav, et sama asutuse
+  erinevates andmebaasides oleks seadistatud erinevad allüksused või
+  ametikohad. Nüüd piisab ka sellest, kui erinevate andmebaaside puhul on
+  seadistatud erinevad DVK kaustad.
+- Universaalkliendi asutuste ja allüksuste andmetabelitest eemaldatakse andmete
+  sünkroniseerimisel nüüd need kirjed, mis DVK serverist on kustutatud.
+- Õnnestunud saatmisel eemaldatakse nüüd DHL_MESSAGE tabelist veateated, mis
+  varasemate ebaõnnestunud saatmiskatsete käigus sinna on tekkinud.
+- Nüüd kirjutatakse DHL_MESSAGE_RECIPIENT andmetabelisse ka DVK keskserverist
+  allalaetud dokumentide adressaatide anmded (varem kirjutati nimetatud
+  tabelisse ainult väljasaadetavate dokumentide adressaatide andmed).
+- Tabelisse DHL_MESSAGE lisatakse nüüd korrektselt saabunud dokumendi adressaadi
+  allüksuse ja ametikoha lühinimetused.

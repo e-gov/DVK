@@ -11,7 +11,7 @@ import java.util.Date;
  */
 public class AccessRestrictionBeginDateHandler implements FieldHandler {
 
-    private DvkDateHandler dateHandler = new DvkDateHandler("yyyy-MM-dd");;
+    private DvkDateHandler dateHandler = new DvkDateHandler("yyyy-MM-dd");
 
     public AccessRestrictionBeginDateHandler() {
         super();

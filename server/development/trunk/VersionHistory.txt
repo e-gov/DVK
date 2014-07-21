@@ -1,6 +1,7 @@
 1.7.7
 ------------------------------------------------------------------------------
 - DVK-66 - DVK kapsli konverteerimisel osade failide sisu kaob
+- DVK-56 - DVK getSendStatus päringu vastusest tuleb eemaldada &-märk
 
 1.7.6
 -------------------------------------------------------------------------------

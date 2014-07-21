@@ -1,3 +1,10 @@
+1.7.6
+------------------------------------------------------------------------------
+- DVK-50 - DVK UK sõnumi kustutamine ebaõnnestub kui leidub seotud kirje vigade tabelis
+- DVK-68 - DVK staatuse päringu vastus annab ebakorrektse veateate
+- DVK-67 - DVK UK paigaldusjuhendisse info ADIT getSendStatus päringu käivitamise kohta
+
+
 1.7.5
 -------------------------------------------------------------------------------
 - DVK-57 - AditGetSendStatus task now receives and parses response from ADIT correctly.

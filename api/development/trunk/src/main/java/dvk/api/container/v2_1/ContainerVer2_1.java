@@ -63,10 +63,12 @@ public class ContainerVer2_1 extends Container {
 
         if (recipient != null) {
             for (Recipient rec : recipient) {
-                if (rec.getOrganisation() != null && rec.getPerson() != null
+                String orgCode = rec.getOrganisation() != null ? rec.getOrganisation().getOrganisationCode() : null;
+
+                if (rec.getPerson() != null
                         && isDecRecipientRelatedWithRecipient(
                         decRecipient,
-                        rec.getOrganisation().getOrganisationCode(),
+                        orgCode,
                         rec.getPerson().getPersonalIdCode())) {
                     result = rec;
                     break;
@@ -89,15 +91,23 @@ public class ContainerVer2_1 extends Container {
                                                       String recipientOrgCode, String recipientPersonalIdCode) {
         boolean result = false;
 
-        if (recipientOrgCode != null && recipientPersonalIdCode != null) {
-            if (recipientOrgCode.equalsIgnoreCase("adit")
-                    && recipientPersonalIdCode.equalsIgnoreCase(decRecipient.getPersonalIdCode())) {
-                result = true;
-            } else if (recipientOrgCode.equalsIgnoreCase(decRecipient.getOrganisationCode())
-                    && recipientPersonalIdCode.equalsIgnoreCase(decRecipient.getPersonalIdCode())) {
-                result = true;
+        if (decRecipient.getOrganisationCode().equalsIgnoreCase("adit")) {
+            if ((recipientOrgCode == null || recipientOrgCode.equalsIgnoreCase("adit"))
+                    && recipientPersonalIdCode.equalsIgnoreCase(decRecipient.getPersonalIdCode())
+                    || recipientPersonalIdCode.equalsIgnoreCase("EE" + decRecipient.getPersonalIdCode())) {
+               result = true;
+            }
+        } else {
+            if (recipientOrgCode != null && recipientPersonalIdCode != null) {
+                if ((recipientOrgCode.equalsIgnoreCase(decRecipient.getOrganisationCode())
+                        || recipientOrgCode.equalsIgnoreCase("EE" + decRecipient.getOrganisationCode()))
+                        && (recipientPersonalIdCode.equalsIgnoreCase(decRecipient.getPersonalIdCode())
+                        || recipientPersonalIdCode.equalsIgnoreCase("EE" + decRecipient.getPersonalIdCode()))) {
+                    result = true;
+                }
             }
         }
+
         return result;
     }
 

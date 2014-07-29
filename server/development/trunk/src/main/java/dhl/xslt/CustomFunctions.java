@@ -1,5 +1,18 @@
 package dhl.xslt;
 
+import dvk.core.Settings;
+import org.apache.axis.AxisFault;
+import org.apache.commons.codec.binary.Base64InputStream;
+import org.apache.commons.codec.binary.Base64OutputStream;
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
+import org.apache.xml.dtm.ref.DTMNodeIterator;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -12,23 +25,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Random;
 import java.util.zip.GZIPInputStream;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import org.apache.axis.AxisFault;
-import org.apache.commons.codec.binary.Base64InputStream;
-import org.apache.commons.codec.binary.Base64OutputStream;
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-import org.apache.xml.dtm.ref.DTMNodeIterator;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import dvk.core.Settings;
 
 public class CustomFunctions {
 
     private static Logger logger = Logger.getLogger(CustomFunctions.class);
+
+    static final int BASE64_CHUNK_SIZE = 76;
+    static final String BASE64_LINE_SEPARATOR = "\n";
 
     private Connection connection;
 
@@ -150,7 +153,7 @@ public class CustomFunctions {
                     // Open an outputStream for base64 encoding
                     ByteArrayOutputStream encodedByteArrayOutputStream = new ByteArrayOutputStream();
                     // Base64 encode
-                    Base64OutputStream base64OutputStream = new Base64OutputStream(encodedByteArrayOutputStream);
+                    Base64OutputStream base64OutputStream = new Base64OutputStream(encodedByteArrayOutputStream, true, BASE64_CHUNK_SIZE, BASE64_LINE_SEPARATOR.getBytes());
                     IOUtils.copy(unzippedDataFileInputStream, base64OutputStream);
 
                     // Close the streams

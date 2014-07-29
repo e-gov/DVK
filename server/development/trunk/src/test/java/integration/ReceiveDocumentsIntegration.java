@@ -15,9 +15,11 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -87,6 +89,7 @@ public class ReceiveDocumentsIntegration {
         Assert.assertTrue(xml.contains("<mm:koostaja_asutuse_nr>87654321</mm:koostaja_asutuse_nr>"));
     }
 
+    @Ignore
     @Test
     public void whenContainer_V21_isSentTo_sendDocuments_v4_receiveDocuments_v1_mustRespondWithTheSameDocument_withAutomaticMetadata() throws Exception {
         updatePreviouslySentDocumentsStatusToReceived();
@@ -117,6 +120,7 @@ public class ReceiveDocumentsIntegration {
         Assert.assertTrue(xml.contains("dhl_id"));
     }
 
+    @Ignore
     @Test
     public void when_2_1_isSentWithoutDecMetaDataBlock_mustRespondWithProperMetaDataBlock() throws Exception {
         updatePreviouslySentDocumentsStatusToReceived();

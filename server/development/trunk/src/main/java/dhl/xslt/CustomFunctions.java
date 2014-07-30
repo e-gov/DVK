@@ -157,6 +157,7 @@ public class CustomFunctions {
                     IOUtils.copy(unzippedDataFileInputStream, base64OutputStream);
 
                     // Close the streams
+                    base64OutputStream.close();
                     base64InputStream.close();
                     encodedByteArrayOutputStream.close();
                     unzippedDataFileInputStream.close();

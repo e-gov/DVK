@@ -157,11 +157,11 @@ public class CustomFunctions {
                     IOUtils.copy(unzippedDataFileInputStream, base64OutputStream);
 
                     // Close the streams
+                    base64InputStream.close();
                     encodedByteArrayOutputStream.close();
                     unzippedDataFileInputStream.close();
                     gzipInputStream.close();
                     unzippedDataFileOutputStream.close();
-                    base64InputStream.close();
                     xsltContentInputStream.close();
 
                     // Write the result back to the XSLT

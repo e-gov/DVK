@@ -918,6 +918,7 @@ public class ReceiveDocuments {
                                                                   Connection conn) throws Exception {
         logger.debug("Constructing document from XML. File: " + filePath);
         Document currentXmlContent = CommonMethods.xmlDocumentFromFile(filePath, true);
+        System.out.println("PATH IGOR: " + filePath);
 
         if (currentXmlContent == null) {
             throw new Exception(

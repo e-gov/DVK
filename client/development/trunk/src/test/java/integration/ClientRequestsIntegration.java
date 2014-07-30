@@ -279,24 +279,167 @@ public class ClientRequestsIntegration {
         Assert.assertTrue(sentXMLData.length() > 0);
         Assert.assertTrue(receivedXMLData.length() > 0);
 
-
         Assert.assertNotNull(containerForSentMessage);
         Assert.assertNotNull(containerForReceivedMessage);
         Assert.assertNotNull(containerForSentMessage.getTransport());
         Assert.assertNotNull(containerForReceivedMessage.getTransport());
+
+        // DecSender blocks
+        Assert.assertNotNull(containerForSentMessage.getTransport().getDecSender());
+        Assert.assertNotNull(containerForReceivedMessage.getTransport().getDecSender());
         Assert.assertEquals(containerForSentMessage.getTransport().getDecSender().getOrganisationCode(),
                 containerForReceivedMessage.getTransport().getDecSender().getOrganisationCode());
         Assert.assertEquals(containerForSentMessage.getTransport().getDecSender().getPersonalIdCode(),
                 containerForReceivedMessage.getTransport().getDecSender().getPersonalIdCode());
+
+        // DecRecipient blocks
+        Assert.assertNotNull(containerForSentMessage.getTransport().getDecRecipient());
+        Assert.assertNotNull(containerForReceivedMessage.getTransport().getDecRecipient());
         Assert.assertEquals(containerForSentMessage.getTransport().getDecRecipient().get(0).getOrganisationCode(),
                 containerForReceivedMessage.getTransport().getDecRecipient().get(0).getOrganisationCode());
         Assert.assertEquals(containerForSentMessage.getTransport().getDecRecipient().get(0).getPersonalIdCode(),
                 containerForReceivedMessage.getTransport().getDecRecipient().get(0).getPersonalIdCode());
+
+        // Recipient block
+        Assert.assertNotNull(containerForSentMessage.getRecipient().get(0).getOrganisation());
+        Assert.assertNotNull(containerForReceivedMessage.getRecipient().get(0).getOrganisation());
+        Assert.assertEquals(containerForSentMessage.getRecipient().get(0).getOrganisation().getName(),
+                            containerForReceivedMessage.getRecipient().get(0).getOrganisation().getName());
+        Assert.assertEquals(containerForSentMessage.getRecipient().get(0).getOrganisation().getOrganisationCode(),
+                            containerForSentMessage.getRecipient().get(0).getOrganisation().getOrganisationCode());
+        Assert.assertEquals(containerForSentMessage.getRecipient().get(0).getOrganisation().getResidency(),
+                containerForSentMessage.getRecipient().get(0).getOrganisation().getResidency());
+
+        // RecordMetaData block
+        Assert.assertNotNull(containerForSentMessage.getRecordMetadata());
+        Assert.assertNotNull(containerForReceivedMessage.getRecordMetadata());
+        Assert.assertEquals(containerForSentMessage.getRecordMetadata().getRecordGuid(),
+                            containerForReceivedMessage.getRecordMetadata().getRecordGuid());
+        Assert.assertEquals(containerForSentMessage.getRecordMetadata().getRecordType(),
+                            containerForReceivedMessage.getRecordMetadata().getRecordType());
+        Assert.assertEquals(containerForSentMessage.getRecordMetadata().getRecordOriginalIdentifier(),
+                            containerForReceivedMessage.getRecordMetadata().getRecordOriginalIdentifier());
+        Assert.assertEquals(containerForSentMessage.getRecordMetadata().getRecordDateRegistered(),
+                            containerForReceivedMessage.getRecordMetadata().getRecordDateRegistered());
+        Assert.assertEquals(containerForSentMessage.getRecordMetadata().getRecordTitle(),
+                            containerForReceivedMessage.getRecordMetadata().getRecordTitle());
+        Assert.assertEquals(containerForSentMessage.getRecordMetadata().getRecordLanguage(),
+                            containerForReceivedMessage.getRecordMetadata().getRecordLanguage());
+
+        // Access block
+        Assert.assertNotNull(containerForReceivedMessage.getAccess());
+        Assert.assertEquals(containerForSentMessage.getAccess().getAccessConditionsCode(),
+                            containerForReceivedMessage.getAccess().getAccessConditionsCode());
+
+        // DecMetaData block
         Assert.assertNotNull(containerForSentMessage.getDecMetadata());
         Assert.assertNotNull(containerForReceivedMessage.getDecMetadata());
+
+        // File block and content's asserts
+        Assert.assertNotNull(containerForSentMessage.getFile().get(0));
+        Assert.assertNotNull(containerForReceivedMessage.getFile().get(0));
+        Assert.assertEquals(containerForSentMessage.getFile().get(0).getFileName(),
+                            containerForReceivedMessage.getFile().get(0).getFileName());
+        Assert.assertEquals(containerForSentMessage.getFile().get(0).getFileSize(),
+                            containerForReceivedMessage.getFile().get(0).getFileSize());
         Assert.assertEquals(containerForSentMessage.getFile().get(0).getZipBase64Content(),
                             containerForReceivedMessage.getFile().get(0).getZipBase64Content());
-    }
+        Assert.assertEquals(containerForSentMessage.getFile().get(0).getFileGuid(),
+                            containerForReceivedMessage.getFile().get(0).getFileGuid());
+        Assert.assertEquals(containerForSentMessage.getFile().get(0).getMimeType(),
+                            containerForReceivedMessage.getFile().get(0).getMimeType());
+
+        // RecordCreator block
+        Assert.assertNotNull(containerForSentMessage.getRecordCreator());
+        Assert.assertNotNull(containerForReceivedMessage.getRecordCreator());
+        Assert.assertNotNull(containerForSentMessage.getRecordCreator().getPerson());
+        Assert.assertNotNull(containerForReceivedMessage.getRecordCreator().getPerson());
+        Assert.assertEquals(containerForSentMessage.getRecordCreator().getPerson().getName(),
+                            containerForReceivedMessage.getRecordCreator().getPerson().getName());
+        Assert.assertEquals(containerForSentMessage.getRecordCreator().getPerson().getGivenName(),
+                            containerForReceivedMessage.getRecordCreator().getPerson().getGivenName());
+        Assert.assertEquals(containerForSentMessage.getRecordCreator().getPerson().getSurname(),
+                            containerForReceivedMessage.getRecordCreator().getPerson().getSurname());
+        Assert.assertEquals(containerForSentMessage.getRecordCreator().getPerson().getPersonalIdCode(),
+                            containerForReceivedMessage.getRecordCreator().getPerson().getPersonalIdCode());
+        Assert.assertEquals(containerForSentMessage.getRecordCreator().getPerson().getResidency(),
+                            containerForReceivedMessage.getRecordCreator().getPerson().getResidency());
+        Assert.assertNotNull(containerForSentMessage.getRecordCreator().getContactData());
+        Assert.assertNotNull(containerForReceivedMessage.getRecordCreator().getContactData());
+        Assert.assertEquals(containerForSentMessage.getRecordCreator().getContactData().getAdit(),
+                            containerForReceivedMessage.getRecordCreator().getContactData().getAdit());
+        Assert.assertEquals(containerForSentMessage.getRecordCreator().getContactData().getPhone(),
+                            containerForReceivedMessage.getRecordCreator().getContactData().getPhone());
+        Assert.assertEquals(containerForSentMessage.getRecordCreator().getContactData().getEmail(),
+                            containerForReceivedMessage.getRecordCreator().getContactData().getEmail());
+        Assert.assertEquals(containerForSentMessage.getRecordCreator().getContactData().getWebPage(),
+                            containerForReceivedMessage.getRecordCreator().getContactData().getWebPage());
+        Assert.assertEquals(containerForSentMessage.getRecordCreator().getContactData().getMessagingAddress(),
+                            containerForReceivedMessage.getRecordCreator().getContactData().getMessagingAddress());
+        Assert.assertNotNull(containerForSentMessage.getRecordCreator().getContactData().getPostalAddress());
+        Assert.assertNotNull(containerForReceivedMessage.getRecordCreator().getContactData().getPostalAddress());
+        Assert.assertEquals(containerForSentMessage.getRecordCreator().getContactData().getPostalAddress().getCountry(),
+                            containerForReceivedMessage.getRecordCreator().getContactData().getPostalAddress().getCountry());
+        Assert.assertEquals(containerForSentMessage.getRecordCreator().getContactData().getPostalAddress().getCounty(),
+                            containerForReceivedMessage.getRecordCreator().getContactData().getPostalAddress().getCounty());
+        Assert.assertEquals(containerForSentMessage.getRecordCreator().getContactData().getPostalAddress().getLocalGovernment(),
+                            containerForReceivedMessage.getRecordCreator().getContactData().getPostalAddress().getLocalGovernment());
+        Assert.assertEquals(containerForSentMessage.getRecordCreator().getContactData().getPostalAddress().getAdministrativeUnit(),
+                            containerForReceivedMessage.getRecordCreator().getContactData().getPostalAddress().getAdministrativeUnit());
+        Assert.assertEquals(containerForSentMessage.getRecordCreator().getContactData().getPostalAddress().getSmallPlace(),
+                            containerForReceivedMessage.getRecordCreator().getContactData().getPostalAddress().getSmallPlace());
+        Assert.assertEquals(containerForSentMessage.getRecordCreator().getContactData().getPostalAddress().getHouseNumber(),
+                            containerForReceivedMessage.getRecordCreator().getContactData().getPostalAddress().getHouseNumber());
+        Assert.assertEquals(containerForSentMessage.getRecordCreator().getContactData().getPostalAddress().getBuildingPartNumber(),
+                            containerForReceivedMessage.getRecordCreator().getContactData().getPostalAddress().getBuildingPartNumber());
+        Assert.assertEquals(containerForSentMessage.getRecordCreator().getContactData().getPostalAddress().getPostalCode(),
+                            containerForReceivedMessage.getRecordCreator().getContactData().getPostalAddress().getPostalCode());
+
+        // RecordSenderToDeck block
+        Assert.assertNotNull(containerForSentMessage.getRecordSenderToDec());
+        Assert.assertNotNull(containerForReceivedMessage.getRecordSenderToDec());
+        Assert.assertNotNull(containerForSentMessage.getRecordSenderToDec().getPerson());
+        Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getPerson().getName(),
+                            containerForReceivedMessage.getRecordSenderToDec().getPerson().getName());
+        Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getPerson().getGivenName(),
+                            containerForReceivedMessage.getRecordSenderToDec().getPerson().getGivenName());
+        Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getPerson().getSurname(),
+                            containerForReceivedMessage.getRecordSenderToDec().getPerson().getSurname());
+        Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getPerson().getPersonalIdCode(),
+                            containerForReceivedMessage.getRecordSenderToDec().getPerson().getPersonalIdCode());
+        Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getPerson().getResidency(),
+                            containerForReceivedMessage.getRecordSenderToDec().getPerson().getResidency());
+        Assert.assertNotNull(containerForSentMessage.getRecordSenderToDec().getContactData());
+        Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getAdit(),
+                            containerForReceivedMessage.getRecordSenderToDec().getContactData().getAdit());
+        Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getPhone(),
+                            containerForReceivedMessage.getRecordSenderToDec().getContactData().getPhone());
+        Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getEmail(),
+                            containerForReceivedMessage.getRecordSenderToDec().getContactData().getEmail());
+        Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getWebPage(),
+                            containerForReceivedMessage.getRecordSenderToDec().getContactData().getWebPage());
+        Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getMessagingAddress(),
+                            containerForReceivedMessage.getRecordSenderToDec().getContactData().getMessagingAddress());
+        Assert.assertNotNull(containerForSentMessage.getRecordSenderToDec().getContactData().getPostalAddress());
+        Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getPostalAddress().getCountry(),
+                            containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getCountry());
+        Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getPostalAddress().getCounty(),
+                            containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getCounty());
+        Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getPostalAddress().getLocalGovernment(),
+                            containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getLocalGovernment());
+        Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getPostalAddress().getAdministrativeUnit(),
+                            containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getAdministrativeUnit());
+        Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getPostalAddress().getSmallPlace(),
+                            containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getSmallPlace());
+        Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getPostalAddress().getStreet(),
+                            containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getStreet());
+        Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getPostalAddress().getHouseNumber(),
+                            containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getHouseNumber());
+        Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getPostalAddress().getBuildingPartNumber(),
+                            containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getBuildingPartNumber());
+        Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getPostalAddress().getPostalCode(),
+                            containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getPostalCode());
+        }
 
     private void doDataAsserts(String sentXMLData, String receivedXMLData, ContainerVer1 containerForSentMessage,
                                ContainerVer1 containerForReceivedMessage) {

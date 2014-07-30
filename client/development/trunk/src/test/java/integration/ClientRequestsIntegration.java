@@ -284,8 +284,18 @@ public class ClientRequestsIntegration {
         Assert.assertNotNull(containerForReceivedMessage);
         Assert.assertNotNull(containerForSentMessage.getTransport());
         Assert.assertNotNull(containerForReceivedMessage.getTransport());
+        Assert.assertEquals(containerForSentMessage.getTransport().getDecSender().getOrganisationCode(),
+                containerForReceivedMessage.getTransport().getDecSender().getOrganisationCode());
+        Assert.assertEquals(containerForSentMessage.getTransport().getDecSender().getPersonalIdCode(),
+                containerForReceivedMessage.getTransport().getDecSender().getPersonalIdCode());
+        Assert.assertEquals(containerForSentMessage.getTransport().getDecRecipient().get(0).getOrganisationCode(),
+                containerForReceivedMessage.getTransport().getDecRecipient().get(0).getOrganisationCode());
+        Assert.assertEquals(containerForSentMessage.getTransport().getDecRecipient().get(0).getPersonalIdCode(),
+                containerForReceivedMessage.getTransport().getDecRecipient().get(0).getPersonalIdCode());
         Assert.assertNotNull(containerForSentMessage.getDecMetadata());
         Assert.assertNotNull(containerForReceivedMessage.getDecMetadata());
+        Assert.assertEquals(containerForSentMessage.getFile().get(0).getZipBase64Content(),
+                            containerForReceivedMessage.getFile().get(0).getZipBase64Content());
     }
 
     private void doDataAsserts(String sentXMLData, String receivedXMLData, ContainerVer1 containerForSentMessage,
@@ -295,12 +305,14 @@ public class ClientRequestsIntegration {
         Assert.assertTrue(sentXMLData.length() > 0);
         Assert.assertTrue(receivedXMLData.length() > 0);
 
-
         Assert.assertNotNull(containerForSentMessage);
         Assert.assertNotNull(containerForReceivedMessage);
         Assert.assertNotNull(containerForSentMessage.getTransport());
         Assert.assertNotNull(containerForReceivedMessage.getTransport());
         Assert.assertNotNull(containerForReceivedMessage.getMetainfo());
+
+        Assert.assertEquals(containerForSentMessage.getSignedDoc().getDataFiles().get(0).getFileBase64Content(),
+                           containerForReceivedMessage.getSignedDoc().getDataFiles().get(0).getFileBase64Content());
     }
 
     private void doStatusAsserts(int statusOfSentMessage, int statusOfReceivedMessage) {

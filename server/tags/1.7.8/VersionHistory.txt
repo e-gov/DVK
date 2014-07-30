@@ -1,0 +1,57 @@
+1.7.8
+------------------------------------------------------------------------------
+
+1.7.7
+------------------------------------------------------------------------------
+- DVK-66 - DVK kapsli konverteerimisel osade failide sisu kaob
+- DVK-56 - DVK getSendStatus päringu vastusest tuleb eemaldada &-märk
+
+1.7.6
+-------------------------------------------------------------------------------
+- DVK-10 - Jdigidoc config file is now configurable with server_jdigidoc_config_location if necessary
+- DVK-61 - Suurendada DVK.VASTUVOTJA.ALLYKSUSE_LYHINIMETUS veeru lubatud suurust
+
+1.7.5
+-------------------------------------------------------------------------------
+- Now uses dvk-client-1.7.4 and dvk-core-1.7.2
+
+1.7.4
+-------------------------------------------------------------------------------
+- New client available
+
+1.7.3
+-------------------------------------------------------------------------------
+- DVK-43 - DVK uuest kapslist vanale konverteerimisel mitu source-elemendi on vaja mappida ühele destination-elemendile
+
+
+1.7.2
+-------------------------------------------------------------------------------
+- DVK-10 (Vana kapsli saatmine ebaõnnestub teatud manustega) - lisatud logimist
+- Parandatud DVK-41 (DVK konverteerimisel ei kandu üle juurdepääsupiirangu andmed)
+
+1.7.1
+-------------------------------------------------------------------------------
+- 2.1 container support added
+
+
+1.6.2
+-------------------------------------------------------------------------------
+- ReceiveDocuments päring tagastab nüüd veateate, kui dokumente soovitakse
+  alla laadida kaustast, mida ei eksisteeri.
+- Kui asutus asutuste andmetabelis mitteaktiivseks märkida (dhl_saatmine = 0),
+  siis tagastab DVK server selle asutuse poolt käivitatud päringute vastusena
+  veateate.
+- Andmetabelisse VASTUVOTJA märgitakse nüüd saatmise alguse ajana kuupäev ja
+  kellaaeg, millal dokument DVK serverisse laekus.
+- Muudetud õiguste süsteemi nii, et getSendStatus päringut saaks käivitada ka
+  dokumendi adressaat.
+- Parandatud DVK XML skeemi dhl.xsd, et konteineri valideerimine toimiks
+  korrektselt ka juhul, kui saatja või adressaadi isikukood on tühi (st
+  isikukoodi element on XML-andmetes olemas, aga ei sisalda ühtegi tähemärki).
+- getSendingOptions.v3 päring tagastab allüksuste ja ametikohtade andmetes
+  nüüd korrektselt asutuse koodi ka juhul, kui päring käivitatakse ilma
+  asutuste nimekirja ette andmata.
+- Parandatud vigased täpitähed serveri poolt tagastatavates teadetes ja
+  lähtekoodi kommentaarides.
+- Täiendatud getOccupationList ja getSubdivisionList päringute poolt
+  tagastatavaid teateid.

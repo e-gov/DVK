@@ -23,7 +23,6 @@ public class ClientNegativeCasesIntegration {
     private static Logger logger = Logger.getLogger(ClientRequestsIntegration.class);
     private static final int SEND_RECEIVE_MODE = 3;
 
-    @Ignore
     @Test
     public void serverIsMissingTest() {
         List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForNegativeCases();

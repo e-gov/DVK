@@ -611,7 +611,7 @@ public class ClientRequestsIntegration {
                             containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getBuildingPartNumber());
         Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getPostalAddress().getPostalCode(),
                             containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getPostalCode());
-        }
+    }
 
     private void doDataAsserts(String sentXMLData, String receivedXMLData, ContainerVer1 containerForSentMessage,
                                ContainerVer1 containerForReceivedMessage) {

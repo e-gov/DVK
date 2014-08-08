@@ -14,7 +14,6 @@ import dvk.core.Settings;
 import ee.ria.dvk.client.testutil.IntegrationTestsConfigUtil;
 import junit.framework.Assert;
 import org.apache.log4j.Logger;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.sql.Connection;
@@ -82,7 +81,7 @@ public class OrgCapabilityCheckerRequestsIntegration {
             Assert.assertNotNull(resultOfGetSendingOptions);
             Assert.assertEquals(4, resultOfGetSendingOptions.allyksused.size());
             Assert.assertEquals(5, resultOfGetSendingOptions.asutused.size());
-            Assert.assertEquals(6, resultOfGetSendingOptions.ametikohad.size());
+            Assert.assertEquals(7, resultOfGetSendingOptions.ametikohad.size());
 
             // Get org codes from getSendingOptions response (for getOccupationList)
             for (int i = 0; i < resultOfGetSendingOptions.asutused.size(); ++i) {
@@ -102,7 +101,7 @@ public class OrgCapabilityCheckerRequestsIntegration {
 
             // Assert getOccupationList response
             Assert.assertNotNull(resultOfGetOccupationList);
-            Assert.assertEquals(6, resultOfGetOccupationList.size());
+            Assert.assertEquals(7, resultOfGetOccupationList.size());
 
             // Execute getSubdivisionList request with all necessary parameters
             try {

@@ -82,7 +82,7 @@ public class CoreServices implements Dhl {
             	configFileName = httpServlet.getServletContext().getRealPath(configFileName);
             }
             if (!(new File(configFileName)).exists()) {
-            	throw new FileNotFoundException("DVK configuration error. Specified configuration file dows not exist!");
+            	throw new FileNotFoundException("DVK configuration error. Specified configuration file does not exist!");
             }
             
             // Load configuration

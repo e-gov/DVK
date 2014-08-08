@@ -1,274 +1,173 @@
 package integration;
 
 import dvk.api.container.v1.ContainerVer1;
+import dvk.api.container.v1.DataFile;
+import dvk.api.container.v1.Saaja;
+import dvk.api.container.v1.Saatja;
 import dvk.api.container.v2_1.ContainerVer2_1;
-import dvk.client.businesslayer.DhlMessage;
+import dvk.api.container.v2_1.DecRecipient;
+import dvk.api.container.v2_1.DecSender;
+import dvk.api.container.v2_1.File;
 import dvk.client.conf.OrgSettings;
-import dvk.client.db.UnitCredential;
 import dvk.client.dhl.service.DatabaseSessionService;
-import dvk.core.CommonStructures;
 import dvk.core.Settings;
 import ee.ria.dvk.client.testutil.ClientTestUtil;
 import ee.ria.dvk.client.testutil.DBTestUtil;
-import ee.ria.dvk.client.testutil.FileUtil;
+import ee.ria.dvk.client.testutil.DhlMessageData;
+import ee.ria.dvk.client.testutil.DhlSetting;
 import ee.ria.dvk.client.testutil.IntegrationTestsConfigUtil;
-import junit.framework.Assert;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
+import org.apache.commons.codec.binary.Base64InputStream;
+import org.apache.commons.codec.binary.Base64OutputStream;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import java.sql.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
-//TODO: remove unnecessary comments
-// fix the searching part of inserted messages
-// remove try and catch blocks where possible
+// TODO: remove try and catch blocks where possible
+@RunWith(JUnitParamsRunner.class)
 public class ClientRequestsIntegration {
     private static Logger logger = Logger.getLogger(ClientRequestsIntegration.class);
-    private static final double CONTAINER_VERSION_1_0 = 1.0;
-    private static final double CONTAINER_VERSION_2_1 = 2.1;
     private static final int SEND_RECEIVE_MODE = 3;
+    private static final int SEND_MODE = 1;
+    private static final int RECEIVE_MODE = 2;
 
     @Test
-    public void sendAndReceiveAndGetSendStatusRequestsAndMarkDocumentsReceivedContainer2_1Test() throws Exception {
+    @Parameters({"container_2_1_icefire_1.xml"})
+    public void sendAndReceiveAndGetSendStatusRequestsAndMarkDocumentsReceivedContainer2_1Test(String xmlContainer) throws Exception {
         List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCases();
-
         for (String path : configFilePaths) {
-            int messageId = insertNewMessage(path, CONTAINER_VERSION_2_1);
+            DhlSetting oldSettings = DBTestUtil.fetchDhlSettings(path);
+            DhlSetting newSettings = new DhlSetting(DhlSetting.CONTAINER_VERSION_2_1);
+            int sentMessageId = 0;
+            int receivedMessageId = 0;
+            try {
+                DBTestUtil.updateDhlSettings(path, newSettings);
+                sentMessageId = DBTestUtil.insertNewMessageToDB(path, xmlContainer);
+                ClientTestUtil.executeTheClient(path, SEND_RECEIVE_MODE);
+                DhlMessageData sentDhlMessageData = DBTestUtil.getMessageById(path, sentMessageId);
+                Assert.assertNotNull("Can't get the sent document", sentDhlMessageData);
+                String sentXMLData = sentDhlMessageData.getXmlData();
+                DhlMessageData receivedDhlMessageData = DBTestUtil.getMessageByDhlId(path, sentDhlMessageData.getDhlId(), true);
+                Assert.assertNotNull("Can't get the received document", receivedDhlMessageData);
+                receivedMessageId = receivedDhlMessageData.getId();
+                String receivedXMLData = receivedDhlMessageData.getXmlData();
+                ContainerVer2_1 containerForSentMessage = createTheContainerVer2_1(sentXMLData);
+                ContainerVer2_1 containerForReceivedMessage = createTheContainerVer2_1(receivedXMLData);
+                doDataAsserts(sentXMLData, receivedXMLData, containerForSentMessage, containerForReceivedMessage);
 
-            ClientTestUtil.executeTheClient(path, SEND_RECEIVE_MODE);
+                int statusOfSentMessage = getMessagesStatus(sentMessageId, path);
+                int statusOfReceivedMessage = getMessagesStatus(receivedDhlMessageData.getId(), path);
+                doStatusAsserts(statusOfSentMessage, statusOfReceivedMessage);
 
-            String sentXMLData = getSentXML(path, messageId);
-            DhlResultRow receivedRow = getReceivedInformation(path);
-            String receivedXMLData = receivedRow.getXmlData();
-
-            ContainerVer2_1 containerForSentMessage = createTheContainerVer2_1(sentXMLData);
-            ContainerVer2_1 containerForReceivedMessage = createTheContainerVer2_1(receivedXMLData);
-
-            doDataAsserts(sentXMLData, receivedXMLData, containerForSentMessage, containerForReceivedMessage);
-
-            int statusOfSentMessage = getMessagesStatus(messageId, path);
-            int statusOfReceivedMessage = getMessagesStatus(receivedRow.getId(), path);
-            doStatusAsserts(statusOfSentMessage, statusOfReceivedMessage);
+            } finally {
+                DBTestUtil.restoreDhlSettings(path, oldSettings);
+                DBTestUtil.clearDataBaseAfterTest(path, Arrays.asList(sentMessageId, receivedMessageId));
+            }
         }
     }
 
     @Test
-    //This test must be fixed
-    public void sendAndReceiveAndGetSendStatusRequestsAndMarkDocumentsReceivedVersion1_0Test() throws Exception {
-
+    @Parameters({"container_1_0_icefire_test1.xml"})
+    public void sendAndReceiveAndGetSendStatusRequestsAndMarkDocumentsReceivedVersion1_0Test(String xmlContainer) throws Exception {
         List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCasesContainerVer1();
-
         for (String path : configFilePaths) {
+            DhlSetting oldSettings = DBTestUtil.fetchDhlSettings(path);
+            DhlSetting newSettings = new DhlSetting(DhlSetting.CONTAINER_VERSION_1_0);
+            int sentMessageId = 0;
+            int receivedMessageId = 0;
             try {
-                // Before the test, update an information in DHL_SETTING table (using another organization for this test)
-                updateAnInformationInDhlSettings(path);
-
-                int messageId = insertNewMessage(path, CONTAINER_VERSION_1_0);
-
+                DBTestUtil.updateDhlSettings(path, newSettings);
+                sentMessageId = DBTestUtil.insertNewMessageToDB(path, xmlContainer);
                 ClientTestUtil.executeTheClient(path, SEND_RECEIVE_MODE);
-
-                String sentXMLData = getSentXML(path, messageId);
-                DhlResultRow receivedRow = getReceivedInformation(path);
-                String receivedXMLData = receivedRow.getXmlData();
-
+                DhlMessageData sentDhlMessageData = DBTestUtil.getMessageById(path, sentMessageId);
+                Assert.assertNotNull("Can't get the sent document", sentDhlMessageData);
+                String sentXMLData = sentDhlMessageData.getXmlData();
+                DhlMessageData receivedDhlMessageData = DBTestUtil.getMessageByDhlId(path, sentDhlMessageData.getDhlId(), true);
+                Assert.assertNotNull("Can't get the received document", receivedDhlMessageData);
+                receivedMessageId = receivedDhlMessageData.getId();
+                String receivedXMLData = receivedDhlMessageData.getXmlData();
                 ContainerVer1 containerForSentMessage = createTheContainerVer1(sentXMLData);
                 ContainerVer1 containerForReceivedMessage = createTheContainerVer1(receivedXMLData);
-
                 doDataAsserts(sentXMLData, receivedXMLData, containerForSentMessage, containerForReceivedMessage);
-                int statusOfSentMessage = getMessagesStatus(messageId, path);
-                int statusOfReceivedMessage = getMessagesStatus(receivedRow.getId(), path);
+
+                int statusOfSentMessage = getMessagesStatus(sentMessageId, path);
+                int statusOfReceivedMessage = getMessagesStatus(receivedDhlMessageData.getId(), path);
                 doStatusAsserts(statusOfSentMessage, statusOfReceivedMessage);
+
             } finally {
-                // After the test was completed, restore an information in DHL_SETTINGS table (back to the default org.)
-                try {
-                    restoreAnInformationInDhlSettings(path);
-                } catch (Exception ex) {
-                    logger.error("Can't update an information in DHL_SETTINGS table");
-                    Assert.fail();
-                }
+                DBTestUtil.restoreDhlSettings(path, oldSettings);
+                DBTestUtil.clearDataBaseAfterTest(path, Arrays.asList(sentMessageId, receivedMessageId));
             }
         }
     }
 
-    private int insertNewMessageToDB(String configFile, double containerVersion) throws Exception {
-        String sql = "";
-        int messageId = 0;
-        String sqlFile = "";
-
-        if (containerVersion == CONTAINER_VERSION_2_1) {
-            sqlFile = ClientRequestsIntegration.class.getResource("../insert_message").getPath();
-        } else if (containerVersion == CONTAINER_VERSION_1_0) {
-            sqlFile = ClientRequestsIntegration.class.getResource("../insert_message_container_v1_0").getPath();
-        } else {
-            throw new Exception("Can't recognize the containers version");
-        }
-
-        IntegrationTestsConfigUtil.setUpFromTheConfigurationFile(configFile);
-        Connection dbConnection = DatabaseSessionService.getInstance().getConnection();
-        OrgSettings orgSettings = DatabaseSessionService.getInstance().getOrgSettings();
-
-        try {
-            if ((orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_MSSQL))
-                    || (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_MSSQL_2005))
-                    || (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_SQLANYWHERE))) {
-                String sqlFileMSSQL = "";
-                if (containerVersion == CONTAINER_VERSION_2_1) {
-                    sqlFileMSSQL = ClientRequestsIntegration.class.getResource("../insert_messageForMSSQL").getPath();
-                } else if (containerVersion == CONTAINER_VERSION_1_0) {
-                    sqlFileMSSQL = ClientRequestsIntegration.class.getResource("../insert_message_other_asutus_ForMSSQL").getPath();
-                }
-                sql = FileUtil.readSQLToString(sqlFileMSSQL);
-            } else if (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                sql = FileUtil.readSQLToString(sqlFile);
-            } else if (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_10G)
-                    || orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_11G)) {
-                messageId = insertNewMessageToDBForOracle(dbConnection, orgSettings, containerVersion);
-                return messageId;
-            } else {
-                throw new Exception("Can't recognize the database");
-            }
-        } catch (Exception ex) {
-            logger.error("Can't read SQL file or insert a message to Oracle", ex);
-            throw ex;
-        }
-
-        messageId = DBTestUtil.executeSQLToInsertTheMessage(sql, dbConnection, orgSettings);
-        return messageId;
-    }
-
-    private int insertNewMessageToDBForOracle(Connection dbConnection,
-                                              OrgSettings orgSettings, double containerVersion) throws Exception {
-        int messageId = 0;
-        // Get data from xml file for new message
-        String xmlFileForMessage = "";
-        if (containerVersion == CONTAINER_VERSION_2_1) {
-            xmlFileForMessage = ClientRequestsIntegration.class.getResource("../xmlDataForNewMessage.xml").getPath();
-        } else if (containerVersion == CONTAINER_VERSION_1_0) {
-            xmlFileForMessage = ClientRequestsIntegration.class.getResource("../xmlDataForNewMessage_other_asutus.xml").getPath();
-        }
-        UnitCredential[] credentials = UnitCredential.getCredentials(orgSettings, dbConnection);
-
-        DhlMessage newMessage = new DhlMessage();
-        newMessage.loadFromXML(xmlFileForMessage, credentials[0]);
-        newMessage.setFilePath(xmlFileForMessage);
-        messageId = newMessage.addToDB(orgSettings, dbConnection);
-
-        DBTestUtil.closeTheConnectionAndDoClearTheSession(dbConnection);
-
-        return messageId;
-    }
-
-    private DhlResultRow getTheLastReceivedDocumentXMLDataFromDB(String configFile) throws Exception {
-        String data = "";
+    @Test
+    @Parameters({"container_2_1_icefire_test1.xml"})
+    public void sendContainer_2_1_AndReceive_1_0_Test(String xmlContainer) throws Exception {
+        String configFilePath = IntegrationTestsConfigUtil.getConfigFileAbsolutePathForConversionCase().get(0);
+        DhlSetting oldSettings = DBTestUtil.fetchDhlSettings(configFilePath);
+        DhlSetting newSettings = new DhlSetting(DhlSetting.CONTAINER_VERSION_1_0);
+        int sentMessageId = 0;
         int receivedMessageId = 0;
-        // Before, connect to database to get the last received message
-        IntegrationTestsConfigUtil.setUpFromTheConfigurationFile(configFile);
+        try {
+            DBTestUtil.updateDhlSettings(configFilePath, newSettings);
+            sentMessageId = DBTestUtil.insertNewMessageToDB(configFilePath, xmlContainer);
+            ClientTestUtil.executeTheClient(configFilePath, SEND_MODE);
+            ClientTestUtil.executeTheClient(configFilePath, RECEIVE_MODE);
+            DhlMessageData sentDhlMessageData = DBTestUtil.getMessageById(configFilePath, sentMessageId);
+            Assert.assertNotNull("Can't get the sent document", sentDhlMessageData);
+            String sentXMLData = sentDhlMessageData.getXmlData();
+            DhlMessageData receivedDhlMessageData = DBTestUtil.getMessageByDhlId(configFilePath, sentDhlMessageData.getDhlId(), true);
+            Assert.assertNotNull("Can't get the received document", receivedDhlMessageData);
+            receivedMessageId = receivedDhlMessageData.getId();
+            String receivedXMLData = receivedDhlMessageData.getXmlData();
 
-        Connection dbConnection = DatabaseSessionService.getInstance().getConnection();
-        OrgSettings orgSettings = DatabaseSessionService.getInstance().getOrgSettings();
+            Assert.assertTrue(sentXMLData != null && sentXMLData.length() > 0);
+            Assert.assertTrue(receivedXMLData != null && receivedXMLData.length() > 0);
 
-        Clob dataClob = null;
-        PreparedStatement preparedStatement = null;
+            ContainerVer2_1 containerForSentMessage = createTheContainerVer2_1(sentXMLData);
+            ContainerVer1 containerForReceivedMessage = createTheContainerVer1(receivedXMLData);
 
-        // Different syntax for different databases
-        if (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_10G)
-                || orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_11G)) {
-            preparedStatement = dbConnection.prepareStatement("SELECT * FROM dhl_message" +
-                    " WHERE rownum = 1 ORDER BY dhl_message_id DESC");
-        } else if (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-            preparedStatement = dbConnection.prepareStatement("SELECT * FROM dvk.dhl_message ORDER BY " +
-                    "dhl_message_id DESC LIMIT 1");
-        } else if (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_MSSQL)
-                || (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_MSSQL_2005))
-                || (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_SQLANYWHERE))) {
-            preparedStatement = dbConnection.prepareStatement("SELECT TOP 1 * FROM dhl_message " +
-                    "ORDER BY dhl_message_id DESC");
-        } else {
-            throw new Exception("Can't recognize the database");
+            doDataAsserts(containerForSentMessage, containerForReceivedMessage);
+            logger.debug("sendContainer_2_1_AndReceive_1_0_Test passed");
+
+        } finally {
+            DBTestUtil.restoreDhlSettings(configFilePath, oldSettings);
+            DBTestUtil.clearDataBaseAfterTest(configFilePath, Arrays.asList(sentMessageId, receivedMessageId));
         }
-
-        ResultSet resultSet = preparedStatement.executeQuery();
-
-        if (resultSet.next()) {
-            if (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_10G)
-                    || orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_11G)) {
-                dataClob = resultSet.getClob("data");
-                data = FileUtil.parseClobData(dataClob);
-            } else {
-                data = resultSet.getString("data");
-            }
-            receivedMessageId = resultSet.getInt("dhl_message_id");
-        }
-
-        DhlResultRow dhlResultRow = new DhlResultRow(receivedMessageId, data);
-
-        DBTestUtil.closeTheConnectionAndDoClearTheSession(dbConnection);
-
-        return dhlResultRow;
-    }
-
-    private DhlResultRow getSentMessageXMLData(int messageId, String configFile) throws Exception {
-        // Before, connect to database to get the sended message
-        IntegrationTestsConfigUtil.setUpFromTheConfigurationFile(configFile);
-
-        String data = "";
-        Clob dataClob = null;
-
-        Connection dbConnection = DatabaseSessionService.getInstance().getConnection();
-        OrgSettings orgSettings = DatabaseSessionService.getInstance().getOrgSettings();
-
-        PreparedStatement preparedStatement = null;
-
-        if (!orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-            preparedStatement = dbConnection.prepareStatement("SELECT * FROM dhl_message " +
-                    "WHERE dhl_message_id = ?");
-        } else {
-            preparedStatement = dbConnection.prepareStatement("SELECT * FROM dvk.dhl_message " +
-                    "WHERE dhl_message_id = ?");
-        }
-
-        preparedStatement.setInt(1, messageId);
-        ResultSet resultSet = preparedStatement.executeQuery();
-        if (resultSet.next()) {
-
-            if (orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_10G)
-                    || orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_ORACLE_11G)) {
-                dataClob = resultSet.getClob("data");
-                data = FileUtil.parseClobData(dataClob);
-            } else {
-                data = resultSet.getString("data");
-            }
-        }
-
-        DhlResultRow dhlResultRow = new DhlResultRow();
-        dhlResultRow.setXmlData(data);
-
-        return dhlResultRow;
     }
 
     private int getMessagesStatus(int messageId, String configFile) throws Exception {
         int status = -1;
-        // Before, connect to database to get status of the message
         IntegrationTestsConfigUtil.setUpFromTheConfigurationFile(configFile);
         Connection dbConnection = DatabaseSessionService.getInstance().getConnection();
         OrgSettings orgSettings = DatabaseSessionService.getInstance().getOrgSettings();
 
         PreparedStatement preparedStatement = null;
-
-        if (!orgSettings.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-            preparedStatement = dbConnection.prepareStatement("SELECT * FROM dhl_message " +
-                    "WHERE dhl_message_id = ?");
-        } else {
-            preparedStatement = dbConnection.prepareStatement("SELECT * FROM dvk.dhl_message " +
-                    "WHERE dhl_message_id = ?");
+        try {
+            preparedStatement = dbConnection.prepareStatement("SELECT * FROM dhl_message WHERE dhl_message_id = ?");
+            preparedStatement.setInt(1, messageId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                status = resultSet.getInt("sending_status_id");
+            }
+        } finally {
+            DBTestUtil.closeTheConnectionAndDoClearTheSession(dbConnection);
         }
-
-        preparedStatement.setInt(1, messageId);
-        ResultSet resultSet = preparedStatement.executeQuery();
-        if (resultSet.next()) {
-            status = resultSet.getInt("sending_status_id");
-        }
-
         return status;
     }
 
@@ -378,9 +277,9 @@ public class ClientRequestsIntegration {
                             containerForReceivedMessage.getRecipient().get(0).getMessageForRecipient());
 
         Assert.assertEquals(containerForSentMessage.getRecipient().get(0).getOrganisation().getName(),
-                            containerForReceivedMessage.getRecipient().get(0).getOrganisation().getName());
+                containerForReceivedMessage.getRecipient().get(0).getOrganisation().getName());
         Assert.assertEquals(containerForSentMessage.getRecipient().get(0).getOrganisation().getOrganisationCode(),
-                            containerForSentMessage.getRecipient().get(0).getOrganisation().getOrganisationCode());
+                containerForSentMessage.getRecipient().get(0).getOrganisation().getOrganisationCode());
         Assert.assertEquals(containerForSentMessage.getRecipient().get(0).getOrganisation().getResidency(),
                 containerForSentMessage.getRecipient().get(0).getOrganisation().getResidency());
         Assert.assertEquals(containerForSentMessage.getRecipient().get(0).getOrganisation().getStructuralUnit(),
@@ -423,21 +322,21 @@ public class ClientRequestsIntegration {
         Assert.assertNotNull(containerForSentMessage.getRecordMetadata());
         Assert.assertNotNull(containerForReceivedMessage.getRecordMetadata());
         Assert.assertEquals(containerForSentMessage.getRecordMetadata().getRecordGuid(),
-                            containerForReceivedMessage.getRecordMetadata().getRecordGuid());
+                containerForReceivedMessage.getRecordMetadata().getRecordGuid());
         Assert.assertEquals(containerForSentMessage.getRecordMetadata().getRecordType(),
-                            containerForReceivedMessage.getRecordMetadata().getRecordType());
+                containerForReceivedMessage.getRecordMetadata().getRecordType());
         Assert.assertEquals(containerForSentMessage.getRecordMetadata().getRecordOriginalIdentifier(),
-                            containerForReceivedMessage.getRecordMetadata().getRecordOriginalIdentifier());
+                containerForReceivedMessage.getRecordMetadata().getRecordOriginalIdentifier());
         Assert.assertEquals(containerForSentMessage.getRecordMetadata().getRecordDateRegistered(),
-                            containerForReceivedMessage.getRecordMetadata().getRecordDateRegistered());
+                containerForReceivedMessage.getRecordMetadata().getRecordDateRegistered());
         Assert.assertEquals(containerForSentMessage.getRecordMetadata().getRecordTitle(),
-                            containerForReceivedMessage.getRecordMetadata().getRecordTitle());
+                containerForReceivedMessage.getRecordMetadata().getRecordTitle());
         Assert.assertEquals(containerForSentMessage.getRecordMetadata().getRecordLanguage(),
                             containerForReceivedMessage.getRecordMetadata().getRecordLanguage());
         Assert.assertEquals(containerForSentMessage.getRecordMetadata().getRecordAbstract(),
                             containerForReceivedMessage.getRecordMetadata().getRecordAbstract());
         Assert.assertEquals(containerForSentMessage.getRecordMetadata().getReplyDueDate(),
-                            containerForReceivedMessage.getRecordMetadata().getReplyDueDate());
+                containerForReceivedMessage.getRecordMetadata().getReplyDueDate());
 
         // Access block
         Assert.assertNotNull(containerForReceivedMessage.getAccess());
@@ -460,7 +359,7 @@ public class ClientRequestsIntegration {
         Assert.assertEquals(containerForSentMessage.getAccess().getAccessRestriction().get(0).getInformationOwner(),
                 containerForReceivedMessage.getAccess().getAccessRestriction().get(0).getInformationOwner());
         Assert.assertEquals(containerForSentMessage.getAccess().getAccessRestriction().get(0).getRestrictionBasis(),
-                            containerForReceivedMessage.getAccess().getAccessRestriction().get(0).getRestrictionBasis());
+                containerForReceivedMessage.getAccess().getAccessRestriction().get(0).getRestrictionBasis());
 
         // DecMetaData block
         Assert.assertNotNull(containerForSentMessage.getDecMetadata());
@@ -482,15 +381,15 @@ public class ClientRequestsIntegration {
         Assert.assertNotNull(containerForSentMessage.getFile().get(0));
         Assert.assertNotNull(containerForReceivedMessage.getFile().get(0));
         Assert.assertEquals(containerForSentMessage.getFile().get(0).getFileName(),
-                            containerForReceivedMessage.getFile().get(0).getFileName());
+                containerForReceivedMessage.getFile().get(0).getFileName());
         Assert.assertEquals(containerForSentMessage.getFile().get(0).getFileSize(),
-                            containerForReceivedMessage.getFile().get(0).getFileSize());
+                containerForReceivedMessage.getFile().get(0).getFileSize());
         Assert.assertEquals(containerForSentMessage.getFile().get(0).getZipBase64Content(),
-                            containerForReceivedMessage.getFile().get(0).getZipBase64Content());
+                containerForReceivedMessage.getFile().get(0).getZipBase64Content());
         Assert.assertEquals(containerForSentMessage.getFile().get(0).getFileGuid(),
-                            containerForReceivedMessage.getFile().get(0).getFileGuid());
+                containerForReceivedMessage.getFile().get(0).getFileGuid());
         Assert.assertEquals(containerForSentMessage.getFile().get(0).getMimeType(),
-                            containerForReceivedMessage.getFile().get(0).getMimeType());
+                containerForReceivedMessage.getFile().get(0).getMimeType());
 
         // RecordCreator block
         Assert.assertNotNull(containerForSentMessage.getRecordCreator());
@@ -510,47 +409,47 @@ public class ClientRequestsIntegration {
         Assert.assertNotNull(containerForSentMessage.getRecordCreator().getPerson());
         Assert.assertNotNull(containerForReceivedMessage.getRecordCreator().getPerson());
         Assert.assertEquals(containerForSentMessage.getRecordCreator().getPerson().getName(),
-                            containerForReceivedMessage.getRecordCreator().getPerson().getName());
+                containerForReceivedMessage.getRecordCreator().getPerson().getName());
         Assert.assertEquals(containerForSentMessage.getRecordCreator().getPerson().getGivenName(),
-                            containerForReceivedMessage.getRecordCreator().getPerson().getGivenName());
+                containerForReceivedMessage.getRecordCreator().getPerson().getGivenName());
         Assert.assertEquals(containerForSentMessage.getRecordCreator().getPerson().getSurname(),
-                            containerForReceivedMessage.getRecordCreator().getPerson().getSurname());
+                containerForReceivedMessage.getRecordCreator().getPerson().getSurname());
         Assert.assertEquals(containerForSentMessage.getRecordCreator().getPerson().getPersonalIdCode(),
-                            containerForReceivedMessage.getRecordCreator().getPerson().getPersonalIdCode());
+                containerForReceivedMessage.getRecordCreator().getPerson().getPersonalIdCode());
         Assert.assertEquals(containerForSentMessage.getRecordCreator().getPerson().getResidency(),
-                            containerForReceivedMessage.getRecordCreator().getPerson().getResidency());
+                containerForReceivedMessage.getRecordCreator().getPerson().getResidency());
         Assert.assertNotNull(containerForSentMessage.getRecordCreator().getContactData());
         Assert.assertNotNull(containerForReceivedMessage.getRecordCreator().getContactData());
         Assert.assertEquals(containerForSentMessage.getRecordCreator().getContactData().getAdit(),
-                            containerForReceivedMessage.getRecordCreator().getContactData().getAdit());
+                containerForReceivedMessage.getRecordCreator().getContactData().getAdit());
         Assert.assertEquals(containerForSentMessage.getRecordCreator().getContactData().getPhone(),
-                            containerForReceivedMessage.getRecordCreator().getContactData().getPhone());
+                containerForReceivedMessage.getRecordCreator().getContactData().getPhone());
         Assert.assertEquals(containerForSentMessage.getRecordCreator().getContactData().getEmail(),
-                            containerForReceivedMessage.getRecordCreator().getContactData().getEmail());
+                containerForReceivedMessage.getRecordCreator().getContactData().getEmail());
         Assert.assertEquals(containerForSentMessage.getRecordCreator().getContactData().getWebPage(),
-                            containerForReceivedMessage.getRecordCreator().getContactData().getWebPage());
+                containerForReceivedMessage.getRecordCreator().getContactData().getWebPage());
         Assert.assertEquals(containerForSentMessage.getRecordCreator().getContactData().getMessagingAddress(),
-                            containerForReceivedMessage.getRecordCreator().getContactData().getMessagingAddress());
+                containerForReceivedMessage.getRecordCreator().getContactData().getMessagingAddress());
         Assert.assertNotNull(containerForSentMessage.getRecordCreator().getContactData().getPostalAddress());
         Assert.assertNotNull(containerForReceivedMessage.getRecordCreator().getContactData().getPostalAddress());
         Assert.assertEquals(containerForSentMessage.getRecordCreator().getContactData().getPostalAddress().getCountry(),
-                            containerForReceivedMessage.getRecordCreator().getContactData().getPostalAddress().getCountry());
+                containerForReceivedMessage.getRecordCreator().getContactData().getPostalAddress().getCountry());
         Assert.assertEquals(containerForSentMessage.getRecordCreator().getContactData().getPostalAddress().getCounty(),
-                            containerForReceivedMessage.getRecordCreator().getContactData().getPostalAddress().getCounty());
+                containerForReceivedMessage.getRecordCreator().getContactData().getPostalAddress().getCounty());
         Assert.assertEquals(containerForSentMessage.getRecordCreator().getContactData().getPostalAddress().getLocalGovernment(),
-                            containerForReceivedMessage.getRecordCreator().getContactData().getPostalAddress().getLocalGovernment());
+                containerForReceivedMessage.getRecordCreator().getContactData().getPostalAddress().getLocalGovernment());
         Assert.assertEquals(containerForSentMessage.getRecordCreator().getContactData().getPostalAddress().getAdministrativeUnit(),
                             containerForReceivedMessage.getRecordCreator().getContactData().getPostalAddress().getAdministrativeUnit());
         Assert.assertEquals(containerForSentMessage.getRecordCreator().getContactData().getPostalAddress().getLandUnit(),
                 containerForReceivedMessage.getRecordCreator().getContactData().getPostalAddress().getLandUnit());
         Assert.assertEquals(containerForSentMessage.getRecordCreator().getContactData().getPostalAddress().getSmallPlace(),
-                            containerForReceivedMessage.getRecordCreator().getContactData().getPostalAddress().getSmallPlace());
+                containerForReceivedMessage.getRecordCreator().getContactData().getPostalAddress().getSmallPlace());
         Assert.assertEquals(containerForSentMessage.getRecordCreator().getContactData().getPostalAddress().getHouseNumber(),
-                            containerForReceivedMessage.getRecordCreator().getContactData().getPostalAddress().getHouseNumber());
+                containerForReceivedMessage.getRecordCreator().getContactData().getPostalAddress().getHouseNumber());
         Assert.assertEquals(containerForSentMessage.getRecordCreator().getContactData().getPostalAddress().getBuildingPartNumber(),
-                            containerForReceivedMessage.getRecordCreator().getContactData().getPostalAddress().getBuildingPartNumber());
+                containerForReceivedMessage.getRecordCreator().getContactData().getPostalAddress().getBuildingPartNumber());
         Assert.assertEquals(containerForSentMessage.getRecordCreator().getContactData().getPostalAddress().getPostalCode(),
-                            containerForReceivedMessage.getRecordCreator().getContactData().getPostalAddress().getPostalCode());
+                containerForReceivedMessage.getRecordCreator().getContactData().getPostalAddress().getPostalCode());
 
         // RecordSenderToDeck block
         Assert.assertNotNull(containerForSentMessage.getRecordSenderToDec());
@@ -570,47 +469,47 @@ public class ClientRequestsIntegration {
         Assert.assertNotNull(containerForSentMessage.getRecordSenderToDec().getPerson());
         Assert.assertNotNull(containerForReceivedMessage.getRecordSenderToDec().getPerson());
         Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getPerson().getName(),
-                            containerForReceivedMessage.getRecordSenderToDec().getPerson().getName());
+                containerForReceivedMessage.getRecordSenderToDec().getPerson().getName());
         Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getPerson().getGivenName(),
-                            containerForReceivedMessage.getRecordSenderToDec().getPerson().getGivenName());
+                containerForReceivedMessage.getRecordSenderToDec().getPerson().getGivenName());
         Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getPerson().getSurname(),
-                            containerForReceivedMessage.getRecordSenderToDec().getPerson().getSurname());
+                containerForReceivedMessage.getRecordSenderToDec().getPerson().getSurname());
         Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getPerson().getPersonalIdCode(),
-                            containerForReceivedMessage.getRecordSenderToDec().getPerson().getPersonalIdCode());
+                containerForReceivedMessage.getRecordSenderToDec().getPerson().getPersonalIdCode());
         Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getPerson().getResidency(),
-                            containerForReceivedMessage.getRecordSenderToDec().getPerson().getResidency());
+                containerForReceivedMessage.getRecordSenderToDec().getPerson().getResidency());
         Assert.assertNotNull(containerForSentMessage.getRecordSenderToDec().getContactData());
         Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getAdit(),
-                            containerForReceivedMessage.getRecordSenderToDec().getContactData().getAdit());
+                containerForReceivedMessage.getRecordSenderToDec().getContactData().getAdit());
         Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getPhone(),
-                            containerForReceivedMessage.getRecordSenderToDec().getContactData().getPhone());
+                containerForReceivedMessage.getRecordSenderToDec().getContactData().getPhone());
         Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getEmail(),
-                            containerForReceivedMessage.getRecordSenderToDec().getContactData().getEmail());
+                containerForReceivedMessage.getRecordSenderToDec().getContactData().getEmail());
         Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getWebPage(),
-                            containerForReceivedMessage.getRecordSenderToDec().getContactData().getWebPage());
+                containerForReceivedMessage.getRecordSenderToDec().getContactData().getWebPage());
         Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getMessagingAddress(),
-                            containerForReceivedMessage.getRecordSenderToDec().getContactData().getMessagingAddress());
+                containerForReceivedMessage.getRecordSenderToDec().getContactData().getMessagingAddress());
         Assert.assertNotNull(containerForSentMessage.getRecordSenderToDec().getContactData().getPostalAddress());
         Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getPostalAddress().getCountry(),
-                            containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getCountry());
+                containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getCountry());
         Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getPostalAddress().getCounty(),
-                            containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getCounty());
+                containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getCounty());
         Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getPostalAddress().getLocalGovernment(),
                             containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getLocalGovernment());
         Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getPostalAddress().getLandUnit(),
                 containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getLandUnit());
         Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getPostalAddress().getAdministrativeUnit(),
-                            containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getAdministrativeUnit());
+                containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getAdministrativeUnit());
         Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getPostalAddress().getSmallPlace(),
-                            containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getSmallPlace());
+                containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getSmallPlace());
         Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getPostalAddress().getStreet(),
-                            containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getStreet());
+                containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getStreet());
         Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getPostalAddress().getHouseNumber(),
-                            containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getHouseNumber());
+                containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getHouseNumber());
         Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getPostalAddress().getBuildingPartNumber(),
-                            containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getBuildingPartNumber());
+                containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getBuildingPartNumber());
         Assert.assertEquals(containerForSentMessage.getRecordSenderToDec().getContactData().getPostalAddress().getPostalCode(),
-                            containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getPostalCode());
+                containerForReceivedMessage.getRecordSenderToDec().getContactData().getPostalAddress().getPostalCode());
     }
 
     private void doDataAsserts(String sentXMLData, String receivedXMLData, ContainerVer1 containerForSentMessage,
@@ -627,80 +526,84 @@ public class ClientRequestsIntegration {
         Assert.assertNotNull(containerForReceivedMessage.getMetainfo());
 
         Assert.assertEquals(containerForSentMessage.getSignedDoc().getDataFiles().get(0).getFileBase64Content(),
-                           containerForReceivedMessage.getSignedDoc().getDataFiles().get(0).getFileBase64Content());
+                containerForReceivedMessage.getSignedDoc().getDataFiles().get(0).getFileBase64Content());
+    }
+
+    private void doDataAsserts(ContainerVer2_1 containerForSentMessage,
+                               ContainerVer1 containerForReceivedMessage) throws Exception {
+        Assert.assertNotNull(containerForSentMessage);
+        Assert.assertNotNull(containerForReceivedMessage);
+
+        // Transport block
+        Assert.assertNotNull(containerForSentMessage.getTransport());
+        Assert.assertNotNull(containerForReceivedMessage.getTransport());
+
+        // DecSender blocks
+        DecSender decSender = containerForSentMessage.getTransport().getDecSender();
+        Assert.assertNotNull(decSender);
+        Saatja saatja = containerForReceivedMessage.getTransport().getSaatjad().get(0);
+        Assert.assertNotNull(saatja);
+        Assert.assertTrue(isTwoStringsIgnoreCaseEqual(decSender.getOrganisationCode(), saatja.getRegNr()));
+        Assert.assertTrue(isTwoStringsIgnoreCaseEqual(decSender.getPersonalIdCode(), saatja.getIsikukood()));
+        Assert.assertTrue(isTwoStringsIgnoreCaseEqual(decSender.getStructuralUnit(), saatja.getAllyksuseNimetus()));
+
+        // DecRecipient blocks
+        List<DecRecipient> decRecipientList = containerForSentMessage.getTransport().getDecRecipient();
+        Assert.assertTrue(decRecipientList != null && decRecipientList.size() != 0);
+        Assert.assertTrue(containerForReceivedMessage.getTransport().getSaajad() != null
+                && containerForReceivedMessage.getTransport().getSaajad().size() != 0);
+        Map<String, Saaja> saajad = new HashMap<String, Saaja>();
+        for (Saaja saaja : containerForReceivedMessage.getTransport().getSaajad()) {
+            saajad.put(saaja.getRegNr() + saaja.getIsikukood(), saaja);
+        }
+        for (DecRecipient decRecipient : decRecipientList) {
+            Assert.assertTrue(saajad.containsKey(decRecipient.getOrganisationCode() + decRecipient.getPersonalIdCode()));
+        }
+        logger.debug("Transport block data is identical.");
+
+        // RecordCreator block
+        if (containerForSentMessage.getRecordCreator() != null) {
+            Assert.assertNotNull(containerForReceivedMessage.getMetaxml());
+        }
+        if (containerForSentMessage.getRecordCreator().getOrganisation() != null
+                && containerForSentMessage.getRecordCreator().getOrganisation().getOrganisationCode() != null) {
+            Assert.assertNotNull(containerForReceivedMessage.getMetainfo());
+            Assert.assertTrue(isTwoStringsIgnoreCaseEqual(containerForSentMessage.getRecordCreator().getOrganisation().getOrganisationCode(),
+                    containerForReceivedMessage.getMetainfo().getKoostajaAsutuseNr()));
+        }
+        if (containerForSentMessage.getRecordCreator().getPerson() != null
+                && containerForSentMessage.getRecordCreator().getPerson().getPersonalIdCode() != null) {
+            Assert.assertNotNull(containerForReceivedMessage.getMetainfo());
+            Assert.assertTrue(isTwoStringsIgnoreCaseEqual(containerForSentMessage.getRecordCreator().getPerson().getPersonalIdCode(),
+                    containerForReceivedMessage.getMetainfo().getAutoriIsikukood()));
+        }
+        logger.debug("RecordCreator block data is identical.");
+
+        // Recipient block
+
+        // File block and content's asserts
+        List<File> fileList = containerForSentMessage.getFile();
+        Assert.assertTrue(fileList != null && fileList.size() != 0);
+        Assert.assertNotNull(containerForReceivedMessage.getSignedDoc());
+        Assert.assertTrue(containerForReceivedMessage.getSignedDoc().getDataFiles() != null
+                && containerForReceivedMessage.getSignedDoc().getDataFiles().size() != 0);
+        Map<String, DataFile> dataFiles = new HashMap<String, DataFile>();
+        for (DataFile dataFile : containerForReceivedMessage.getSignedDoc().getDataFiles()) {
+            dataFiles.put(dataFile.getFileName() + dataFile.getFileSize(), dataFile);
+        }
+        for (File file : fileList) {
+            Assert.assertTrue(dataFiles.containsKey(file.getFileName() + file.getFileSize()));
+            DataFile dataFile = dataFiles.get(file.getFileName() + file.getFileSize());
+            Assert.assertNotNull(dataFile);
+            Assert.assertTrue(isZipBase64ConvertedContentEqualToFileBase64Content(file.getZipBase64Content(), dataFile.getFileBase64Content()));
+        }
+        logger.debug("File block data is identical.");
+
     }
 
     private void doStatusAsserts(int statusOfSentMessage, int statusOfReceivedMessage) {
         Assert.assertEquals(Settings.Client_StatusSent, statusOfSentMessage);
         Assert.assertEquals(Settings.Client_StatusReceived, statusOfReceivedMessage);
-    }
-
-    private void updateAnInformationInDhlSettings(String configFile) throws Exception {
-        IntegrationTestsConfigUtil.setUpFromTheConfigurationFile(configFile);
-        Connection dbConnection = DatabaseSessionService.getInstance().getConnection();
-
-        PreparedStatement preparedStatement = dbConnection.prepareStatement("UPDATE dhl_settings SET institution_code = 'icefire-test1'," +
-                "institution_name = 'ICEFIRE TEST1' WHERE id = 1");
-        try {
-            preparedStatement.executeUpdate();
-        } catch (Exception ex) {
-            throw ex;
-        }
-    }
-
-    private void restoreAnInformationInDhlSettings(String configFile) throws Exception {
-        IntegrationTestsConfigUtil.setUpFromTheConfigurationFile(configFile);
-        Connection dbConnection = DatabaseSessionService.getInstance().getConnection();
-
-        PreparedStatement preparedStatement = dbConnection.prepareStatement("UPDATE dhl_settings SET institution_code = '10885324'," +
-                    "institution_name = 'Icefire OÜ' WHERE id = 1");
-        try {
-            preparedStatement.executeUpdate();
-        } catch (Exception ex) {
-            throw ex;
-        }
-    }
-
-    private int insertNewMessage(String configFile, double containerVersion) {
-        int messageId = 0;
-        try {
-            messageId = insertNewMessageToDB(configFile, containerVersion);
-        } catch (Exception ex) {
-            logger.error("Can't insert a new message", ex);
-            Assert.fail();
-        }
-
-        if (messageId == -1) {
-            logger.error("Can't insert a new message");
-            Assert.fail();
-        }
-
-        return messageId;
-    }
-
-    private String getSentXML(String configFile, int messageId) {
-        String sendedXML = "";
-        try {
-            DhlResultRow resultRow = getSentMessageXMLData(messageId, configFile);
-            sendedXML = resultRow.getXmlData();
-        } catch (Exception ex) {
-            logger.error("Can't get a sent document");
-            Assert.fail();
-        }
-
-        return sendedXML;
-    }
-
-    private DhlResultRow getReceivedInformation(String configFile) {
-        DhlResultRow resultRow = null;
-        try {
-            resultRow = getTheLastReceivedDocumentXMLDataFromDB(configFile);
-        } catch (Exception ex) {
-            logger.error("Can't get a received document");
-            Assert.fail();
-        }
-
-        return resultRow;
     }
 
     private ContainerVer2_1 createTheContainerVer2_1(String xml) {
@@ -727,32 +630,41 @@ public class ClientRequestsIntegration {
         return container;
     }
 
-    private class DhlResultRow {
-        private int id;
-        private String xmlData;
+    private boolean isZipBase64ConvertedContentEqualToFileBase64Content(String zipBase64Content, String fileBase64Content) throws Exception {
+        // Decode and unzip zipBase64Content
+        ByteArrayInputStream zipBase64ContentInputStream = new ByteArrayInputStream(
+                zipBase64Content.getBytes("UTF-8"));
+        Base64InputStream base64InputStream = new Base64InputStream(zipBase64ContentInputStream);
+        GZIPInputStream gzipInputStream = new GZIPInputStream(base64InputStream);
+        ByteArrayOutputStream unzippedByteOutputStream = new ByteArrayOutputStream();
+        IOUtils.copy(gzipInputStream, unzippedByteOutputStream);
+        base64InputStream.close();
+        gzipInputStream.close();
+        byte[] b = unzippedByteOutputStream.toByteArray();
+        unzippedByteOutputStream.close();
+        ByteArrayInputStream unzippedByteInputStream = new ByteArrayInputStream(b);
 
-        DhlResultRow(int id, String xmlData) {
-            this.id = id;
-            this.xmlData = xmlData;
-        }
+        // Encode unzipped content
+        ByteArrayOutputStream encodedByteOutputStream = new ByteArrayOutputStream();
+        Base64OutputStream base64OutputStream = new Base64OutputStream(encodedByteOutputStream, true, 76, "\n".getBytes());
 
-        DhlResultRow() {
-        }
+        IOUtils.copy(unzippedByteInputStream, base64OutputStream);
+        base64OutputStream.close();
+        String base64encodedString = encodedByteOutputStream.toString();
 
-        public int getId() {
-            return id;
+        // Compare two encoded contents
+        if (base64encodedString != null && fileBase64Content != null && base64encodedString.equalsIgnoreCase(fileBase64Content)) {
+            return true;
         }
+        return false;
+    }
 
-        public void setId(int id) {
-            this.id = id;
+    private boolean isTwoStringsIgnoreCaseEqual(String str1, String str2) {
+        if ((str1 == null || str1.isEmpty()) && (str2 == null || str2.isEmpty())) {
+            return true;
+        } else if (str1 != null) {
+            return str1.equalsIgnoreCase(str2);
         }
-
-        public String getXmlData() {
-            return xmlData;
-        }
-
-        public void setXmlData(String xmlData) {
-            this.xmlData = xmlData;
-        }
+        return false;
     }
 }

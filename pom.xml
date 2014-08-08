@@ -54,6 +54,7 @@
                 <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_hendrik.properties</listOfTestConfigs>
                 <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_serverIsMissing.properties</serverIsMissingConfigs>
                 <containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_hendrik_container_1_0.properties</containerVer1Configs>
+                <conversionTestConfig>./conf/integrationTests/dvk_client_postgreSQL_hendrik_container_1_0_conversion.properties</conversionTestConfig>
             </properties>
         </profile>
         <profile>
@@ -71,6 +72,26 @@
                 <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_Igor.properties</listOfTestConfigs>
                 <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_IgorAndLiza-serverIsMissing.properties</serverIsMissingConfigs>
                 <containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_Igor_capsuleVer1_0.properties</containerVer1Configs>
+                <conversionTestConfig>./conf/integrationTests/dvk_client_postgreSQL-V9_3_Igor_capsuleVer1_0_conversion.properties</conversionTestConfig>
+            </properties>
+        </profile>
+        <profile>
+            <id>trunk-liza</id>
+            <modules>
+                <module>core/development/trunk</module>
+                <module>client/development/trunk</module>
+                <module>server/development/trunk</module>
+                <module>api/development/trunk</module>
+            </modules>
+            <properties>
+                <dvkCoreDir>C:\Projects\RIA_DVK\core\development\trunk</dvkCoreDir>
+                <dvkClientDir>C:\Projects\RIA_DVK\client\development\trunk</dvkClientDir>
+                <dvkServerJettyEnvLocation>C:\Projects\RIA_DVK\server\development\trunk\src\test\resources\jetty-env.xml</dvkServerJettyEnvLocation>
+                <!--                <listOfTestConfigs>./conf/integrationTests/dvk_client_SQLAnywhere_V12_Liza.properties, ./conf/integrationTests/dvk_client_SQLAnywhere_V16_Liza.properties, ./conf/integrationTests/dvk_client_postgreSQL_8_4_Liza.properties, ./conf/integrationTests/dvk_client_postgreSQL_9_1_Liza.properties, ./conf/integrationTests/dvk_client_postgreSQL_9_3_Liza.properties, ./conf/integrationTests/dvk_client_Oracle_V10_Liza.properties, ./conf/integrationTests/dvk_client_MSSQL_V2008_Liza.properties</listOfTestConfigs>-->
+                <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_9_3_Liza.properties, ./conf/integrationTests/dvk_client_Oracle_V10_Liza.properties, ./conf/integrationTests/dvk_client_MSSQL_V2008_Liza.properties</listOfTestConfigs>
+                <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_IgorAndLiza-serverIsMissing.properties</serverIsMissingConfigs>
+                <containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_9_3_Liza-containerVer1.properties</containerVer1Configs>
+                <conversionTestConfig>./conf/integrationTests/dvk_client_postgreSQL_9_3_Liza-conversion.properties</conversionTestConfig>
             </properties>
         </profile>
         <profile>
@@ -88,6 +109,7 @@
                 <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI.properties</listOfTestConfigs>
                 <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_CI_serverIsMissing.properties</serverIsMissingConfigs>
                 <containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_CI_container_1_0.properties</containerVer1Configs>
+                <conversionTestConfig>./conf/integrationTests/dvk_client_postgreSQL_CI_conversion.properties</conversionTestConfig>
             </properties>
         </profile>
         <profile>
@@ -108,6 +130,7 @@
                 <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI.properties</listOfTestConfigs>
                 <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_CI_serverIsMissing.properties</serverIsMissingConfigs>
                 <containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_CI_container_1_0.properties</containerVer1Configs>
+                <conversionTestConfig>./conf/integrationTests/dvk_client_postgreSQL_CI_conversion.properties</conversionTestConfig>
             </properties>
         </profile>
         <profile>
@@ -128,6 +151,7 @@
                 <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI.properties</listOfTestConfigs>
                 <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_CI_serverIsMissing.properties</serverIsMissingConfigs>
                 <containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_CI_container_1_0.properties</containerVer1Configs>
+                <conversionTestConfig>./conf/integrationTests/dvk_client_postgreSQL_CI_conversion.properties</conversionTestConfig>
             </properties>
         </profile>
     </profiles>

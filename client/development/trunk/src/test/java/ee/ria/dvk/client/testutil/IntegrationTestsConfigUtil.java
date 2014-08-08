@@ -4,7 +4,6 @@ import dvk.client.conf.OrgSettings;
 import dvk.client.db.DBConnection;
 import dvk.client.dhl.service.DatabaseSessionService;
 import dvk.core.Settings;
-import junit.framework.Assert;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -22,6 +21,7 @@ import java.util.Properties;
 public class IntegrationTestsConfigUtil {
     private static Logger logger = Logger.getLogger(IntegrationTestsConfigUtil.class);
     private static final String TEST_CONFIGS_POSITIVE_CASES = "listOfTestConfigs";
+    private static final String TEST_CONFIG_CONVERSION_CASE = "conversionTestConfig";
     private static final String TEST_CONFIGS_SERVER_MISSING = "serverIsMissingConfigs";
     private static final String TEST_CONFIGS_POSITIVE_CASES_CONTAINER_VERSION_1_0 = "containerVer1Configs";
 
@@ -64,6 +64,10 @@ public class IntegrationTestsConfigUtil {
         return getAllConfigFilesAbsolutePaths(TEST_CONFIGS_POSITIVE_CASES);
     }
 
+    public static List<String> getConfigFileAbsolutePathForConversionCase() {
+        return getAllConfigFilesAbsolutePaths(TEST_CONFIG_CONVERSION_CASE);
+    }
+
     public static List<String> getAllConfigFilesAbsolutePathsForNegativeCases() {
         return getAllConfigFilesAbsolutePaths(TEST_CONFIGS_SERVER_MISSING);
     }
@@ -96,7 +100,7 @@ public class IntegrationTestsConfigUtil {
             DatabaseSessionService.getInstance().setSession(connection, allKnownDatabases.get(0));
         } catch (Exception ex) {
             logger.error("Can't connect to the database");
-            throw ex;
+            throw new RuntimeException(ex);
         }
     }
 }

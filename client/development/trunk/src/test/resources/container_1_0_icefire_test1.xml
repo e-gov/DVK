@@ -1,6 +1,21 @@
 <dhl:dokument xmlns:dhl="http://www.riik.ee/schemas/dhl" xmlns:mm="http://www.riik.ee/schemas/dhl-meta-manual"
-              xmlns:rkel="http://www.riik.ee/schemas/dhl/rkel_letter">
-    <dhl:metainfo xmlns:ma="http://www.riik.ee/schemas/dhl-meta-automatic"><ma:dhl_id>3617</ma:dhl_id><ma:dhl_saabumisviis>xtee</ma:dhl_saabumisviis><ma:dhl_saabumisaeg>2014-03-25T15:09:52+02:00</ma:dhl_saabumisaeg><ma:dhl_saatmisviis>xtee</ma:dhl_saatmisviis><ma:dhl_saatmisaeg>2014-03-25T15:09:54+02:00</ma:dhl_saatmisaeg><ma:dhl_saatja_asutuse_nr>10885324</ma:dhl_saatja_asutuse_nr><ma:dhl_saatja_asutuse_nimi>Icefire OÜ</ma:dhl_saatja_asutuse_nimi><ma:dhl_saatja_isikukood>36212240216</ma:dhl_saatja_isikukood><ma:dhl_saaja_asutuse_nr>10885324</ma:dhl_saaja_asutuse_nr><ma:dhl_saaja_asutuse_nimi>Icefire OÜ</ma:dhl_saaja_asutuse_nimi><ma:dhl_saaja_isikukood>36212240216</ma:dhl_saaja_isikukood><ma:dhl_saatja_epost/><ma:dhl_saaja_epost/><ma:dhl_kaust>/</ma:dhl_kaust>
+              xmlns:rkel="http://www.riik.ee/schemas/dhl/rkel_letter"
+              xmlns:ma="http://www.riik.ee/schemas/dhl-meta-automatic">
+    <dhl:metainfo>
+        <ma:dhl_id>3617</ma:dhl_id>
+        <ma:dhl_saabumisviis>xtee</ma:dhl_saabumisviis>
+        <ma:dhl_saabumisaeg>2014-03-25T15:09:52+02:00</ma:dhl_saabumisaeg>
+        <ma:dhl_saatmisviis>xtee</ma:dhl_saatmisviis>
+        <ma:dhl_saatmisaeg>2014-03-25T15:09:54+02:00</ma:dhl_saatmisaeg>
+        <ma:dhl_saatja_asutuse_nr>10885324</ma:dhl_saatja_asutuse_nr>
+        <ma:dhl_saatja_asutuse_nimi>Icefire OÜ</ma:dhl_saatja_asutuse_nimi>
+        <ma:dhl_saatja_isikukood>36212240216</ma:dhl_saatja_isikukood>
+        <ma:dhl_saaja_asutuse_nr>10885324</ma:dhl_saaja_asutuse_nr>
+        <ma:dhl_saaja_asutuse_nimi>Icefire OÜ</ma:dhl_saaja_asutuse_nimi>
+        <ma:dhl_saaja_isikukood>36212240216</ma:dhl_saaja_isikukood>
+        <ma:dhl_saatja_epost/>
+        <ma:dhl_saaja_epost/>
+        <ma:dhl_kaust>/</ma:dhl_kaust>
         <mm:koostaja_asutuse_nr/>
         <mm:saaja_asutuse_nr>EE70006317</mm:saaja_asutuse_nr>
         <mm:koostaja_dokumendinimi>Ettepanek</mm:koostaja_dokumendinimi>
@@ -66,7 +81,8 @@
         </rkel:LetterMetaData>
     </dhl:metaxml>
     <SignedDoc xmlns="http://www.sk.ee/DigiDoc/v1.3.0#" format="DIGIDOC-XML" version="1.3">
-        <DataFile ContentType="EMBEDDED_BASE64" Filename="Ettepanek.doc" Id="D0" MimeType="application/msword" Size="211543">H4sIAAAAAAAAA+1ZeSCUa/se+5qyRfbIWmbsy9iX7MvQFImYxmCYzcwgUhJZs1Rkq5BQKEvWRMlW
+        <DataFile ContentType="EMBEDDED_BASE64" Filename="Ettepanek.doc" Id="D0" MimeType="application/msword"
+                  Size="211543">H4sIAAAAAAAAA+1ZeSCUa/se+5qyRfbIWmbsy9iX7MvQFImYxmCYzcwgUhJZs1Rkq5BQKEvWRMlW
             smXJFrLvZMve+UbndA59db5z/v79XvOY932e+7ru+1nnuZ4XYkxByQYA0AIAG+hA7fN1MoyiAABg
             N5GyAGgkGkH0xiFgOBwKCYcRkVgMyBPjCMTCCEgCEItDYByxcA80AkMEEhEXiZB9ZOLCt5TeUwAA
             u+kbGYIIA15Eo1Q1SP8EPBF4AolOTVAaKCUogMDAsY5IjLOa4GmonqSSoIY6vSrWyQkJR4C/e5Dc
@@ -175,6 +191,7 @@
             1L8uU8BfL1W/o7736N7jP8Z9KF3K/e9kfkTuPexg2Icco9t3WPhjoD+ehfx1SR/49cnIj+73qpv9
             gV89tF8Q/uh/ry3/PuRL5n+ghX5NxrWPbPsnZHu10T/lkWP5e630T3lQP+HZq51+zcOzj+fhT3j2
             a6lfM+3v7oFf1OzfsbCx/p3W2j9odu2/CybRfSxGP2H5hfb656Gl/oT0L+W1P7S9iy79PpYu1r1K
-            7Efc3oWEfR9unfsXCzTEmIp614CZ9IcjwWx5d5/+A/kq8ZziIQAA</DataFile>
+            7Efc3oWEfR9unfsXCzTEmIp614CZ9IcjwWx5d5/+A/kq8ZziIQAA
+        </DataFile>
     </SignedDoc>
 </dhl:dokument>

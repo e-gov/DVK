@@ -239,6 +239,13 @@
             <systemPath>${basedir}/lib/bctsp-jdk15-1.44.jar</systemPath>
         </dependency>
         <dependency>
+            <groupId>java</groupId>
+            <artifactId>bcpkix-jdk15on</artifactId>
+            <version>1.48</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/bcpkix-jdk15on-148.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>apache</groupId>
             <artifactId>commons-codec</artifactId>
             <version>1.9</version>

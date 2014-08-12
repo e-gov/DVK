@@ -33,7 +33,7 @@
         <appender-ref ref="stdout"/>
     </logger>
 
-    <logger name="ee.sk.digidoc">
+    <logger name="ee.sk">
         <level value="debug"></level>
         <appender-ref ref="file"/>
     </logger>
@@ -51,7 +51,7 @@
     </logger>
 
     <root>
-        <priority value ="info" />
+        <priority value ="debug" />
         <appender-ref ref="console" />
     </root>
 </log4j:configuration>

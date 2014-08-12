@@ -310,12 +310,7 @@ public class DocumentFile {
 
         if (this.m_fileName.toLowerCase().endsWith("ddoc") || this.m_fileName.toLowerCase().endsWith("bdoc")) {
             initJdigiDoc();
-            DigiDocFactory ddocFactory = null;
-            if (this.m_fileName.toLowerCase().endsWith("bdoc")) {
-                ddocFactory = ConfigManager.instance().getBDigiDocFactory();
-            } else {
-                ddocFactory = ConfigManager.instance().getDigiDocFactory();
-            }
+            DigiDocFactory ddocFactory = ConfigManager.instance().getDigiDocFactory();
 
             logger.debug("localFileFullname: " + this.m_localFileFullName);
             SignedDoc container = ddocFactory.readSignedDoc(this.m_localFileFullName);
@@ -365,11 +360,7 @@ public class DocumentFile {
             initJdigiDoc();
             DigiDocFactory ddocFactory = null;
             try {
-                if (this.m_fileName.toLowerCase().endsWith("bdoc")) {
-                    ddocFactory = ConfigManager.instance().getBDigiDocFactory();
-                } else {
-                    ddocFactory = ConfigManager.instance().getDigiDocFactory();
-                }
+                ddocFactory = ConfigManager.instance().getDigiDocFactory();
             } catch (DigiDocException ex) {
                 throw new ComponentException("DigiDoc teegi initsialiseerimine ebaõnnestus!", ex);
             }

@@ -220,16 +220,16 @@
         <dependency>
             <groupId>java</groupId>
             <artifactId>bcmail-jdk15</artifactId>
-            <version>1.44</version>
+            <version>1.48</version>
             <scope>system</scope>
-            <systemPath>${basedir}/lib/bcmail-jdk15-1.44.jar</systemPath>
+            <systemPath>${basedir}/lib/bcmail-jdk15on-148.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
             <artifactId>bcprov-jdk15</artifactId>
-            <version>1.44</version>
+            <version>1.48</version>
             <scope>system</scope>
-            <systemPath>${basedir}/lib/bcprov-jdk15-1.44.jar</systemPath>
+            <systemPath>${basedir}/lib/bcprov-jdk15on-148.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>
@@ -339,9 +339,16 @@
         <dependency>
             <groupId>java</groupId>
             <artifactId>jdigidoc</artifactId>
-            <version>2.3.98</version>
+            <version>3.9.0-726</version>
             <scope>system</scope>
-            <systemPath>${basedir}/lib/jdigidoc-2.3.98.jar</systemPath>
+            <systemPath>${basedir}/lib/jdigidoc-3.9.0-726.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.8.1</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/commons-compress-1.8.1.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>

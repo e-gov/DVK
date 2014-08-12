@@ -1228,6 +1228,7 @@ public class SendDocuments {
     }
 
     private static void validateXmlFiles(ArrayList<DocumentFile> docFiles) throws AxisFault, Exception {
+        logger.debug("validateXmlFiles started");
         if (Settings.Server_ValidateXmlFiles && (docFiles != null)) {
             logger.info("Starting XML validation of total " + String.valueOf(docFiles.size()) + " files.");
             ArrayList<String> allErrors = new ArrayList<String>();
@@ -1244,8 +1245,11 @@ public class SendDocuments {
                         logger.info("File \"" + originalFileName + "\" is valid.");
                     }
                 } else if (originalFileName.toLowerCase().endsWith("ddoc") || originalFileName.toLowerCase().endsWith("bdoc")) {
+                    logger.debug("validate ddoc or bdoc");
                     ArrayList<String> signedFiles = docFiles.get(i).getFilesFromDdocBdoc("xml");
+
                     if ((signedFiles != null) && (signedFiles.size() > 0)) {
+                        logger.debug("signedFiles.size: " + signedFiles.size());
                         for (int j = 0; j < signedFiles.size(); j++) {
                             ArrayList<String> validationErrors = XmlValidator.Validate(signedFiles.get(j));
                             if ((validationErrors != null) && (validationErrors.size() > 0)) {

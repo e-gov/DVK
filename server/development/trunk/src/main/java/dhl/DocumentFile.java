@@ -306,9 +306,11 @@ public class DocumentFile {
     }
 
     public ArrayList<String> getFilesFromDdocBdoc(String extensionFilter) throws Exception {
+        logger.debug("getFilesFromDdocBdoc");
         ArrayList<String> result = new ArrayList<String>();
-
+        logger.debug("this.m_fileName: " + this.m_fileName);
         if (this.m_fileName.toLowerCase().endsWith("ddoc") || this.m_fileName.toLowerCase().endsWith("bdoc")) {
+            logger.debug("this file is a ddoc or bdoc");
             initJdigiDoc();
             DigiDocFactory ddocFactory = ConfigManager.instance().getDigiDocFactory();
 

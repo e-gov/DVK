@@ -35,6 +35,12 @@ import dvk.core.FileSplitResult;
 import dvk.core.HeaderVariables;
 import dvk.core.Settings;
 import dvk.core.XmlValidator;
+import org.apache.axis.AxisFault;
+import org.apache.axis.MessageContext;
+import org.apache.log4j.Logger;
+
+import javax.activation.DataSource;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,11 +52,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
-import javax.activation.DataSource;
-import javax.xml.parsers.ParserConfigurationException;
-import org.apache.axis.AxisFault;
-import org.apache.axis.MessageContext;
-import org.apache.log4j.Logger;
 
 public class SendDocuments {
     private static Logger logger = Logger.getLogger(SendDocuments.class);
@@ -1247,6 +1248,12 @@ public class SendDocuments {
                 } else if (originalFileName.toLowerCase().endsWith("ddoc") || originalFileName.toLowerCase().endsWith("bdoc")) {
                     logger.debug("validate ddoc or bdoc");
                     ArrayList<String> signedFiles = docFiles.get(i).getFilesFromDdocBdoc("xml");
+
+                    // TODO: test - remove it
+                    logger.debug("docFiles.get(i).getFilesFromDdocBdoc(\"xml\") finished. Before if in validateXmlFiles method");
+                    logger.debug("signedFiles" + signedFiles);
+                    logger.debug("signedFiles.size()" + signedFiles.size());
+                    logger.debug("IF must be OK");
 
                     if ((signedFiles != null) && (signedFiles.size() > 0)) {
                         logger.debug("signedFiles.size: " + signedFiles.size());

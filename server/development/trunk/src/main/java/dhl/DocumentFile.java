@@ -1,18 +1,5 @@
 package dhl;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
-import org.apache.axis.AxisFault;
-import org.apache.axis.encoding.Base64;
-import org.apache.log4j.Logger;
-
 import dhl.exceptions.ComponentException;
 import dhl.exceptions.IncorrectSignatureException;
 import dvk.core.CommonMethods;
@@ -22,6 +9,17 @@ import ee.sk.digidoc.DigiDocException;
 import ee.sk.digidoc.SignedDoc;
 import ee.sk.digidoc.factory.DigiDocFactory;
 import ee.sk.utils.ConfigManager;
+import org.apache.axis.AxisFault;
+import org.apache.axis.encoding.Base64;
+import org.apache.log4j.Logger;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
 
 /**
  * Dokumendi fail. Vastab andmebaasi tabelile DOKUMENDI_FAIL
@@ -334,22 +332,35 @@ public class DocumentFile {
                         out = new FileOutputStream(fileName);
                         in = df.getBodyAsStream();
 
+                        // TODO: test - remove it
+                        logger.debug("Before IF in getFilesFromDdocBdoc method");
+
                         if ((in != null) && (out != null)) {
                             // Siin ei tasu puhverdamist üritada, kuna JDigiDoc teek ei toeta seda.
                             while ((val = in.read()) >= 0) {
                                 out.write((byte) val);
                             }
                             result.add(fileName);
+                            // TODO: test - remove it
+                            logger.debug("inside IF in getFilesFromDdocBdoc method");
+
                         }
+                        // TODO: test - remove it
+                        logger.debug("End of try in getFilesFromDdocBdoc method");
                     } finally {
                         CommonMethods.safeCloseStream(in);
                         CommonMethods.safeCloseStream(out);
                         in = null;
                         out = null;
+                        // TODO: test - remove it
+                        logger.debug("End of finally  in getFilesFromDdocBdoc method");
                     }
                 }
             }
         }
+
+        // TODO: test - remove it
+        logger.debug("End of getFilesFromDdocBdoc method");
 
         return result;
     }

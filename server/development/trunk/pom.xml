@@ -250,7 +250,7 @@
             <artifactId>commons-codec</artifactId>
             <version>1.9</version>
             <scope>system</scope>
-            <systemPath>${basedir}/lib/commons-codec-1.4.jar</systemPath>
+            <systemPath>${basedir}/lib/commons-codec-1.6.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>apache</groupId>
@@ -554,6 +554,27 @@
             <version>3.3.2</version>
             <scope>system</scope>
             <systemPath>${basedir}/lib/commons-lang3-3.3.2.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>sunjce_provider</groupId>
+            <artifactId>sunjce_provider</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/sunjce_provider.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>sunpkcs11</groupId>
+            <artifactId>sunpkcs11</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/sunpkcs11.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>tinyxmlcanonicalizer</groupId>
+            <artifactId>tinyxmlcanonicalizer</artifactId>
+            <version>0.9.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/tinyxmlcanonicalizer-0.9.0.jar</systemPath>
         </dependency>
     </dependencies>
 

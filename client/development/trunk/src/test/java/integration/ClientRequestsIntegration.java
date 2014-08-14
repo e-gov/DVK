@@ -39,7 +39,6 @@ import java.util.zip.GZIPInputStream;
 
 // TODO: remove try and catch blocks where possible
 @RunWith(JUnitParamsRunner.class)
-@Ignore
 public class ClientRequestsIntegration {
     private static Logger logger = Logger.getLogger(ClientRequestsIntegration.class);
     private static final int SEND_RECEIVE_MODE = 3;

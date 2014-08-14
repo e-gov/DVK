@@ -65,9 +65,9 @@ public class SendDocumentsIntegration {
 
     @Test
     public void whenContainer_V1_isSentTo_sendDocuments_V1_serviceShouldRespondWithCID() throws Exception {
-        List<String> attachmentPaths = Arrays.asList("../testcontainers/v1_0/dvk_konteiner_v1.xml.gz"
-                //"../testcontainers/v1_0/container_1_0_icefire_test1_ddoc_evorm.xml.gz");
-                //"../testcontainers/v1_0/test.xml.gz"
+        List<String> attachmentPaths = Arrays.asList("../testcontainers/v1_0/container_1_0_icefire_test1_ddoc_evorm.xml.gz",
+                "../testcontainers/v1_0/container_1_0_icefire_test1_ddoc_evorm.xml.gz",
+                "../testcontainers/v1_0/test.xml.gz"
         );
         sendMessageWithAttachment(attachmentPaths, xHeaderBuilder.build());
     }
@@ -87,7 +87,7 @@ public class SendDocumentsIntegration {
     @Test
     public void whenContainer_V2_1_isSentTo_sendDocuments_V4_serviceShouldRespondWithCID() throws Exception {
         List<String> attachmentPaths = Arrays.asList(
-                "../testcontainers/v2_1/Dvk_kapsel_vers_2_1_n2ide1.xml.gz",
+                "../testcontainers/v2_1/container_2_1_icefire_ddoc.xml.gz",
                 "../testcontainers/v2_1/Dvk_kapsel_vers_2_1_n2ide2.xml.gz",
                 "../testcontainers/v2_1/Dvk_kapsel_vers_2_1_n2ide3.xml.gz",
                 "../testcontainers/v2_1/Dvk_kapsel_vers_2_1_n2ide1_DecMetaDataMissing.xml.gz",

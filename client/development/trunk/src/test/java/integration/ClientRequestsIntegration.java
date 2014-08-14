@@ -47,6 +47,7 @@ public class ClientRequestsIntegration {
 
     @Test
     @Parameters({"container_2_1_icefire.xml", "container_2_1_icefire_1.xml", "container_2_1_icefire_2.xml", "container_2_1_icefire_ddoc.xml"})
+    @Ignore
     public void sendAndReceiveAndGetSendStatusRequestsAndMarkDocumentsReceivedContainer2_1Test(String xmlContainer) throws Exception {
         List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCases();
         for (String path : configFilePaths) {
@@ -81,6 +82,7 @@ public class ClientRequestsIntegration {
     }
 
     @Test
+    @Ignore
     @Parameters({"container_1_0_icefire_test1.xml", "container_1_0_icefire_test1_ddoc.xml", "container_1_0_icefire_test1_ddoc_evorm.xml", "container_1_0_icefire_test1_ddoc_evorm_1.xml"})
     public void sendAndReceiveAndGetSendStatusRequestsAndMarkDocumentsReceivedVersion1_0Test(String xmlContainer) throws Exception {
         List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCasesContainerVer1();

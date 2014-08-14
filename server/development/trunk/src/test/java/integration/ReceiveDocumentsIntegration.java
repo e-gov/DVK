@@ -31,6 +31,7 @@ import java.util.ArrayList;
  * @author Hendrik Pärna
  * @since 17.12.13
  */
+@Ignore
 public class ReceiveDocumentsIntegration {
     private static Logger logger = Logger.getLogger(ReceiveDocumentsIntegration.class);
 

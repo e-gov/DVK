@@ -36,6 +36,7 @@ import java.util.List;
  * @author Hendrik Pärna
  * @since 2.12.13
  */
+@Ignore
 public class SendDocumentsIntegration {
     private static Options options;
     private static XHeaderBuilder xHeaderBuilder;

@@ -409,4 +409,88 @@ public class DocumentFile {
 
         return result;
     }
+
+    /**
+     * Parse DocumentFile from container.
+     * @param xmlReader reader
+     * @param extensionFilter filter
+     * @return DocumentFile
+     * @throws IOException
+     * @throws XMLStreamException
+     */
+    public static DocumentFile getListFromContainerV2_1(XMLStreamReader xmlReader, ArrayList<String> extensionFilter) throws IOException, XMLStreamException {
+        DocumentFile item = null;
+        int itemIndex = 1;
+
+        while (xmlReader.hasNext()) {
+            if (xmlReader.hasName()) {
+                if (xmlReader.getLocalName().equalsIgnoreCase("File") && xmlReader.isEndElement()) {
+                    // Kui oleme jõudnud failide ploki lõppu, siis katkestame tsükli
+                    break;
+                } else if (xmlReader.getLocalName().equalsIgnoreCase("File") && xmlReader.isStartElement()) {
+                    item = new DocumentFile();
+                } else if ((item != null) && xmlReader.getLocalName().equalsIgnoreCase("FileName") && xmlReader.isStartElement()) {
+                    xmlReader.next();
+                    if (xmlReader.isCharacters()) {
+                        item.m_fileName = xmlReader.getText().trim();
+                    }
+                } else if ((item != null) && xmlReader.getLocalName().equalsIgnoreCase("MimeType") && xmlReader.isStartElement()) {
+                    xmlReader.next();
+                    if (xmlReader.isCharacters()) {
+                        item.m_mimeType = xmlReader.getText().trim();
+                    }
+                } else if ((item != null) && xmlReader.getLocalName().equalsIgnoreCase("FileSize") && xmlReader.isStartElement()) {
+                    xmlReader.next();
+                    if (xmlReader.isCharacters()) {
+                        try {
+                            item.m_fileSizeBytes = Integer.parseInt(xmlReader.getText().trim());
+                        } catch (Exception ex) {
+                            logger.warn("Unable to parse value of \"filesize\" to integer. Defaulting to 0.");
+                            item.m_fileSizeBytes = 0;
+                        }
+                    }
+                } else if ((item != null) && xmlReader.getLocalName().equalsIgnoreCase("ZipBase64Content") && xmlReader.isStartElement()) {
+                    item.m_localFileFullName = CommonMethods.createPipelineFile(itemIndex);
+                    FileOutputStream outStream = new FileOutputStream(item.m_localFileFullName, false);
+
+                    try {
+                        xmlReader.next();
+                        if (xmlReader.isCharacters()) {
+                            String fourByteString = "";
+                            char[] buf = new char[1];
+                            int sourceStart = 0;
+                            while (xmlReader.getTextCharacters(sourceStart, buf, 0, buf.length) > 0) {
+                                if (((buf[0] >= 48) && (buf[0] <= 57))
+                                        || ((buf[0] >= 65) && (buf[0] <= 90))
+                                        || ((buf[0] >= 97) && (buf[0] <= 122))
+                                        || (buf[0] == 43) || (buf[0] == 47) || (buf[0] == 61)) {
+                                    fourByteString += buf[0];
+                                }
+                                if (fourByteString.length() == 4) {
+                                    outStream.write(Base64.decode(fourByteString));
+                                    fourByteString = "";
+                                }
+                                sourceStart++;
+                            }
+                            if (fourByteString.length() > 0) {
+                                outStream.write(Base64.decode(fourByteString));
+                            }
+                        }
+                    } finally {
+                        CommonMethods.safeCloseStream(outStream);
+                        outStream = null;
+                        itemIndex++;
+                    }
+
+                    // Pakime faili lahti
+                    if (!CommonMethods.gzipUnpackXML(item.m_localFileFullName, false)) {
+                        throw new AxisFault("File data extraction failed!");
+                    }
+                }
+            }
+            xmlReader.next();
+        }
+
+        return item;
+    }
 }

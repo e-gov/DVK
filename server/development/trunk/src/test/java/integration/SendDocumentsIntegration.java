@@ -36,7 +36,6 @@ import java.util.List;
  * @author Hendrik Pärna
  * @since 2.12.13
  */
-@Ignore
 public class SendDocumentsIntegration {
     private static Options options;
     private static XHeaderBuilder xHeaderBuilder;
@@ -67,8 +66,8 @@ public class SendDocumentsIntegration {
     @Test
     public void whenContainer_V1_isSentTo_sendDocuments_V1_serviceShouldRespondWithCID() throws Exception {
         List<String> attachmentPaths = Arrays.asList("../testcontainers/v1_0/container_1_0_icefire_test1_ddoc_evorm.xml.gz",
-                "../testcontainers/v1_0/container_1_0_icefire_test1_ddoc_evorm.xml.gz",
-                "../testcontainers/v1_0/test.xml.gz"
+                "../testcontainers/v1_0/test.xml.gz",
+                "../testcontainers/v1_0/ddoc_xforms_obfuscated_onlyXml.xml.gz"
         );
         sendMessageWithAttachment(attachmentPaths, xHeaderBuilder.build());
     }
@@ -93,7 +92,8 @@ public class SendDocumentsIntegration {
                 "../testcontainers/v2_1/Dvk_kapsel_vers_2_1_n2ide3.xml.gz",
                 "../testcontainers/v2_1/Dvk_kapsel_vers_2_1_n2ide1_DecMetaDataMissing.xml.gz",
                 "../testcontainers/v2_1/viga1.xml.gz",
-                "../testcontainers/v2_1/viga2.xml.gz"
+                "../testcontainers/v2_1/viga2.xml.gz",
+                "../testcontainers/v2_1/icefire_ddoc_obfuscated_both.xml.gz"
         );
 
         sendMessageWithAttachment(attachmentPaths, xHeaderBuilder.setNimi("dhl.sendDocuments.v4").build());

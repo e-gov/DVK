@@ -541,6 +541,11 @@ public class Document {
                             result.m_files = DocumentFile.getListFromContainerV1(reader, fileExtensionFilter);
                         } else if (reader.getLocalName().equalsIgnoreCase("failid") && reader.isStartElement() && extractFiles) {
                             result.m_files = DocumentFile.getListFromContainerV2(reader, fileExtensionFilter);
+                        } else if (reader.getLocalName().equalsIgnoreCase("file") && reader.isStartElement()) {
+                            if (result.m_files == null) {
+                               result.m_files = new ArrayList<DocumentFile>();
+                            }
+                            result.m_files.add(DocumentFile.getListFromContainerV2_1(reader, fileExtensionFilter));
                         } else if (reader.getLocalName().equalsIgnoreCase("konteineri_versioon") && reader.isStartElement()) {
                             reader.next();
                             if (reader.isCharacters()) {

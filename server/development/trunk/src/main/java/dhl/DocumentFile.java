@@ -332,35 +332,22 @@ public class DocumentFile {
                         out = new FileOutputStream(fileName);
                         in = df.getBodyAsStream();
 
-                        // TODO: test - remove it
-                        logger.debug("Before IF in getFilesFromDdocBdoc method");
-
                         if ((in != null) && (out != null)) {
                             // Siin ei tasu puhverdamist üritada, kuna JDigiDoc teek ei toeta seda.
                             while ((val = in.read()) >= 0) {
                                 out.write((byte) val);
                             }
                             result.add(fileName);
-                            // TODO: test - remove it
-                            logger.debug("inside IF in getFilesFromDdocBdoc method");
-
                         }
-                        // TODO: test - remove it
-                        logger.debug("End of try in getFilesFromDdocBdoc method");
                     } finally {
                         CommonMethods.safeCloseStream(in);
                         CommonMethods.safeCloseStream(out);
                         in = null;
                         out = null;
-                        // TODO: test - remove it
-                        logger.debug("End of finally  in getFilesFromDdocBdoc method");
                     }
                 }
             }
         }
-
-        // TODO: test - remove it
-        logger.debug("End of getFilesFromDdocBdoc method");
 
         return result;
     }
@@ -412,7 +399,8 @@ public class DocumentFile {
 
     /**
      * Parse DocumentFile from container.
-     * @param xmlReader reader
+     *
+     * @param xmlReader       reader
      * @param extensionFilter filter
      * @return DocumentFile
      * @throws IOException

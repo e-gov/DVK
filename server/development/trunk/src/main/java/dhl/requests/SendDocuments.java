@@ -1249,12 +1249,6 @@ public class SendDocuments {
                     logger.debug("validate ddoc or bdoc");
                     ArrayList<String> signedFiles = docFiles.get(i).getFilesFromDdocBdoc("xml");
 
-                    // TODO: test - remove it
-                    logger.debug("docFiles.get(i).getFilesFromDdocBdoc(\"xml\") finished. Before if in validateXmlFiles method");
-                    logger.debug("signedFiles" + signedFiles);
-                    logger.debug("signedFiles.size()" + signedFiles.size());
-                    logger.debug("IF must be OK");
-
                     if ((signedFiles != null) && (signedFiles.size() > 0)) {
                         logger.debug("signedFiles.size: " + signedFiles.size());
                         for (int j = 0; j < signedFiles.size(); j++) {

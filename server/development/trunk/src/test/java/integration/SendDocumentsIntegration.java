@@ -92,8 +92,9 @@ public class SendDocumentsIntegration {
                 "../testcontainers/v2_1/Dvk_kapsel_vers_2_1_n2ide3.xml.gz",
                 "../testcontainers/v2_1/Dvk_kapsel_vers_2_1_n2ide1_DecMetaDataMissing.xml.gz",
                 "../testcontainers/v2_1/viga1.xml.gz",
-                "../testcontainers/v2_1/viga2.xml.gz",
-                "../testcontainers/v2_1/icefire_ddoc_obfuscated_both.xml.gz"
+                "../testcontainers/v2_1/viga2.xml.gz"
+                //"../testcontainers/v2_1/icefire_ddoc_obfuscated_both.xml.gz",
+                //"../testcontainers/v2_1/books.ddoc.xml.gz"
         );
 
         sendMessageWithAttachment(attachmentPaths, xHeaderBuilder.setNimi("dhl.sendDocuments.v4").build());

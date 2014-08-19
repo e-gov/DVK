@@ -638,7 +638,7 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>2.9</version>
                 <configuration>
-                    <skipTests>true</skipTests>
+                    <skipTests>${ignoreIntegrationTests}</skipTests>
                     <includes>
                         <include>**/*Integration.java</include>
                     </includes>

@@ -51,6 +51,7 @@
                 <dvkCoreDir>C:\Work\Dev\DVK\core\development\trunk</dvkCoreDir>
                 <dvkClientDir>C:\Work\Dev\DVK\client\development\trunk</dvkClientDir>
                 <dvkServerJettyEnvLocation>C:\Work\Dev\DVK\server\development\trunk\src\test\resources\jetty-env.xml</dvkServerJettyEnvLocation>
+                <ignoreIntegrationTests>false</ignoreIntegrationTests>
                 <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_hendrik.properties</listOfTestConfigs>
                 <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_serverIsMissing.properties</serverIsMissingConfigs>
                 <containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_hendrik_container_1_0.properties</containerVer1Configs>
@@ -69,6 +70,7 @@
                 <dvkCoreDir>C:\Projects\RIA_DVK\core\development\trunk</dvkCoreDir>
                 <dvkClientDir>C:\Projects\RIA_DVK\client\development\trunk</dvkClientDir>
                 <dvkServerJettyEnvLocation>C:\Projects\RIA_DVK\server\development\trunk\src\test\resources\jetty-env-igor.xml</dvkServerJettyEnvLocation>
+                <ignoreIntegrationTests>false</ignoreIntegrationTests>
                 <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_Igor.properties</listOfTestConfigs>
                 <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_IgorAndLiza-serverIsMissing.properties</serverIsMissingConfigs>
                 <containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_Igor_capsuleVer1_0.properties</containerVer1Configs>
@@ -87,6 +89,7 @@
                 <dvkCoreDir>C:\Projects\RIA_DVK\core\development\trunk</dvkCoreDir>
                 <dvkClientDir>C:\Projects\RIA_DVK\client\development\trunk</dvkClientDir>
                 <dvkServerJettyEnvLocation>C:\Projects\RIA_DVK\server\development\trunk\src\test\resources\jetty-env.xml</dvkServerJettyEnvLocation>
+                <ignoreIntegrationTests>false</ignoreIntegrationTests>
                 <!--                <listOfTestConfigs>./conf/integrationTests/dvk_client_SQLAnywhere_V12_Liza.properties, ./conf/integrationTests/dvk_client_SQLAnywhere_V16_Liza.properties, ./conf/integrationTests/dvk_client_postgreSQL_8_4_Liza.properties, ./conf/integrationTests/dvk_client_postgreSQL_9_1_Liza.properties, ./conf/integrationTests/dvk_client_postgreSQL_9_3_Liza.properties, ./conf/integrationTests/dvk_client_Oracle_V10_Liza.properties, ./conf/integrationTests/dvk_client_MSSQL_V2008_Liza.properties</listOfTestConfigs>-->
                 <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_9_3_Liza.properties, ./conf/integrationTests/dvk_client_Oracle_V10_Liza.properties, ./conf/integrationTests/dvk_client_MSSQL_V2008_Liza.properties</listOfTestConfigs>
                 <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_IgorAndLiza-serverIsMissing.properties</serverIsMissingConfigs>
@@ -106,6 +109,7 @@
                 <dvkCoreDir>C:\Projects\RIA_DVK\core\development\trunk</dvkCoreDir>
                 <dvkClientDir>C:\Projects\RIA_DVK\client\development\trunk</dvkClientDir>
                 <dvkServerJettyEnvLocation>C:\Projects\RIA_DVK\server\development\trunk\src\test\resources\jetty-env.xml</dvkServerJettyEnvLocation>
+                <ignoreIntegrationTests>false</ignoreIntegrationTests>
                 <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI.properties</listOfTestConfigs>
                 <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_CI_serverIsMissing.properties</serverIsMissingConfigs>
                 <containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_CI_container_1_0.properties</containerVer1Configs>
@@ -127,6 +131,7 @@
                 <dvkClientDir>${dvkClientDir}</dvkClientDir>
                 <!-- e.g. C:\Work\Dev\DVK\server\development\trunk\src\test\resources\jetty-env-jenkins.xml -->
                 <dvkServerJettyEnvLocation>${dvkServerJettyEnvLocation}</dvkServerJettyEnvLocation>
+                <ignoreIntegrationTests>${ignoreIntegrationTests}</ignoreIntegrationTests>
                 <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI.properties</listOfTestConfigs>
                 <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_CI_serverIsMissing.properties</serverIsMissingConfigs>
                 <containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_CI_container_1_0.properties</containerVer1Configs>
@@ -148,6 +153,7 @@
                 <dvkClientDir>${dvkClientDir}</dvkClientDir>
                 <!-- e.g. C:\Work\Dev\DVK\server\development\trunk\src\test\resources\jetty-env-jenkins.xml -->
                 <dvkServerJettyEnvLocation>${dvkServerJettyEnvLocation}</dvkServerJettyEnvLocation>
+                <ignoreIntegrationTests>false</ignoreIntegrationTests>
                 <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI.properties</listOfTestConfigs>
                 <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_CI_serverIsMissing.properties</serverIsMissingConfigs>
                 <containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_CI_container_1_0.properties</containerVer1Configs>

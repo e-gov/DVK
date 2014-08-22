@@ -22,7 +22,6 @@ import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -37,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
-// TODO: remove try and catch blocks where possible
 @RunWith(JUnitParamsRunner.class)
 public class ClientRequestsIntegration {
     private static Logger logger = Logger.getLogger(ClientRequestsIntegration.class);
@@ -46,8 +44,13 @@ public class ClientRequestsIntegration {
     private static final int RECEIVE_MODE = 2;
 
     @Test
-    @Parameters({"container_2_1_icefire.xml", "container_2_1_icefire_1.xml", "container_2_1_icefire_2.xml", "container_2_1_icefire_ddoc.xml"})
-    @Ignore
+    @Parameters({
+            "container_2_1_icefire.xml",
+            "container_2_1_icefire_1.xml",
+            "container_2_1_icefire_2.xml",
+            "container_2_1_icefire_ddoc.xml",
+            "2_1_nok1.xml"
+    })
     public void sendAndReceiveAndGetSendStatusRequestsAndMarkDocumentsReceivedContainer2_1Test(String xmlContainer) throws Exception {
         List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCases();
         for (String path : configFilePaths) {
@@ -82,8 +85,13 @@ public class ClientRequestsIntegration {
     }
 
     @Test
-    @Ignore
-    @Parameters({"container_1_0_icefire_test1.xml", "container_1_0_icefire_test1_ddoc.xml", "container_1_0_icefire_test1_ddoc_evorm.xml", "container_1_0_icefire_test1_ddoc_evorm_1.xml"})
+    @Parameters({
+            "container_1_0_icefire_test1.xml",
+            "container_1_0_icefire_test1_ddoc.xml",
+            "container_1_0_icefire_test1_ddoc_evorm.xml",
+            "container_1_0_icefire_test1_ddoc_evorm_1.xml",
+            "container_1_0_nok1.xml"
+    })
     public void sendAndReceiveAndGetSendStatusRequestsAndMarkDocumentsReceivedVersion1_0Test(String xmlContainer) throws Exception {
         List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCasesContainerVer1();
         for (String path : configFilePaths) {
@@ -118,7 +126,9 @@ public class ClientRequestsIntegration {
     }
 
     @Test
-    @Parameters({"container_2_1_icefire_test1.xml"})
+    @Parameters({
+            "container_2_1_icefire_test1.xml"
+    })
     public void sendContainer_2_1_AndReceive_1_0_Test(String xmlContainer) throws Exception {
         String configFilePath = IntegrationTestsConfigUtil.getConfigFileAbsolutePathForConversionCase().get(0);
         DhlSetting oldSettings = DBTestUtil.fetchDhlSettings(configFilePath);

@@ -88,10 +88,10 @@
             <properties>
                 <dvkCoreDir>C:\Projects\RIA_DVK\core\development\trunk</dvkCoreDir>
                 <dvkClientDir>C:\Projects\RIA_DVK\client\development\trunk</dvkClientDir>
-                <dvkServerJettyEnvLocation>C:\Projects\RIA_DVK\server\development\trunk\src\test\resources\jetty-env.xml</dvkServerJettyEnvLocation>
+                <dvkServerJettyEnvLocation>C:\Projects\RIA_DVK\server\development\trunk\src\test\resources\jetty-env-liza.xml</dvkServerJettyEnvLocation>
                 <ignoreIntegrationTests>false</ignoreIntegrationTests>
                 <!--                <listOfTestConfigs>./conf/integrationTests/dvk_client_SQLAnywhere_V12_Liza.properties, ./conf/integrationTests/dvk_client_SQLAnywhere_V16_Liza.properties, ./conf/integrationTests/dvk_client_postgreSQL_8_4_Liza.properties, ./conf/integrationTests/dvk_client_postgreSQL_9_1_Liza.properties, ./conf/integrationTests/dvk_client_postgreSQL_9_3_Liza.properties, ./conf/integrationTests/dvk_client_Oracle_V10_Liza.properties, ./conf/integrationTests/dvk_client_MSSQL_V2008_Liza.properties</listOfTestConfigs>-->
-                <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_9_3_Liza.properties, ./conf/integrationTests/dvk_client_Oracle_V10_Liza.properties, ./conf/integrationTests/dvk_client_MSSQL_V2008_Liza.properties</listOfTestConfigs>
+                <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_9_3_Liza.properties</listOfTestConfigs>
                 <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_IgorAndLiza-serverIsMissing.properties</serverIsMissingConfigs>
                 <containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_9_3_Liza-containerVer1.properties</containerVer1Configs>
                 <conversionTestConfig>./conf/integrationTests/dvk_client_postgreSQL_9_3_Liza-conversion.properties</conversionTestConfig>

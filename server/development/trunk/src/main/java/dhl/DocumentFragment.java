@@ -5,13 +5,12 @@ import dhl.iostructures.XHeader;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import dvk.core.Settings;
+import org.apache.axis.AxisFault;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.sql.Blob;
 import java.sql.CallableStatement;
@@ -23,8 +22,6 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-
-import org.apache.axis.AxisFault;
 
 public class DocumentFragment {
     private int m_id;
@@ -216,14 +213,15 @@ public class DocumentFragment {
                     }
 
                     // BINARY TO BLOB
-                    if ((new File(m_fileName)).exists()) {
-                        int fileCharsCount = CommonMethods.getCharacterCountInFile(m_fileName);
-                        inStream = new FileInputStream(m_fileName);
-                        cs.setBlob(8, inStream, fileCharsCount);
+                    File fileIn = new File(m_fileName);
+                    if (fileIn.exists()) {
+                        inStream = new FileInputStream(fileIn);
+                        cs.setBinaryStream(8, inStream, (int) fileIn.length());
                     }
 
                     // Execute
                     cs.execute();
+                    inStream.close();
                     cs.close();
                     conn.commit();
                 } catch (Exception ex) {
@@ -231,6 +229,7 @@ public class DocumentFragment {
                     CommonMethods.logError(ex, this.getClass().getName(), "addToDB");
                     throw ex;
                 } finally {
+                    CommonMethods.safeCloseStream(inStream);
                     CommonMethods.safeCloseStream(fis);
                     fis = null;
                 }

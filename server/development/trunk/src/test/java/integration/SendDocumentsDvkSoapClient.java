@@ -5,7 +5,6 @@ import org.apache.axiom.attachments.ConfigurableDataHandler;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.context.MessageContext;
 import org.apache.log4j.Logger;
@@ -42,6 +41,23 @@ public class SendDocumentsDvkSoapClient extends AbstractDvkServiceSoapClient {
         eldokumendid.addAttribute(attID);
         elKeha.addChild(eldokumendid);
         elKeha.addChild(fac.createOMElement("kaust", null));
+
+/*        // Send document in fragments
+        // start
+        OMElement elEdastusId = fac.createOMElement("edastus_id", null);
+        //b.edastusID = headerVar.getOrganizationCode() + String.valueOf(message.getId());
+        elEdastusId.setText("87654321776");
+        elKeha.addChild(elEdastusId);
+
+        OMElement elFragmendiNr = fac.createOMElement("fragment_nr", null);
+        elFragmendiNr.setText("0");
+        elKeha.addChild(elFragmendiNr);
+
+        OMElement elFragmendiKokku = fac.createOMElement("fragmente_kokku", null);
+        elFragmendiKokku.setText("1");
+        elKeha.addChild(elFragmendiKokku);
+        // end*/
+
         elSendDocuments.addChild(elKeha);
         return elSendDocuments;
     }

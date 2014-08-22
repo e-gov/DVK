@@ -65,7 +65,8 @@ public class SendDocumentsIntegration {
 
     @Test
     public void whenContainer_V1_isSentTo_sendDocuments_V1_serviceShouldRespondWithCID() throws Exception {
-        List<String> attachmentPaths = Arrays.asList("../testcontainers/v1_0/container_1_0_icefire_test1_ddoc_evorm.xml.gz",
+        List<String> attachmentPaths = Arrays.asList(
+                "../testcontainers/v1_0/container_1_0_icefire_test1_ddoc_evorm.xml.gz",
                 "../testcontainers/v1_0/test.xml.gz",
                 "../testcontainers/v1_0/ddoc_xforms_obfuscated_onlyXml.xml.gz"
         );

@@ -24,6 +24,8 @@ public class IntegrationTestsConfigUtil {
     private static final String TEST_CONFIG_CONVERSION_CASE = "conversionTestConfig";
     private static final String TEST_CONFIGS_SERVER_MISSING = "serverIsMissingConfigs";
     private static final String TEST_CONFIGS_POSITIVE_CASES_CONTAINER_VERSION_1_0 = "containerVer1Configs";
+    private static final String TEST_CONFIGS_POSITIVE_CASES_CONTAINER_VERSION_2_1_FRAGMENTING = "containerVer2FragmentingConfigs";
+    private static final String TEST_CONFIGS_POSITIVE_CASES_CONTAINER_VERSION_1_0_FRAGMENTING = "containerVer1FragmentingConfigs";
 
     private IntegrationTestsConfigUtil() {
         //because its a utility class
@@ -74,6 +76,14 @@ public class IntegrationTestsConfigUtil {
 
     public static List<String> getAllConfigFilesAbsolutePathsForPositiveCasesContainerVer1() {
         return getAllConfigFilesAbsolutePaths(TEST_CONFIGS_POSITIVE_CASES_CONTAINER_VERSION_1_0);
+    }
+
+    public static List<String> getAllConfigFilesAbsolutePathsForPositiveCasesContainerVer2UsingFragmenting() {
+        return getAllConfigFilesAbsolutePaths(TEST_CONFIGS_POSITIVE_CASES_CONTAINER_VERSION_2_1_FRAGMENTING);
+    }
+
+    public static List<String> getAllConfigFilesAbsolutePathsForPositiveCasesContainerVer1UsingFragmenting() {
+        return getAllConfigFilesAbsolutePaths(TEST_CONFIGS_POSITIVE_CASES_CONTAINER_VERSION_1_0_FRAGMENTING);
     }
 
     private static Properties findPropertiesFile() {

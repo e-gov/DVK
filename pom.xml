@@ -75,6 +75,8 @@
                 <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_IgorAndLiza-serverIsMissing.properties</serverIsMissingConfigs>
                 <containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_Igor_capsuleVer1_0.properties</containerVer1Configs>
                 <conversionTestConfig>./conf/integrationTests/dvk_client_postgreSQL-V9_3_Igor_capsuleVer1_0_conversion.properties</conversionTestConfig>
+                <containerVer2FragmentingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_Fragmenting_Igor.properties</containerVer2FragmentingConfigs>
+                <containerVer1FragmentingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_Igor_capsuleVer1_0_Fragmenting.properties</containerVer1FragmentingConfigs>
             </properties>
         </profile>
         <profile>
@@ -136,6 +138,8 @@
                 <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_CI_serverIsMissing.properties</serverIsMissingConfigs>
                 <containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_CI_container_1_0.properties</containerVer1Configs>
                 <conversionTestConfig>./conf/integrationTests/dvk_client_postgreSQL_CI_conversion.properties</conversionTestConfig>
+                <containerVer2FragmentingConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI_fragmenting.properties</containerVer2FragmentingConfigs>
+                <containerVer1FragmentingConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI_container_1_0_fragmenting.properties</containerVer1FragmentingConfigs>
             </properties>
         </profile>
         <profile>

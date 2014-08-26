@@ -163,6 +163,82 @@ public class ClientRequestsIntegration {
         }
     }
 
+    @Test
+    @Parameters({
+            "container_2_1_icefire.xml",
+            "container_2_1_icefire_ddoc.xml"           
+    })
+    public void sendAndReceiveContainer2_1_UsingFragmentingTest(String xmlContainer) throws Exception {
+        List<String> configFilePaths = IntegrationTestsConfigUtil.
+                getAllConfigFilesAbsolutePathsForPositiveCasesContainerVer2UsingFragmenting();
+        for (String path : configFilePaths) {
+            DhlSetting oldSettings = DBTestUtil.fetchDhlSettings(path);
+            DhlSetting newSettings = new DhlSetting(DhlSetting.CONTAINER_VERSION_2_1);
+            int sentMessageId = 0;
+            int receivedMessageId = 0;
+            try {
+                DBTestUtil.updateDhlSettings(path, newSettings);
+                sentMessageId = DBTestUtil.insertNewMessageToDB(path, xmlContainer);
+                ClientTestUtil.executeTheClient(path, SEND_RECEIVE_MODE);
+                DhlMessageData sentDhlMessageData = DBTestUtil.getMessageById(path, sentMessageId);
+                Assert.assertNotNull("Can't get the sent document", sentDhlMessageData);
+                String sentXMLData = sentDhlMessageData.getXmlData();
+                DhlMessageData receivedDhlMessageData = DBTestUtil.getMessageByDhlId(path, sentDhlMessageData.getDhlId(), true);
+                Assert.assertNotNull("Can't get the received document", receivedDhlMessageData);
+                receivedMessageId = receivedDhlMessageData.getId();
+                String receivedXMLData = receivedDhlMessageData.getXmlData();
+                ContainerVer2_1 containerForSentMessage = createTheContainerVer2_1(sentXMLData);
+                ContainerVer2_1 containerForReceivedMessage = createTheContainerVer2_1(receivedXMLData);
+                doDataAsserts(sentXMLData, receivedXMLData, containerForSentMessage, containerForReceivedMessage);
+
+                int statusOfSentMessage = getMessagesStatus(sentMessageId, path);
+                int statusOfReceivedMessage = getMessagesStatus(receivedDhlMessageData.getId(), path);
+                doStatusAsserts(statusOfSentMessage, statusOfReceivedMessage);
+
+            } finally {
+                DBTestUtil.restoreDhlSettings(path, oldSettings);
+                DBTestUtil.clearDataBaseAfterTest(path, Arrays.asList(sentMessageId, receivedMessageId));
+            }
+        }                                        
+    }
+
+    @Test
+    @Parameters({"container_1_0_icefire_test1.xml",
+            "container_1_0_icefire_test1_ddoc.xml"})
+    public void sendAndReceiveContainer1_0_UsingFragmentingTest(String xmlContainer) throws Exception {
+        List<String> configFilePaths = IntegrationTestsConfigUtil.
+                getAllConfigFilesAbsolutePathsForPositiveCasesContainerVer1UsingFragmenting();
+        for (String path : configFilePaths) {
+            DhlSetting oldSettings = DBTestUtil.fetchDhlSettings(path);
+            DhlSetting newSettings = new DhlSetting(DhlSetting.CONTAINER_VERSION_1_0);
+            int sentMessageId = 0;
+            int receivedMessageId = 0;
+            try {
+                DBTestUtil.updateDhlSettings(path, newSettings);
+                sentMessageId = DBTestUtil.insertNewMessageToDB(path, xmlContainer);
+                ClientTestUtil.executeTheClient(path, SEND_RECEIVE_MODE);
+                DhlMessageData sentDhlMessageData = DBTestUtil.getMessageById(path, sentMessageId);
+                Assert.assertNotNull("Can't get the sent document", sentDhlMessageData);
+                String sentXMLData = sentDhlMessageData.getXmlData();
+                DhlMessageData receivedDhlMessageData = DBTestUtil.getMessageByDhlId(path, sentDhlMessageData.getDhlId(), true);
+                Assert.assertNotNull("Can't get the received document", receivedDhlMessageData);
+                receivedMessageId = receivedDhlMessageData.getId();
+                String receivedXMLData = receivedDhlMessageData.getXmlData();
+                ContainerVer1 containerForSentMessage = createTheContainerVer1(sentXMLData);
+                ContainerVer1 containerForReceivedMessage = createTheContainerVer1(receivedXMLData);
+                doDataAsserts(sentXMLData, receivedXMLData, containerForSentMessage, containerForReceivedMessage);
+
+                int statusOfSentMessage = getMessagesStatus(sentMessageId, path);
+                int statusOfReceivedMessage = getMessagesStatus(receivedDhlMessageData.getId(), path);
+                doStatusAsserts(statusOfSentMessage, statusOfReceivedMessage);
+
+            } finally {
+                DBTestUtil.restoreDhlSettings(path, oldSettings);
+                DBTestUtil.clearDataBaseAfterTest(path, Arrays.asList(sentMessageId, receivedMessageId));
+            }
+        }
+    }
+
     private int getMessagesStatus(int messageId, String configFile) throws Exception {
         int status = -1;
         IntegrationTestsConfigUtil.setUpFromTheConfigurationFile(configFile);

@@ -700,8 +700,10 @@ public class ClientAPI {
                             // ja salvestame saadud dokumendid andmebaasi.
                             if (!hasMoreFragments) {
                                 CommonMethods.gzipUnpackXML(attachmentFile, true);
-                                FileSplitResult splitResult = CommonMethods.splitOutTags(attachmentFile, "dokument", true, false, false);
-                                result.documents.addAll(splitResult.subFiles);
+                                FileSplitResult splitResultVer1 = CommonMethods.splitOutTags(attachmentFile, "dokument", true, false, false);
+                                FileSplitResult splitResultVer2_1 = CommonMethods.splitOutTags(attachmentFile, "DecContainer", true, false, false);
+                                result.documents.addAll(splitResultVer1.subFiles);
+                                result.documents.addAll(splitResultVer2_1.subFiles);
 
                                 // Kustutame manuse faili, kuna kogu edasine tää toimub juba
                                 // eraldatud dokumentide failidega.

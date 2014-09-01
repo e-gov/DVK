@@ -170,7 +170,7 @@ public class ClientRequestsIntegration {
     })
     public void sendAndReceiveContainer2_1_UsingFragmentingTest(String xmlContainer) throws Exception {
         List<String> configFilePaths = IntegrationTestsConfigUtil.
-                getAllConfigFilesAbsolutePathsForPositiveCasesContainerVer2UsingFragmenting();
+                getAllConfigFilesAbsolutePathsForPositiveCasesContainerVer2_1UsingFragmenting();
         for (String path : configFilePaths) {
             DhlSetting oldSettings = DBTestUtil.fetchDhlSettings(path);
             DhlSetting newSettings = new DhlSetting(DhlSetting.CONTAINER_VERSION_2_1);

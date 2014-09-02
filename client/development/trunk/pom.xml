@@ -5,13 +5,13 @@
     <artifactId>client</artifactId>
     <packaging>jar</packaging>
     <name>dvk-client</name>
+    <version>1.7.8</version>
     <parent>
         <groupId>dvk</groupId>
         <artifactId>parent</artifactId>
         <version>1.7.1</version>
         <relativePath>../../..</relativePath>
     </parent>
-    <version>1.7.7</version>
 
     <!-- Dependencies -->
     <dependencies>
@@ -37,7 +37,7 @@
         <dependency>
             <groupId>dvk</groupId>
             <artifactId>api</artifactId>
-            <version>1.0.12</version>
+            <version>1.0.13</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.castor</groupId>

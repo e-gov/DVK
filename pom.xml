@@ -56,6 +56,8 @@
                 <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_serverIsMissing.properties</serverIsMissingConfigs>
                 <containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_hendrik_container_1_0.properties</containerVer1Configs>
                 <conversionTestConfig>./conf/integrationTests/dvk_client_postgreSQL_hendrik_container_1_0_conversion.properties</conversionTestConfig>
+                <containerVer2_1FragmentingConfigs>./conf/integrationTests/dvk_client_postgreSQL_fragmenting_hendrik.properties</containerVer2_1FragmentingConfigs>
+                <containerVer1FragmentingConfigs>./conf/integrationTests/dvk_client_postgreSQL_fragmenting_2_1Container_hendrik.properties</containerVer1FragmentingConfigs>
             </properties>
         </profile>
         <profile>

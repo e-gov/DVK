@@ -149,7 +149,7 @@
             <modules>
                 <module>core/development/trunk</module>
                 <module>client/tags/1.7.7</module>
-                <module>server/tags/1.7.9</module>
+                <module>server/tags/1.7.10</module>
                 <module>api/tags/1.0.12</module>
             </modules>
             <properties>

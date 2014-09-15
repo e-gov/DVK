@@ -233,13 +233,6 @@
         </dependency>
         <dependency>
             <groupId>java</groupId>
-            <artifactId>bctsp-jdk15</artifactId>
-            <version>1.44</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/lib/bctsp-jdk15-1.44.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>java</groupId>
             <artifactId>bcpkix-jdk15on</artifactId>
             <version>1.48</version>
             <scope>system</scope>

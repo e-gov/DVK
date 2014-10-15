@@ -99,6 +99,8 @@
                 <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_IgorAndLiza-serverIsMissing.properties</serverIsMissingConfigs>
                 <containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_9_3_Liza-containerVer1.properties</containerVer1Configs>
                 <conversionTestConfig>./conf/integrationTests/dvk_client_postgreSQL_9_3_Liza-conversion.properties</conversionTestConfig>
+                <containerVer2_1FragmentingConfigs>./conf/integrationTests/dvk_client_postgreSQL_9_3_Liza-fragmenting_capsule_2_1.properties</containerVer2_1FragmentingConfigs>
+                <containerVer1FragmentingConfigs>./conf/integrationTests/dvk_client_postgreSQL_9_3_Liza-fragmenting_capsule_1_0.properties</containerVer1FragmentingConfigs>
             </properties>
         </profile>
         <profile>
@@ -149,7 +151,7 @@
             <modules>
                 <module>core/development/trunk</module>
                 <module>client/tags/1.7.7</module>
-                <module>server/tags/1.7.10</module>
+                <module>server/tags/1.7.11</module>
                 <module>api/tags/1.0.12</module>
             </modules>
             <properties>

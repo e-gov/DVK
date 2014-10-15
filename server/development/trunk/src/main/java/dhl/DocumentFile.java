@@ -310,40 +310,42 @@ public class DocumentFile {
         if (this.m_fileName.toLowerCase().endsWith("ddoc") || this.m_fileName.toLowerCase().endsWith("bdoc")) {
             logger.debug("this file is a ddoc or bdoc");
             initJdigiDoc();
-            DigiDocFactory ddocFactory = ConfigManager.instance().getDigiDocFactory();
+            DigiDocFactory ddocFactory = DdocFactoryWrapper.initializeDdocFactory();
 
             logger.debug("localFileFullname: " + this.m_localFileFullName);
-            SignedDoc container = ddocFactory.readSignedDoc(this.m_localFileFullName);
-            int dataFileCount = container.countDataFiles();
-            for (int i = 0; i < dataFileCount; i++) {
-                DataFile df = container.getDataFile(i);
-                String dataFileName = df.getFileName();
+            SignedDoc container = DdocFactoryWrapper.readSignedDoc(ddocFactory, this.m_localFileFullName);
+            if (container != null) {
+                int dataFileCount = container.countDataFiles();
+                for (int i = 0; i < dataFileCount; i++) {
+                    DataFile df = container.getDataFile(i);
+                    String dataFileName = df.getFileName();
 
-                if ((extensionFilter == null)
-                        || (extensionFilter.length() < 1)
-                        || (dataFileName.toLowerCase().endsWith(extensionFilter.toLowerCase()))) {
-                    String extension = dataFileName.substring(dataFileName.lastIndexOf("."));
-                    String fileName = CommonMethods.createPipelineFile(i, extension);
+                    if ((extensionFilter == null)
+                            || (extensionFilter.length() < 1)
+                            || (dataFileName.toLowerCase().endsWith(extensionFilter.toLowerCase()))) {
+                        String extension = dataFileName.substring(dataFileName.lastIndexOf("."));
+                        String fileName = CommonMethods.createPipelineFile(i, extension);
 
-                    InputStream in = null;
-                    OutputStream out = null;
-                    int val = 0;
-                    try {
-                        out = new FileOutputStream(fileName);
-                        in = df.getBodyAsStream();
+                        InputStream in = null;
+                        OutputStream out = null;
+                        int val = 0;
+                        try {
+                            out = new FileOutputStream(fileName);
+                            in = df.getBodyAsStream();
 
-                        if ((in != null) && (out != null)) {
-                            // Siin ei tasu puhverdamist üritada, kuna JDigiDoc teek ei toeta seda.
-                            while ((val = in.read()) >= 0) {
-                                out.write((byte) val);
+                            if ((in != null) && (out != null)) {
+                                // Siin ei tasu puhverdamist üritada, kuna JDigiDoc teek ei toeta seda.
+                                while ((val = in.read()) >= 0) {
+                                    out.write((byte) val);
+                                }
+                                result.add(fileName);
                             }
-                            result.add(fileName);
+                        } finally {
+                            CommonMethods.safeCloseStream(in);
+                            CommonMethods.safeCloseStream(out);
+                            in = null;
+                            out = null;
                         }
-                    } finally {
-                        CommonMethods.safeCloseStream(in);
-                        CommonMethods.safeCloseStream(out);
-                        in = null;
-                        out = null;
                     }
                 }
             }
@@ -358,21 +360,16 @@ public class DocumentFile {
         if (this.m_fileName.toLowerCase().endsWith("ddoc") || this.m_fileName.toLowerCase().endsWith("bdoc")) {
             logger.info("Validating signatures of file " + this.m_fileName + " (" + this.m_localFileFullName + ").");
             initJdigiDoc();
-            DigiDocFactory ddocFactory = null;
-            try {
-                ddocFactory = ConfigManager.instance().getDigiDocFactory();
-            } catch (DigiDocException ex) {
-                throw new ComponentException("DigiDoc teegi initsialiseerimine ebaõnnestus!", ex);
-            }
+            DigiDocFactory ddocFactory = DdocFactoryWrapper.initializeDdocFactory();
 
             SignedDoc container = null;
             try {
-                container = ddocFactory.readSignedDoc(this.m_localFileFullName);
+                container = DdocFactoryWrapper.readSignedDoc(ddocFactory, this.m_localFileFullName);
             } catch (DigiDocException ex) {
                 throw new ComponentException("DigiDoc faili avamine ebaõnnestus!", ex);
             }
 
-            if (container.countSignatures() > 0) {
+            if (container != null && container.countSignatures() > 0) {
                 ArrayList errs = container.verify(true, true);
                 if (errs.size() >= 0) {
                     for (int j = 0; j < errs.size(); j++) {

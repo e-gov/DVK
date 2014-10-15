@@ -58,7 +58,8 @@ public class SendDocumentsIntegration {
     @Parameters({
             "../testcontainers/v1_0/DVK_73_jdigidoc_cache_problem.xml.gz",
             "../testcontainers/v1_0/test.xml.gz",
-            "../testcontainers/v1_0/ddoc_xforms_obfuscated_onlyXml.xml.gz"
+            "../testcontainers/v1_0/ddoc_xforms_obfuscated_onlyXml.xml.gz",
+            "../testcontainers/v1_0/container_1_0_jddoc_bug.xml.gz"
     })
     public void whenContainer_V1_isSentTo_sendDocuments_V1_serviceShouldRespondWithCID(String attachmentPath) throws Exception {
         sendMessageWithAttachment(attachmentPath, xHeaderBuilder.build());

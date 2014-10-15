@@ -64,7 +64,8 @@ public class ClientRequestsIntegration {
             "container_1_0_icefire_test1_ddoc.xml",
             "container_1_0_icefire_test1_ddoc_evorm.xml",
             "container_1_0_icefire_test1_ddoc_evorm_1.xml",
-            "container_1_0_nok1.xml"
+            "container_1_0_nok1.xml",
+            "container_1_0_jddoc_bug.xml"
     })
     public void sendAndReceiveAndGetSendStatusRequestsAndMarkDocumentsReceivedVersion1_0Test(String xmlContainer) throws Exception {
         List<String> configFilePaths = IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCasesContainerVer1();
@@ -114,14 +115,14 @@ public class ClientRequestsIntegration {
     @Test
     @Parameters({
             "container_2_1_icefire.xml",
-            "container_2_1_icefire_ddoc.xml"           
+            "container_2_1_icefire_ddoc.xml"
     })
     public void sendAndReceiveContainer2_1_UsingFragmentingTest(String xmlContainer) throws Exception {
         List<String> configFilePaths = IntegrationTestsConfigUtil.
                 getAllConfigFilesAbsolutePathsForPositiveCasesContainerVer2_1UsingFragmenting();
         for (String path : configFilePaths) {
             doTestForContainerVer2_1(path, xmlContainer);
-        }                                        
+        }
     }
 
     @Test

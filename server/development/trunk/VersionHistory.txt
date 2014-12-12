@@ -1,3 +1,5 @@
+- Testcommit
+
 1.7.11
 -----------------------------------------------------------------------------
 - Fix related to jdigidoc problem with valid, but not correct signatures.

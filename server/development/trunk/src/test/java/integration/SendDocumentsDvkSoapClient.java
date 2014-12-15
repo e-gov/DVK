@@ -42,7 +42,8 @@ public class SendDocumentsDvkSoapClient extends AbstractDvkServiceSoapClient {
         elKeha.addChild(eldokumendid);
         elKeha.addChild(fac.createOMElement("kaust", null));
 
-/*        // Send document in fragments
+        /*       
+		// Send document in fragments
         // start
         OMElement elEdastusId = fac.createOMElement("edastus_id", null);
         //b.edastusID = headerVar.getOrganizationCode() + String.valueOf(message.getId());

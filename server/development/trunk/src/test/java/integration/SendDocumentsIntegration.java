@@ -33,12 +33,14 @@ public class SendDocumentsIntegration {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        xHeaderBuilder = new XHeaderBuilder();
+        xHeaderBuilder = new XHeaderBuilder();        
         xHeaderBuilder.setAsutus("87654321").setAndmekogu("dhl")
+        //xHeaderBuilder.setAsutus("70006317").setAndmekogu("dhl")
                 .setAmetnik("EE12345678901").setId("6cae248568b3db7e97ff784673a4d38c5906bee0")
                 .setNimi("dhl.sendDocuments.v1").setToimik("").setIsikukood("");
 
-        String serviceUrl = "http://0.0.0.0:9099/services/dhlHttpSoapPort";
+        //String serviceUrl = "http://0.0.0.0:9099/services/dhlHttpSoapPort";
+        String serviceUrl = "http://0.0.0.0:8070/dvk/services/dhlHttpSoapPort";        
         EndpointReference endpointReference = new EndpointReference(serviceUrl);
         options = new Options();
         options.setTo(endpointReference);

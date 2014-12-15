@@ -36,10 +36,10 @@ public class ApplicationParams {
         try {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
-                CallableStatement cs = conn.prepareCall("{call GET_PARAMETERS(?)}");
-                cs.registerOutParameter("aar_last_sync", Types.TIMESTAMP);
+                CallableStatement cs = conn.prepareCall("{? = call \"Get_Parameters\"()}");
+                cs.registerOutParameter(1, Types.TIMESTAMP);
                 cs.executeUpdate();
-                m_lastAarSync = cs.getTimestamp("aar_last_sync", cal);
+                m_lastAarSync = cs.getTimestamp(1, cal);
                 cs.close();
             } else {
                 clear();
@@ -54,8 +54,8 @@ public class ApplicationParams {
         try {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
-                CallableStatement cs = conn.prepareCall("{call SAVE_PARAMETERS(?)}");
-                cs.setTimestamp("aar_last_sync", CommonMethods.sqlDateFromDate(m_lastAarSync), cal);
+                CallableStatement cs = conn.prepareCall("{call \"Save_Parameters\"(?)}");
+                cs.setTimestamp(1, CommonMethods.sqlDateFromDate(m_lastAarSync), cal);
                 cs.executeUpdate();
                 cs.close();
                 return true;

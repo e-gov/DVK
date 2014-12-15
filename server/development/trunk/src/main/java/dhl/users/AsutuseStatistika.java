@@ -2,7 +2,7 @@ package dhl.users;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.Types;
+import java.sql.ResultSet;
 
 import org.apache.log4j.Logger;
 
@@ -34,6 +34,78 @@ public class AsutuseStatistika {
         m_vahetatudDokumente = value;
     }
 
+
+    public static AsutuseStatistika getByOrgID(int orgID, Connection conn) throws Exception {
+        logger.debug("AsutuseStatistika.getByOrgID invoked. Parameters: ");
+        logger.debug("orgID: " + orgID);
+                        
+        AsutuseStatistika stat = null;
+        if (conn != null) {
+        	CallableStatement cs = conn.prepareCall("SELECT * FROM \"Get_AsutusStat\"(?)");
+            cs.setInt(1, orgID);
+            ResultSet rs = cs.executeQuery();        	
+            while (rs.next()) {      
+	            stat = new AsutuseStatistika();
+	            Long vastuvotmata_dokumente = rs.getLong("vastuvotmata_dokumente");
+	            Long vahetatud_dokumente = rs.getLong("vahetatud_dokumente"); 
+	            stat.setVastuvotmataDokumente(Integer.parseInt(String.valueOf(vastuvotmata_dokumente)));
+	            stat.setVahetatudDokumente(Integer.parseInt(String.valueOf(vahetatud_dokumente)));
+            }
+            rs.close();
+            cs.close();
+            return stat;            
+        } else {
+            throw new Exception("DB Connection is NULL!");
+        }
+    }
+
+
+    public static AsutuseStatistika getBySubdivisionId(int orgId, int subdivisionId, Connection conn) throws Exception {
+        AsutuseStatistika stat = null;
+        if (conn != null) {
+        	CallableStatement cs = conn.prepareCall("SELECT * FROM \"Get_AllyksusStat\"(?,?)");
+            cs.setInt(1, orgId);
+            cs.setInt(2, subdivisionId);
+            ResultSet rs = cs.executeQuery();        	
+            while (rs.next()) {                               
+	            stat = new AsutuseStatistika();
+	            Long vastuvotmata_dokumente = rs.getLong("vastuvotmata_dokumente");
+	            Long vahetatud_dokumente = rs.getLong("vahetatud_dokumente"); 
+	            stat.setVastuvotmataDokumente(Integer.parseInt(String.valueOf(vastuvotmata_dokumente)));
+	            stat.setVahetatudDokumente(Integer.parseInt(String.valueOf(vahetatud_dokumente)));	            
+            }
+            rs.close();
+            cs.close();
+            return stat;
+        } else {
+            throw new Exception("DB Connection is NULL!");
+        }
+    }
+
+    
+    public static AsutuseStatistika getByOccupationId(int orgId, int occupationId, Connection conn) throws Exception {
+        AsutuseStatistika stat = null;
+        if (conn != null) {
+        	
+        	CallableStatement cs = conn.prepareCall("SELECT * FROM \"Get_AmetikohtStat\"(?,?)");
+            cs.setInt(1, orgId);
+            cs.setInt(2, occupationId);
+            ResultSet rs = cs.executeQuery();        	        	
+            while (rs.next()) {                               
+	            stat = new AsutuseStatistika();	            
+	            Long vastuvotmata_dokumente = rs.getLong("vastuvotmata_dokumente");
+	            Long vahetatud_dokumente = rs.getLong("vahetatud_dokumente"); 
+	            stat.setVastuvotmataDokumente(Integer.parseInt(String.valueOf(vastuvotmata_dokumente)));
+	            stat.setVahetatudDokumente(Integer.parseInt(String.valueOf(vahetatud_dokumente)));	            
+            }
+            rs.close();
+            cs.close();
+            return stat;
+        } else {
+            throw new Exception("DB Connection is NULL!");
+        }
+    }
+    /*
     public static AsutuseStatistika getByOrgID(int orgID, Connection conn) throws Exception {
 
         logger.debug("AsutuseStatistika.getByOrgID invoked. Parameters: ");
@@ -55,7 +127,8 @@ public class AsutuseStatistika {
             throw new Exception("DB Connection is NULL!");
         }
     }
-
+    */
+    /*
     public static AsutuseStatistika getBySubdivisionId(int orgId, int subdivisionId, Connection conn) throws Exception {
         AsutuseStatistika stat = null;
         if (conn != null) {
@@ -74,7 +147,8 @@ public class AsutuseStatistika {
             throw new Exception("DB Connection is NULL!");
         }
     }
-
+    */
+    /*
     public static AsutuseStatistika getByOccupationId(int orgId, int occupationId, Connection conn) throws Exception {
         AsutuseStatistika stat = null;
         if (conn != null) {
@@ -93,4 +167,6 @@ public class AsutuseStatistika {
             throw new Exception("DB Connection is NULL!");
         }
     }
+    */
+    
 }

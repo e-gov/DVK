@@ -9,8 +9,11 @@ import dvk.core.CommonStructures;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -187,35 +190,25 @@ public class Proxy {
     public void LoadBySendingID(int sendingID, Connection conn) {
         try {
             if (conn != null) {
-                CallableStatement cs = conn.prepareCall("{call GET_PROXYBYSENDINGID(?,?,?,?,?,?,?,?,?,?,?,?,?)}");
-                cs.setInt("sending_id", sendingID);
-                cs.registerOutParameter("proxy_id", Types.INTEGER);
-                cs.registerOutParameter("organization_id", Types.INTEGER);
-                cs.registerOutParameter("position_id", Types.INTEGER);
-                cs.registerOutParameter("division_id", Types.INTEGER);
-                cs.registerOutParameter("personal_id_code", Types.VARCHAR);
-                cs.registerOutParameter("name", Types.VARCHAR);
-                cs.registerOutParameter("organization_name", Types.VARCHAR);
-                cs.registerOutParameter("email", Types.VARCHAR);
-                cs.registerOutParameter("department_nr", Types.VARCHAR);
-                cs.registerOutParameter("department_name", Types.VARCHAR);
-                cs.registerOutParameter("position_short_name", Types.VARCHAR);
-                cs.registerOutParameter("division_short_name", Types.VARCHAR);
-                cs.executeUpdate();
-                m_id = cs.getInt("proxy_id");
-                m_sendingID = sendingID;
-                m_organizationID = cs.getInt("organization_id");
-                m_positionID = cs.getInt("position_id");
-                m_divisionID = cs.getInt("division_id");
-                m_personalIdCode = cs.getString("personal_id_code");
-                m_name = cs.getString("name");
-                m_organizationName = cs.getString("organization_name");
-                m_email = cs.getString("email");
-                m_departmentNumber = cs.getString("department_nr");
-                m_departmentName = cs.getString("department_name");
-                m_positionShortName = cs.getString("position_short_name");
-                m_divisionShortName = cs.getString("division_short_name");
-                cs.close();
+	            Statement cs = conn.createStatement();
+	            ResultSet rs = cs.executeQuery("SELECT * FROM \"Get_ProxyBySendingID\"(" + sendingID + ")");
+	            while (rs.next()) {
+	                m_id = rs.getInt("proxy_id");
+	                m_sendingID = sendingID;
+	                m_organizationID = rs.getInt("organization_id");
+	                m_positionID = rs.getInt("position_id");
+	                m_divisionID = rs.getInt("division_id");
+	                m_personalIdCode = rs.getString("personal_id_code");
+	                m_name = rs.getString("name");
+	                m_organizationName = rs.getString("organization_name");
+	                m_email = rs.getString("email");
+	                m_departmentNumber = rs.getString("department_nr");
+	                m_departmentName = rs.getString("department_name");
+	                m_positionShortName = rs.getString("position_short_name");
+	                m_divisionShortName = rs.getString("division_short_name");
+	            }	                
+                rs.close();
+                cs.close();	            
             } else {
                 clear();
             }
@@ -227,31 +220,32 @@ public class Proxy {
 
     public int addToDB(Connection conn, XHeader xTeePais) throws IllegalArgumentException, SQLException {
         if (conn != null) {
-            CallableStatement cs = conn.prepareCall("{call ADD_PROXY(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
-            cs.registerOutParameter("proxy_id", Types.INTEGER);
-            cs.setInt("sending_id", m_sendingID);
-            cs.setInt("organization_id", m_organizationID);
-            cs.setInt("position_id", m_positionID);
-            cs.setInt("division_id", m_divisionID);
-            cs.setString("personal_id_code", m_personalIdCode);
-            cs.setString("email", m_email);
-            cs.setString("name", m_name);
-            cs.setString("organization_name", m_organizationName);
-            cs.setString("department_nr", m_departmentNumber);
-            cs.setString("department_name", m_departmentName);
-            cs.setString("position_short_name", m_positionShortName);
-            cs.setString("division_short_name", m_divisionShortName);
+            CallableStatement cs = conn.prepareCall("{? = call \"Add_Proxy\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+            cs.registerOutParameter(1, Types.INTEGER);
+            
+            cs.setInt(2, m_sendingID);
+            cs.setInt(3, m_organizationID);
+            cs.setInt(4, m_positionID);
+            cs.setInt(5, m_divisionID);
+            cs.setString(6, m_personalIdCode);
+            cs.setString(7, m_email);
+            cs.setString(8, m_name);
+            cs.setString(9, m_organizationName);
+            cs.setString(10, m_departmentNumber);
+            cs.setString(11, m_departmentName);
+            cs.setString(12, m_positionShortName);
+            cs.setString(13, m_divisionShortName);
 
             if (xTeePais != null) {
-                cs.setString("xtee_isikukood", xTeePais.isikukood);
-                cs.setString("xtee_asutus", xTeePais.asutus);
+                cs.setString(14, xTeePais.isikukood);
+                cs.setString(15, xTeePais.asutus);
             } else {
-                cs.setString("xtee_isikukood", null);
-                cs.setString("xtee_asutus", null);
+                cs.setString(14, null);
+                cs.setString(15, null);
             }
 
             cs.executeUpdate();
-            m_id = cs.getInt("proxy_id");
+            m_id = cs.getInt(1);
             cs.close();
             return m_id;
         } else {
@@ -259,7 +253,7 @@ public class Proxy {
         }
     }
 
-    public static Proxy fromXML(XMLStreamReader xmlReader, Connection conn) throws AxisFault {
+    public static Proxy fromXML(XMLStreamReader xmlReader, Connection conn) throws AxisFault {    
         try {
             Proxy result = new Proxy();
 

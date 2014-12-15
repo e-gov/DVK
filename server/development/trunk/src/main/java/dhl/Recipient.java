@@ -10,10 +10,8 @@ import dhl.users.Ametikoht;
 import dhl.users.Asutus;
 
 import java.io.OutputStreamWriter;
-import java.io.Reader;
 import java.io.StringReader;
 import java.sql.CallableStatement;
-import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -279,73 +277,71 @@ public class Recipient {
         m_cc = false;
         m_statusDate = new Date();
     }
+    
 
     public static ArrayList<Recipient> getList(int sendingID, Connection conn) throws Exception {
         if (conn != null) {
             Calendar cal = Calendar.getInstance();
-            CallableStatement cs = conn.prepareCall("{call GET_RECIPIENTS(?,?)}");
-            cs.setInt("sending_id", sendingID);
-            cs.registerOutParameter("RC1", oracle.jdbc.OracleTypes.CURSOR);
-            cs.execute();
-            ResultSet rs = (ResultSet) cs.getObject("RC1");
-            ArrayList<Recipient> result = new ArrayList<Recipient>();
-            while (rs.next()) {
-                Recipient item = new Recipient();
-                item.setId(rs.getInt("vastuvotja_id"));
-                item.setSendingID(rs.getInt("transport_id"));
-                item.setOrganizationID(rs.getInt("asutus_id"));
-                item.setPositionID(rs.getInt("ametikoht_id"));
-                item.setDivisionID(rs.getInt("allyksus_id"));
-                item.setPersonalIdCode(rs.getString("isikukood"));
-                item.setName(rs.getString("nimi"));
-                item.setOrganizationName(rs.getString("asutuse_nimi"));
-                item.setEmail(rs.getString("email"));
-                item.setDepartmentNumber(rs.getString("osakonna_nr"));
-                item.setDepartmentName(rs.getString("osakonna_nimi"));
-                item.setSendingMethodID(rs.getInt("saatmisviis_id"));
-                item.setSendStatusID(rs.getInt("staatus_id"));
-                item.setSendingStartDate(rs.getTimestamp("saatmise_algus", cal));
-                item.setSendingEndDate(rs.getTimestamp("saatmise_lopp", cal));
-
-                String faultString = rs.getString("fault_string");
-                if ((faultString != null) && (faultString.length() > 0)) {
-                    Fault f = new Fault(rs.getString("fault_code"), rs.getString("fault_actor"), faultString, rs.getString("fault_detail"));
-                    item.setFault(f);
-                }
-
-                item.setRecipientStatusId(rs.getInt("vastuvotja_staatus_id"));
-                item.setIdInRemoteServer(rs.getInt("dok_id_teises_serveris"));
-                item.setDivisionShortName(rs.getString("allyksuse_lyhinimetus"));
-                item.setPositionShortName(rs.getString("ametikoha_lyhinimetus"));
-
-                // Loeme CLOB-ist dokumendi andmed
-                Clob tmpBlob = rs.getClob("metaxml");
-                if (tmpBlob != null) {
-                    Reader r = tmpBlob.getCharacterStream();
-
-                    StringBuffer sb = new StringBuffer();
-                    try {
-                        char[] charbuf = new char[Settings.getBinaryBufferSize()];
-                        for (int i = r.read(charbuf); i > 0; i = r.read(charbuf)) {
-                            sb.append(charbuf, 0, i);
-                        }
-                    } catch (Exception e) {
-                        CommonMethods.logError(e, "dhl.Recipient", "getList");
-                        throw e;
-                    }
-                    item.setMetaXML(sb.toString());
-                }
-
-                result.add(item);
-            }
-            rs.close();
-            cs.close();
-            return result;
+        	boolean defaultAutoCommit = conn.getAutoCommit();
+        	try{
+        		conn.setAutoCommit(false);
+        		
+            	CallableStatement cs = conn.prepareCall("{? = call \"Get_Recipients\"(?)}");
+            	cs.registerOutParameter(1, Types.OTHER);
+            	cs.setInt(2, sendingID);
+                cs.execute();
+            
+	            ResultSet rs = (ResultSet) cs.getObject(1);
+	            ArrayList<Recipient> result = new ArrayList<Recipient>();
+	            while (rs.next()) {
+	                Recipient item = new Recipient();
+	                item.setId(rs.getInt("vastuvotja_id"));
+	                item.setSendingID(rs.getInt("transport_id"));
+	                item.setOrganizationID(rs.getInt("asutus_id"));
+	                item.setPositionID(rs.getInt("ametikoht_id"));
+	                item.setDivisionID(rs.getInt("allyksus_id"));
+	                item.setPersonalIdCode(rs.getString("isikukood"));
+	                item.setName(rs.getString("nimi"));
+	                item.setOrganizationName(rs.getString("asutuse_nimi"));
+	                item.setEmail(rs.getString("email"));
+	                item.setDepartmentNumber(rs.getString("osakonna_nr"));
+	                item.setDepartmentName(rs.getString("osakonna_nimi"));
+	                item.setSendingMethodID(rs.getInt("saatmisviis_id"));
+	                item.setSendStatusID(rs.getInt("staatus_id"));
+	                item.setSendingStartDate(rs.getTimestamp("saatmise_algus", cal));
+	                item.setSendingEndDate(rs.getTimestamp("saatmise_lopp", cal));
+	
+	                String faultString = rs.getString("fault_string");
+	                if ((faultString != null) && (faultString.length() > 0)) {
+	                    Fault f = new Fault(rs.getString("fault_code"), rs.getString("fault_actor"), faultString, rs.getString("fault_detail"));
+	                    item.setFault(f);
+	                }
+	
+	                item.setRecipientStatusId(rs.getInt("vastuvotja_staatus_id"));
+	                item.setIdInRemoteServer(rs.getInt("dok_id_teises_serveris"));
+	                item.setDivisionShortName(rs.getString("allyksuse_lyhinimetus"));
+	                item.setPositionShortName(rs.getString("ametikoha_lyhinimetus"));
+	
+	                // Loeme CLOB-ist dokumendi andmed
+	                String tmpBlob = rs.getString("metaxml");
+	                if (tmpBlob != null) {
+	                    item.setMetaXML(tmpBlob);
+	                }
+	
+	                result.add(item);
+	            }
+	            rs.close();
+	            cs.close();
+	            return result;
+            } finally {
+    			conn.setAutoCommit(defaultAutoCommit);
+    		}	               	               	                	            
         } else {
             throw new Exception("Database connection is NULL!");
         }
     }
-
+    
+    
     public int addToDB(Connection conn, XHeader xTeePais) throws SQLException, IllegalArgumentException {
         if (conn != null) {
             Calendar cal = Calendar.getInstance();
@@ -355,8 +351,7 @@ public class Recipient {
             try {
                 m_id = getNextID(conn);
                 StringReader r = new StringReader(m_metaXML);
-
-                CallableStatement cs = conn.prepareCall("{call ADD_VASTUVOTJA(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                CallableStatement cs = conn.prepareCall("{call \"Add_Vastuvotja\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 cs.setInt(1, m_id);
                 cs.setInt(2, m_sendingID);
                 cs = CommonMethods.setNullableIntParam(cs, 3, m_organizationID);
@@ -397,7 +392,7 @@ public class Recipient {
                     cs.setString(26, "");
                 }
 
-                cs.executeUpdate();
+                cs.execute();
                 cs.close();
 
                 // Lisame staatuse ajaloo kirje
@@ -418,6 +413,7 @@ public class Recipient {
             throw new IllegalArgumentException("Database connection is NULL!");
         }
     }
+    
 
     public boolean updateProc(Connection conn, XHeader xTeePais) throws SQLException, IllegalArgumentException {
         if (conn != null) {
@@ -427,8 +423,7 @@ public class Recipient {
 
             try {
                 StringReader r = new StringReader(m_metaXML);
-                CallableStatement cs = conn.prepareCall("{call UPDATE_VASTUVOTJA(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
-
+                CallableStatement cs = conn.prepareCall("{call \"Update_Vastuvotja\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");                
                 cs.setInt(2, m_sendingID);
                 cs = CommonMethods.setNullableIntParam(cs, 3, m_organizationID);
                 cs = CommonMethods.setNullableIntParam(cs, 4, m_positionID);
@@ -463,11 +458,11 @@ public class Recipient {
                 cs.setString(24, m_positionShortName);
 
                 if (xTeePais != null) {
-                    cs.setString("xtee_isikukood", xTeePais.isikukood);
-                    cs.setString("xtee_asutus", xTeePais.asutus);
+                    cs.setString(25, xTeePais.isikukood);
+                    cs.setString(26, xTeePais.asutus);
                 } else {
-                    cs.setString("xtee_isikukood", "");
-                    cs.setString("xtee_asutus", "");
+                    cs.setString(25, "");
+                    cs.setString(26, "");
                 }
 
                 cs.executeUpdate();
@@ -491,7 +486,8 @@ public class Recipient {
             throw new IllegalArgumentException("Database connection is NULL!");
         }
     }
-
+    
+    
     public boolean update(Connection conn, XHeader xTeePais) throws SQLException, IllegalArgumentException {
         if (conn != null) {
             Calendar cal = Calendar.getInstance();
@@ -568,10 +564,10 @@ public class Recipient {
 
     public static int getNextID(Connection conn) throws SQLException, IllegalArgumentException {
         if (conn != null) {
-            CallableStatement cs = conn.prepareCall("{call GET_NEXTRECIPIENTID(?)}");
-            cs.registerOutParameter("recipient_id", Types.INTEGER);
-            cs.executeUpdate();
-            int result = cs.getInt("recipient_id");
+            CallableStatement cs = conn.prepareCall("{? = call \"Get_NextRecipientID\"()}");
+            cs.registerOutParameter(1, Types.INTEGER);
+            cs.execute();
+            int result = cs.getInt(1);
             cs.close();
             return result;
         } else {
@@ -841,4 +837,224 @@ public class Recipient {
             logger.warn("Unable to copy recipient status from another recipient instance because the other instance is NULL!");
         }
     }
+    
+    /*
+    public static ArrayList<Recipient> getList(int sendingID, Connection conn) throws Exception {
+        if (conn != null) {
+            Calendar cal = Calendar.getInstance();
+            CallableStatement cs = conn.prepareCall("{call GET_RECIPIENTS(?,?)}");
+            cs.setInt("sending_id", sendingID);
+            cs.registerOutParameter("RC1", oracle.jdbc.OracleTypes.CURSOR);
+            cs.execute();
+            ResultSet rs = (ResultSet) cs.getObject("RC1");
+            ArrayList<Recipient> result = new ArrayList<Recipient>();
+            while (rs.next()) {
+                Recipient item = new Recipient();
+                item.setId(rs.getInt("vastuvotja_id"));
+                item.setSendingID(rs.getInt("transport_id"));
+                item.setOrganizationID(rs.getInt("asutus_id"));
+                item.setPositionID(rs.getInt("ametikoht_id"));
+                item.setDivisionID(rs.getInt("allyksus_id"));
+                item.setPersonalIdCode(rs.getString("isikukood"));
+                item.setName(rs.getString("nimi"));
+                item.setOrganizationName(rs.getString("asutuse_nimi"));
+                item.setEmail(rs.getString("email"));
+                item.setDepartmentNumber(rs.getString("osakonna_nr"));
+                item.setDepartmentName(rs.getString("osakonna_nimi"));
+                item.setSendingMethodID(rs.getInt("saatmisviis_id"));
+                item.setSendStatusID(rs.getInt("staatus_id"));
+                item.setSendingStartDate(rs.getTimestamp("saatmise_algus", cal));
+                item.setSendingEndDate(rs.getTimestamp("saatmise_lopp", cal));
+
+                String faultString = rs.getString("fault_string");
+                if ((faultString != null) && (faultString.length() > 0)) {
+                    Fault f = new Fault(rs.getString("fault_code"), rs.getString("fault_actor"), faultString, rs.getString("fault_detail"));
+                    item.setFault(f);
+                }
+
+                item.setRecipientStatusId(rs.getInt("vastuvotja_staatus_id"));
+                item.setIdInRemoteServer(rs.getInt("dok_id_teises_serveris"));
+                item.setDivisionShortName(rs.getString("allyksuse_lyhinimetus"));
+                item.setPositionShortName(rs.getString("ametikoha_lyhinimetus"));
+
+                // Loeme CLOB-ist dokumendi andmed
+                Clob tmpBlob = rs.getClob("metaxml");
+                if (tmpBlob != null) {
+                    Reader r = tmpBlob.getCharacterStream();
+
+                    StringBuffer sb = new StringBuffer();
+                    try {
+                        char[] charbuf = new char[Settings.getBinaryBufferSize()];
+                        for (int i = r.read(charbuf); i > 0; i = r.read(charbuf)) {
+                            sb.append(charbuf, 0, i);
+                        }
+                    } catch (Exception e) {
+                        CommonMethods.logError(e, "dhl.Recipient", "getList");
+                        throw e;
+                    }
+                    item.setMetaXML(sb.toString());
+                }
+
+                result.add(item);
+            }
+            rs.close();
+            cs.close();
+            return result;
+        } else {
+            throw new Exception("Database connection is NULL!");
+        }
+    }
+    */
+    
+    /*
+    public int addToDB(Connection conn, XHeader xTeePais) throws SQLException, IllegalArgumentException {
+        if (conn != null) {
+            Calendar cal = Calendar.getInstance();
+            boolean defaultAutoCommit = conn.getAutoCommit();
+            conn.setAutoCommit(false);
+
+            try {
+                m_id = getNextID(conn);
+                StringReader r = new StringReader(m_metaXML);
+
+                CallableStatement cs = conn.prepareCall("{call ADD_VASTUVOTJA(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                cs.setInt(1, m_id);
+                cs.setInt(2, m_sendingID);
+                cs = CommonMethods.setNullableIntParam(cs, 3, m_organizationID);
+                cs = CommonMethods.setNullableIntParam(cs, 4, m_positionID);
+                cs = CommonMethods.setNullableIntParam(cs, 5, m_divisionID);
+                cs.setString(6, m_personalIdCode);
+                cs.setString(7, m_name);
+                cs.setString(8, m_organizationName);
+                cs.setString(9, m_email);
+                cs.setString(10, m_departmentNumber);
+                cs.setString(11, m_departmentName);
+                cs.setInt(12, m_sendingMethodID);
+                cs.setInt(13, m_sendStatusID);
+                cs.setTimestamp(14, CommonMethods.sqlDateFromDate(m_sendingStartDate), cal);
+                cs.setTimestamp(15, CommonMethods.sqlDateFromDate(m_sendingEndDate), cal);
+                if (m_fault != null) {
+                    cs.setString(16, CommonMethods.TruncateString(m_fault.getFaultCode(), 50));
+                    cs.setString(17, CommonMethods.TruncateString(m_fault.getFaultActor(), 250));
+                    cs.setString(18, CommonMethods.TruncateString(m_fault.getFaultString(), 500));
+                    cs.setString(19, CommonMethods.TruncateString(m_fault.getFaultDetail(), 2000));
+                } else {
+                    cs.setString(16, "");
+                    cs.setString(17, "");
+                    cs.setString(18, "");
+                    cs.setString(19, "");
+                }
+                cs = CommonMethods.setNullableIntParam(cs, 20, m_recipientStatusID);
+                cs.setCharacterStream(21, r, m_metaXML.length());
+                cs = CommonMethods.setNullableIntParam(cs, 22, m_idInRemoteServer);
+                cs.setString(23, m_divisionShortName);
+                cs.setString(24, m_positionShortName);
+
+                if (xTeePais != null) {
+                    cs.setString(25, xTeePais.isikukood);
+                    cs.setString(26, xTeePais.asutus);
+                } else {
+                    cs.setString(25, "");
+                    cs.setString(26, "");
+                }
+
+                cs.executeUpdate();
+                cs.close();
+
+                // Lisame staatuse ajaloo kirje
+                DocumentStatusHistory historyEntry = new DocumentStatusHistory(
+                        0, m_id, m_sendStatusID, m_statusDate, m_fault, m_recipientStatusID, m_metaXML);
+                historyEntry.addToDB(conn, xTeePais);
+
+                conn.commit();
+            } catch (SQLException ex) {
+                logger.error("Error while saving recipient data: ", ex);
+                conn.rollback();
+                throw ex;
+            } finally {
+                conn.setAutoCommit(defaultAutoCommit);
+            }
+            return m_id;
+        } else {
+            throw new IllegalArgumentException("Database connection is NULL!");
+        }
+    }
+    */
+    
+    /*
+    public boolean updateProc(Connection conn, XHeader xTeePais) throws SQLException, IllegalArgumentException {
+        if (conn != null) {
+            Calendar cal = Calendar.getInstance();
+            boolean defaultAutoCommit = conn.getAutoCommit();
+            conn.setAutoCommit(false);
+
+            try {
+                StringReader r = new StringReader(m_metaXML);
+                CallableStatement cs = conn.prepareCall("{call UPDATE_VASTUVOTJA(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+
+                cs.setInt(2, m_sendingID);
+                cs = CommonMethods.setNullableIntParam(cs, 3, m_organizationID);
+                cs = CommonMethods.setNullableIntParam(cs, 4, m_positionID);
+                cs = CommonMethods.setNullableIntParam(cs, 5, m_divisionID);
+                cs.setString(6, m_personalIdCode);
+                cs.setString(7, m_email);
+                cs.setString(8, m_name);
+                cs.setString(9, m_organizationName);
+                cs.setString(10, m_departmentNumber);
+                cs.setString(11, m_departmentName);
+                cs.setInt(12, m_sendingMethodID);
+                cs.setInt(13, m_sendStatusID);
+                cs.setTimestamp(14, CommonMethods.sqlDateFromDate(m_sendingStartDate), cal);
+                cs.setTimestamp(15, CommonMethods.sqlDateFromDate(m_sendingEndDate), cal);
+
+                if (m_fault != null) {
+                    cs.setString(16, CommonMethods.TruncateString(m_fault.getFaultCode(), 50));
+                    cs.setString(17, CommonMethods.TruncateString(m_fault.getFaultActor(), 250));
+                    cs.setString(18, CommonMethods.TruncateString(m_fault.getFaultString(), 500));
+                    cs.setString(19, CommonMethods.TruncateString(m_fault.getFaultDetail(), 2000));
+                } else {
+                    cs.setString(16, "");
+                    cs.setString(17, "");
+                    cs.setString(18, "");
+                    cs.setString(19, "");
+                }
+
+                cs = CommonMethods.setNullableIntParam(cs, 20, m_recipientStatusID);
+                cs.setCharacterStream(21, r, m_metaXML.length());
+                cs = CommonMethods.setNullableIntParam(cs, 22, m_idInRemoteServer);
+                cs.setString(23, m_divisionShortName);
+                cs.setString(24, m_positionShortName);
+
+                if (xTeePais != null) {
+                    cs.setString("xtee_isikukood", xTeePais.isikukood);
+                    cs.setString("xtee_asutus", xTeePais.asutus);
+                } else {
+                    cs.setString("xtee_isikukood", "");
+                    cs.setString("xtee_asutus", "");
+                }
+
+                cs.executeUpdate();
+                cs.close();
+
+                // Lisame staatuse ajaloo kirje
+                DocumentStatusHistory historyEntry = new DocumentStatusHistory(
+                        0, m_id, m_sendStatusID, m_statusDate, m_fault, m_recipientStatusID, m_metaXML);
+                historyEntry.addToDB(conn, xTeePais);
+
+                conn.commit();
+            } catch (SQLException ex) {
+                conn.rollback();
+                throw ex;
+            } finally {
+                conn.setAutoCommit(defaultAutoCommit);
+            }
+
+            return true;
+        } else {
+            throw new IllegalArgumentException("Database connection is NULL!");
+        }
+    }
+    */
+    
+    
 }

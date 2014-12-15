@@ -143,19 +143,25 @@ public class Kasutusoigus {
     public static ArrayList<String> getPersonCurrentRoles(int personID, int orgID, Connection conn) {
         try {
             if (conn != null) {
-                CallableStatement cs = conn.prepareCall("{call GET_PERSONCURRENTROLES(?,?,?)}");
-                cs.setInt("person_id", personID);
-                cs.setInt("organization_id", orgID);
-                cs.registerOutParameter("RC1", oracle.jdbc.OracleTypes.CURSOR);
-                cs.execute();
-                ResultSet rs = (ResultSet) cs.getObject("RC1");
-                ArrayList<String> result = new ArrayList<String>();
-                while (rs.next()) {
-                    result.add(rs.getString("roll"));
-                }
-                rs.close();
-                cs.close();
-                return result;
+            	boolean defaultAutoCommit = conn.getAutoCommit();
+            	try{
+	            	conn.setAutoCommit(false);            	
+	            	CallableStatement cs = conn.prepareCall("{? = call \"Get_PersonCurrentRoles\"(?,?)}");
+	            	cs.registerOutParameter(1, Types.OTHER);
+	                cs.setInt(2, personID);
+	                cs.setInt(3, orgID);	            
+	                cs.execute();
+	                ResultSet rs = (ResultSet) cs.getObject(1);
+	                ArrayList<String> result = new ArrayList<String>();
+	                while (rs.next()) {
+	                    result.add(rs.getString("roll"));
+	                }
+	                rs.close();
+	                cs.close();
+	                return result;
+	            } finally {
+	    			conn.setAutoCommit(defaultAutoCommit);
+	    		}	               	               
             } else {
                 return new ArrayList<String>();
             }
@@ -164,9 +170,10 @@ public class Kasutusoigus {
             return new ArrayList<String>();
         }
     }
-
+    
+    
     public static Kasutusoigus getFromDB(String roll, int asutusID, int ametikohtID, int allyksusID, Connection conn) {
-        try {
+    	try {
             if (conn != null) {
                 Kasutusoigus result = new Kasutusoigus();
                 Calendar cal = Calendar.getInstance();
@@ -210,8 +217,9 @@ public class Kasutusoigus {
             return null;
         }
     }
-
-    public int addToDB(Connection conn) {
+    
+    
+    public int addToDB(Connection conn) {    	    	
         try {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
@@ -283,11 +291,9 @@ public class Kasutusoigus {
             if (aarRight == null) {
                 return 0;
             }
-
             if (right == null) {
                 right = new Kasutusoigus();
             }
-
             // Kannamae keskregistrist saadud andmed kohaliku
             // andmeobjekti külge
             right.setRoll(aarRight.getOigusNimi());
@@ -310,4 +316,32 @@ public class Kasutusoigus {
             return 0;
         }
     }
+    
+    /*
+    public static ArrayList<String> getPersonCurrentRoles(int personID, int orgID, Connection conn) {
+        try {
+            if (conn != null) {
+                CallableStatement cs = conn.prepareCall("{call GET_PERSONCURRENTROLES(?,?,?)}");
+                cs.setInt("person_id", personID);
+                cs.setInt("organization_id", orgID);
+                cs.registerOutParameter("RC1", oracle.jdbc.OracleTypes.CURSOR);
+                cs.execute();
+                ResultSet rs = (ResultSet) cs.getObject("RC1");
+                ArrayList<String> result = new ArrayList<String>();
+                while (rs.next()) {
+                    result.add(rs.getString("roll"));
+                }
+                rs.close();
+                cs.close();
+                return result;
+            } else {
+                return new ArrayList<String>();
+            }
+        } catch (Exception ex) {
+            CommonMethods.logError(ex, "dhl.users.Kasutusoigus", "getPersonCurrentRoles");
+            return new ArrayList<String>();
+        }
+    }
+    */
+    
 }

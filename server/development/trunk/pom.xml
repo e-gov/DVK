@@ -6,13 +6,14 @@
     <packaging>war</packaging>
     <version>1.7.12</version>
     <name>dvk-server</name>
+    <!-- 
     <parent>
         <groupId>dvk</groupId>
         <artifactId>parent</artifactId>
         <version>1.7.1</version>
         <relativePath>../../..</relativePath>
     </parent>
-
+ 	-->
     <properties>
         <packageName>dhl</packageName>
     </properties>
@@ -718,6 +719,13 @@
                         <scope>system</scope>
                         <systemPath>${basedir}/lib/ojdbc14.jar</systemPath>
                     </dependency>
+				    <dependency>
+				      <groupId>org.postgresql</groupId>
+				      <artifactId>postgresql</artifactId>
+				      <version>postgresql-9.0-801.jdbc4</version>
+				      <scope>system</scope>
+				      <systemPath>${basedir}/lib/postgresql-9.0-801.jdbc4.jar</systemPath>
+				    </dependency>                                                            
                 </dependencies>
             </plugin>
         </plugins>

@@ -4,8 +4,10 @@ import dhl.aar.iostructures.AarIsik;
 import dvk.core.CommonMethods;
 
 import java.sql.CallableStatement;
+import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.Types;
+import java.sql.ResultSet;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -157,7 +159,166 @@ public class Isik {
         m_muudetud = null;
         m_muutja = "";
     }
+    
+    public static Isik getByCode(String isikukood, Connection conn) {
+        try {
+            if (conn != null) {
+                Isik result = null;                
+                Calendar cal = Calendar.getInstance();                                                        
+                Statement cs = conn.createStatement();
+                ResultSet rs = cs.executeQuery("SELECT * FROM \"Get_IsikByCode\"(" + isikukood + ")");
+                while (rs.next()) {                               
+	                if (rs.getInt("id") > 0) {
+	                    result = new Isik();
+	                    result.setId(rs.getInt("id"));
+	                    result.setIsikukood(isikukood);
+	                    result.setPerenimi(rs.getString("perenimi"));
+	                    result.setEesnimi(rs.getString("eesnimi"));
+	                    result.setMaakond(rs.getString("maakond"));
+	                    result.setAadress(rs.getString("aadress"));
+	                    result.setPostiIndeks(rs.getString("postiindeks"));
+	                    result.setTelefon(rs.getString("telefon"));
+	                    result.setEpost(rs.getString("epost"));
+	                    result.setWww(rs.getString("www"));
+	                    result.setParameetrid(rs.getString("parameetrid"));
+	                    result.setLoodud(rs.getTimestamp("loodud", cal));
+	                    result.setMuudetud(rs.getTimestamp("muudetud", cal));
+	                    result.setMuutja(rs.getString("muutja"));
+	                }
+                }	                
+                rs.close();
+                cs.close();
+                return result;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            CommonMethods.logError(e, "dhl.users.Isik", "getIDByCode");
+            return null;
+        }
+    }
+    
+    
+    public static int getIDByCode(String isikukood, Connection conn) {
+        try {
+            if (conn != null) {
+            	CallableStatement cs = conn.prepareCall("{? = call \"Get_IsikIdByCode\"(?)}");
+            	cs.registerOutParameter(1, Types.INTEGER);
+                cs.setString(2, isikukood);                               
+                cs.execute();                                
+                int result = cs.getInt(1);
+                cs.close();
+                return result;
+            } else {
+                return 0;
+            }
+        } catch (Exception e) {
+            CommonMethods.logError(e, "dhl.users.Isik", "getIDByCode");
+            return 0;
+        }
+    }
 
+    public int addToDB(Connection conn) {    	
+        try {
+            if (conn != null) {
+                Calendar cal = Calendar.getInstance();
+                CallableStatement cs = conn.prepareCall("{? = call \"Add_Isik\"(?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                cs.registerOutParameter(1, Types.INTEGER);
+                
+                cs.setString(2, m_isikukood);
+                cs.setString(3, m_perenimi);
+                cs.setString(4, m_eesnimi);
+                cs.setString(5, m_maakond);
+                cs.setString(6, m_aadress);
+                cs.setString(7, m_postiIndeks);
+                cs.setString(8, m_telefon);
+                cs.setString(9, m_epost);
+                cs.setString(10, m_www);
+                cs.setString(11, m_parameetrid);
+                cs.setTimestamp(12, CommonMethods.sqlDateFromDate(m_loodud), cal);
+                cs.setTimestamp(13, CommonMethods.sqlDateFromDate(m_muudetud), cal);
+                cs.setString(14, m_muutja);
+                cs.execute();
+
+                m_id = cs.getInt(1);
+                cs.close();
+                return m_id;
+            } else {
+                return 0;
+            }
+        } catch (Exception e) {
+            CommonMethods.logError(e, this.getClass().getName(), "addToDB");
+            return 0;
+        }
+    }
+    
+
+    
+    public int updateInDB(Connection conn) {    	    
+        try {
+            if (conn != null) {
+                Calendar cal = Calendar.getInstance();
+                CallableStatement cs = conn.prepareCall("{call \"Update_Isik\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                cs.setInt(1, m_id);
+                cs.setString(2, m_isikukood);
+                cs.setString(3, m_perenimi);
+                cs.setString(4, m_eesnimi);
+                cs.setString(5, m_maakond);
+                cs.setString(6, m_aadress);
+                cs.setString(7, m_postiIndeks);
+                cs.setString(8, m_telefon);
+                cs.setString(9, m_epost);
+                cs.setString(10, m_www);
+                cs.setString(11, m_parameetrid);
+                cs.setTimestamp(12, CommonMethods.sqlDateFromDate(m_loodud), cal);
+                cs.setTimestamp(13, CommonMethods.sqlDateFromDate(m_muudetud), cal);
+                cs.setString(14, m_muutja);
+                cs.executeUpdate();
+                cs.close();
+                return m_id;
+            } else {
+                return 0;
+            }
+        } catch (Exception e) {
+            CommonMethods.logError(e, this.getClass().getName(), "updateInDB");
+            return 0;
+        }
+    }
+    
+    public int saveToDB(Connection conn) {
+        if (m_id > 0) {
+            return updateInDB(conn);
+        } else {
+            return addToDB(conn);
+        }
+    }
+
+    public static int syncWithAar(Isik person, AarIsik aarPerson, Connection conn) {
+        try {
+            if (aarPerson == null) {
+                return 0;
+            }
+            if (person == null) {
+                person = new Isik();
+            }
+
+            // Kannamae keskregistrist saadud andmed kohaliku
+            // andmeobjekti külge
+            person.setIsikukood(aarPerson.getIsikukood());
+            person.setPerenimi(aarPerson.getPerenimi());
+            person.setEesnimi(aarPerson.getEesnimi());
+            person.setTelefon(aarPerson.getTelefon());
+            person.setEpost(aarPerson.getEPost());
+            person.saveToDB(conn);
+
+            return person.getId();
+        } catch (Exception ex) {
+            CommonMethods.logError(ex, "dhl.users.Isik", "syncWithAar");
+            return 0;
+        }
+    }
+    
+    /*
     public static Isik getByCode(String isikukood, Connection conn) {
         try {
             if (conn != null) {
@@ -206,7 +367,8 @@ public class Isik {
             return null;
         }
     }
-
+    */
+    /*
     public static int getIDByCode(String isikukood, Connection conn) {
         try {
             if (conn != null) {
@@ -225,7 +387,9 @@ public class Isik {
             return 0;
         }
     }
+    */
 
+    /*
     public int addToDB(Connection conn) {
         try {
             if (conn != null) {
@@ -257,7 +421,9 @@ public class Isik {
             return 0;
         }
     }
+    */
 
+    /*
     public int updateInDB(Connection conn) {
         try {
             if (conn != null) {
@@ -288,38 +454,6 @@ public class Isik {
             return 0;
         }
     }
-
-    public int saveToDB(Connection conn) {
-        if (m_id > 0) {
-            return updateInDB(conn);
-        } else {
-            return addToDB(conn);
-        }
-    }
-
-    public static int syncWithAar(Isik person, AarIsik aarPerson, Connection conn) {
-        try {
-            if (aarPerson == null) {
-                return 0;
-            }
-
-            if (person == null) {
-                person = new Isik();
-            }
-
-            // Kannamae keskregistrist saadud andmed kohaliku
-            // andmeobjekti külge
-            person.setIsikukood(aarPerson.getIsikukood());
-            person.setPerenimi(aarPerson.getPerenimi());
-            person.setEesnimi(aarPerson.getEesnimi());
-            person.setTelefon(aarPerson.getTelefon());
-            person.setEpost(aarPerson.getEPost());
-            person.saveToDB(conn);
-
-            return person.getId();
-        } catch (Exception ex) {
-            CommonMethods.logError(ex, "dhl.users.Isik", "syncWithAar");
-            return 0;
-        }
-    }
+    */
+    
 }

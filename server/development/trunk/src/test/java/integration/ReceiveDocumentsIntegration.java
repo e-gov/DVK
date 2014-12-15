@@ -3,6 +3,7 @@ package integration;
 import Utills.IntegrationTestUtills;
 import dvk.core.CommonStructures;
 import oracle.jdbc.pool.OracleDataSource;
+
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.Constants;
@@ -21,6 +22,7 @@ import org.junit.Test;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -39,7 +41,9 @@ public class ReceiveDocumentsIntegration {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        String serviceUrl = "http://0.0.0.0:9099/services/dhlHttpSoapPort";
+        //String serviceUrl = "http://0.0.0.0:9099/services/dhlHttpSoapPort";
+    	String serviceUrl = "http://0.0.0.0:8070/dvk/services/dhlHttpSoapPort";
+        
         EndpointReference endpointReference = new EndpointReference(serviceUrl);
         options = new Options();
         options.setTo(endpointReference);
@@ -58,6 +62,7 @@ public class ReceiveDocumentsIntegration {
     private static XHeaderBuilder getDefaultXHeaderBuilder() {
         XHeaderBuilder xHeaderBuilder = new XHeaderBuilder();
         xHeaderBuilder.setAsutus("87654321").setAndmekogu("dhl")
+        //xHeaderBuilder.setAsutus("70006317").setAndmekogu("dhl")
                 .setAmetnik("EE38806190294").setId("6cae248568b3db7e97ff784673a4d38c5906bee0")
                 .setNimi("dhl.sendDocuments.v1").setToimik("").setIsikukood("EE38806190294");
         return xHeaderBuilder;
@@ -88,6 +93,7 @@ public class ReceiveDocumentsIntegration {
         logger.debug("xml: "+xml);
         Assert.assertTrue(xml.contains("<ma:dhl_id>"));
         Assert.assertTrue(xml.contains("<mm:koostaja_asutuse_nr>87654321</mm:koostaja_asutuse_nr>"));
+        //Assert.assertTrue(xml.contains("<mm:koostaja_asutuse_nr>70006317</mm:koostaja_asutuse_nr>"));
     }
 
     @Ignore
@@ -191,8 +197,11 @@ public class ReceiveDocumentsIntegration {
     private void updatePreviouslySentDocumentsStatusToReceived() throws Exception {
         Connection connection = null;
         try {
-            connection = getDatabaseConnection();
-
+            //connection = getDatabaseConnection();
+        	connection = DriverManager.getConnection(
+					"jdbc:postgresql://127.0.0.1:5432/postgres", "postgres",
+					"postgres");
+            
             PreparedStatement preparedStatement = connection.prepareStatement(
                     "UPDATE vastuvotja SET staatus_id = ? WHERE staatus_id != ? ");
             preparedStatement.setInt(1, CommonStructures.SendStatus_Sent);
@@ -213,6 +222,7 @@ public class ReceiveDocumentsIntegration {
         }
     }
 
+
     private Connection getDatabaseConnection() throws Exception {
         OracleDataSource oracleDataSource = new OracleDataSource();
         oracleDataSource.setDriverType("thin");
@@ -221,4 +231,5 @@ public class ReceiveDocumentsIntegration {
         oracleDataSource.setPassword("dvkd");
         return oracleDataSource.getConnection();
     }
+
 }

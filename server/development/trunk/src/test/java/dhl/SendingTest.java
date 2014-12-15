@@ -46,6 +46,7 @@ public class SendingTest {
 		org2Id = 2;
 		org2Code = "87654321";
 		//org2Name = "Ettevõte";
+		//org2Code = "70006317";
 		
 		org1UserWithOrgAdminRole = new UserProfile();
 		org1UserWithOrgAdminRole.setOrganizationID(org1Id);

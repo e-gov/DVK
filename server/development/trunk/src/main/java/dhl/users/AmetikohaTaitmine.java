@@ -7,6 +7,7 @@ import dvk.core.Settings;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -131,39 +132,33 @@ public class AmetikohaTaitmine {
         m_aarID = 0;
     }
 
+
     public static AmetikohaTaitmine getByAarID(int aarID, Connection conn) {
         try {
-            if (conn != null) {
+            if (conn != null) {            	
                 AmetikohaTaitmine result = new AmetikohaTaitmine();
                 Calendar cal = Calendar.getInstance();
-                CallableStatement cs = conn.prepareCall("{call GET_AMETIKOHATAITMINEBYAARID(?,?,?,?,?,?,?,?,?,?,?)}");
-                cs.registerOutParameter("id", Types.INTEGER);
-                cs.registerOutParameter("ametikoht_id", Types.INTEGER);
-                cs.registerOutParameter("isik_id", Types.INTEGER);
-                cs.registerOutParameter("alates", Types.TIMESTAMP);
-                cs.registerOutParameter("kuni", Types.TIMESTAMP);
-                cs.registerOutParameter("roll", Types.VARCHAR);
-                cs.registerOutParameter("created", Types.TIMESTAMP);
-                cs.registerOutParameter("last_modified", Types.TIMESTAMP);
-                cs.registerOutParameter("username", Types.VARCHAR);
-                cs.registerOutParameter("peatatud", Types.INTEGER);
-                cs.setInt("aar_id", aarID);
-                cs.executeUpdate();
-                if (cs.getInt("id") > 0) {
-                    result.setID(cs.getInt("id"));
-                    result.setAmetikohtID(cs.getInt("ametikoht_id"));
-                    result.setIsikID(cs.getInt("isik_id"));
-                    result.setAlates(cs.getTimestamp("alates", cal));
-                    result.setKuni(cs.getTimestamp("kuni", cal));
-                    result.setRoll(cs.getString("roll"));
-                    result.setLoodud(cs.getTimestamp("created", cal));
-                    result.setMuudetud(cs.getTimestamp("last_modified", cal));
-                    result.setMuutja(cs.getString("username"));
-                    result.setPeatatud(cs.getInt("peatatud") > 0);
-                    result.setAarID(aarID);
-                } else {
-                    result = null;
+                
+                Statement cs = conn.createStatement();
+                ResultSet rs = cs.executeQuery("SELECT * FROM \"Get_AmetikohaTaitmineByAarID\"(" + aarID + ")");
+                while (rs.next()) {                                               
+	                if (rs.getInt("id") > 0) {
+	                    result.setID(rs.getInt("id"));
+	                    result.setAmetikohtID(rs.getInt("ametikoht_id"));
+	                    result.setIsikID(rs.getInt("isik_id"));
+	                    result.setAlates(rs.getTimestamp("alates", cal));
+	                    result.setKuni(rs.getTimestamp("kuni", cal));
+	                    result.setRoll(rs.getString("roll"));
+	                    result.setLoodud(rs.getTimestamp("created", cal));
+	                    result.setMuudetud(rs.getTimestamp("last_modified", cal));
+	                    result.setMuutja(rs.getString("username"));
+	                    result.setPeatatud(rs.getInt("peatatud") > 0);
+	                    result.setAarID(aarID);
+	                } else {
+	                    result = null;
+	                }
                 }
+                rs.close();
                 cs.close();
                 return result;
             } else {
@@ -174,36 +169,45 @@ public class AmetikohaTaitmine {
             return null;
         }
     }
+    
 
+    
     public static ArrayList<AmetikohaTaitmine> getList(int jobID, String personCode, Connection conn) {
         try {
             if (conn != null) {
-                Calendar cal = Calendar.getInstance();
-                CallableStatement cs = conn.prepareCall("{call GET_AMETIKOHATAITMINELIST(?,?,?)}");
-                cs.setInt("ametikoht_id", jobID);
-                cs.setString("isikukood", personCode);
-                cs.registerOutParameter("RC1", oracle.jdbc.OracleTypes.CURSOR);
-                cs.execute();
-                ResultSet rs = (ResultSet) cs.getObject("RC1");
-                ArrayList<AmetikohaTaitmine> result = new ArrayList<AmetikohaTaitmine>();
-                while (rs.next()) {
-                    AmetikohaTaitmine item = new AmetikohaTaitmine();
-                    item.setID(rs.getInt("taitmine_id"));
-                    item.setAmetikohtID(rs.getInt("ametikoht_id"));
-                    item.setIsikID(rs.getInt("i_id"));
-                    item.setAlates(rs.getTimestamp("alates", cal));
-                    item.setKuni(rs.getTimestamp("kuni", cal));
-                    item.setRoll(rs.getString("roll"));
-                    item.setLoodud(rs.getTimestamp("created", cal));
-                    item.setMuudetud(rs.getTimestamp("last_modified", cal));
-                    item.setMuutja(rs.getString("username"));
-                    item.setPeatatud(rs.getInt("peatatud") > 0);
-                    item.setAarID(rs.getInt("aar_id"));
-                    result.add(item);
-                }
-                rs.close();
-                cs.close();
-                return result;
+            	boolean defaultAutoCommit = conn.getAutoCommit();
+            	try{
+	            	conn.setAutoCommit(false);	                        
+	            	Calendar cal = Calendar.getInstance();
+	                CallableStatement cs = conn.prepareCall("{? = call \"Get_AmetikohaTaitmineList\"(?,?)}");
+	                cs.registerOutParameter(1, Types.OTHER);
+
+	                cs.setInt(2, jobID);
+	                cs.setString(3, personCode);
+	                cs.execute();
+	                ResultSet rs = (ResultSet) cs.getObject(1);
+	                ArrayList<AmetikohaTaitmine> result = new ArrayList<AmetikohaTaitmine>();
+	                while (rs.next()) {
+	                    AmetikohaTaitmine item = new AmetikohaTaitmine();
+	                    item.setID(rs.getInt("taitmine_id"));
+	                    item.setAmetikohtID(rs.getInt("ametikoht_id"));
+	                    item.setIsikID(rs.getInt("i_id"));
+	                    item.setAlates(rs.getTimestamp("alates", cal));
+	                    item.setKuni(rs.getTimestamp("kuni", cal));
+	                    item.setRoll(rs.getString("roll"));
+	                    item.setLoodud(rs.getTimestamp("created", cal));
+	                    item.setMuudetud(rs.getTimestamp("last_modified", cal));
+	                    item.setMuutja(rs.getString("username"));
+	                    item.setPeatatud(rs.getInt("peatatud") > 0);
+	                    item.setAarID(rs.getInt("aar_id"));
+	                    result.add(item);
+	                }
+	                rs.close();
+	                cs.close();
+	                return result;
+	            } finally {
+	    			conn.setAutoCommit(defaultAutoCommit);
+	    		}	                	                
             } else {
                 return null;
             }
@@ -212,25 +216,27 @@ public class AmetikohaTaitmine {
             return null;
         }
     }
+    
 
     public int addToDB(Connection conn) {
         try {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
-                CallableStatement cs = conn.prepareCall("{call ADD_AMETIKOHATAITMINE(?,?,?,?,?,?,?,?,?,?,?)}");
-                cs.registerOutParameter("id", Types.INTEGER);
-                cs.setInt("ametikoht_id", m_ametikohtID);
-                cs.setInt("isik_id", m_isikID);
-                cs.setTimestamp("alates", CommonMethods.sqlDateFromDate(m_alates), cal);
-                cs.setTimestamp("kuni", CommonMethods.sqlDateFromDate(m_kuni), cal);
-                cs.setString("roll", m_roll);
-                cs.setTimestamp("created", CommonMethods.sqlDateFromDate(m_loodud), cal);
-                cs.setTimestamp("last_modified", CommonMethods.sqlDateFromDate(m_muudetud), cal);
-                cs.setString("username", m_muutja);
-                cs.setInt("peatatud", m_peatatud ? 1 : 0);
-                cs.setInt("aar_id", m_aarID);
+                CallableStatement cs = conn.prepareCall("{? = call \"Add_AmetikohaTaitmine\"(?,?,?,?,?,?,?,?,?,?)}");
+                cs.registerOutParameter(1, Types.INTEGER);
+                
+                cs.setInt(2, m_ametikohtID);
+                cs.setInt(3, m_isikID);
+                cs.setTimestamp(4, CommonMethods.sqlDateFromDate(m_alates), cal);
+                cs.setTimestamp(5, CommonMethods.sqlDateFromDate(m_kuni), cal);
+                cs.setString(6, m_roll);
+                cs.setTimestamp(7, CommonMethods.sqlDateFromDate(m_loodud), cal);
+                cs.setTimestamp(8, CommonMethods.sqlDateFromDate(m_muudetud), cal);
+                cs.setString(9, m_muutja);
+                cs.setInt(10, m_peatatud ? 1 : 0);
+                cs.setInt(11, m_aarID);
                 cs.executeUpdate();
-                m_id = cs.getInt("id");
+                m_id = cs.getInt(1);
                 cs.close();
                 return m_id;
             } else {
@@ -241,23 +247,24 @@ public class AmetikohaTaitmine {
             return 0;
         }
     }
-
+    
+    
     public int updateInDB(Connection conn) {
         try {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
-                CallableStatement cs = conn.prepareCall("{call UPDATE_AMETIKOHATAITMINE(?,?,?,?,?,?,?,?,?,?,?)}");
-                cs.setInt("id", m_id);
-                cs.setInt("ametikoht_id", m_ametikohtID);
-                cs.setInt("isik_id", m_isikID);
-                cs.setTimestamp("alates", CommonMethods.sqlDateFromDate(m_alates), cal);
-                cs.setTimestamp("kuni", CommonMethods.sqlDateFromDate(m_kuni), cal);
-                cs.setString("roll", m_roll);
-                cs.setTimestamp("created", CommonMethods.sqlDateFromDate(m_loodud), cal);
-                cs.setTimestamp("last_modified", CommonMethods.sqlDateFromDate(m_muudetud), cal);
-                cs.setString("username", m_muutja);
-                cs.setInt("peatatud", m_peatatud ? 1 : 0);
-                cs.setInt("aar_id", m_aarID);
+                CallableStatement cs = conn.prepareCall("{call \"Update_AmetikohaTaitmine\"(?,?,?,?,?,?,?,?,?,?,?)}");
+                cs.setInt(1, m_id);
+                cs.setInt(2, m_ametikohtID);
+                cs.setInt(3, m_isikID);
+                cs.setTimestamp(4, CommonMethods.sqlDateFromDate(m_alates), cal);
+                cs.setTimestamp(5, CommonMethods.sqlDateFromDate(m_kuni), cal);
+                cs.setString(6, m_roll);
+                cs.setTimestamp(7, CommonMethods.sqlDateFromDate(m_loodud), cal);
+                cs.setTimestamp(8, CommonMethods.sqlDateFromDate(m_muudetud), cal);
+                cs.setString(9, m_muutja);
+                cs.setInt(10, m_peatatud ? 1 : 0);
+                cs.setInt(11, m_aarID);
                 cs.executeUpdate();
                 cs.close();
                 return m_id;
@@ -335,4 +342,120 @@ public class AmetikohaTaitmine {
             return 0;
         }
     }
+    
+    /*
+    public int addToDB(Connection conn) {
+        try {
+            if (conn != null) {
+                Calendar cal = Calendar.getInstance();
+                CallableStatement cs = conn.prepareCall("{call ADD_AMETIKOHATAITMINE(?,?,?,?,?,?,?,?,?,?,?)}");
+                cs.registerOutParameter("id", Types.INTEGER);
+                cs.setInt("ametikoht_id", m_ametikohtID);
+                cs.setInt("isik_id", m_isikID);
+                cs.setTimestamp("alates", CommonMethods.sqlDateFromDate(m_alates), cal);
+                cs.setTimestamp("kuni", CommonMethods.sqlDateFromDate(m_kuni), cal);
+                cs.setString("roll", m_roll);
+                cs.setTimestamp("created", CommonMethods.sqlDateFromDate(m_loodud), cal);
+                cs.setTimestamp("last_modified", CommonMethods.sqlDateFromDate(m_muudetud), cal);
+                cs.setString("username", m_muutja);
+                cs.setInt("peatatud", m_peatatud ? 1 : 0);
+                cs.setInt("aar_id", m_aarID);
+                cs.executeUpdate();
+                m_id = cs.getInt("id");
+                cs.close();
+                return m_id;
+            } else {
+                return 0;
+            }
+        } catch (Exception e) {
+            CommonMethods.logError(e, this.getClass().getName(), "addToDB");
+            return 0;
+        }
+    }
+    */
+    /*
+    public static ArrayList<AmetikohaTaitmine> getList(int jobID, String personCode, Connection conn) {
+        try {
+            if (conn != null) {
+                Calendar cal = Calendar.getInstance();
+                CallableStatement cs = conn.prepareCall("{call GET_AMETIKOHATAITMINELIST(?,?,?)}");
+                cs.setInt("ametikoht_id", jobID);
+                cs.setString("isikukood", personCode);
+                cs.registerOutParameter("RC1", oracle.jdbc.OracleTypes.CURSOR);
+                cs.execute();
+                ResultSet rs = (ResultSet) cs.getObject("RC1");
+                ArrayList<AmetikohaTaitmine> result = new ArrayList<AmetikohaTaitmine>();
+                while (rs.next()) {
+                    AmetikohaTaitmine item = new AmetikohaTaitmine();
+                    item.setID(rs.getInt("taitmine_id"));
+                    item.setAmetikohtID(rs.getInt("ametikoht_id"));
+                    item.setIsikID(rs.getInt("i_id"));
+                    item.setAlates(rs.getTimestamp("alates", cal));
+                    item.setKuni(rs.getTimestamp("kuni", cal));
+                    item.setRoll(rs.getString("roll"));
+                    item.setLoodud(rs.getTimestamp("created", cal));
+                    item.setMuudetud(rs.getTimestamp("last_modified", cal));
+                    item.setMuutja(rs.getString("username"));
+                    item.setPeatatud(rs.getInt("peatatud") > 0);
+                    item.setAarID(rs.getInt("aar_id"));
+                    result.add(item);
+                }
+                rs.close();
+                cs.close();
+                return result;
+            } else {
+                return null;
+            }
+        } catch (Exception ex) {
+            CommonMethods.logError(ex, "dhl.users.AmetikohaTaitmine", "getList");
+            return null;
+        }
+    }
+    */
+    /*
+    public static AmetikohaTaitmine getByAarID(int aarID, Connection conn) {
+        try {
+            if (conn != null) {
+                AmetikohaTaitmine result = new AmetikohaTaitmine();
+                Calendar cal = Calendar.getInstance();
+                CallableStatement cs = conn.prepareCall("{call GET_AMETIKOHATAITMINEBYAARID(?,?,?,?,?,?,?,?,?,?,?)}");
+                cs.registerOutParameter("id", Types.INTEGER);
+                cs.registerOutParameter("ametikoht_id", Types.INTEGER);
+                cs.registerOutParameter("isik_id", Types.INTEGER);
+                cs.registerOutParameter("alates", Types.TIMESTAMP);
+                cs.registerOutParameter("kuni", Types.TIMESTAMP);
+                cs.registerOutParameter("roll", Types.VARCHAR);
+                cs.registerOutParameter("created", Types.TIMESTAMP);
+                cs.registerOutParameter("last_modified", Types.TIMESTAMP);
+                cs.registerOutParameter("username", Types.VARCHAR);
+                cs.registerOutParameter("peatatud", Types.INTEGER);
+                cs.setInt("aar_id", aarID);
+                cs.executeUpdate();
+                if (cs.getInt("id") > 0) {
+                    result.setID(cs.getInt("id"));
+                    result.setAmetikohtID(cs.getInt("ametikoht_id"));
+                    result.setIsikID(cs.getInt("isik_id"));
+                    result.setAlates(cs.getTimestamp("alates", cal));
+                    result.setKuni(cs.getTimestamp("kuni", cal));
+                    result.setRoll(cs.getString("roll"));
+                    result.setLoodud(cs.getTimestamp("created", cal));
+                    result.setMuudetud(cs.getTimestamp("last_modified", cal));
+                    result.setMuutja(cs.getString("username"));
+                    result.setPeatatud(cs.getInt("peatatud") > 0);
+                    result.setAarID(aarID);
+                } else {
+                    result = null;
+                }
+                cs.close();
+                return result;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            CommonMethods.logError(e, "dhl.users.AmetikohaTaitmine", "getByAarID");
+            return null;
+        }
+    }
+    */
+    
 }

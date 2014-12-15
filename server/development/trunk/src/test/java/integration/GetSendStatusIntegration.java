@@ -34,10 +34,12 @@ public class GetSendStatusIntegration {
     public static void setUp() throws Exception {
         xHeaderBuilder = new XHeaderBuilder();
         xHeaderBuilder.setAsutus("87654321").setAndmekogu("dhl")
+        //xHeaderBuilder.setAsutus("70006317").setAndmekogu("dhl")
                 .setAmetnik("EE37001010001").setId("6cae248568b3db7e97ff784673a4d38c5906bee0")
                 .setNimi("dhl.getSendStatus.v1").setToimik("").setIsikukood("EE37001010001");
-
-        String serviceUrl = "http://0.0.0.0:9099/services/dhlHttpSoapPort";
+  
+        //String serviceUrl = "http://0.0.0.0:9099/services/dhlHttpSoapPort";
+        String serviceUrl = "http://0.0.0.0:8070/dvk/services/dhlHttpSoapPort";
         EndpointReference endpointReference = new EndpointReference(serviceUrl);
         options = new Options();
         options.setTo(endpointReference);
@@ -67,10 +69,12 @@ public class GetSendStatusIntegration {
 
         xHeaderBuilderForSending = new XHeaderBuilder();
         xHeaderBuilderForSending.setAsutus("87654321").setAndmekogu("dhl")
+        //xHeaderBuilderForSending.setAsutus("70006317").setAndmekogu("dhl")
                 .setAmetnik("EE12345678901").setId("6cae248568b3db7e97ff784673a4d38c5906bee0")
                 .setNimi("dhl.sendDocuments.v3").setToimik("").setIsikukood("");
-
-        String serviceUrl = "http://0.0.0.0:9099/services/dhlHttpSoapPort";
+        
+        //String serviceUrl = "http://0.0.0.0:9099/services/dhlHttpSoapPort";
+        String serviceUrl = "http://0.0.0.0:8070/dvk/services/dhlHttpSoapPort";
         EndpointReference endpointReference = new EndpointReference(serviceUrl);
         optionsForSending = new Options();
         optionsForSending.setTo(endpointReference);

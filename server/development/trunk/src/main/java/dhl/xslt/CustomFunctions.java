@@ -243,19 +243,28 @@ public class CustomFunctions {
 
     private Connection initTestConnection() throws ClassNotFoundException,
             SQLException {
-        // Load the JDBC driver
-        String driverName = "oracle.jdbc.driver.OracleDriver";
+        // Load the JDBC driver and create a connection to the ORACLE database
+        /*
+    	String driverName = "oracle.jdbc.driver.OracleDriver";
         Class.forName(driverName);
-
-        // Create a connection to the database
         String serverName = "127.0.0.1";
         String portNumber = "1521";
         String sid = "XE";
-        String url = "jdbc:oracle:thin:@" + serverName + ":" + portNumber + ":"
-                + sid;
+        String url = "jdbc:oracle:thin:@" + serverName + ":" + portNumber + ":" + sid;                
         String username = "dvk";
         String password = "dvk123";
-
+        return DriverManager.getConnection(url, username, password);
+        */
+    	
+        // Load the JDBC driver and create a connection to the ORACLE database
+    	String driverName = "org.postgresql.Driver";
+        Class.forName(driverName);
+        String serverName = "127.0.0.1";
+        String portNumber = "5432";
+        String sid = "postgres";
+        String url = "jdbc:postgresql://" + serverName + ":" + portNumber + "/" + sid;                
+        String username = "postgres";
+        String password = "postgres";
         return DriverManager.getConnection(url, username, password);
     }
 

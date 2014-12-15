@@ -1,28 +1,27 @@
 package dhl;
 
+
+import dhl.DocumentFile;
+import dhl.Folder;
+import dhl.Sending;
 import dhl.iostructures.ExpiredDocumentData;
 import dhl.iostructures.XHeader;
-import dvk.core.Settings;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
 import java.sql.CallableStatement;
-import java.sql.Clob;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
@@ -190,10 +189,10 @@ public class Document {
     public static int getNextID(Connection conn) {
         try {
             if (conn != null) {
-                CallableStatement cs = conn.prepareCall("{call GET_NEXTDOCID(?)}");
-                cs.registerOutParameter("document_id", Types.INTEGER);
-                cs.executeUpdate();
-                int result = cs.getInt("document_id");
+                CallableStatement cs = conn.prepareCall("{? = call \"Get_NextDocID\"()}");
+                cs.registerOutParameter(1, Types.INTEGER);
+                cs.execute();
+                int result = cs.getInt(1);
                 cs.close();
                 return result;
             } else {
@@ -204,6 +203,7 @@ public class Document {
             return 0;
         }
     }
+    
 
     public int addToDB(Connection conn, XHeader xTeePais) throws AxisFault {
         FileInputStream inStream = null;
@@ -213,83 +213,66 @@ public class Document {
             if (conn != null) {
                 boolean defaultAutoCommit = conn.getAutoCommit();
                 FileInputStream fis = null;
-                InputStreamReader r = null;
                 conn.setAutoCommit(false);
                 try {
                     Calendar cal = Calendar.getInstance();
                     m_id = getNextID(conn);
 
+                    
                     File file = new File(m_filePath);
                     long fileSize = 0;
                     if (file.exists()) {
                         fileSize = file.length();
                     }
 
-                    CallableStatement cs = conn.prepareCall("{call ADD_DOKUMENT(?,?,?,?,?,?,?,?,?,?,?)}");
+                    CallableStatement cs = conn.prepareCall("{call \"Add_Dokument\"(?,?,?,?,?,?,?,?,?,?)}");
                     cs.setInt(1, m_id);
                     cs.setInt(2, m_organizationID);
-                    cs.setInt(3, m_folderID);
-                    cs.setString(4, " ");
+                    cs.setInt(3, m_folderID);                    
+                    cs.setString(4, "");
+                    
                     cs.setTimestamp(5, CommonMethods.sqlDateFromDate(m_conservationDeadline), cal);
-
+                    
                     if (fileSize > 0) {
                         cs.setLong(6, fileSize);
                     } else {
-                        cs.setNull(6, java.sql.Types.BIGINT);
+                        cs.setNull(6, Types.BIGINT);
                     }
-
+                    
                     cs.setInt(7, m_dvkContainerVersion);
                     cs.setString(8, m_guid);
-
                     if (xTeePais != null) {
                         cs.setString(9, xTeePais.isikukood);
                         cs.setString(10, xTeePais.asutus);
                     } else {
                         cs.setString(9, null);
                         cs.setString(10, null);
+
                     }
-
-                    cs.setString(11, containerVersion);
-
+                    //cs.setString(11, containerVersion);
+                    
+                    
                     // Execute
                     cs.execute();
                     cs.close();
-
-                    // XML to CLOB
-                    // int fileCharsCount = CommonMethods.getCharacterCountInFile(m_filePath);
-                    // inStream = new FileInputStream(m_filePath);
-                    // inReader = new InputStreamReader(inStream, "UTF-8");
-                    // reader = new BufferedReader(inReader);
-                    // cs.setCharacterStream(4, reader, fileCharsCount);
                     if (file.exists()) {
-                        Statement stmt = conn.createStatement();
-                        ResultSet rs = stmt.executeQuery(
-                                "SELECT sisu FROM dokument WHERE dokument_id=" + String.valueOf(m_id) + " FOR UPDATE");
-                        if (rs.next()) {
-                            Clob sisu = rs.getClob(1);
-                            Writer clobWriter = sisu.setCharacterStream(0);
-                            fis = new FileInputStream(m_filePath);
-                            r = new InputStreamReader(fis, "UTF-8");
-                            char[] cbuffer = new char[Settings.getDBBufferSize()];
-                            int nread = 0;
-                            while ((nread = r.read(cbuffer)) > 0) {
-                                clobWriter.write(cbuffer, 0, nread);
-                            }
-                            CommonMethods.safeCloseWriter(clobWriter);
-                            CommonMethods.safeCloseReader(r);
-                            CommonMethods.safeCloseStream(fis);
-                        } else {
-                            throw new Exception(
-                                    "Failed writing document contents to database, ID "
-                                            + String.valueOf(m_id) + " returned empty recordset!");
-                        }
-                        stmt.close();
+                    	fis = new FileInputStream(m_filePath);                    	
+                    	PreparedStatement ps = conn.prepareStatement("UPDATE dokument SET sisu = ? WHERE dokument_id = ?");
+                    	ps.setBinaryStream(1, fis, (int)file.length());
+                    	ps.setInt(2, m_id);
+                    	ps.executeUpdate();
+                    	
+                        CommonMethods.safeCloseStream(fis);
+
+                        ps.close();
+                    	fis.close();
+                    	
                     } else {
                         throw new Exception(
                                 "Document file " + m_filePath + " of document " + String.valueOf(m_id)
                                         + " does not exist and therefore cannot be saved into database!");
                     }
-
+                    
                     // Execute
                     conn.commit();
                 } catch (Exception e) {
@@ -331,11 +314,10 @@ public class Document {
         }
         return m_id;
     }
-
     public static boolean deleteFromDB(int id, Connection conn) {
         try {
             if (conn != null) {
-                CallableStatement cs = conn.prepareCall("{call DELETE_DOCUMENT(?)}");
+                CallableStatement cs = conn.prepareCall("{call \"Delete_Document\"(?)}");                
                 cs.setInt(1, id);
                 boolean result = cs.execute();
                 cs.close();
@@ -349,11 +331,12 @@ public class Document {
         }
     }
 
+    
     public static boolean updateExpirationDate(int id, Date expirationDate, Connection conn) {
         try {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
-                CallableStatement cs = conn.prepareCall("{call UPDATE_DOCUMENTEXPIRATIONDATE(?,?)}");
+                CallableStatement cs = conn.prepareCall("{call \"Update_DocumentExpirationDate\"(?,?)}");
                 cs.setInt(1, id);
                 cs.setTimestamp(2, CommonMethods.sqlDateFromDate(expirationDate), cal);
                 boolean result = cs.execute();
@@ -368,6 +351,8 @@ public class Document {
             return false;
         }
     }
+
+    
 
     /**
      * Tagastab nimekirja etteantud dokumentidest, mille allalaadimiseks
@@ -384,7 +369,9 @@ public class Document {
      * @param conn                andmebaasiühenduse objekt
      * @return nimekiri allalaadimist ootavatest dokumentidest
      */
-    public static ArrayList<Document> getDocumentsSentTo(
+
+    
+    public static ArrayList<Document> getDocumentsSentTo(    		
             int organizationID,
             int folderID,
             int userID,
@@ -393,45 +380,47 @@ public class Document {
             int occupationID,
             String occupationShortName,
             int resultLimit,
-            Connection conn) {
+            Connection conn) {    	
         try {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
                 boolean defaultAutoCommit = conn.getAutoCommit();
                 conn.setAutoCommit(false);
 
-                CallableStatement cs = conn.prepareCall("{call GET_DOCUMENTSSENTTO(?,?,?,?,?,?,?,?,?)}");
-                cs.setInt("organization_id", organizationID);
+                CallableStatement cs = conn.prepareCall("{? = call \"Get_DocumentsSentTo\"(?,?,?,?,?,?,?,?)}");
+                cs.registerOutParameter(1, Types.OTHER);
+                
+                cs.setInt(2, organizationID);
                 if (folderID >= 0) {
-                    cs.setInt("folder_id", folderID);
+                    cs.setInt(3, folderID);
                 } else {
-                    cs.setNull("folder_id", Types.INTEGER);
+                    cs.setNull(3, Types.INTEGER);
                 }
-                cs.setInt("user_id", userID);
+                cs.setInt(4, userID);
                 if (divisionID > 0) {
-                    cs.setInt("division_id", divisionID);
+                    cs.setInt(5, divisionID);
                 } else {
-                    cs.setNull("division_id", Types.INTEGER);
+                    cs.setNull(5, Types.INTEGER);
                 }
                 if ((divisionShortName != null) && (divisionShortName.length() > 0)) {
-                    cs.setString("division_short_name", divisionShortName);
+                    cs.setString(6, divisionShortName);
                 } else {
-                    cs.setNull("division_short_name", Types.VARCHAR);
+                    cs.setNull(6, Types.VARCHAR);
                 }
                 if (occupationID > 0) {
-                    cs.setInt("occupation_id", occupationID);
+                    cs.setInt(7, occupationID);
                 } else {
-                    cs.setNull("occupation_id", Types.INTEGER);
+                    cs.setNull(7, Types.INTEGER);
                 }
                 if ((occupationShortName != null) && (occupationShortName.length() > 0)) {
-                    cs.setString("occupation_short_name", occupationShortName);
+                    cs.setString(8, occupationShortName);
                 } else {
-                    cs.setNull("occupation_short_name", Types.VARCHAR);
+                    cs.setNull(8, Types.VARCHAR);
                 }
-                cs.setInt("result_limit", resultLimit);
-                cs.registerOutParameter("RC1", oracle.jdbc.OracleTypes.CURSOR);
+                cs.setInt(9, resultLimit);
+
                 cs.execute();
-                ResultSet rs = (ResultSet) cs.getObject("RC1");
+                ResultSet rs = (ResultSet) cs.getObject(1);
                 ArrayList<Document> result = new ArrayList<Document>();
                 int docCounter = 0;
                 while (rs.next()) {
@@ -443,33 +432,15 @@ public class Document {
                     item.setFolderID(rs.getInt("kaust_id"));
                     item.setConservationDeadline(rs.getTimestamp("sailitustahtaeg", cal));
                     item.setDvkContainerVersion(rs.getInt("versioon"));
-                    item.setContainerVersion(rs.getString("kapsli_versioon"));
+                    //item.setContainerVersion(rs.getString("kapsli_versioon"));
+                    item.setContainerVersion("");
 
-                    // Loeme CLOB-ist dokumendi andmed
-                     Clob tmpBlob = rs.getClob("sisu");
-                    Reader r = tmpBlob.getCharacterStream();
+
+                    
                     String itemDataFile = CommonMethods.createPipelineFile(docCounter);
-                    item.setFilePath(itemDataFile);
-                    FileOutputStream fos = new FileOutputStream(itemDataFile);
-                    OutputStreamWriter out = new OutputStreamWriter(fos, "UTF-8");
-                    int actualReadLength = 0;
-                    int totalReadLength = 0;
-                    try {
-                        char[] charbuf = new char[Settings.getDBBufferSize()];
-                        while ((actualReadLength = r.read(charbuf)) > 0) {
-                            out.write(charbuf, 0, actualReadLength);
-                            totalReadLength += actualReadLength;
-                        }
-                    } finally {
-                        out.flush();
-                        out.close();
-                        fos.close();
-                    }
-
-                    if (totalReadLength < 1) {
-                        (new File(itemDataFile)).delete();
-                        item.setFilePath(null);
-                    }
+                    byte[] containerData = rs.getString("sisu").getBytes("UTF-8");
+                    logger.debug("Container data was read from database. Container size: " + containerData.length + " bytes.");
+                    CommonMethods.writeToFile(itemDataFile, containerData);
 
                     result.add(item);
                 }
@@ -488,7 +459,7 @@ public class Document {
             return null;
         }
     }
-
+    
     /**
      * Loob XML-i põhjal <code>Document</code> objekti.
      *
@@ -675,7 +646,44 @@ public class Document {
             return null;
         }
     }
-
+    
+    public static ArrayList<ExpiredDocumentData> getExpiredDocuments(Connection conn) {    
+        try {
+            if (conn != null) {
+                Calendar cal = Calendar.getInstance();
+                CallableStatement cs = null;
+                ResultSet rs = null;
+                ArrayList<ExpiredDocumentData> result = new ArrayList<ExpiredDocumentData>();
+            	boolean defaultAutoCommit = conn.getAutoCommit();
+                try {
+                	conn.setAutoCommit(false);      
+                    cs = conn.prepareCall("{? = call \"Get_ExpiredDocuments\"()}");
+                    cs.registerOutParameter(1, Types.OTHER);
+                    cs.execute();
+                    rs = (ResultSet) cs.getObject(1);
+                    while (rs.next()) {
+                        ExpiredDocumentData item = new ExpiredDocumentData();
+                        item.setDocumentID(rs.getInt("dokument_id"));
+                        item.setSendStatusID(rs.getInt("staatus_id"));
+                        item.setConservationDeadline(rs.getTimestamp("sailitustahtaeg", cal));
+                        result.add(item);
+                    }
+                    rs.close();
+                    cs.close();
+                    return result;
+                } finally {
+                	conn.setAutoCommit(defaultAutoCommit);
+                }
+            } else {
+                return null;
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            return null;
+        }
+    }
+    
+    /*
     public static ArrayList<ExpiredDocumentData> getExpiredDocuments(Connection conn) {
         try {
             if (conn != null) {
@@ -708,4 +716,302 @@ public class Document {
             return null;
         }
     }
+    */
+    
+    /*
+    public static int getNextID(Connection conn) {
+        try {
+            if (conn != null) {
+                CallableStatement cs = conn.prepareCall("{call GET_NEXTDOCID(?)}");
+                cs.registerOutParameter("document_id", Types.INTEGER);
+                cs.executeUpdate();
+                int result = cs.getInt("document_id");
+                cs.close();
+                return result;
+            } else {
+                return 0;
+            }
+        } catch (Exception ex) {
+            logger.error(ex);
+            return 0;
+        }
+    }
+    */
+    
+    /*
+    public static ArrayList<Document> getDocumentsSentTo(
+            int organizationID,
+            int folderID,
+            int userID,
+            int divisionID,
+            String divisionShortName,
+            int occupationID,
+            String occupationShortName,
+            int resultLimit,
+            Connection conn) {
+        try {
+            if (conn != null) {
+                Calendar cal = Calendar.getInstance();
+                boolean defaultAutoCommit = conn.getAutoCommit();
+                conn.setAutoCommit(false);
+
+                CallableStatement cs = conn.prepareCall("{call GET_DOCUMENTSSENTTO(?,?,?,?,?,?,?,?,?)}");
+                cs.setInt("organization_id", organizationID);
+                if (folderID >= 0) {
+                    cs.setInt("folder_id", folderID);
+                } else {
+                    cs.setNull("folder_id", Types.INTEGER);
+                }
+                cs.setInt("user_id", userID);
+                if (divisionID > 0) {
+                    cs.setInt("division_id", divisionID);
+                } else {
+                    cs.setNull("division_id", Types.INTEGER);
+                }
+                if ((divisionShortName != null) && (divisionShortName.length() > 0)) {
+                    cs.setString("division_short_name", divisionShortName);
+                } else {
+                    cs.setNull("division_short_name", Types.VARCHAR);
+                }
+                if (occupationID > 0) {
+                    cs.setInt("occupation_id", occupationID);
+                } else {
+                    cs.setNull("occupation_id", Types.INTEGER);
+                }
+                if ((occupationShortName != null) && (occupationShortName.length() > 0)) {
+                    cs.setString("occupation_short_name", occupationShortName);
+                } else {
+                    cs.setNull("occupation_short_name", Types.VARCHAR);
+                }
+                cs.setInt("result_limit", resultLimit);
+                cs.registerOutParameter("RC1", oracle.jdbc.OracleTypes.CURSOR);
+                cs.execute();
+                ResultSet rs = (ResultSet) cs.getObject("RC1");
+                ArrayList<Document> result = new ArrayList<Document>();
+                int docCounter = 0;
+                while (rs.next()) {
+                    ++docCounter;
+
+                    Document item = new Document();
+                    item.setId(rs.getInt("dokument_id"));
+                    item.setOrganizationID(rs.getInt("asutus_id"));
+                    item.setFolderID(rs.getInt("kaust_id"));
+                    item.setConservationDeadline(rs.getTimestamp("sailitustahtaeg", cal));
+                    item.setDvkContainerVersion(rs.getInt("versioon"));
+                    item.setContainerVersion(rs.getString("kapsli_versioon"));
+
+                    // Loeme CLOB-ist dokumendi andmed
+                     Clob tmpBlob = rs.getClob("sisu");
+                    Reader r = tmpBlob.getCharacterStream();
+                    String itemDataFile = CommonMethods.createPipelineFile(docCounter);
+                    item.setFilePath(itemDataFile);
+                    FileOutputStream fos = new FileOutputStream(itemDataFile);
+                    OutputStreamWriter out = new OutputStreamWriter(fos, "UTF-8");
+                    int actualReadLength = 0;
+                    int totalReadLength = 0;
+                    try {
+                        char[] charbuf = new char[Settings.getDBBufferSize()];
+                        while ((actualReadLength = r.read(charbuf)) > 0) {
+                            out.write(charbuf, 0, actualReadLength);
+                            totalReadLength += actualReadLength;
+                        }
+                    } finally {
+                        out.flush();
+                        out.close();
+                        fos.close();
+                    }
+
+                    if (totalReadLength < 1) {
+                        (new File(itemDataFile)).delete();
+                        item.setFilePath(null);
+                    }
+
+                    result.add(item);
+                }
+                rs.close();
+                cs.close();
+
+                conn.commit();
+                conn.setAutoCommit(defaultAutoCommit);
+
+                return result;
+            } else {
+                return null;
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            return null;
+        }
+    }
+    */
+    /*    
+    public static boolean deleteFromDB(int id, Connection conn) {
+        try {
+            if (conn != null) {
+                CallableStatement cs = conn.prepareCall("{call DELETE_DOCUMENT(?)}");
+                cs.setInt(1, id);
+                boolean result = cs.execute();
+                cs.close();
+                return result;
+            } else {
+                return false;
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            return false;
+        }
+    }
+    */
+    
+    /*
+    public int addToDB(Connection conn, XHeader xTeePais) throws AxisFault {
+        FileInputStream inStream = null;
+        InputStreamReader inReader = null;
+        BufferedReader reader = null;
+        try {
+            if (conn != null) {
+                boolean defaultAutoCommit = conn.getAutoCommit();
+                FileInputStream fis = null;
+                InputStreamReader r = null;
+                conn.setAutoCommit(false);
+                try {
+                    Calendar cal = Calendar.getInstance();
+                    m_id = getNextID(conn);
+
+                    File file = new File(m_filePath);
+                    long fileSize = 0;
+                    if (file.exists()) {
+                        fileSize = file.length();
+                    }
+
+                    CallableStatement cs = conn.prepareCall("{call ADD_DOKUMENT(?,?,?,?,?,?,?,?,?,?,?)}");
+                    cs.setInt(1, m_id);
+                    cs.setInt(2, m_organizationID);
+                    cs.setInt(3, m_folderID);
+                    cs.setString(4, " ");
+                    cs.setTimestamp(5, CommonMethods.sqlDateFromDate(m_conservationDeadline), cal);
+
+                    if (fileSize > 0) {
+                        cs.setLong(6, fileSize);
+                    } else {
+                        cs.setNull(6, java.sql.Types.BIGINT);
+                    }
+
+                    cs.setInt(7, m_dvkContainerVersion);
+                    cs.setString(8, m_guid);
+
+                    if (xTeePais != null) {
+                        cs.setString(9, xTeePais.isikukood);
+                        cs.setString(10, xTeePais.asutus);
+                    } else {
+                        cs.setString(9, null);
+                        cs.setString(10, null);
+                    }
+
+                    cs.setString(11, containerVersion);
+
+                    // Execute
+                    cs.execute();
+                    cs.close();
+
+                    // XML to CLOB
+                    // int fileCharsCount = CommonMethods.getCharacterCountInFile(m_filePath);
+                    // inStream = new FileInputStream(m_filePath);
+                    // inReader = new InputStreamReader(inStream, "UTF-8");
+                    // reader = new BufferedReader(inReader);
+                    // cs.setCharacterStream(4, reader, fileCharsCount);
+                    if (file.exists()) {
+                        Statement stmt = conn.createStatement();
+                        ResultSet rs = stmt.executeQuery(
+                                "SELECT sisu FROM dokument WHERE dokument_id=" + String.valueOf(m_id) + " FOR UPDATE");
+                        if (rs.next()) {
+                            Clob sisu = rs.getClob(1);
+                            Writer clobWriter = sisu.setCharacterStream(0);
+                            fis = new FileInputStream(m_filePath);
+                            r = new InputStreamReader(fis, "UTF-8");
+                            char[] cbuffer = new char[Settings.getDBBufferSize()];
+                            int nread = 0;
+                            while ((nread = r.read(cbuffer)) > 0) {
+                                clobWriter.write(cbuffer, 0, nread);
+                            }
+                            CommonMethods.safeCloseWriter(clobWriter);
+                            CommonMethods.safeCloseReader(r);
+                            CommonMethods.safeCloseStream(fis);
+                        } else {
+                            throw new Exception(
+                                    "Failed writing document contents to database, ID "
+                                            + String.valueOf(m_id) + " returned empty recordset!");
+                        }
+                        stmt.close();
+                    } else {
+                        throw new Exception(
+                                "Document file " + m_filePath + " of document " + String.valueOf(m_id)
+                                        + " does not exist and therefore cannot be saved into database!");
+                    }
+
+                    // Execute
+                    conn.commit();
+                } catch (Exception e) {
+                    logger.error("Exception while saving document to database: ", e);
+                    conn.rollback();
+                    conn.setAutoCommit(defaultAutoCommit);
+                    throw e;
+                } finally {
+                    CommonMethods.safeCloseReader(reader);
+                    CommonMethods.safeCloseReader(inReader);
+                    CommonMethods.safeCloseStream(inStream);
+                    inStream = null;
+                    inReader = null;
+                    reader = null;
+                }
+
+                // Salvestame dokumendi transpordiinfo
+                for (Sending tmpSending : m_sendingList) {
+                    tmpSending.setDocumentID(m_id);
+                    logger.debug("Saving transport info for document: " + m_id);
+                    int sendingResult = tmpSending.addToDB(conn, xTeePais);
+                    if (sendingResult <= 0) {
+                        conn.rollback();
+                        conn.setAutoCommit(defaultAutoCommit);
+                        throw new AxisFault("Error saving addressing information to database!");
+                    }
+                }
+
+                // Kinnitame andmebaasis tehtud muudatused
+                conn.commit();
+                conn.setAutoCommit(defaultAutoCommit);
+
+            } else {
+                logger.error("Database connection is null.");
+            }
+        } catch (Exception e) {
+            logger.error(CommonStructures.VIGA_ANDMEBAASI_SALVESTAMISEL + ": ", e);
+            throw new AxisFault(CommonStructures.VIGA_ANDMEBAASI_SALVESTAMISEL + " : " + e.getMessage());
+        }
+        return m_id;
+    }
+ 	*/
+    /*
+    public static boolean updateExpirationDate(int id, Date expirationDate, Connection conn) {
+        try {
+            if (conn != null) {
+                Calendar cal = Calendar.getInstance();
+                CallableStatement cs = conn.prepareCall("{call UPDATE_DOCUMENTEXPIRATIONDATE(?,?)}");
+                cs.setInt(1, id);
+                cs.setTimestamp(2, CommonMethods.sqlDateFromDate(expirationDate), cal);
+                boolean result = cs.execute();
+                cs.close();
+                cal = null;
+                return result;
+            } else {
+                return false;
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            return false;
+        }
+    }
+    */
+    
+    
 }

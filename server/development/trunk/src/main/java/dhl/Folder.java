@@ -122,7 +122,152 @@ public class Folder {
      * @param parentID       otsitava kausta ülemkausta ID
      * @param conn           andmebaasiühenduse objekt
      * @return kausta ID
+     */   
+    public static int getFolderIdByName(String folderName, int organizationID, int parentID, Connection conn) {    	
+        if ((folderName == null) || (folderName.length() < 1)) {
+            return UNSPECIFIED_FOLDER;
+        }
+
+        try {
+            if (conn != null) {
+                CallableStatement cs = conn.prepareCall("{? = call \"Get_FolderIdByName\"(?,?,?)}");
+                cs.registerOutParameter(1, Types.INTEGER);
+                
+                cs.setString(2, folderName);
+                cs.setInt(3, organizationID);
+                cs.setInt(4, parentID);
+                cs.executeUpdate();
+                int result = cs.getInt(1);
+                if (cs.getObject(1) == null) {
+                    result = NONEXISTING_FOLDER;
+                }
+                cs.close();
+                return result;
+            } else {
+                return NONEXISTING_FOLDER;
+            }
+        } catch (Exception e) {
+            CommonMethods.logError(e, "dhl.Folder", "getFolderIdByName");
+            return NONEXISTING_FOLDER;
+        }
+    }
+    
+    /**
+     * Leiab kataloogi ID järgi kausta täisnime (täisteekonna alustades juurkaustast).
+     *
+     * @param folderID Kausta ID
+     * @param conn     Andmebaasiühenduse objekt
+     * @return Kausta täisnimi
      */
+    public static String getFolderFullPath(int folderID, Connection conn) {
+        try {
+            if (conn != null) {
+                CallableStatement cs = conn.prepareCall("{? = call \"Get_FolderFullPath\"(?)}");
+                cs.registerOutParameter(1, Types.VARCHAR);
+                cs.setInt(2, folderID);
+                cs.executeUpdate();
+                String result = cs.getString(1);
+                cs.close();
+                return result;
+            } else {
+                return "";
+            }
+        } catch (Exception e) {
+            CommonMethods.logError(e, "dhl.Folder", "getFolderFullPath");
+            return "";
+        }
+    }
+
+
+    
+    public static int createFolder(String fullPath, int parentID, int orgID, String folderNumber, Connection conn, XHeader xTeePais) {
+    	try {
+            if (conn != null) {
+                while (fullPath.startsWith(DELIMITER)) {
+                    fullPath = fullPath.substring(1);
+                }
+                while (fullPath.endsWith(DELIMITER)) {
+                    fullPath = fullPath.substring(0, fullPath.length() - 2);
+                }
+
+                int id = GLOBAL_ROOT_FOLDER;
+                String[] splitPath = fullPath.split(DELIMITER);
+                if ((splitPath.length > 0) && (splitPath[0] != null) && (splitPath[0].trim().length() > 0)) {
+                    id = getFolderIdByName(splitPath[0].trim(), orgID, parentID, conn);
+                    if (id == NONEXISTING_FOLDER) {
+                        CallableStatement cs = conn.prepareCall("{? = call \"Add_Folder\"(?,?,?,?,?,?)}");
+                        cs.registerOutParameter(1, Types.INTEGER);
+                        
+                        cs.setString(2, splitPath[0].trim());
+                        cs.setInt(3, parentID);
+
+                        if (orgID > 0) {
+                            cs.setInt(4, orgID);
+                        } else {
+                            cs.setNull(4, Types.INTEGER);
+                        }
+
+                        if (splitPath.length == 1) {
+                            cs.setString(5, folderNumber);
+                        } else {
+                            cs.setNull(5, Types.VARCHAR);
+                        }
+
+                        if (xTeePais != null) {
+                            cs.setString(6, xTeePais.isikukood);
+                            cs.setString(7, xTeePais.asutus);
+                        } else {
+                            cs.setString(6, null);
+                            cs.setString(7, null);
+                        }
+                        cs.executeUpdate();
+                        id = cs.getInt(1);
+                        cs.close();
+                    }
+                }
+
+                if (splitPath.length > 1) {
+                    String subPath = "";
+                    for (int i = 1; i < splitPath.length; ++i) {
+                        if (i > 1) {
+                            subPath += DELIMITER;
+                        }
+                        subPath += splitPath[i];
+                    }
+                    return createFolder(subPath, id, orgID, folderNumber, conn, xTeePais);
+                } else {
+                    return id;
+                }
+            } else {
+                return GLOBAL_ROOT_FOLDER;
+            }
+        } catch (Exception e) {
+            CommonMethods.logError(e, "dhl.Folder", "createFolder");
+            return GLOBAL_ROOT_FOLDER;
+        }
+    }
+    
+    /**
+     * Muudab etteantud kausta nimetust nii, et see sisaldaks ainult ASCII sümboleid
+     * A-Z, 0-9, /, _.
+     *
+     * @param initialName Kliendi poolt etteantud kausta nimetus
+     * @return DVK jaoks sobilikule kujule viidud kausta nimetus
+     */
+    public String correctFolderName(String initialName) {
+        if ((initialName == null) || (initialName.length() < 1)) {
+            return initialName;
+        }
+        try {
+            return initialName.toUpperCase().replaceAll("[^A-Z_/0-9]", "");
+        } catch (Exception ex) {
+            CommonMethods.logError(ex, "dhl.Folder", "correctFolderName");
+            return initialName;
+        }
+    }
+    
+    
+    /*
     public static int getFolderIdByName(String folderName, int organizationID, int parentID, Connection conn) {
         if ((folderName == null) || (folderName.length() < 1)) {
             return UNSPECIFIED_FOLDER;
@@ -150,33 +295,8 @@ public class Folder {
             return NONEXISTING_FOLDER;
         }
     }
-
-    /**
-     * Leiab kataloogi ID järgi kausta täisnime (täisteekonna alustades juurkaustast).
-     *
-     * @param folderID Kausta ID
-     * @param conn     Andmebaasiühenduse objekt
-     * @return Kausta täisnimi
-     */
-    public static String getFolderFullPath(int folderID, Connection conn) {
-        try {
-            if (conn != null) {
-                CallableStatement cs = conn.prepareCall("{call GET_FOLDERFULLPATH(?,?)}");
-                cs.setInt("folder_id", folderID);
-                cs.registerOutParameter("folder_path", Types.VARCHAR);
-                cs.executeUpdate();
-                String result = cs.getString("folder_path");
-                cs.close();
-                return result;
-            } else {
-                return "";
-            }
-        } catch (Exception e) {
-            CommonMethods.logError(e, "dhl.Folder", "getFolderFullPath");
-            return "";
-        }
-    }
-
+    */
+    /*
     public static int createFolder(String fullPath, int parentID, int orgID, String folderNumber, Connection conn, XHeader xTeePais) {
         try {
             if (conn != null) {
@@ -244,23 +364,27 @@ public class Folder {
             return GLOBAL_ROOT_FOLDER;
         }
     }
-
-    /**
-     * Muudab etteantud kausta nimetust nii, et see sisaldaks ainult ASCII sümboleid
-     * A-Z, 0-9, /, _.
-     *
-     * @param initialName Kliendi poolt etteantud kausta nimetus
-     * @return DVK jaoks sobilikule kujule viidud kausta nimetus
-     */
-    public String correctFolderName(String initialName) {
-        if ((initialName == null) || (initialName.length() < 1)) {
-            return initialName;
-        }
+    */
+    
+    
+    /*
+    public static String getFolderFullPath(int folderID, Connection conn) {
         try {
-            return initialName.toUpperCase().replaceAll("[^A-Z_/0-9]", "");
-        } catch (Exception ex) {
-            CommonMethods.logError(ex, "dhl.Folder", "correctFolderName");
-            return initialName;
+            if (conn != null) {
+                CallableStatement cs = conn.prepareCall("{call GET_FOLDERFULLPATH(?,?)}");
+                cs.setInt("folder_id", folderID);
+                cs.registerOutParameter("folder_path", Types.VARCHAR);
+                cs.executeUpdate();
+                String result = cs.getString("folder_path");
+                cs.close();
+                return result;
+            } else {
+                return "";
+            }
+        } catch (Exception e) {
+            CommonMethods.logError(e, "dhl.Folder", "getFolderFullPath");
+            return "";
         }
     }
+    */
 }

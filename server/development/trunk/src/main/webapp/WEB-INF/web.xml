@@ -16,7 +16,7 @@ Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
     <display-name>Apache-Axis Servlet</display-name>
     <servlet-class>org.apache.axis.transport.http.AxisServlet</servlet-class>
     <init-param>
-      <param-name>configFile</param-name>
+      <param-name>configFile</param-name>      
       <param-value>${dhl.properties}</param-value>
     </init-param>
   </servlet>

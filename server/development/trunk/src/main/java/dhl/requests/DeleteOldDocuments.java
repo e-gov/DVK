@@ -1,6 +1,7 @@
 package dhl.requests;
 
 import dhl.CoreServices;
+import dhl.requests.RequestInternalResult;
 import dvk.core.CommonStructures;
 import dvk.core.Settings;
 import dhl.Document;

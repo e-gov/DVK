@@ -7,6 +7,7 @@ import dvk.core.CommonStructures;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.xml.xpath.XPath;
@@ -189,7 +190,8 @@ public class RecipientTemplate {
                     template = templates.get(i);
                     expr = xpath.compile(template.m_conditionXPath);
                     nodes = (NodeList) expr.evaluate(xmlDoc, XPathConstants.NODESET);
-                    if (nodes.getLength() > 0) {
+                    
+                    if (nodes.getLength() > 0) {                   
                         newRecipient = new Recipient();
                         newRecipient.setOrganizationID(template.m_organizationID);
                         newRecipient.setPositionID(template.m_positionID);
@@ -232,7 +234,8 @@ public class RecipientTemplate {
                                         defaultPrefix = "dhl" + String.valueOf(prefixCounter);
                                     }
                                 }
-
+                                
+                                
                                 el1 = xmlDocNS.createElementNS(CommonStructures.DhlNamespace, defaultPrefix + ":saaja");
                                 el.appendChild(el1);
 
@@ -250,6 +253,7 @@ public class RecipientTemplate {
                                 el2.setTextContent(String.valueOf(newRecipient.getPositionID()));
                                 el1.appendChild(el2);
 
+                                
                                 el2 = xmlDocNS.createElementNS(CommonStructures.DhlNamespace, defaultPrefix + ":allyksuse_kood");
                                 el2.setTextContent(String.valueOf(newRecipient.getDivisionID()));
                                 el1.appendChild(el2);
@@ -339,8 +343,6 @@ public class RecipientTemplate {
                         } else {
                             logger.error("Unknown document container version: " + doc.getDvkContainerVersion());
                         }
-
-
                     }
                 } catch (Exception ex) {
                     CommonMethods.logError(ex, "dhl.RecipientTemplate", "applyToDocument");
@@ -361,7 +363,54 @@ public class RecipientTemplate {
 
         return doc;
     }
-
+    
+    
+    
+    public static ArrayList<RecipientTemplate> getList(Connection conn) {
+        try {
+            if (conn != null) {            	
+            	boolean defaultAutoCommit = conn.getAutoCommit();
+            	try{
+	            	conn.setAutoCommit(false);	            	
+	            	CallableStatement cs = conn.prepareCall("{? = call \"Get_RecipientTemplates\"()}");	            	
+	            	cs.registerOutParameter(1, Types.OTHER);            	                
+	                cs.execute();
+	                ResultSet rs = (ResultSet) cs.getObject(1);
+	                ArrayList<RecipientTemplate> result = new ArrayList<RecipientTemplate>();
+	                while (rs.next()) {
+	                    RecipientTemplate item = new RecipientTemplate();
+	                    item.setId(rs.getInt("vastuvotja_mall_id"));
+	                    item.setOrganizationID(rs.getInt("asutus_id"));
+	                    item.setPositionID(rs.getInt("ametikoht_id"));
+	                    item.setDivisionID(rs.getInt("allyksus_id"));
+	                    item.setPositionShortName(rs.getString("ametikoha_lyhinimetus"));
+	                    item.setDivisionShortName(rs.getString("allyksuse_lyhinimetus"));
+	                    item.setPersonalIdCode(rs.getString("isikukood"));
+	                    item.setName(rs.getString("nimi"));
+	                    item.setOrganizationName(rs.getString("asutuse_nimi"));
+	                    item.setEmail(rs.getString("email"));
+	                    item.setDepartmentNumber(rs.getString("osakonna_nr"));
+	                    item.setDepartmentName(rs.getString("osakonna_nimi"));
+	                    item.setSendingMethodID(rs.getInt("saatmisviis_id"));
+	                    item.setConditionXPath(rs.getString("tingimus_xpath"));
+	                    result.add(item);
+	                }
+	                rs.close();
+	                cs.close();
+	                return result;
+	            } finally {
+	    			conn.setAutoCommit(defaultAutoCommit);
+	    		}	               	               	                	                
+            } else {
+                return null;
+            }
+        } catch (Exception ex) {
+            CommonMethods.logError(ex, "dhl.RecipientTemplate", "getList");
+            return null;
+        }
+    }
+    
+    /*
     public static ArrayList<RecipientTemplate> getList(Connection conn) {
         try {
             if (conn != null) {
@@ -399,4 +448,5 @@ public class RecipientTemplate {
             return null;
         }
     }
+    */
 }

@@ -1,0 +1,17 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns4="http://x-tee.riik.ee/xsd/xtee.xsd" xmlns:xtee="http://x-tee.riik.ee/xsd/xtee.xsd" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/">
+	<soapenv:Header>
+		<ns4:asutus xsi:type="xsd:string">adit</ns4:asutus>
+		<ns4:andmekogu xsi:type="xsd:string">dhl</ns4:andmekogu>
+		<ns4:isikukood xsi:type="xsd:string">EE38806190294</ns4:isikukood>
+		<ns4:id xsi:type="xsd:string">13a213c22e210391131-1095465132</ns4:id>
+		<ns4:nimi xsi:type="xsd:string">dhl.markDocumentsReceived.v1</ns4:nimi>
+	</soapenv:Header>
+	<soapenv:Body>
+		<markDocumentsReceived>
+			<keha>		
+				<dokumendid href="cid:vana_kapsel_manus" xsi:nil="true"/>
+				<kaust/>
+			</keha>
+		</markDocumentsReceived>
+	</soapenv:Body>
+</soapenv:Envelope>

@@ -3,6 +3,7 @@ package dhl;
 import dvk.core.CommonMethods;
 
 import java.sql.CallableStatement;
+import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Types;
@@ -60,6 +61,68 @@ public class RemoteServer {
         m_address = "";
     }
 
+    
+    
+    
+    public void loadByID(int id, Connection conn) {
+        try {
+            if (conn != null) {
+            	
+                Statement cs = conn.createStatement();
+                ResultSet rs = cs.executeQuery("SELECT * FROM \"Get_ServerByID\"(" + id + ")");
+                while (rs.next()) {
+                    m_id = id;
+                    m_producerName = rs.getString("andmekogu_nimi");
+                    m_address = rs.getString("aadress");
+                }
+                rs.close();
+                cs.close();
+            } else {
+                clear();
+            }
+        } catch (Exception e) {
+            CommonMethods.logError(e, this.getClass().getName(), "loadByID");
+            clear();
+        }
+    }
+    
+
+    
+    public static ArrayList<RemoteServer> getList(Connection conn) {
+        try {
+            if (conn != null) {
+            	boolean defaultAutoCommit = conn.getAutoCommit();
+            	try{
+	            	conn.setAutoCommit(false);            	
+	            	CallableStatement cs = conn.prepareCall("{? = call \"Get_Servers\"()}");
+	            	cs.registerOutParameter(1, Types.OTHER);            	                
+	                cs.execute();
+	                
+	                ResultSet rs = (ResultSet) cs.getObject(1);
+	                ArrayList<RemoteServer> result = new ArrayList<RemoteServer>();
+	                while (rs.next()) {
+	                    RemoteServer item = new RemoteServer();
+	                    item.setID(rs.getInt("server_id"));
+	                    item.setProducerName(rs.getString("andmekogu_nimi"));
+	                    item.setAddress(rs.getString("aadress"));
+	                    result.add(item);
+	                }
+	                rs.close();
+	                cs.close();
+	                return result;
+	            } finally {
+	    			conn.setAutoCommit(defaultAutoCommit);
+	    		}	               	               	                
+            } else {
+                return null;
+            }
+        } catch (Exception ex) {
+            CommonMethods.logError(ex, "dhl.RemoteServer", "getList");
+            return null;
+        }
+    }
+    
+    /*
     public void loadByID(int id, Connection conn) {
         try {
             if (conn != null) {
@@ -107,4 +170,5 @@ public class RemoteServer {
             return null;
         }
     }
+    */
 }

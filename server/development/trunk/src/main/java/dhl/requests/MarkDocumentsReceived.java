@@ -104,7 +104,6 @@ public class MarkDocumentsReceived {
                             // adressaatide poolt, kes kuuluvad päringu teinud asutuse alla.
                             if (((bodyData.allyksusId <= 0) || (tmpRecipient.getDivisionID() == bodyData.allyksusId))
                                     && ((bodyData.ametikohtId <= 0) || (tmpRecipient.getPositionID() == bodyData.ametikohtId))) {
-
                                 recipientFound = true;
                                 tmpRecipient.setSendStatusID(CommonStructures.SendStatus_Sent);
                                 tmpRecipient.setSendingEndDate(new Date());

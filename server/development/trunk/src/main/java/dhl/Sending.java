@@ -10,9 +10,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.Calendar;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -145,106 +148,109 @@ public class Sending {
         }
         m_isNewlyAdded = false;
     }
+    
+    
 
+    
+    
     public boolean loadByDocumentID(int documentID, Connection conn) {
         clear();
+        boolean find = false;
         try {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
-                CallableStatement cs = conn.prepareCall("{call GET_LASTSENDINGBYDOCID(?,?,?,?,?)}");
-                cs.setInt("document_id", documentID);
-                cs.registerOutParameter("sending_id", Types.INTEGER);
-                cs.registerOutParameter("sending_start_date", Types.TIMESTAMP);
-                cs.registerOutParameter("sending_end_date", Types.TIMESTAMP);
-                cs.registerOutParameter("send_status_id", Types.INTEGER);
-                cs.executeUpdate();
-                m_id = cs.getInt("sending_id");
-                m_startDate = cs.getTimestamp("sending_start_date", cal);
-                m_endDate = cs.getTimestamp("sending_end_date", cal);
-                m_sendStatusID = cs.getInt("send_status_id");
-                m_documentID = documentID;
-
-                if (m_id > 0) {
-                    m_sender.getBySendingID(m_id, conn);
-                    m_proxy.LoadBySendingID(m_id, conn);
-                    m_recipients = Recipient.getList(m_id, conn);
+                Statement cs = conn.createStatement();
+                ResultSet rs = cs.executeQuery("SELECT * FROM \"Get_LastSendingByDocID\"(" + documentID + ")");
+                while (rs.next()) {
+	                m_id = rs.getInt("sending_id");
+	                m_startDate = rs.getTimestamp("sending_start_date", cal);
+	                m_endDate = rs.getTimestamp("sending_end_date", cal);
+	                m_sendStatusID = rs.getInt("send_status_id");
+	                m_documentID = documentID;	
+	                if (m_id > 0) {
+	                    m_sender.getBySendingID(m_id, conn);
+	                    m_proxy.LoadBySendingID(m_id, conn);
+	                    m_recipients = Recipient.getList(m_id, conn);
+	                }	
+	                find = true;
                 }
-
-                cs.close();
-                return true;
+                rs.close();
+                cs.close();                
             } else {
-                return false;
+            	find = false;
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return false;
+            find = false;
         }
+        return find;
     }
-
-    public boolean loadByDocumentGUID(String document_guid, Connection conn) {
+    
+    
+    public boolean loadByDocumentGUID(String document_guid, Connection conn) {    	
         clear();
+        boolean find = false;
         try {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
-                CallableStatement cs = conn.prepareCall("{call GET_LASTSENDINGBYDOCGUID(?,?,?,?,?,?)}");
-                cs.setString("document_guid", document_guid);
-                cs.registerOutParameter("sending_id", Types.INTEGER);
-                cs.registerOutParameter("sending_start_date", Types.TIMESTAMP);
-                cs.registerOutParameter("sending_end_date", Types.TIMESTAMP);
-                cs.registerOutParameter("send_status_id", Types.INTEGER);
-                cs.registerOutParameter("document_id", Types.INTEGER);
-                cs.executeUpdate();
-                m_id = cs.getInt("sending_id");
-                m_startDate = cs.getTimestamp("sending_start_date", cal);
-                m_endDate = cs.getTimestamp("sending_end_date", cal);
-                m_sendStatusID = cs.getInt("send_status_id");
-                m_documentID = cs.getInt("document_id");
-                m_documentGUID = document_guid;
-
-                if (m_id > 0) {
-                    m_sender.getBySendingID(m_id, conn);
-                    m_proxy.LoadBySendingID(m_id, conn);
-                    m_recipients = Recipient.getList(m_id, conn);
+                Statement cs = conn.createStatement();
+                ResultSet rs = cs.executeQuery("SELECT * FROM \"Get_LastSendingByDocGUID\"(" + document_guid + ")");
+                while (rs.next()) {
+	                m_id = rs.getInt("sending_id");
+	                m_startDate = rs.getTimestamp("sending_start_date", cal);
+	                m_endDate = rs.getTimestamp("sending_end_date", cal);
+	                m_sendStatusID = rs.getInt("send_status_id");
+	                m_documentID = rs.getInt("document_id");
+	                m_documentGUID = document_guid;
+	
+	                if (m_id > 0) {
+	                    m_sender.getBySendingID(m_id, conn);
+	                    m_proxy.LoadBySendingID(m_id, conn);
+	                    m_recipients = Recipient.getList(m_id, conn);
+	                }
+	                find = true;
                 }
-
-                cs.close();
-                return true;
+                rs.close();
+                cs.close();                
             } else {
-                return false;
+            	find = false;
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return false;
+            find = false;
         }
+        return find;
     }
-
+    
+    
     public int addToDB(Connection conn, XHeader xTeePais) throws IllegalArgumentException, SQLException {
-        if (conn != null) {
+    	if (conn != null) {
 
             logger.debug("Adding transport info to database: ");
             logger.debug("m_documentID: " + m_documentID);
             logger.debug("m_startDate: " + m_startDate);
             logger.debug("m_endDate: " + m_endDate);
             logger.debug("m_sendStatusID: " + m_sendStatusID);
-
+            
             Calendar cal = Calendar.getInstance();
-            CallableStatement cs = conn.prepareCall("{call ADD_SENDING(?,?,?,?,?,?,?)}");
-            cs.registerOutParameter("sending_id", Types.INTEGER);
-            cs.setInt("document_id", m_documentID);
-            cs.setTimestamp("sending_start_date", CommonMethods.sqlDateFromDate(m_startDate), cal);
-            cs.setTimestamp("sending_end_date", CommonMethods.sqlDateFromDate(m_endDate), cal);
-            cs.setInt("send_status_id", m_sendStatusID);
+            CallableStatement cs = conn.prepareCall("{? = call \"Add_Sending\"(?,?,?,?,?,?)}");
+            cs.registerOutParameter(1, Types.INTEGER);
+            
+            cs.setInt(2, m_documentID);
+            cs.setTimestamp(3, CommonMethods.sqlDateFromDate(m_startDate), cal);
+            cs.setTimestamp(4, CommonMethods.sqlDateFromDate(m_endDate), cal);
+            cs.setInt(5, m_sendStatusID);
 
             if (xTeePais != null) {
-                cs.setString("xtee_isikukood", xTeePais.isikukood);
-                cs.setString("xtee_asutus", xTeePais.asutus);
+                cs.setString(6, xTeePais.isikukood);
+                cs.setString(7, xTeePais.asutus);
             } else {
-                cs.setString("xtee_isikukood", null);
-                cs.setString("xtee_asutus", null);
+                cs.setString(6, null);
+                cs.setString(7, null);
             }
 
             cs.executeUpdate();
-            m_id = cs.getInt("sending_id");
+            m_id = cs.getInt(1);
             cs.close();
 
             if (m_id > 0) {
@@ -268,6 +274,7 @@ public class Sending {
         }
     }
 
+    
     public boolean update(boolean updateChildObjects, Connection conn, XHeader xTeePais) {
         logger.debug("Updating sending. Parameters: ");
         logger.debug("sending_id: " + m_id);
@@ -279,12 +286,12 @@ public class Sending {
         try {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
-                CallableStatement cs = conn.prepareCall("{call UPDATE_SENDING(?,?,?,?,?)}");
-                cs.setInt("sending_id", m_id);
-                cs.setInt("document_id", m_documentID);
-                cs.setTimestamp("sending_start_date", CommonMethods.sqlDateFromDate(m_startDate), cal);
-                cs.setTimestamp("sending_end_date", CommonMethods.sqlDateFromDate(m_endDate), cal);
-                cs.setInt("send_status_id", m_sendStatusID);
+                CallableStatement cs = conn.prepareCall("{call \"Update_Sending\"(?,?,?,?,?)}");
+                cs.setInt(1, m_id);
+                cs.setInt(2, m_documentID);
+                cs.setTimestamp(3, CommonMethods.sqlDateFromDate(m_startDate), cal);
+                cs.setTimestamp(4, CommonMethods.sqlDateFromDate(m_endDate), cal);
+                cs.setInt(5, m_sendStatusID);
                 cs.executeUpdate();
                 cs.close();
 
@@ -303,8 +310,8 @@ public class Sending {
             return false;
         }
     }
-
-
+    
+    
     public static Sending fromXML(XMLStreamReader xmlReader, Connection conn, XHeader xTeePais) throws AxisFault {
         logger.debug("Parsing sending information from XML...");
         try {
@@ -444,4 +451,132 @@ public class Sending {
 
         return result;
     }
+
+    /*
+    public boolean loadByDocumentID(int documentID, Connection conn) {
+        clear();
+        try {
+            if (conn != null) {
+                Calendar cal = Calendar.getInstance();
+                CallableStatement cs = conn.prepareCall("{call GET_LASTSENDINGBYDOCID(?,?,?,?,?)}");
+                cs.setInt("document_id", documentID);
+                cs.registerOutParameter("sending_id", Types.INTEGER);
+                cs.registerOutParameter("sending_start_date", Types.TIMESTAMP);
+                cs.registerOutParameter("sending_end_date", Types.TIMESTAMP);
+                cs.registerOutParameter("send_status_id", Types.INTEGER);
+                cs.executeUpdate();
+                m_id = cs.getInt("sending_id");
+                m_startDate = cs.getTimestamp("sending_start_date", cal);
+                m_endDate = cs.getTimestamp("sending_end_date", cal);
+                m_sendStatusID = cs.getInt("send_status_id");
+                m_documentID = documentID;
+
+                if (m_id > 0) {
+                    m_sender.getBySendingID(m_id, conn);
+                    m_proxy.LoadBySendingID(m_id, conn);
+                    m_recipients = Recipient.getList(m_id, conn);
+                }
+
+                cs.close();
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            return false;
+        }
+    }
+     */
+    
+    /*
+    public int addToDB(Connection conn, XHeader xTeePais) throws IllegalArgumentException, SQLException {
+        if (conn != null) {
+
+            logger.debug("Adding transport info to database: ");
+            logger.debug("m_documentID: " + m_documentID);
+            logger.debug("m_startDate: " + m_startDate);
+            logger.debug("m_endDate: " + m_endDate);
+            logger.debug("m_sendStatusID: " + m_sendStatusID);
+
+            Calendar cal = Calendar.getInstance();
+            CallableStatement cs = conn.prepareCall("{call ADD_SENDING(?,?,?,?,?,?,?)}");
+            cs.registerOutParameter("sending_id", Types.INTEGER);
+            cs.setInt("document_id", m_documentID);
+            cs.setTimestamp("sending_start_date", CommonMethods.sqlDateFromDate(m_startDate), cal);
+            cs.setTimestamp("sending_end_date", CommonMethods.sqlDateFromDate(m_endDate), cal);
+            cs.setInt("send_status_id", m_sendStatusID);
+
+            if (xTeePais != null) {
+                cs.setString("xtee_isikukood", xTeePais.isikukood);
+                cs.setString("xtee_asutus", xTeePais.asutus);
+            } else {
+                cs.setString("xtee_isikukood", null);
+                cs.setString("xtee_asutus", null);
+            }
+
+            cs.executeUpdate();
+            m_id = cs.getInt("sending_id");
+            cs.close();
+
+            if (m_id > 0) {
+                m_sender.setSendingID(m_id);
+                m_sender.addToDB(conn, xTeePais);
+
+                if ((m_proxy != null) && (m_proxy.getOrganizationID() > 0)) {
+                    m_proxy.setSendingID(m_id);
+                    m_proxy.addToDB(conn, xTeePais);
+                }
+
+                for (Recipient tmpRecipient : m_recipients) {
+                    tmpRecipient.setSendingID(m_id);
+                    tmpRecipient.addToDB(conn, xTeePais);
+                }
+            }
+
+            return m_id;
+        } else {
+            throw new IllegalArgumentException("Database connection is NULL!");
+        }
+    }
+    */
+    
+    /*
+    public boolean update(boolean updateChildObjects, Connection conn, XHeader xTeePais) {
+        logger.debug("Updating sending. Parameters: ");
+        logger.debug("sending_id: " + m_id);
+        logger.debug("document_id: " + m_documentID);
+        logger.debug("sending_start_date: " + m_startDate);
+        logger.debug("sending_end_date: " + m_endDate);
+        logger.debug("send_status_id: " + m_sendStatusID);
+
+        try {
+            if (conn != null) {
+                Calendar cal = Calendar.getInstance();
+                CallableStatement cs = conn.prepareCall("{call UPDATE_SENDING(?,?,?,?,?)}");
+                cs.setInt("sending_id", m_id);
+                cs.setInt("document_id", m_documentID);
+                cs.setTimestamp("sending_start_date", CommonMethods.sqlDateFromDate(m_startDate), cal);
+                cs.setTimestamp("sending_end_date", CommonMethods.sqlDateFromDate(m_endDate), cal);
+                cs.setInt("send_status_id", m_sendStatusID);
+                cs.executeUpdate();
+                cs.close();
+
+                if (updateChildObjects) {
+                    for (Recipient tmpRecipient : m_recipients) {
+                        tmpRecipient.update(conn, xTeePais);
+                    }
+                }
+
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            return false;
+        }
+    }
+     */
+    
 }

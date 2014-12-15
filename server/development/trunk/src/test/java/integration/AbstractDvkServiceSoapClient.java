@@ -1,7 +1,7 @@
 package integration;
 
 import dhl.iostructures.XHeader;
-import org.apache.axiom.attachments.ConfigurableDataHandler;
+
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
@@ -13,7 +13,7 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.wsdl.WSDLConstants;
 
-import javax.activation.FileDataSource;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,7 +59,8 @@ public abstract class AbstractDvkServiceSoapClient {
         OMNamespace xsiNs = fac.createOMNamespace("http://www.w3.org/2001/XMLSchema-instance", "xsi");
         OMNamespace xteeNs = fac.createOMNamespace("http://x-tee.riik.ee/xsd/xtee.xsd", "xtee");
         OMNamespace xsdNs = fac.createOMNamespace("http://www.w3.org/2001/XMLSchema", "xsd");
-        OMNamespace dhlNs = fac.createOMNamespace("http://0.0.0.0:9099/services/dhlHttpSoapPort", "xsd");
+        //OMNamespace dhlNs = fac.createOMNamespace("http://0.0.0.0:9099/services/dhlHttpSoapPort", "xsd");
+        OMNamespace dhlNs = fac.createOMNamespace("http://0.0.0.0:8070/dvk/services/dhlHttpSoapPort", "xsd");
 
         namespaces.put("xsiNs", xsiNs);
         namespaces.put("xteeNs", xteeNs);

@@ -6,7 +6,7 @@
     <packaging>war</packaging>
     <version>1.7.12</version>
     <name>dvk-server</name>
-    <!-- 
+    <!--  
     <parent>
         <groupId>dvk</groupId>
         <artifactId>parent</artifactId>

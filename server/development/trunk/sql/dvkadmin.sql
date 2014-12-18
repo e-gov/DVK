@@ -63,6 +63,7 @@ ALTER SEQUENCE dvk.sq_vastuvotja_id OWNER TO dvkadmin;
 ALTER SEQUENCE dvk.sq_vastuvotja_mall_id OWNER TO dvkadmin;
 
 
+ALTER FUNCTION tr_allkiri_log() OWNER TO dvkadmin;
 ALTER FUNCTION tr_allyksus_log() OWNER TO dvkadmin;
 ALTER FUNCTION tr_ametikoht_log() OWNER TO dvkadmin;
 ALTER FUNCTION tr_ametikoht_log() OWNER TO dvkadmin;
@@ -191,14 +192,3 @@ ALTER FUNCTION dvklog.log_vahendaja(vahendaja, vahendaja, character varying) OWN
 ALTER FUNCTION dvklog.log_vastuvotja(vastuvotja, vastuvotja, character varying) OWNER TO dvkadmin; 
 ALTER FUNCTION dvklog.log_vastuvotja_mall(vastuvotja_mall, vastuvotja_mall, character varying) OWNER TO dvkadmin; 
 ALTER FUNCTION dvklog.log_vastuvotja_staatus(vastuvotja_staatus, vastuvotja_staatus, character varying) OWNER TO dvkadmin;  
-
-ALTER DATABASE postgres OWNER TO dvkadmin;
-
-ALTER SCHEMA pg_catalog OWNER TO dvkadmin;
-ALTER SCHEMA information_schema OWNER TO dvkadmin;
-ALTER SCHEMA dvk OWNER TO dvkadmin;
-ALTER SCHEMA dvklog OWNER TO dvkadmin;
-ALTER SCHEMA public OWNER TO dvkadmin;
-
-ALTER TABLESPACE pg_global OWNER TO dvkadmin;
-ALTER TABLESPACE pg_default OWNER TO dvkadmin;

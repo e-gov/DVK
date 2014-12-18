@@ -64,8 +64,9 @@ CREATE SCHEMA dvklog;
 SET dvkxtee.xtee_asutus = '';
 SET dvkxtee.xtee_isikukood = '';
 
-SET search_path = dvk, pg_catalog;
-ALTER USER postgres SET search_path = dvk, public;
+SET search_path = dvk, dvklog, pg_catalog;
+ALTER USER postgres SET search_path = dvk, dvklog, public;
+
 
 CREATE SEQUENCE sq_allyksus_id INCREMENT 1 MINVALUE 1 NO MAXVALUE START 1 CACHE 1;
 CREATE SEQUENCE sq_vahendaja_id INCREMENT 1 MINVALUE 1 NO MAXVALUE START 1 CACHE 1;

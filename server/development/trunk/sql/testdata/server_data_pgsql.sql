@@ -1,3 +1,6 @@
+SET dvkxtee.xtee_asutus = '';
+SET dvkxtee.xtee_isikukood = '';
+
 INSERT INTO dvk.asutus (registrikood, nimetus, liik2, dhl_saatmine, dhs_nimetus) 
 VALUES ('70006317', 'RIA', null, '1', null);
 

@@ -66,7 +66,7 @@ ALTER SEQUENCE dvk.sq_vastuvotja_mall_id OWNER TO dvkadmin;
 ALTER FUNCTION tr_allkiri_log() OWNER TO dvkadmin;
 ALTER FUNCTION tr_allyksus_log() OWNER TO dvkadmin;
 ALTER FUNCTION tr_ametikoht_log() OWNER TO dvkadmin;
-ALTER FUNCTION tr_ametikoht_log() OWNER TO dvkadmin;
+ALTER FUNCTION tr_ametikoht_taitmine_log() OWNER TO dvkadmin;
 ALTER FUNCTION tr_asutus_log() OWNER TO dvkadmin;
 ALTER FUNCTION tr_dokumendi_ajalugu_log() OWNER TO dvkadmin;
 ALTER FUNCTION tr_dokumendi_fail_log() OWNER TO dvkadmin;
@@ -115,7 +115,7 @@ ALTER FUNCTION "Get_AllyksusIdByShortName"(integer, character varying) OWNER TO 
 ALTER FUNCTION "Get_AllyksusList"(integer, character varying) OWNER TO dvkadmin;
 ALTER FUNCTION "Get_AllyksusStat"(integer, integer) OWNER TO dvkadmin;
 ALTER FUNCTION "Get_AmetikohaTaitmineByAarID"(integer) OWNER TO dvkadmin; 
-ALTER FUNCTION "Get_AmetikohaTaitmineByAarID"(integer) OWNER TO dvkadmin;  
+ALTER FUNCTION "Get_AmetikohaTaitmineList"(integer, character varying) OWNER TO dvkadmin;  
 ALTER FUNCTION "Get_AmetikohtByAarID"(integer) OWNER TO dvkadmin;
 ALTER FUNCTION "Get_AmetikohtIdByAarID"(integer) OWNER TO dvkadmin;
 ALTER FUNCTION "Get_AmetikohtIdByShortName"(integer, character varying) OWNER TO dvkadmin;
@@ -160,7 +160,7 @@ ALTER FUNCTION "Update_Isik"(integer, character varying, character varying, char
 ALTER FUNCTION "Update_Sending"(integer, integer, timestamp without time zone, timestamp without time zone, integer) OWNER TO dvkadmin;
 ALTER FUNCTION "Update_Vastuvotja"(integer, integer, integer, integer, character varying, character varying, character varying, character varying, character varying, integer, integer, timestamp without time zone, timestamp without time zone, character varying, character varying, character varying, character varying, integer, text, character varying, integer, integer, character varying, character varying, character varying, character varying)OWNER TO dvkadmin;
 ALTER FUNCTION bytea_import(text) OWNER TO dvkadmin;
-ALTER FUNCTION bytea_import(text) OWNER TO dvkadmin;  
+ALTER FUNCTION dir_temp_konv(character varying) OWNER TO dvkadmin;  
 
 
 ALTER FUNCTION dvklog.log_allkiri(allkiri, allkiri, character varying) OWNER TO dvkadmin;

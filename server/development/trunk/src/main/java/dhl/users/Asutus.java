@@ -483,6 +483,7 @@ public class Asutus {
 	                m_toetatavDVKVersioon = rs.getString("toetatav_dvk_versioon");
 	                m_serverID = rs.getInt("server_id");
 	                m_aarID = rs.getInt("aar_id");
+	                m_kapsel_versioon = rs.getString("kapsel_versioon");	                
                 }
                 rs.close();
                 cs.close();
@@ -539,6 +540,7 @@ public class Asutus {
                     m_toetatavDVKVersioon = rs.getString("toetatav_dvk_versioon");
                     m_serverID = rs.getInt("server_id");
                     m_aarID = rs.getInt("aar_id");
+                    m_kapsel_versioon = rs.getString("kapsel_versioon");                    
                 }
                 rs.close();
                 cs.close();
@@ -647,7 +649,7 @@ public class Asutus {
 	                    item.setToetatavDVKVersioon(rs.getString("toetatav_dvk_versioon"));
 	                    item.setServerID(rs.getInt("server_id"));
 	                    item.setAarID(rs.getInt("aar_id"));
-	                    //item.setKapselVersioon(rs.getString("kapsel_versioon"));
+	                    item.setKapselVersioon(rs.getString("kapsel_versioon"));
 	                    result.add(item);
 	                }
 	                rs.close();
@@ -673,7 +675,7 @@ public class Asutus {
                 Calendar cal = Calendar.getInstance();
                 
 
-                CallableStatement cs = conn.prepareCall("{? = call \"Add_Asutus\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                CallableStatement cs = conn.prepareCall("{? = call \"Add_Asutus\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 cs.registerOutParameter(1, Types.INTEGER);
 
                 cs.setString(2, m_registrikood);
@@ -723,7 +725,7 @@ public class Asutus {
                     cs.setString(40, null);
                 }
                 
-                //cs.setString("kapsel_versioon", m_kapsel_versioon);
+                cs.setString(41, m_kapsel_versioon);
                 cs.execute();
                 m_id = cs.getInt(1);
                 cs.close();
@@ -739,7 +741,7 @@ public class Asutus {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
                 CallableStatement cs = conn.prepareCall(
-                		"{call \"Update_Asutus\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                		"{call \"Update_Asutus\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 
                 cs.setInt(1, m_id);
                 cs.setString(2, m_registrikood);
@@ -788,7 +790,7 @@ public class Asutus {
                     cs.setString(39, null);
                     cs.setString(40, null);
                 }
-                //cs.setString("kapsel_versioon", m_kapsel_versioon);
+                cs.setString(41, m_kapsel_versioon);
                 cs.execute();
                 cs.close();
             }

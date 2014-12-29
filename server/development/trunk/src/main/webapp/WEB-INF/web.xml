@@ -18,6 +18,7 @@ Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
     <init-param>
       <param-name>configFile</param-name>      
       <param-value>${dhl.properties}</param-value>
+      <!-- <param-value>C:\Users\aleksandr.potapov\apache-tomcat-6\webapps\dvk\WEB-INF\dhl.properties</param-value> -->      
     </init-param>
   </servlet>
   <servlet-mapping>

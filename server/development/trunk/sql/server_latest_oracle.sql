@@ -245,7 +245,8 @@ CREATE TABLE asutus
     dhs_nimetus varchar2(150) null,
     toetatav_dvk_versioon varchar2(20) null,
     server_id number(38,0) null,
-    aar_id number(38,0) null
+    aar_id number(38,0) null,
+	kapsel_versioon varchar2(4) default '1.0' not null
 )
 /
 
@@ -269,6 +270,7 @@ begin
 end;
 /
 
+COMMENT ON COLUMN asutus.kapsel_versioon IS 'Asutuse poolt toetatud kapsli versioon.';
 COMMENT ON COLUMN asutus.asutus_id IS 'asutuste tabeli primary key';
 COMMENT ON COLUMN asutus.registrikood IS 'asutuse registrikood';
 COMMENT ON COLUMN asutus.e_registrikood IS 'asutuse varasem registrikood';
@@ -549,8 +551,13 @@ create table dokument
     eelmise_versiooni_id number(38,0) null,
 	suurus number(20) null,
 	GUID varchar2(36) null,
-    versioon number(10) default 1
+    versioon number(10) default 1,
+	kapsli_versioon varchar2(5) null
+	
 )
+/
+
+COMMENT ON COLUMN dokument.kapsli_versioon IS 'Kapsli versioon.'
 /
 
 COMMENT ON COLUMN dokument.suurus IS 'Dokumendi suurus baitides.'
@@ -18941,7 +18948,8 @@ procedure Get_AsutusByRegNr(
     dhs_nimetus out varchar2,
     toetatav_dvk_versioon out varchar2,
     server_id out number,
-    aar_id out number)
+    aar_id out number,
+	kapsel_versioon out varchar2)
 as
 cnt number(38,0) := 0;
 begin
@@ -18988,7 +18996,8 @@ begin
                 a.dhs_nimetus,
                 a.toetatav_dvk_versioon,
                 a.server_id,
-                a.aar_id
+                a.aar_id,
+				a.kapsel_versioon
         into    Get_AsutusByRegNr.id,
                 Get_AsutusByRegNr.registrikood_vana,
                 Get_AsutusByRegNr.ks_asutuse_id,
@@ -19025,7 +19034,8 @@ begin
                 Get_AsutusByRegNr.dhs_nimetus,
                 Get_AsutusByRegNr.toetatav_dvk_versioon,
                 Get_AsutusByRegNr.server_id,
-                Get_AsutusByRegNr.aar_id
+                Get_AsutusByRegNr.aar_id,
+				Get_AsutusByRegNr.kapsel_versioon
         from    asutus a
         where   a.registrikood = Get_AsutusByRegNr.registrikood
                 and rownum < 2;
@@ -19067,6 +19077,7 @@ begin
         Get_AsutusByRegNr.toetatav_dvk_versioon := null;
         Get_AsutusByRegNr.server_id := null;
         Get_AsutusByRegNr.aar_id := null;
+		Get_AsutusByRegNr.kapsel_versioon := null;
     end if;
 end;
 /
@@ -19110,7 +19121,8 @@ procedure Get_AsutusByID(
     dhs_nimetus out varchar2,
     toetatav_dvk_versioon out varchar2,
     server_id out number,
-    aar_id out number)
+    aar_id out number,
+	kapsel_versioon out varchar2)
 as
 cnt number(38,0) := 0;
 begin
@@ -19157,7 +19169,8 @@ begin
                 a.dhs_nimetus,
                 a.toetatav_dvk_versioon,
                 a.server_id,
-                a.aar_id
+                a.aar_id,
+				a.kapsel_versioon
         into    Get_AsutusByID.registrikood,
                 Get_AsutusByID.registrikood_vana,
                 Get_AsutusByID.ks_asutuse_id,
@@ -19194,7 +19207,8 @@ begin
                 Get_AsutusByID.dhs_nimetus,
                 Get_AsutusByID.toetatav_dvk_versioon,
                 Get_AsutusByID.server_id,
-                Get_AsutusByID.aar_id
+                Get_AsutusByID.aar_id,
+				Get_AsutusByID.kapsel_versioon
         from    asutus a
         where   a.asutus_id = Get_AsutusByID.id
                 and rownum < 2;
@@ -19236,6 +19250,7 @@ begin
         Get_AsutusByID.toetatav_dvk_versioon := null;
         Get_AsutusByID.server_id := null;
         Get_AsutusByID.aar_id := null;
+		Get_AsutusByID.kapsel_versioon := null;
     end if;
 end;
 /
@@ -19606,7 +19621,8 @@ procedure Add_Asutus(
     server_id in number,
     aar_id in number,
     xtee_isikukood in varchar2,
-    xtee_asutus in varchar2)
+    xtee_asutus in varchar2,
+	kapsel_versioon in varchar2)
 as
 cnt number(38,0) := 0;
 begin
@@ -19661,7 +19677,8 @@ begin
                 dhs_nimetus,
                 toetatav_dvk_versioon,
                 server_id,
-                aar_id)
+                aar_id,
+				kapsel_versioon)
         values  (0,
                 Add_Asutus.registrikood,
                 Add_Asutus.registrikood_vana,
@@ -19699,7 +19716,8 @@ begin
                 Add_Asutus.dhs_nimetus,
                 Add_Asutus.toetatav_dvk_versioon,
                 Add_Asutus.server_id,
-                Add_Asutus.aar_id);
+                Add_Asutus.aar_id,
+				Add_Asutus.kapsel_versioon);
 
         Add_Asutus.id := globalPkg.identity;
     else
@@ -19753,7 +19771,8 @@ procedure Update_Asutus(
     server_id in number,
     aar_id in number,
     xtee_isikukood in varchar2,
-    xtee_asutus in varchar2)
+    xtee_asutus in varchar2,
+	kapsel_versioon in varchar2)
 as
 begin
 
@@ -19798,7 +19817,8 @@ begin
             dhs_nimetus = Update_Asutus.dhs_nimetus,
             toetatav_dvk_versioon = Update_Asutus.toetatav_dvk_versioon,
             server_id = Update_Asutus.server_id,
-            aar_id = Update_Asutus.aar_id
+            aar_id = Update_Asutus.aar_id,
+			kapsel_versioon = Update_Asutus.kapsel_versioon
     where   asutus_id = Update_Asutus.id;
 end;
 /
@@ -21191,7 +21211,8 @@ PROCEDURE ADD_DOKUMENT(
   versioon IN NUMBER,
   guid IN VARCHAR2,
   xtee_isikukood IN VARCHAR2,
-  xtee_asutus IN VARCHAR2
+  xtee_asutus IN VARCHAR2,
+  kapsli_versioon IN VARCHAR2
 ) AS
 
 BEGIN
@@ -21208,7 +21229,8 @@ BEGIN
     sailitustahtaeg,
     suurus,
     versioon,
-    guid
+    guid,
+	kapsli_versioon
   ) VALUES (
     ADD_DOKUMENT.dokument_id,
     ADD_DOKUMENT.asutus_id,
@@ -21217,7 +21239,8 @@ BEGIN
     ADD_DOKUMENT.sailitustahtaeg,
     ADD_DOKUMENT.suurus,
     ADD_DOKUMENT.versioon,
-    ADD_DOKUMENT.guid
+    ADD_DOKUMENT.guid,
+	ADD_DOKUMENT.kapsli_versioon
   );
 
 END;

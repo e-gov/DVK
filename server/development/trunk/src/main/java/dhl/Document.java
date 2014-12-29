@@ -225,7 +225,7 @@ public class Document {
                         fileSize = file.length();
                     }
 
-                    CallableStatement cs = conn.prepareCall("{call \"Add_Dokument\"(?,?,?,?,?,?,?,?,?,?)}");
+                    CallableStatement cs = conn.prepareCall("{call \"Add_Dokument\"(?,?,?,?,?,?,?,?,?,?,?)}");
                     cs.setInt(1, m_id);
                     cs.setInt(2, m_organizationID);
                     cs.setInt(3, m_folderID);                    
@@ -249,7 +249,7 @@ public class Document {
                         cs.setString(10, null);
 
                     }
-                    //cs.setString(11, containerVersion);
+                    cs.setString(11, containerVersion);
                     
                     
                     // Execute
@@ -432,9 +432,7 @@ public class Document {
                     item.setFolderID(rs.getInt("kaust_id"));
                     item.setConservationDeadline(rs.getTimestamp("sailitustahtaeg", cal));
                     item.setDvkContainerVersion(rs.getInt("versioon"));
-                    //item.setContainerVersion(rs.getString("kapsli_versioon"));
-                    item.setContainerVersion("");
-
+                    item.setContainerVersion(rs.getString("kapsli_versioon"));                    
 
                     
                     String itemDataFile = CommonMethods.createPipelineFile(docCounter);

@@ -415,8 +415,10 @@ CREATE TABLE asutus (
 	dhs_nimetus varchar(150) NULL,
 	toetatav_dvk_versioon varchar(20) NULL,
 	server_id integer NULL,
-	aar_id integer NULL
+	aar_id integer NULL,
+	kapsel_versioon varchar(4) default '1.0' not null
 ) ;
+COMMENT ON COLUMN asutus.kapsel_versioon IS 'Asutuse poolt toetatud kapsli versioon.';
 COMMENT ON COLUMN asutus.asutus_id IS 'asutuste tabeli primary key';
 COMMENT ON COLUMN asutus.registrikood IS 'asutuse registrikood';
 COMMENT ON COLUMN asutus.e_registrikood IS 'asutuse varasem registrikood';
@@ -469,8 +471,10 @@ CREATE TABLE dokument (
 	eelmise_versiooni_id integer NULL,
 	suurus bigint NULL,
 	guid varchar(36),
-	versioon integer DEFAULT 1
+	versioon integer DEFAULT 1,
+	kapsli_versioon varchar(5)
 ) ;
+COMMENT ON COLUMN dokument.kapsli_versioon IS 'Kapsli versioon.';
 COMMENT ON COLUMN dokument.suurus IS 'Dokumendi suurus baitides.';
 COMMENT ON COLUMN dokument.guid IS 'Dokumendi Globaalselt Unikaalne Identifikaator.';
 ALTER TABLE dokument ADD CONSTRAINT dokumendi_id_pkey PRIMARY KEY (dokument_id);
@@ -928,7 +932,9 @@ CREATE OR REPLACE FUNCTION "Add_Asutus"(
     p_server_id integer,
     p_aar_id integer,
     p_xtee_isikukood character varying,
-    p_xtee_asutus character varying)
+    p_xtee_asutus character varying,
+	p_kapsel_versioon character varying)
+	
 RETURNS integer AS $$
 DECLARE
     p_id int4;
@@ -944,7 +950,7 @@ BEGIN
 
     if (found) then
         select  a.asutus_id
-        into    Add_Asutus.id
+        into    p_id
         from    asutus a
         where   a.registrikood = p_registrikood
                 limit 1;
@@ -990,7 +996,8 @@ BEGIN
                 dhs_nimetus,
                 toetatav_dvk_versioon,
                 server_id,
-                aar_id)
+                aar_id,
+				kapsel_versioon)
         values  (p_id,
                 p_registrikood,
                 p_registrikood_vana,
@@ -1028,7 +1035,8 @@ BEGIN
                 p_dhs_nimetus,
                 p_toetatav_dvk_versioon,
                 p_server_id,
-                p_aar_id);
+                p_aar_id,
+				p_kapsel_versioon);
 
     end if;
     return  p_id;
@@ -1046,7 +1054,8 @@ CREATE OR REPLACE FUNCTION "Add_Dokument" (
     p_versioon integer,
     p_guid character varying,
     p_xtee_isikukood character varying,
-    p_xtee_asutus character varying)
+    p_xtee_asutus character varying,
+	p_kapsli_versioon character varying)
 RETURNS void AS $$
 BEGIN
   -- Set session scope variables
@@ -1062,7 +1071,8 @@ BEGIN
           sailitustahtaeg,
           suurus,
           versioon,
-          guid)
+          guid,
+		  kapsli_versioon)
   VALUES( p_dokument_id,
           p_asutus_id,
           p_kaust_id,
@@ -1070,7 +1080,8 @@ BEGIN
           p_sailitustahtaeg,
           p_suurus,
           p_versioon,
-          p_guid);
+          p_guid,
+		  p_kapsli_versioon);
 
 END; $$
 LANGUAGE plpgsql;
@@ -1960,7 +1971,8 @@ create type get_asutus_by_id as (
     dhs_nimetus character varying,
     toetatav_dvk_versioon character varying,
     server_id integer,
-    aar_id integer
+    aar_id integer,
+	kapsel_versioon character varying
 );
 
 CREATE OR REPLACE FUNCTION "Get_AsutusByID" (
@@ -2006,7 +2018,8 @@ RETURN QUERY
                 a.dhs_nimetus,
                 a.toetatav_dvk_versioon,
                 a.server_id,
-                a.aar_id
+                a.aar_id,
+				a.kapsel_versioon
         from    asutus a
         where   a.asutus_id = p_id
                 LIMIT 1;
@@ -2051,7 +2064,8 @@ create type get_asutus_by_regnr as (
 	dhs_nimetus character varying,
 	toetatav_dvk_versioon character varying,
 	server_id integer,
-	aar_id integer
+	aar_id integer,
+	kapsel_versioon character varying
 );
 
 
@@ -2098,7 +2112,8 @@ RETURN QUERY
                 dhs_nimetus,
                 toetatav_dvk_versioon,
                 server_id,
-                aar_id
+                aar_id,
+				kapsel_versioon				
         from    asutus
         where   registrikood = p_registrikood
                 LIMIT 1;
@@ -3172,7 +3187,8 @@ CREATE OR REPLACE FUNCTION "Update_Asutus" (
     p_server_id integer,
     p_aar_id integer,
     p_xtee_isikukood character varying,
-    p_xtee_asutus character varying)
+    p_xtee_asutus character varying,
+	p_kapsel_versioon character varying)
  RETURNS VOID AS $$
 BEGIN
 
@@ -3217,7 +3233,8 @@ BEGIN
             dhs_nimetus = p_dhs_nimetus,
             toetatav_dvk_versioon = p_toetatav_dvk_versioon,
             server_id = p_server_id,
-            aar_id = p_aar_id
+            aar_id = p_aar_id,
+			kapsel_versioon = p_kapsel_versioon
     where   asutus_id = p_id;
 end;$$
 LANGUAGE PLPGSQL;
@@ -7646,6 +7663,7 @@ BEGIN
 		  asutus_new.TOETATAV_DVK_VERSIOON := NEW.TOETATAV_DVK_VERSIOON;
 		  asutus_new.SERVER_ID := NEW.SERVER_ID;
 		  asutus_new.AAR_ID := NEW.AAR_ID;
+		  asutus_new.KAPSEL_VERSIOON := NEW.KAPSEL_VERSIOON;
 	   elsif tg_op = 'UPDATE' then    
 		  tr_operation := 'UPDATE';		  		  
 		  asutus_old.ASUTUS_ID := OLD.ASUTUS_ID;
@@ -7686,6 +7704,7 @@ BEGIN
 		  asutus_old.TOETATAV_DVK_VERSIOON := OLD.TOETATAV_DVK_VERSIOON;
 		  asutus_old.SERVER_ID := OLD.SERVER_ID;
 		  asutus_old.AAR_ID := OLD.AAR_ID;
+		  asutus_old.KAPSEL_VERSIOON := OLD.KAPSEL_VERSIOON;
 	   elsif tg_op = 'DELETE' then    
 		  tr_operation := 'DELETE'; 		  		  
 		  asutus_old.ASUTUS_ID := OLD.ASUTUS_ID;
@@ -7726,6 +7745,7 @@ BEGIN
 		  asutus_old.TOETATAV_DVK_VERSIOON := OLD.TOETATAV_DVK_VERSIOON;
 		  asutus_old.SERVER_ID := OLD.SERVER_ID;
 		  asutus_old.AAR_ID := OLD.AAR_ID;
+		  asutus_old.KAPSEL_VERSIOON := OLD.KAPSEL_VERSIOON;		  
 	  end if;	
 	  
 	  execute dvklog.log_asutus(asutus_new, asutus_old, tr_operation);       		  
@@ -9631,6 +9651,55 @@ BEGIN
         current_setting('dvkxtee.xtee_asutus')
       );
     END IF;		
+	
+    -- kapsel_versioon changed
+    IF(coalesce(asutus_new.kapsel_versioon, ' ') != coalesce(asutus_old.kapsel_versioon, ' ')) THEN
+      SELECT * INTO clmn FROM information_schema.columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('kapsel_versioon');
+	  p_id := nextval('sq_logi_id');
+      INSERT INTO logi(
+        log_id,
+        tabel,
+        op,
+        uidcol,
+        tabel_uid,
+        veerg,
+        ctype,
+        vana_vaartus,
+        uus_vaartus,
+        muutmise_aeg,
+        ab_kasutaja,
+        ef_kasutaja,
+        kasutaja_kood,
+        comm,
+        created,
+        last_modified,
+        username,
+        ametikoht,
+        xtee_isikukood,
+        xtee_asutus
+      ) VALUES (
+        p_id,
+        tablename,
+        tr_operation,
+        pkey_col, -- primary key column name
+        primary_key_value, -- primary key value
+        clmn.column_name, -- column name
+        clmn.data_type,
+        asutus_old.kapsel_versioon,
+        asutus_new.kapsel_versioon,
+        LOCALTIMESTAMP,
+        usr,
+        '''',
+        '''',
+        '''',
+        LOCALTIMESTAMP,
+        LOCALTIMESTAMP,
+        '''',
+        0,
+        current_setting('dvkxtee.xtee_isikukood'),
+        current_setting('dvkxtee.xtee_asutus')
+      );
+    END IF;	
   END;$$
 LANGUAGE PLPGSQL;
 		
@@ -11725,6 +11794,7 @@ BEGIN
 		  dokument_new.versioon := NEW.versioon;
 		  dokument_new.suurus := NEW.suurus;
 		  dokument_new.guid := NEW.guid;
+		  dokument_new.kapsli_versioon := NEW.kapsli_versioon;		  
 	   elsif tg_op = 'UPDATE' then    
 		  tr_operation := 'UPDATE';
 		  dokument_old.dokument_id := OLD.dokument_id;
@@ -11735,6 +11805,7 @@ BEGIN
 		  dokument_old.versioon := OLD.versioon;
 		  dokument_old.suurus := OLD.suurus;
 		  dokument_old.guid := OLD.guid;
+		  dokument_old.kapsli_versioon := OLD.kapsli_versioon;		  		  
 	   elsif tg_op = 'DELETE' then    
 		  tr_operation := 'DELETE'; 		  		  
 		  dokument_old.dokument_id := OLD.dokument_id;
@@ -11745,6 +11816,7 @@ BEGIN
 		  dokument_old.versioon := OLD.versioon;
 		  dokument_old.suurus := OLD.suurus;
 		  dokument_old.guid := OLD.guid;
+		  dokument_old.kapsli_versioon := OLD.kapsli_versioon;		  		  
 	  end if;	
 
 	  execute dvklog.log_dokument(dokument_new, dokument_old, tr_operation);       		  	  
@@ -12204,7 +12276,59 @@ BEGIN
 		current_setting('dvkxtee.xtee_asutus')
       );
     END IF;
-			
+
+    -- kapsli_versioon changed
+    IF(coalesce(dokument_new.kapsli_versioon, ' ') != coalesce(dokument_old.kapsli_versioon, ' ')) THEN
+      --DEBUG('kapsli_versioon changed');
+      SELECT * INTO clmn FROM information_schema.columns WHERE upper(table_name) = upper('dokument') AND upper(column_name) = upper('kapsli_versioon');
+	  
+	  p_id := nextval('sq_logi_id');
+      
+	  INSERT INTO logi(
+        log_id,
+        tabel,
+        op,
+        uidcol,
+        tabel_uid,
+        veerg,
+        ctype,
+        vana_vaartus,
+        uus_vaartus,
+        muutmise_aeg,
+        ab_kasutaja,
+        ef_kasutaja,
+        kasutaja_kood,
+        comm,
+        created,
+        last_modified,
+        username,
+        ametikoht,
+        xtee_isikukood,
+        xtee_asutus
+      ) VALUES (
+        p_id,
+        tablename,
+        tr_operation,
+        pkey_col, -- primary key column name
+        dokument_old.dokument_id, -- primary key value
+        clmn.column_name, -- column name
+        clmn.data_type,
+        dokument_old.kapsli_versioon,
+        dokument_new.kapsli_versioon,
+        LOCALTIMESTAMP,
+        usr,
+        '''',
+        '''',
+        '''',
+        LOCALTIMESTAMP,
+        LOCALTIMESTAMP,
+        '''',
+        0,
+        current_setting('dvkxtee.xtee_isikukood'),
+		current_setting('dvkxtee.xtee_asutus')
+      );
+    END IF;
+	
 END;$$ 
 LANGUAGE PLPGSQL;    
 

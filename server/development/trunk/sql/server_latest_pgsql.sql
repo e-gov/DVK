@@ -466,7 +466,7 @@ CREATE TABLE dokument (
 	dokument_id integer default nextval('sq_dokument_id') NOT NULL,
 	asutus_id integer NOT NULL,
 	kaust_id integer NOT NULL,
-	sisu bytea NOT NULL,
+	sisu text NOT NULL,
 	sailitustahtaeg timestamp NULL,
 	eelmise_versiooni_id integer NULL,
 	suurus bigint NULL,
@@ -1048,7 +1048,7 @@ CREATE OR REPLACE FUNCTION "Add_Dokument" (
     p_dokument_id integer,
     p_asutus_id integer,
     p_kaust_id integer,
-    p_sisu character varying,
+    p_sisu text,
     p_sailitustahtaeg timestamp,
     p_suurus bigint,
     p_versioon integer,
@@ -1076,7 +1076,7 @@ BEGIN
   VALUES( p_dokument_id,
           p_asutus_id,
           p_kaust_id,
-          decode(p_sisu, 'hex'),
+          p_sisu,
           p_sailitustahtaeg,
           p_suurus,
           p_versioon,
@@ -1086,7 +1086,7 @@ BEGIN
 END; $$
 LANGUAGE plpgsql;
 
-
+/*decode(p_sisu, 'hex'),*/
 
 CREATE OR REPLACE FUNCTION "Add_Dokument_Fragment" (
     p_fragment_id integer,

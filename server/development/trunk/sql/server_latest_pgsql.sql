@@ -675,10 +675,10 @@ ALTER TABLE transport ADD CONSTRAINT transport_staatus_id_fkey FOREIGN KEY (staa
 
 ALTER TABLE dokumendi_metaandmed ADD CONSTRAINT dokumendi_metaandmed_id_fkey FOREIGN KEY (dokument_id) REFERENCES dokument(dokument_id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE;
 
+/*
 INSERT INTO kaust(kaust_id, nimi, ylemkaust_id, asutus_id, kausta_number) VALUES(-1, NULL, NULL, NULL, NULL);
 INSERT INTO kaust(kaust_id, nimi, ylemkaust_id, asutus_id, kausta_number) VALUES(0, '/', NULL, NULL, NULL);
 
-/*
 INSERT INTO vastuvotja_staatus(vastuvotja_staatus_id, nimetus) VALUES  (1, 'Dokumente on puudu (Pooleli)');
 INSERT INTO vastuvotja_staatus(vastuvotja_staatus_id, nimetus) VALUES  (2, 'Järjekorras');
 INSERT INTO vastuvotja_staatus(vastuvotja_staatus_id, nimetus) VALUES  (3, 'Ootel');

@@ -1,4 +1,7 @@
 
+INSERT INTO kaust(kaust_id, nimi, ylemkaust_id, asutus_id, kausta_number) SELECT -1, NULL, NULL, NULL, NULL WHERE NOT EXISTS ( SELECT kaust_id FROM kaust WHERE kaust_id = -1);
+INSERT INTO kaust(kaust_id, nimi, ylemkaust_id, asutus_id, kausta_number) VALUES(0, '/', NULL, NULL, NULL WHERE NOT EXISTS ( SELECT kaust_id FROM kaust WHERE kaust_id = 0);
+
 INSERT INTO vastuvotja_staatus(vastuvotja_staatus_id, nimetus) SELECT  1, 'Dokumente on puudu (Pooleli)' WHERE NOT EXISTS ( SELECT vastuvotja_staatus_id FROM vastuvotja_staatus WHERE vastuvotja_staatus_id = 1);
 INSERT INTO vastuvotja_staatus(vastuvotja_staatus_id, nimetus) SELECT  2, 'Järjekorras' WHERE NOT EXISTS ( SELECT vastuvotja_staatus_id FROM vastuvotja_staatus WHERE vastuvotja_staatus_id = 2);
 INSERT INTO vastuvotja_staatus(vastuvotja_staatus_id, nimetus) SELECT  3, 'Ootel' WHERE NOT EXISTS ( SELECT vastuvotja_staatus_id FROM vastuvotja_staatus WHERE vastuvotja_staatus_id = 3);

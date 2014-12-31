@@ -1,4 +1,26 @@
 
+INSERT INTO vastuvotja_staatus(vastuvotja_staatus_id, nimetus) SELECT  1, 'Dokumente on puudu (Pooleli)' WHERE NOT EXISTS ( SELECT vastuvotja_staatus_id FROM vastuvotja_staatus WHERE vastuvotja_staatus_id = 1);
+INSERT INTO vastuvotja_staatus(vastuvotja_staatus_id, nimetus) SELECT  2, 'Järjekorras' WHERE NOT EXISTS ( SELECT vastuvotja_staatus_id FROM vastuvotja_staatus WHERE vastuvotja_staatus_id = 2);
+INSERT INTO vastuvotja_staatus(vastuvotja_staatus_id, nimetus) SELECT  3, 'Ootel' WHERE NOT EXISTS ( SELECT vastuvotja_staatus_id FROM vastuvotja_staatus WHERE vastuvotja_staatus_id = 3);
+INSERT INTO vastuvotja_staatus(vastuvotja_staatus_id, nimetus) SELECT  4, 'Lõpetatud' WHERE NOT EXISTS ( SELECT vastuvotja_staatus_id FROM vastuvotja_staatus WHERE vastuvotja_staatus_id = 4);
+INSERT INTO vastuvotja_staatus(vastuvotja_staatus_id, nimetus) SELECT  5, 'Tagasi lükatud' WHERE NOT EXISTS ( SELECT vastuvotja_staatus_id FROM vastuvotja_staatus WHERE vastuvotja_staatus_id = 5);
+INSERT INTO vastuvotja_staatus(vastuvotja_staatus_id, nimetus) SELECT  6, 'Teha' WHERE NOT EXISTS ( SELECT vastuvotja_staatus_id FROM vastuvotja_staatus WHERE vastuvotja_staatus_id = 6);
+INSERT INTO vastuvotja_staatus(vastuvotja_staatus_id, nimetus) SELECT  7, 'Töötlemisel' WHERE NOT EXISTS ( SELECT vastuvotja_staatus_id FROM vastuvotja_staatus WHERE vastuvotja_staatus_id = 7);
+INSERT INTO vastuvotja_staatus(vastuvotja_staatus_id, nimetus) SELECT  8, 'Aktsepteeritud (Võetud töösse)' WHERE NOT EXISTS ( SELECT vastuvotja_staatus_id FROM vastuvotja_staatus WHERE vastuvotja_staatus_id = 8);
+INSERT INTO vastuvotja_staatus(vastuvotja_staatus_id, nimetus) SELECT  9, 'Salvestatud' WHERE NOT EXISTS ( SELECT vastuvotja_staatus_id FROM vastuvotja_staatus WHERE vastuvotja_staatus_id = 9);
+INSERT INTO vastuvotja_staatus(vastuvotja_staatus_id, nimetus) SELECT  10, 'Arhiveeritud' WHERE NOT EXISTS ( SELECT vastuvotja_staatus_id FROM vastuvotja_staatus WHERE vastuvotja_staatus_id = 1);
+INSERT INTO vastuvotja_staatus(vastuvotja_staatus_id, nimetus) SELECT  11, 'Saadetud' WHERE NOT EXISTS ( SELECT vastuvotja_staatus_id FROM vastuvotja_staatus WHERE vastuvotja_staatus_id = 11);
+
+INSERT INTO klassifikaatori_tyyp(klassifikaatori_tyyp_id, nimetus) SELECT  1,'Saatmisviis' WHERE NOT EXISTS ( SELECT klassifikaatori_tyyp_id FROM klassifikaatori_tyyp WHERE klassifikaatori_tyyp_id = 1);
+INSERT INTO klassifikaatori_tyyp(klassifikaatori_tyyp_id, nimetus) SELECT  2,'Dokumendi olek' WHERE NOT EXISTS ( SELECT klassifikaatori_tyyp_id FROM klassifikaatori_tyyp WHERE klassifikaatori_tyyp_id = 2);
+
+INSERT INTO klassifikaator(klassifikaator_id, nimetus, klassifikaatori_tyyp_id) SELECT  1, 'xtee', 1 WHERE NOT EXISTS ( SELECT klassifikaator_id FROM klassifikaator WHERE klassifikaator_id = 1);
+INSERT INTO klassifikaator(klassifikaator_id, nimetus, klassifikaatori_tyyp_id) SELECT  2, 'epost', 1 WHERE NOT EXISTS ( SELECT klassifikaator_id FROM klassifikaator WHERE klassifikaator_id = 2);
+INSERT INTO klassifikaator(klassifikaator_id, nimetus, klassifikaatori_tyyp_id) SELECT  101, 'saatmisel', 2 WHERE NOT EXISTS ( SELECT klassifikaator_id FROM klassifikaator WHERE klassifikaator_id = 101);
+INSERT INTO klassifikaator(klassifikaator_id, nimetus, klassifikaatori_tyyp_id) SELECT  102, 'saadetud', 2 WHERE NOT EXISTS ( SELECT klassifikaator_id FROM klassifikaator WHERE klassifikaator_id = 102);
+INSERT INTO klassifikaator(klassifikaator_id, nimetus, klassifikaatori_tyyp_id) SELECT  103, 'katkestatud', 2 WHERE NOT EXISTS ( SELECT klassifikaator_id FROM klassifikaator WHERE klassifikaator_id = 103);
+    
+
 	Insert into ISIK (
 		KOOD,
 		PERENIMI,

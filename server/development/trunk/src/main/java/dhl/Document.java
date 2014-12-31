@@ -12,7 +12,9 @@ import dvk.core.CommonStructures;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -213,6 +215,7 @@ public class Document {
             if (conn != null) {
                 boolean defaultAutoCommit = conn.getAutoCommit();
                 FileInputStream fis = null;
+                InputStreamReader r = null;
                 conn.setAutoCommit(false);
                 try {
                     Calendar cal = Calendar.getInstance();
@@ -256,17 +259,29 @@ public class Document {
                     cs.execute();
                     cs.close();
                     if (file.exists()) {
-                    	fis = new FileInputStream(m_filePath);                    	
+                    	
+                    	
+                    	/*
+                        StringBuffer sb = new StringBuffer();
+                        fis = new FileInputStream(m_filePath);
+                        r = new InputStreamReader(fis, "UTF-8");
+                        char[] buf = new char[1024];
+                        int nread = 0;
+                        while ((nread = r.read(buf)) > 0) {
+                        	sb.append(buf, 0, nread);
+                        }
+                    	*/
                     	PreparedStatement ps = conn.prepareStatement("UPDATE dokument SET sisu = ? WHERE dokument_id = ?");
-                    	ps.setBinaryStream(1, fis, (int)file.length());
+                    	ps.setString(1, readInput(m_filePath));
                     	ps.setInt(2, m_id);
                     	ps.executeUpdate();
                     	
                         CommonMethods.safeCloseStream(fis);
 
                         ps.close();
-                    	fis.close();
-                    	
+                    	//r.close();
+                        //fis.close();
+
                     } else {
                         throw new Exception(
                                 "Document file " + m_filePath + " of document " + String.valueOf(m_id)
@@ -681,6 +696,24 @@ public class Document {
         }
     }
     
+    private String readInput(String filename) {
+        StringBuffer buffer = new StringBuffer( );
+        try {
+            FileInputStream fis = new FileInputStream(filename );
+            InputStreamReader isr = new InputStreamReader(fis, "UTF8");
+            Reader in = new BufferedReader(isr);
+            int ch;
+            while ((ch = in.read()) > -1) {
+                buffer.append((char)ch);
+            }
+            in.close();
+            return buffer.toString();
+        } 
+        catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }    
     /*
     public static ArrayList<ExpiredDocumentData> getExpiredDocuments(Connection conn) {
         try {

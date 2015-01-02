@@ -1,6 +1,6 @@
 
 INSERT INTO kaust(kaust_id, nimi, ylemkaust_id, asutus_id, kausta_number) SELECT -1, NULL, NULL, NULL, NULL WHERE NOT EXISTS ( SELECT kaust_id FROM kaust WHERE kaust_id = -1);
-INSERT INTO kaust(kaust_id, nimi, ylemkaust_id, asutus_id, kausta_number) VALUES(0, '/', NULL, NULL, NULL WHERE NOT EXISTS ( SELECT kaust_id FROM kaust WHERE kaust_id = 0);
+INSERT INTO kaust(kaust_id, nimi, ylemkaust_id, asutus_id, kausta_number) SELECT 0, '/', NULL, NULL, NULL WHERE NOT EXISTS ( SELECT kaust_id FROM kaust WHERE kaust_id = 0);
 
 INSERT INTO vastuvotja_staatus(vastuvotja_staatus_id, nimetus) SELECT  1, 'Dokumente on puudu (Pooleli)' WHERE NOT EXISTS ( SELECT vastuvotja_staatus_id FROM vastuvotja_staatus WHERE vastuvotja_staatus_id = 1);
 INSERT INTO vastuvotja_staatus(vastuvotja_staatus_id, nimetus) SELECT  2, 'Järjekorras' WHERE NOT EXISTS ( SELECT vastuvotja_staatus_id FROM vastuvotja_staatus WHERE vastuvotja_staatus_id = 2);
@@ -11,7 +11,7 @@ INSERT INTO vastuvotja_staatus(vastuvotja_staatus_id, nimetus) SELECT  6, 'Teha'
 INSERT INTO vastuvotja_staatus(vastuvotja_staatus_id, nimetus) SELECT  7, 'Töötlemisel' WHERE NOT EXISTS ( SELECT vastuvotja_staatus_id FROM vastuvotja_staatus WHERE vastuvotja_staatus_id = 7);
 INSERT INTO vastuvotja_staatus(vastuvotja_staatus_id, nimetus) SELECT  8, 'Aktsepteeritud (Võetud töösse)' WHERE NOT EXISTS ( SELECT vastuvotja_staatus_id FROM vastuvotja_staatus WHERE vastuvotja_staatus_id = 8);
 INSERT INTO vastuvotja_staatus(vastuvotja_staatus_id, nimetus) SELECT  9, 'Salvestatud' WHERE NOT EXISTS ( SELECT vastuvotja_staatus_id FROM vastuvotja_staatus WHERE vastuvotja_staatus_id = 9);
-INSERT INTO vastuvotja_staatus(vastuvotja_staatus_id, nimetus) SELECT  10, 'Arhiveeritud' WHERE NOT EXISTS ( SELECT vastuvotja_staatus_id FROM vastuvotja_staatus WHERE vastuvotja_staatus_id = 1);
+INSERT INTO vastuvotja_staatus(vastuvotja_staatus_id, nimetus) SELECT  10, 'Arhiveeritud' WHERE NOT EXISTS ( SELECT vastuvotja_staatus_id FROM vastuvotja_staatus WHERE vastuvotja_staatus_id = 10);
 INSERT INTO vastuvotja_staatus(vastuvotja_staatus_id, nimetus) SELECT  11, 'Saadetud' WHERE NOT EXISTS ( SELECT vastuvotja_staatus_id FROM vastuvotja_staatus WHERE vastuvotja_staatus_id = 11);
 
 INSERT INTO klassifikaatori_tyyp(klassifikaatori_tyyp_id, nimetus) SELECT  1,'Saatmisviis' WHERE NOT EXISTS ( SELECT klassifikaatori_tyyp_id FROM klassifikaatori_tyyp WHERE klassifikaatori_tyyp_id = 1);

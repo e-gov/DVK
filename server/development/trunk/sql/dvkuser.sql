@@ -1,3 +1,6 @@
+CREATE USER dvk_user WITH PASSWORD 'postgres';
+ALTER USER dvk_user SET search_path = dvk, public;
+
 GRANT USAGE ON SCHEMA dvk to dvk_user;
 GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA dvk TO dvk_user;
 GRANT SELECT, UPDATE, INSERT, REFERENCES, TRIGGER, DELETE ON ALL TABLES IN SCHEMA dvk TO dvk_user;   
@@ -10,4 +13,3 @@ GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA dvklog TO dvk_user;
 
 GRANT CONNECT ON DATABASE postgres TO dvk_user;
 
-ALTER USER dvk_user SET search_path = dvk, public;

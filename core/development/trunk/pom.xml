@@ -12,7 +12,13 @@
         <version>1.7.1</version>
         <relativePath>../../..</relativePath>
     </parent>
-
+	
+	<!-- 
+    <properties>           
+		<dvkCoreDir>C:\Users\aleksandr.potapov\workspace\dvk\core\development\trunk</dvkCoreDir>        
+    </properties>
+ 	-->
+ 	
     <!-- Build -->
     <build>
         <finalName>dvk-core</finalName>

@@ -36,11 +36,14 @@
     </build>
 
     <profiles>
+        
         <profile>
             <id>trunk</id>
+            <!-- 
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
+             -->
             <modules>
                 <module>core/development/trunk</module>
                 <module>client/development/trunk</module>
@@ -94,7 +97,6 @@
                 <dvkClientDir>C:\Projects\RIA_DVK\client\development\trunk</dvkClientDir>
                 <dvkServerJettyEnvLocation>C:\Projects\RIA_DVK\server\development\trunk\src\test\resources\jetty-env-liza.xml</dvkServerJettyEnvLocation>
                 <ignoreIntegrationTests>false</ignoreIntegrationTests>
-                <!--                <listOfTestConfigs>./conf/integrationTests/dvk_client_SQLAnywhere_V12_Liza.properties, ./conf/integrationTests/dvk_client_SQLAnywhere_V16_Liza.properties, ./conf/integrationTests/dvk_client_postgreSQL_8_4_Liza.properties, ./conf/integrationTests/dvk_client_postgreSQL_9_1_Liza.properties, ./conf/integrationTests/dvk_client_postgreSQL_9_3_Liza.properties, ./conf/integrationTests/dvk_client_Oracle_V10_Liza.properties, ./conf/integrationTests/dvk_client_MSSQL_V2008_Liza.properties</listOfTestConfigs>-->
                 <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_9_3_Liza.properties</listOfTestConfigs>
                 <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_IgorAndLiza-serverIsMissing.properties</serverIsMissingConfigs>
                 <containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_9_3_Liza-containerVer1.properties</containerVer1Configs>
@@ -131,11 +133,8 @@
                 <module>api/development/trunk</module>
             </modules>
             <properties>
-                <!-- e.g. C:\Work\Dev\DVK\core\development\trunk -->
                 <dvkCoreDir>${dvkCoreDir}</dvkCoreDir>
-                <!-- e.g. C:\Work\Dev\DVK\client\development\trunk -->
                 <dvkClientDir>${dvkClientDir}</dvkClientDir>
-                <!-- e.g. C:\Work\Dev\DVK\server\development\trunk\src\test\resources\jetty-env-jenkins.xml -->
                 <dvkServerJettyEnvLocation>${dvkServerJettyEnvLocation}</dvkServerJettyEnvLocation>
                 <ignoreIntegrationTests>${ignoreIntegrationTests}</ignoreIntegrationTests>
                 <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI.properties</listOfTestConfigs>
@@ -155,11 +154,8 @@
                 <module>api/tags/1.0.12</module>
             </modules>
             <properties>
-                <!-- e.g. C:\Work\Dev\DVK\core\development\trunk -->
                 <dvkCoreDir>${dvkCoreDir}</dvkCoreDir>
-                <!-- e.g. C:\Work\Dev\DVK\client\development\trunk -->
                 <dvkClientDir>${dvkClientDir}</dvkClientDir>
-                <!-- e.g. C:\Work\Dev\DVK\server\development\trunk\src\test\resources\jetty-env-jenkins.xml -->
                 <dvkServerJettyEnvLocation>${dvkServerJettyEnvLocation}</dvkServerJettyEnvLocation>
                 <ignoreIntegrationTests>false</ignoreIntegrationTests>
                 <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI.properties</listOfTestConfigs>
@@ -167,7 +163,30 @@
                 <containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_CI_container_1_0.properties</containerVer1Configs>
                 <conversionTestConfig>./conf/integrationTests/dvk_client_postgreSQL_CI_conversion.properties</conversionTestConfig>
             </properties>
+        </profile>                 
+        <profile>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>        
+            <id>aleksandr</id>
+            <modules>
+                <module>core/development/trunk</module>
+                <module>client/development/trunk</module>
+                <module>server/development/trunk</module>
+                <module>api/development/trunk</module>
+            </modules>
+            <properties>    
+		        <dvkCoreDir>C:\Users\aleksandr.potapov\workspace\dvk\core\development\trunk</dvkCoreDir>
+		 		<dvkClientDir>C:\Users\aleksandr.potapov\workspace\dvk\client\development\trunk</dvkClientDir>
+				<dvkApiDir>C:\Users\aleksandr.potapov\workspace\dvk\api\development\trunk</dvkApiDir>
+                <ignoreIntegrationTests>true</ignoreIntegrationTests>
+                <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI.properties</listOfTestConfigs>
+                <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_CI_serverIsMissing.properties</serverIsMissingConfigs>
+                <containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_CI_container_1_0.properties</containerVer1Configs>
+                <conversionTestConfig>./conf/integrationTests/dvk_client_postgreSQL_CI_conversion.properties</conversionTestConfig>
+            </properties>
         </profile>
+        
     </profiles>
 
     <dependencies>

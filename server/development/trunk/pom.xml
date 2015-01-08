@@ -6,18 +6,21 @@
     <packaging>war</packaging>
     <version>1.7.12</version>
     <name>dvk-server</name>
-    <!--  
+    
     <parent>
         <groupId>dvk</groupId>
         <artifactId>parent</artifactId>
-        <version>1.7.1</version>
+        <version>1.7.1</version>        
         <relativePath>../../..</relativePath>
     </parent>
- 	-->
+ 	
+ 	<!-- 
     <properties>
         <packageName>dhl</packageName>
+      	<basedir>C:\Users\aleksandr.potapov\workspace\dvk\server\development\trunk</basedir>	           
     </properties>
-
+ 	-->
+ 	
     <dependencies>
         <dependency>
             <groupId>dvk</groupId>
@@ -27,7 +30,7 @@
         <dependency>
             <groupId>dvk</groupId>
             <artifactId>client</artifactId>
-            <version>1.7.7</version>
+            <version>1.7.8</version>
         </dependency>
         <dependency>
             <groupId>java</groupId>
@@ -515,7 +518,7 @@
         <dependency>
             <groupId>dvk</groupId>
             <artifactId>api</artifactId>
-            <version>1.0.12</version>
+            <version>1.0.13</version>
         </dependency>
 
         <dependency>

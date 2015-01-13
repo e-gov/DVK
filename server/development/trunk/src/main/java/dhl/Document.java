@@ -220,7 +220,6 @@ public class Document {
                 try {
                     Calendar cal = Calendar.getInstance();
                     m_id = getNextID(conn);
-
                     
                     File file = new File(m_filePath);
                     long fileSize = 0;
@@ -232,8 +231,7 @@ public class Document {
                     cs.setInt(1, m_id);
                     cs.setInt(2, m_organizationID);
                     cs.setInt(3, m_folderID);                    
-                    cs.setString(4, "");
-                    
+                    cs.setString(4, " ");                    
                     cs.setTimestamp(5, CommonMethods.sqlDateFromDate(m_conservationDeadline), cal);
                     
                     if (fileSize > 0) {
@@ -261,27 +259,15 @@ public class Document {
                     if (file.exists()) {
                     	
                     	
-                    	/*
-                        StringBuffer sb = new StringBuffer();
-                        fis = new FileInputStream(m_filePath);
-                        r = new InputStreamReader(fis, "UTF-8");
-                        char[] buf = new char[1024];
-                        int nread = 0;
-                        while ((nread = r.read(buf)) > 0) {
-                        	sb.append(buf, 0, nread);
-                        }
-                    	*/
                     	PreparedStatement ps = conn.prepareStatement("UPDATE dokument SET sisu = ? WHERE dokument_id = ?");
                     	ps.setString(1, readInput(m_filePath));
                     	ps.setInt(2, m_id);
-                    	ps.executeUpdate();
-                    	
-                        CommonMethods.safeCloseStream(fis);
-
+                    	ps.executeUpdate();                    	
+                                                
                         ps.close();
                     	//r.close();
                         //fis.close();
-
+                        
                     } else {
                         throw new Exception(
                                 "Document file " + m_filePath + " of document " + String.valueOf(m_id)
@@ -295,6 +281,7 @@ public class Document {
                     conn.rollback();
                     conn.setAutoCommit(defaultAutoCommit);
                     throw e;
+                /*
                 } finally {
                     CommonMethods.safeCloseReader(reader);
                     CommonMethods.safeCloseReader(inReader);
@@ -302,6 +289,7 @@ public class Document {
                     inStream = null;
                     inReader = null;
                     reader = null;
+                    */
                 }
 
                 // Salvestame dokumendi transpordiinfo
@@ -439,8 +427,7 @@ public class Document {
                 ArrayList<Document> result = new ArrayList<Document>();
                 int docCounter = 0;
                 while (rs.next()) {
-                    ++docCounter;
-
+                    ++docCounter;                    
                     Document item = new Document();
                     item.setId(rs.getInt("dokument_id"));
                     item.setOrganizationID(rs.getInt("asutus_id"));
@@ -448,13 +435,20 @@ public class Document {
                     item.setConservationDeadline(rs.getTimestamp("sailitustahtaeg", cal));
                     item.setDvkContainerVersion(rs.getInt("versioon"));
                     item.setContainerVersion(rs.getString("kapsli_versioon"));                    
-
-                    
+                                                           
                     String itemDataFile = CommonMethods.createPipelineFile(docCounter);
-                    byte[] containerData = rs.getString("sisu").getBytes("UTF-8");
-                    logger.debug("Container data was read from database. Container size: " + containerData.length + " bytes.");
-                    CommonMethods.writeToFile(itemDataFile, containerData);
-
+                    item.setFilePath(itemDataFile);
+                    
+                    
+                    String sisu =  rs.getString("sisu");
+                    if (sisu != null && sisu.length() > 0) { 
+                        byte[] containerData = rs.getString("sisu").getBytes("UTF-8");
+                        logger.debug("Container data was read from database. Container size: " + containerData.length + " bytes.");
+                        CommonMethods.writeToFile(itemDataFile, containerData);
+                    }else{
+                    	item.setFilePath(null);	
+                    }
+                	
                     result.add(item);
                 }
                 rs.close();
@@ -697,9 +691,9 @@ public class Document {
     }
     
     private String readInput(String filename) {
-        StringBuffer buffer = new StringBuffer( );
+        StringBuffer buffer = new StringBuffer();
         try {
-            FileInputStream fis = new FileInputStream(filename );
+            FileInputStream fis = new FileInputStream(filename);
             InputStreamReader isr = new InputStreamReader(fis, "UTF8");
             Reader in = new BufferedReader(isr);
             int ch;
@@ -707,6 +701,10 @@ public class Document {
                 buffer.append((char)ch);
             }
             in.close();
+            
+            CommonMethods.safeCloseReader(isr);
+            CommonMethods.safeCloseStream(fis);
+            
             return buffer.toString();
         } 
         catch (IOException e) {

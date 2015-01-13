@@ -213,13 +213,11 @@ public class ReceiveDocuments {
      */
     protected static boolean isContainerConversionNeeded(String recipientSupportedContainerVersion, String documentContainerVersion) {
         boolean result = false;
-
         if (documentContainerVersion != null
                 && documentContainerVersion.equals(ContainerVersion.VERSION_2_1.toString())
                 && ContainerVersion.VERSION_1_0.toString().equals(recipientSupportedContainerVersion)) {
             result = true;
         }
-
         return result;
     }
 
@@ -240,7 +238,7 @@ public class ReceiveDocuments {
             result.deliverySessionID = bodyData.edastusID;
             result.fragmentSizeBytes = bodyData.fragmentSizeBytesOrig;
             t.markElapsed("Parsing SOAP body");
-
+            
             // Check if all requested folders really exist
             validateFolders(bodyData.kaust, user, conn);
 
@@ -302,13 +300,13 @@ public class ReceiveDocuments {
                             ArrayList<Integer> processedDocuments = new ArrayList<Integer>();
                             for (int i = 0; i < documents.size(); ++i) {
                                 dhl.Document tmpDoc = documents.get(i);
-
+                                
                                 if (tmpDoc != null) {
                                     if (!processedDocuments.contains(tmpDoc.getId()) && (tmpDoc.getFilePath() != null)) {
                                         // Laeme konkreetse dokumendi saatmist puudutavad andmed
                                         Sending tmpSending = new Sending();
                                         tmpSending.loadByDocumentID(tmpDoc.getId(), conn);
-
+                                        
                                         Recipient tmpRecipient = null;
                                         ArrayList<Recipient> tmpRecipients = tmpSending.getRecipients();
 
@@ -321,10 +319,10 @@ public class ReceiveDocuments {
                                             }
                                         }
 
-                                        if ((tmpRecipient != null) && (tmpSending.getSender() != null)) {
-                                            Asutus senderOrg = new Asutus(tmpSending.getSender().getOrganizationID(), conn);
+                                        if ((tmpRecipient != null) && (tmpSending.getSender() != null)) {                                            
+                                        	Asutus senderOrg = new Asutus(tmpSending.getSender().getOrganizationID(), conn);
                                             Asutus recipientOrg = new Asutus(tmpRecipient.getOrganizationID(), conn);
-
+                                            
                                             if (isContainerConversionNeeded(
                                                     recipientOrg.getKapselVersioon(), tmpDoc.getContainerVersion())) {
                                                 tmpDoc.setFilePath(convertContainer(conn, tmpDoc, 21, 1).getOutputFile());

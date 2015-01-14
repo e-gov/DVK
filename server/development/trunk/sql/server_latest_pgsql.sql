@@ -3769,12 +3769,20 @@ DECLARE
 	p_id int4;	
 
 BEGIN	
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
+	*/
 
     -- Current user
     SELECT USER INTO usr ;
@@ -5038,12 +5046,20 @@ DECLARE
 
 BEGIN	
 
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
+	*/
 
     -- Current user
     SELECT USER INTO usr ;
@@ -5683,12 +5699,20 @@ DECLARE
 	p_id int4;	
 
 BEGIN	
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
+	*/
 
     -- Current user
     SELECT USER INTO usr ;
@@ -6323,12 +6347,20 @@ DECLARE
 	p_id int4;	
 
 BEGIN	
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
+	*/
 
     -- Current user
     SELECT USER INTO usr ;
@@ -7054,12 +7086,20 @@ DECLARE
 	p_id int4;	
 
 BEGIN	
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
+	*/
 
     -- Current user
     SELECT USER INTO usr ;
@@ -7769,14 +7809,20 @@ DECLARE
 	p_id int4;	
 
 BEGIN	
-
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
-
+	*/
     -- Current user
     SELECT USER INTO usr ;
 
@@ -9758,12 +9804,20 @@ DECLARE
 
 BEGIN	
 
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
+	*/
 
     -- Current user
     SELECT USER INTO usr ;
@@ -9940,12 +9994,20 @@ DECLARE
 	p_id int4;	
 
 BEGIN	
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
+	*/
 
     -- Current user
     SELECT USER INTO usr ;
@@ -10428,12 +10490,20 @@ DECLARE
 	p_id int4;	
 
 BEGIN	
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
+	*/
 
     -- Current user
     SELECT USER INTO usr ;
@@ -11840,12 +11910,20 @@ DECLARE
 	p_id int4;	
 
 BEGIN	
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
+	*/
 
     -- Current user
     SELECT USER INTO usr ;
@@ -12379,12 +12457,20 @@ DECLARE
 
 BEGIN	
 
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
+	*/
 
     -- Current user
     SELECT USER INTO usr ;
@@ -12611,12 +12697,20 @@ DECLARE
 	p_id int4;	
 
 BEGIN	
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
+	*/
 
     -- Current user
     SELECT USER INTO usr ;
@@ -13153,12 +13247,20 @@ DECLARE
 	p_id int4;	
 
 BEGIN	
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
+	*/
 
     -- Current user
     SELECT USER INTO usr ;
@@ -13915,12 +14017,20 @@ DECLARE
 	p_id int4;	
 
 BEGIN	
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
+	*/
 
     -- Current user
     SELECT USER INTO usr ;
@@ -14227,12 +14337,20 @@ DECLARE
 	p_id int4;	
 
 BEGIN	
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
+	*/
 
     -- Current user
     SELECT USER INTO usr ;
@@ -14394,12 +14512,20 @@ DECLARE
 	p_id int4;	
 
 BEGIN	
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
+	*/
 
     -- Current user
     SELECT USER INTO usr ;
@@ -14614,13 +14740,20 @@ DECLARE
 
 BEGIN	
 
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
-	
+	*/
 
 
     -- Current user
@@ -14859,12 +14992,20 @@ DECLARE
 	p_id int4;	
 
 BEGIN	
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
+	*/
 
     -- Current user
     SELECT USER INTO usr ;
@@ -15528,12 +15669,20 @@ DECLARE
 	p_id int4;	
 
 BEGIN	
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
+	*/
 
     -- Current user
     SELECT USER INTO usr ;
@@ -15935,12 +16084,20 @@ DECLARE
 
 BEGIN	
 
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
+	*/
 
     -- Current user
     SELECT USER INTO usr ;
@@ -16087,12 +16244,20 @@ DECLARE
 
 BEGIN	
 
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
+	*/
 
     -- Current user
     SELECT USER INTO usr ;
@@ -16796,12 +16961,20 @@ DECLARE
 	p_id int4;	
 
 BEGIN	
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
+	*/
 
     -- Current user
     SELECT USER INTO usr ;
@@ -17037,12 +17210,20 @@ DECLARE
 	p_id int4;	
 
 BEGIN	
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
+	*/
 
     -- Current user
     SELECT USER INTO usr ;
@@ -17557,12 +17738,20 @@ DECLARE
 	p_id int4;	
 
 BEGIN	
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
+	*/
 
     -- Current user
     SELECT USER INTO usr ;
@@ -17900,12 +18089,20 @@ DECLARE
 	p_id int4;	
 
 BEGIN	
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
+	*/
 
     -- Current user
     SELECT USER INTO usr ;
@@ -18641,12 +18838,20 @@ DECLARE
 	p_id int4;	
 
 BEGIN	
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
+	*/
 
     -- Current user
     SELECT USER INTO usr ;
@@ -19393,12 +19598,20 @@ DECLARE
 	p_id int4;	
 
 BEGIN	
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
+	*/
 
     -- Current user
     SELECT USER INTO usr ;
@@ -19591,12 +19804,20 @@ DECLARE
 	p_id int4;	
 
 BEGIN	
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_isikukood') = '' THEN
+		SET dvkxtee.xtee_isikukood = '';
+	END IF;
+	IF (SELECT setting FROM pg_catalog.pg_settings WHERE name = 'dvkxtee.xtee_asutus') = '' THEN
+		SET dvkxtee.xtee_asutus = '';
+	END IF;
+	/*
 	IF current_setting('dvkxtee.xtee_isikukood') = 	null THEN
 		SET dvkxtee.xtee_isikukood = '';
 	END IF;
 	IF current_setting('dvkxtee.xtee_asutus') = null THEN
 		SET dvkxtee.xtee_asutus = '';
 	END IF;
+	*/
 
     -- Current user
     SELECT USER INTO usr ;

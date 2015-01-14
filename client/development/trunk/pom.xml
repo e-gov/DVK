@@ -15,9 +15,9 @@
 
 	<!-- 
     <properties>    
-		<basedir>C:\Users\aleksandr.potapov\workspace\dvk\client\development\trunk</basedir>
-		<dvkCoreDir>C:\Users\aleksandr.potapov\workspace\dvk\core\development\trunk</dvkCoreDir>
-		<dvkApiDir>C:\Users\aleksandr.potapov\workspace\dvk\api\development\trunk</dvkApiDir>
+		<basedir>..\dvk\client\development\trunk</basedir>
+		<dvkCoreDir>..\dvk\core\development\trunk</dvkCoreDir>
+		<dvkApiDir>..\dvk\api\development\trunk</dvkApiDir>
 		<ignoreIntegrationTests>true</ignoreIntegrationTests>
     </properties>
  	-->

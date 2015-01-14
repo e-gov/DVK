@@ -14,10 +14,12 @@
         <relativePath>../../..</relativePath>
     </parent>
  	
- 	<!-- 
+	<!-- 
     <properties>
         <packageName>dhl</packageName>
-      	<basedir>C:\Users\aleksandr.potapov\workspace\dvk\server\development\trunk</basedir>	           
+      	<basedir>..\dvk\server\development\trunk</basedir>
+      	<dvkCoreDir>..\dvk\core\development\trunk</dvkCoreDir>
+		<dvkClientDir>..\dvk\client\development\trunk</dvkClientDir>      		          
     </properties>
  	-->
  	

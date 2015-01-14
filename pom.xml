@@ -145,6 +145,7 @@
                 <containerVer1FragmentingConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI_container_1_0_fragmenting.properties</containerVer1FragmentingConfigs>
             </properties>
         </profile>
+        <!-- 
         <profile>
             <id>latestRelease</id>
             <modules>
@@ -163,11 +164,31 @@
                 <containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_CI_container_1_0.properties</containerVer1Configs>
                 <conversionTestConfig>./conf/integrationTests/dvk_client_postgreSQL_CI_conversion.properties</conversionTestConfig>
             </properties>
-        </profile>                 
+        </profile>
+        -->
         <profile>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>        
+            <id>latestRelease</id>
+            <modules>
+                <module>core/development/trunk</module>
+                <module>client/development/trunk</module>
+                <module>server/development/trunk</module>
+                <module>api/development/trunk</module>
+            </modules>
+            <properties>
+		        <dvkCoreDir>..\dvk\core\development\trunk</dvkCoreDir>
+		 		<dvkClientDir>..\dvk\client\development\trunk</dvkClientDir>
+				<dvkApiDir>..\dvk\api\development\trunk</dvkApiDir>
+                <ignoreIntegrationTests>true</ignoreIntegrationTests>
+                <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI.properties</listOfTestConfigs>
+                <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_CI_serverIsMissing.properties</serverIsMissingConfigs>
+                <containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_CI_container_1_0.properties</containerVer1Configs>
+                <conversionTestConfig>./conf/integrationTests/dvk_client_postgreSQL_CI_conversion.properties</conversionTestConfig>
+            </properties>
+        </profile>                         
+        <profile>
             <id>aleksandr</id>
             <modules>
                 <module>core/development/trunk</module>

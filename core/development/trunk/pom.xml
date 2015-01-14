@@ -13,9 +13,9 @@
         <relativePath>../../..</relativePath>
     </parent>
 	
-	<!-- 
+ 	<!-- 
     <properties>           
-		<dvkCoreDir>C:\Users\aleksandr.potapov\workspace\dvk\core\development\trunk</dvkCoreDir>        
+		<dvkCoreDir>..\dvk\core\development\trunk</dvkCoreDir>        
     </properties>
  	-->
  	

@@ -1,0 +1,21 @@
+<soapenv:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+				 xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+				 xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" 
+				 xmlns:xtee="http://x-tee.riik.ee/xsd/xtee.xsd"				  
+				 xmlns:dhl="http://producers.dhl.xtee.riik.ee/producer/dhl">
+   <soapenv:Header>
+      <xtee:toimik xsi:type="xsd:string"></xtee:toimik>
+      <xtee:nimi xsi:type="xsd:string">dhl.getOccupationList.v2</xtee:nimi>
+      <xtee:id xsi:type="xsd:string">6cae248568b3db7e97ff784673a4d38c5906bee0</xtee:id>
+      <xtee:andmekogu xsi:type="xsd:string">dhl</xtee:andmekogu>
+      <xtee:asutus xsi:type="xsd:string">70006317</xtee:asutus>
+      <xtee:isikukood xsi:type="xsd:string">EE38603052255</xtee:isikukood>
+   </soapenv:Header>
+   <soapenv:Body>
+      <dhl:getOccupationList soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+         <keha xsi:type="dhl:institutionRefsArrayType">
+            <asutused href="cid:getSubdivisionList_manus"/>
+         </keha>
+      </dhl:getOccupationList>
+   </soapenv:Body>
+</soapenv:Envelope>

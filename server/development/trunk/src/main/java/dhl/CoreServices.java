@@ -1,6 +1,7 @@
 package dhl;
 
 import dhl.aar.AarClient;
+
 import dhl.aar.AarSyncronizer;
 import dhl.exceptions.IncorrectRequestVersionException;
 import dhl.exceptions.ResponseProcessingException;
@@ -64,11 +65,13 @@ import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.axis.transport.http.HTTPConstants;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 
 public class CoreServices implements Dhl {
     public static String XTEE_URI = "http://x-tee.riik.ee/xsd/xtee.xsd";
-    static Logger logger = Logger.getLogger(CoreServices.class.getName());
+    static Logger logger = LogManager.getLogger(CoreServices.class.getName());
 
     public CoreServices() throws AxisFault {
         try {
@@ -133,6 +136,7 @@ public class CoreServices implements Dhl {
      */
     public void listMethods() throws AxisFault {
         try {
+        	logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele ListMethods");
             String producer = Settings.Server_ProducerName;
             String[] keha = null;
             if (Settings.Server_RunOnClientDatabase) {
@@ -193,6 +197,7 @@ public class CoreServices implements Dhl {
     public void runSystemCheck(Object keha) throws AxisFault {
         Connection conn = null;
         try {
+        	logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele RunSystemCheck");
             // Kontrollime, kas konfiguratsioonifail on edukalt sisse loetud
             if ((Settings.currentProperties == null) || (Settings.currentProperties.size() < 1)) {
                 throw new AxisFault("DVK tarkvaraline viga: Rakenduse seadistuse laadimine ebaõnnestus!");
@@ -290,6 +295,7 @@ public class CoreServices implements Dhl {
         if (!Settings.Server_RunOnClientDatabase) {
             Connection conn = null;
             try {
+            	logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele DeleteOldDocuments");
                 conn = getConnection();
                 DeleteOldDocuments.V1(conn);
                 org.apache.axis.MessageContext context = org.apache.axis.MessageContext.getCurrentContext();
@@ -332,11 +338,13 @@ public class CoreServices implements Dhl {
 
                     // Laeme sõnumi X-Tee päised endale sobivasse andmestruktuuri
                     XHeader xTeePais = XHeader.getFromSOAPHeaderAxis(context);
-
+                    logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele ChangeOrganizationData(xtee teenus:" 
+                    		+ xTeePais.nimi +"). Asutusest:" + xTeePais.asutus 
+                    		+ " ametnik:" + xTeePais.ametnik
+                    		+" isikukood:" + xTeePais.isikukood);
                     // Laeme päises asunud andmete järgi süsteemi tööks vajalikud andmed
                     // autenditud kasutaja kohta.
                     UserProfile user = UserProfile.getFromHeaders(xTeePais, conn);
-
                     // Käivitame päringu keha
                     ChangeOrganizationData.V1(context, conn, user);
 
@@ -401,10 +409,12 @@ public class CoreServices implements Dhl {
 
                 // Laeme sõnumi X-Tee päised endale sobivasse andmestruktuuri
                 XHeader xTeePais = XHeader.getFromSOAPHeaderAxis(context);
-
                 // Tuvastame, millist päringu versiooni välja kutsuti
                 String ver = CommonMethods.getXRoadRequestVersion(xTeePais.nimi);
-
+                logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele GetSendingOptions(xtee teenus:" 
+                		+ xTeePais.nimi +"). Asutusest:" + xTeePais.asutus 
+                		+ " ametnik:" + xTeePais.ametnik
+                		+" isikukood:" + xTeePais.isikukood);
                 // Laeme päises asunud andmete järgi süsteemi tööks vajalikud andmed
                 // autenditud kasutaja kohta.
                 UserProfile user = null;
@@ -421,7 +431,6 @@ public class CoreServices implements Dhl {
                 } else {
                     user = UserProfile.getFromHeaders(xTeePais, conn);
                 }
-
                 // Käivitame päringust vajaliku versiooni
                 SOAPOutputBodyRepresentation result = null;
                 if (ver.equalsIgnoreCase("v1")) {
@@ -516,6 +525,10 @@ public class CoreServices implements Dhl {
                 // Laeme sõnumi X-Tee päised endale sobivasse andmestruktuuri
                 t.reset();
                 XHeader xTeePais = XHeader.getFromSOAPHeaderAxis(context);
+                logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele SendDocuments(xtee teenus:" 
+                		+ xTeePais.nimi +"). Asutusest:" + xTeePais.asutus 
+                		+ " ametnik:" + xTeePais.ametnik
+                		+" isikukood:" + xTeePais.isikukood);
                 t.markElapsed("Getting XRoad header");
 
                 // Tuvastame, millist päringu versiooni välja kutsuti
@@ -639,6 +652,10 @@ public class CoreServices implements Dhl {
                     // sõnumiga MIME lisadena kaasa pandud andmed.
                     t.reset();
                     XHeader xTeePais = XHeader.getFromSOAPHeaderAxis(context);
+                    logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele ReceiveDocuments(xtee teenus:" 
+                    		+ xTeePais.nimi +"). Asutusest:" + xTeePais.asutus 
+                    		+ " ametnik:" + xTeePais.ametnik
+                    		+" isikukood:" + xTeePais.isikukood);
                     t.markElapsed("Getting XRoad header");
 
                     // Tuvastame, millist päringu versiooni välja kutsuti
@@ -767,7 +784,10 @@ public class CoreServices implements Dhl {
                     // Loeme SOAP sõnumi detailandmetest välja X-Tee päise andmed ja
                     // sõnumiga MIME lisadena kaasa pandud andmed.
                     XHeader xTeePais = XHeader.getFromSOAPHeaderAxis(context);
-
+                    logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele MarkDocumentsReceived(xtee teenus:" 
+                    		+ xTeePais.nimi +"). Asutusest:" + xTeePais.asutus 
+                    		+ " ametnik:" + xTeePais.ametnik
+                    		+" isikukood:" + xTeePais.isikukood);
                     // Tuvastame, millist päringu versiooni välja kutsuti
                     String ver = CommonMethods.getXRoadRequestVersion(xTeePais.nimi);
 
@@ -868,7 +888,10 @@ public class CoreServices implements Dhl {
                 // Loeme SOAP sõnumi detailandmetest välja X-Tee päise andmed ja
                 // sõnumiga MIME lisadena kaasa pandud andmed.
                 XHeader xTeePais = XHeader.getFromSOAPHeaderAxis(context);
-
+                logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele GetSendStatus(xtee teenus:" 
+                		+ xTeePais.nimi +"). Asutusest:" + xTeePais.asutus 
+                		+ " ametnik:" + xTeePais.ametnik
+                		+" isikukood:" + xTeePais.isikukood);
                 // Tuvastame, millist päringu versiooni välja kutsuti
                 String ver = CommonMethods.getXRoadRequestVersion(xTeePais.nimi);
 
@@ -969,7 +992,10 @@ public class CoreServices implements Dhl {
 
                     // Laeme sõnumi X-Tee päised endale sobivasse andmestruktuuri
                     XHeader xTeePais = XHeader.getFromSOAPHeaderAxis(context);
-
+                    logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele GetOccupationList(xtee teenus:" 
+                    		+ xTeePais.nimi +"). Asutusest:" + xTeePais.asutus 
+                    		+ " ametnik:" + xTeePais.ametnik
+                    		+" isikukood:" + xTeePais.isikukood);
                     // Tuvastame, millist päringu versiooni välja kutsuti
                     String ver = CommonMethods.getXRoadRequestVersion(xTeePais.nimi);
 
@@ -1044,7 +1070,10 @@ public class CoreServices implements Dhl {
 
                     // Laeme sõnumi X-Tee päised endale sobivasse andmestruktuuri
                     XHeader xTeePais = XHeader.getFromSOAPHeaderAxis(context);
-
+                    logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele GetSubdivisionList(xtee teenus:" 
+                    		+ xTeePais.nimi +"). Asutusest:" + xTeePais.asutus 
+                    		+ " ametnik:" + xTeePais.ametnik
+                    		+" isikukood:" + xTeePais.isikukood);
                     // Tuvastame, millist päringu versiooni välja kutsuti
                     String ver = CommonMethods.getXRoadRequestVersion(xTeePais.nimi);
 

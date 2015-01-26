@@ -38,6 +38,9 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.httpclient.Header;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Ühtse õiguste allsüsteemi klient.
@@ -47,7 +50,7 @@ public class AarClient {
     private String personCode;
     private EndpointReference sevrviceEndpoint;
     private ServiceClient serviceClient;
-
+    static Logger logger = LogManager.getLogger(AarClient.class.getName());
     public AarClient(String serverURL, String requestOrgCode, String requestPersonCode) throws Exception {
         this.orgCode = requestOrgCode;
         this.personCode = requestPersonCode;
@@ -79,7 +82,8 @@ public class AarClient {
 
         // Päringu ID koostamine
         String queryId = "aar" + orgCode + String.valueOf((new Date()).getTime());
-
+        logger.log(Level.getLevel("SERVICEINFO"), "Väljaminev päring teenusele Asutused(xtee teenus:"+requestName+"). Asutusest:" + orgCode 
+        		+" isikukood:" + this.personCode);
         // Saadetava sõnumi päisesse kantavad parameetrid
         XHeader header = new XHeader(
                 orgCode, "aar", personCode, queryId, requestName, "",
@@ -148,7 +152,8 @@ public class AarClient {
 
         // Päringu nimi
         String requestName = "aar.ametikohad.v1";
-
+        logger.log(Level.getLevel("SERVICEINFO"), "Väljaminev päring teenusele Ametikohad(xtee teenus:"+requestName+"). Asutusest:" + orgCode 
+        		+" isikukood:" + this.personCode);
         // Päringu ID koostamine
         String queryId = "aar" + orgCode + String.valueOf((new Date()).getTime());
 
@@ -219,7 +224,8 @@ public class AarClient {
 
         // Päringu nimi
         String requestName = "aar.isikud.v1";
-
+        logger.log(Level.getLevel("SERVICEINFO"), "Väljaminev päring teenusele Isikud(xtee teenus:"+requestName+"). Asutusest:" + orgCode 
+        		+" isikukood:" + personCode);
         // Päringu ID koostamine
         String queryId = "aar" + orgCode + String.valueOf((new Date()).getTime());
 
@@ -290,7 +296,8 @@ public class AarClient {
 
         // Päringu nimi
         String requestName = "aar.taitmised.v1";
-
+        logger.log(Level.getLevel("SERVICEINFO"), "Väljaminev päring teenusele Taitmised(xtee teenus:"+requestName+"). Asutusest:" + orgCode 
+        		+" isikukood:" + personCode);
         // Päringu ID koostamine
         String queryId = "aar" + orgCode + String.valueOf((new Date()).getTime());
 
@@ -358,7 +365,8 @@ public class AarClient {
     public ArrayList<AarOigus> oigusedRequest(String queryOrgCode, int jobID, String queryPersonCode) throws Exception {
         // Päringu nimi
         String requestName = "aar.oigused.v1";
-
+        logger.log(Level.getLevel("SERVICEINFO"), "Väljaminev päring teenusele oigused(xtee teenus:"+requestName+"). Asutusest:" + orgCode 
+        		+" isikukood:" + personCode);
         // Päringu ID koostamine
         String queryId = "aar" + this.orgCode + String.valueOf((new Date()).getTime());
 

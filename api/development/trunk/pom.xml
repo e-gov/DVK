@@ -114,11 +114,25 @@
             <systemPath>${basedir}/lib/jta-1.1.jar</systemPath>
         </dependency>
         <dependency>
-            <groupId>java</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.13</version>
+            <groupId>apache</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.1</version>
             <scope>system</scope>
-            <systemPath>${basedir}/lib/log4j-1.2.13.jar</systemPath>
+            <systemPath>${basedir}/lib/log4j-api-2.1.jar</systemPath>
+        </dependency>
+         <dependency>
+            <groupId>apache</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.1</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/log4j-core-2.1.jar</systemPath>
+        </dependency>
+         <dependency>
+            <groupId>apache</groupId>
+            <artifactId>log4j-bridge</artifactId>
+            <version>2.1</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/log4j-1.2-api-2.1.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>

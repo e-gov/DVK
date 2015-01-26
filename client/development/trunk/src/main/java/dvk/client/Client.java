@@ -21,16 +21,18 @@ import java.util.Date;
 
 import java.util.Hashtable;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 
 public class Client {
-    static Logger logger = Logger.getLogger(Client.class);
+  //  static Logger logger = Logger.getLogger(Client.class);
     private static ArrayList<String> tempFiles = new ArrayList<String>();
     private static ClientAPI dvkClient;
     private static ArrayList<OrgSettings> allKnownDatabases;
     private static ArrayList<OrgSettings> currentClientDatabases;
     private static ClientExecType ExecType; // määrab tegevused, mida programm peab tegema
-
+    static Logger logger = LogManager.getLogger(Client.class.getName());
     public static void main(String[] args) {
         Date startDate = new Date();
         try {
@@ -57,7 +59,7 @@ public class Client {
             int documentLifetimeInDays = CommonMethods.toIntSafe(documentLifetimeString, -1);
             InitExecType(runningMode);
             logger.info("\n\nKäivitamise reziim: " + ExecType);
-
+            logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele "+ ExecType);
             // Check if application properties file exists
             if (!(new File(propertiesFile)).exists()) {
                 logger.error("Application properties file " + propertiesFile + " does not exist!");
@@ -559,7 +561,6 @@ public class Client {
         int resultCounter = 0;
         try {
             ArrayList<DhlMessage> messages = DhlMessage.getList(false, Settings.Client_StatusSending, masterCredential.getUnitID(), false, true, db, dbConnection);
-
             logger.info("    Saatmisel olevaid sõnumeid: " + String.valueOf(messages.size()));
             if (!messages.isEmpty()) {
                 HeaderVariables header = new HeaderVariables(

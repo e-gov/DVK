@@ -1,6 +1,7 @@
 package dvk.client;
 
 import dvk.client.businesslayer.*;
+
 import dvk.client.conf.OrgDvkSettings;
 import dvk.client.conf.OrgSettings;
 import dvk.client.db.DBConnection;
@@ -42,14 +43,16 @@ import org.apache.axis.attachments.AttachmentPart;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.transport.http.HTTPConstants;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class ClientAPI {
-	static Logger logger = Logger.getLogger(ClientAPI.class.getName());
+	//static Logger logger = Logger.getLogger(ClientAPI.class.getName());
     private Service service;
     private Call call;
     private OrgDvkSettings orgSettings;
@@ -57,7 +60,7 @@ public class ClientAPI {
     private String queryId; // viimase X-tee päringu ID
     private String producerName; // andmekogu nimetus (kui suhtlus käib äle X-tee)
     private ArrayList<OrgSettings> allKnownDatabases;
-     
+    static Logger logger = LogManager.getLogger(ClientAPI.class.getName());
     public void setOrgSettings(OrgDvkSettings value) {
         this.orgSettings = value;
     }
@@ -157,7 +160,8 @@ public class ClientAPI {
             if (!messages.isEmpty()) {
                 // Päringu nimi
                 requestName = this.producerName + ".getSendStatus.v" + String.valueOf(requestVersion);
-                
+            	logger.log(Level.getLevel("SERVICEINFO"), "Väljaminev päring teenusele GetSendStatus(xtee teenus:"+requestName+"). Asutusest:" + headerVar.getOrganizationCode() 
+                		+" isikukood:" + headerVar.getPersonalIDCode());
                 // Päringu ID koostamine
                 queryId =  "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
                 
@@ -327,7 +331,8 @@ public class ClientAPI {
         
         // Päringu nimi
         String requestName = this.producerName + ".sendDocuments.v" + String.valueOf(requestVersion);
-        
+        logger.log(Level.getLevel("SERVICEINFO"), "Väljaminev päring teenusele SendDocuments(xtee teenus:"+requestName+"). Asutusest:" + headerVar.getOrganizationCode() 
+        		+" isikukood:" + headerVar.getPersonalIDCode());
         // Päringu ID koostamine
         queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
         
@@ -592,6 +597,8 @@ public class ClientAPI {
 
         // Päringu nimi
         String requestName = this.producerName + ".receiveDocuments.v" + String.valueOf(requestVersion);
+        logger.log(Level.getLevel("SERVICEINFO"), "Väljaminev päring teenusele ReceiveDocuments(xtee teenus:"+requestName+"). Asutusest:" + headerVar.getOrganizationCode() 
+        		+" isikukood:" + headerVar.getPersonalIDCode());
         // Päringu ID koostamine
         queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
         
@@ -1069,7 +1076,8 @@ public class ClientAPI {
         // Päringu nimi ja versioon
         int requestVersion = orgSettings.getMarkDocumentsReceivedRequestVersion();
         String requestName = this.producerName + ".markDocumentsReceived.v" + String.valueOf(requestVersion);
-
+        logger.log(Level.getLevel("SERVICEINFO"), "Väljaminev päring teenusele MarkDocumentsReceived(xtee teenus:"+requestName+"). Asutusest:" + headerVar.getOrganizationCode() 
+        		+" isikukood:" + headerVar.getPersonalIDCode());
         try {
         // Saadetava sänumi päisesse kantavad parameetrid
             DvkXHeader header = new DvkXHeader(
@@ -1221,7 +1229,9 @@ public class ClientAPI {
             // Päringu nimi ja versioon
             int requestVersion = orgSettings.getMarkDocumentsReceivedRequestVersion();
             requestName = this.producerName + ".markDocumentsReceived.v" + String.valueOf(requestVersion);
-
+            logger.log(Level.getLevel("SERVICEINFO"), "Väljaminev päring teenusele MarkDocumentsReceived(xtee teenus:"+requestName+"). Asutusest:" + headerVar.getOrganizationCode() 
+            		+" isikukood:" + headerVar.getPersonalIDCode());
+            
             // Saadetava sänumi päisesse kantavad parameetrid
             DvkXHeader header = new DvkXHeader(
                 headerVar.getOrganizationCode(),
@@ -1476,7 +1486,8 @@ public class ClientAPI {
         try {
             // Päringu nimi
             requestName = this.producerName + ".getSendingOptions.v" + String.valueOf(requestVersion);
-
+            logger.log(Level.getLevel("SERVICEINFO"), "Väljaminev päring teenusele GetSendingOptions(xtee teenus:"+requestName+"). Asutusest:" + headerVar.getOrganizationCode() 
+            		+" isikukood:" + headerVar.getPersonalIDCode());
             // Päringu ID koostamine
             this.queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
 
@@ -1598,7 +1609,8 @@ public class ClientAPI {
         try {
             // Päringu nimi
             requestName = this.producerName + ".getSubdivisionList.v" + String.valueOf(requestVersion);
-
+            logger.log(Level.getLevel("SERVICEINFO"), "Väljaminev päring teenusele GetSubdivisionList(xtee teenus:"+requestName+"). Asutusest:" + headerVar.getOrganizationCode() 
+            		+" isikukood:" + headerVar.getPersonalIDCode());
             // Päringu ID koostamine
             queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
 
@@ -1718,7 +1730,8 @@ public class ClientAPI {
         ArrayList<Occupation> result = new ArrayList<Occupation>();
 
         String requestName = this.producerName + ".getOccupationList.v" + String.valueOf(requestVersion);
-
+        logger.log(Level.getLevel("SERVICEINFO"), "Väljaminev päring teenusele GetOccupationList(xtee teenus:"+requestName+"). Asutusest:" + headerVar.getOrganizationCode() 
+        		+" isikukood:" + headerVar.getPersonalIDCode());
         try {
         // Päringu nimi
             requestName = this.producerName + ".getOccupationList.v" + String.valueOf(requestVersion);

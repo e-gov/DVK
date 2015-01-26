@@ -1,0 +1,22 @@
+	<sql-query name="CreateNewMessage" callable="true">
+	    <return alias="new_msg" class="dvk.api.DhlMessage">
+	    </return>
+	    { ? = call insert_new_row('message') }
+	</sql-query>
+---------------------------------------------------------------------------------------------------
+	<sql-query name="CreateNewSettingsFolder" callable="true">
+	    <return alias="new_sf" class="dvk.api.DhlSettingsFolders">
+	    </return>
+	    { ? = call insert_new_row('settings_folders') }
+	</sql-query>
+---------------------------------------------------------------------------------------------------
+begin
+delete from DHL_OCCUPATION;
+delete from DHL_SUBDIVISION;
+delete from DHL_ORGANIZATION;
+delete from DHL_SETTINGS_FOLDERS;
+delete from DHL_SETTINGS;
+delete from DHL_MESSAGE_RECIPIENT;
+delete from DHL_MESSAGE;
+delete from DHL_COUNTER;
+end; 

@@ -246,12 +246,26 @@
             <scope>system</scope>
             <systemPath>${dvkCoreDir}/lib/orai18n.jar</systemPath>
         </dependency>
-        <dependency>
+		<dependency>
             <groupId>apache</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.15</version>
+            <artifactId>log4j-api</artifactId>
+            <version>2.1</version>
             <scope>system</scope>
-            <systemPath>${dvkCoreDir}/lib/log4j-1.2.15.jar</systemPath>
+            <systemPath>${dvkCoreDir}/lib/log4j-api-2.1.jar</systemPath>
+        </dependency>
+         <dependency>
+            <groupId>apache</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.1</version>
+            <scope>system</scope>
+            <systemPath>${dvkCoreDir}/lib/log4j-core-2.1.jar</systemPath>
+        </dependency>
+         <dependency>
+            <groupId>apache</groupId>
+            <artifactId>log4j-bridge</artifactId>
+            <version>2.1</version>
+            <scope>system</scope>
+            <systemPath>${dvkCoreDir}/lib/log4j-1.2-api-2.1.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>java</groupId>

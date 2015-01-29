@@ -13,16 +13,19 @@
         <version>1.7.1</version>        
         <relativePath>../../..</relativePath>
     </parent>
+
+    <properties>
+        <packageName>dhl</packageName>
+    </properties>
  	
 	<!-- 
     <properties>
-        <packageName>dhl</packageName>
       	<basedir>..\dvk\server\development\trunk</basedir>
       	<dvkCoreDir>..\dvk\core\development\trunk</dvkCoreDir>
 		<dvkClientDir>..\dvk\client\development\trunk</dvkClientDir>      		          
     </properties>
  	-->
- 	
+
     <dependencies>
         <dependency>
             <groupId>dvk</groupId>

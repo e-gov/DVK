@@ -181,13 +181,14 @@
 		        <dvkCoreDir>..\dvk\core\development\trunk</dvkCoreDir>
 		 		<dvkClientDir>..\dvk\client\development\trunk</dvkClientDir>
 				<dvkApiDir>..\dvk\api\development\trunk</dvkApiDir>
+				<basedir>..\dvk\server\development\trunk</basedir>
                 <ignoreIntegrationTests>true</ignoreIntegrationTests>
                 <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI.properties</listOfTestConfigs>
                 <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_CI_serverIsMissing.properties</serverIsMissingConfigs>
                 <containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_CI_container_1_0.properties</containerVer1Configs>
                 <conversionTestConfig>./conf/integrationTests/dvk_client_postgreSQL_CI_conversion.properties</conversionTestConfig>
             </properties>
-        </profile>                         
+        </profile>                                 
         <profile>
             <id>aleksandr</id>
             <modules>
@@ -200,6 +201,7 @@
 		        <dvkCoreDir>C:\Users\aleksandr.potapov\workspace\dvk\core\development\trunk</dvkCoreDir>
 		 		<dvkClientDir>C:\Users\aleksandr.potapov\workspace\dvk\client\development\trunk</dvkClientDir>
 				<dvkApiDir>C:\Users\aleksandr.potapov\workspace\dvk\api\development\trunk</dvkApiDir>
+				<basedir>C:\Users\aleksandr.potapov\workspace\dvk\server\development\trunk</basedir>
                 <ignoreIntegrationTests>true</ignoreIntegrationTests>
                 <listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI.properties</listOfTestConfigs>
                 <serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_CI_serverIsMissing.properties</serverIsMissingConfigs>

@@ -22,6 +22,11 @@
 		<dvkClientDir>..\dvk\client\development\trunk</dvkClientDir>      		          
     </properties>
  	-->
+
+    <properties>
+        <packageName>dhl</packageName>
+    </properties>
+
  	
     <dependencies>
         <dependency>

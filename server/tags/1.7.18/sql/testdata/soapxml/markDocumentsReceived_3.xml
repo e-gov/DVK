@@ -1,0 +1,42 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns4="http://x-tee.riik.ee/xsd/xtee.xsd" xmlns:xtee="http://x-tee.riik.ee/xsd/xtee.xsd" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/">
+ <soapenv:Header>
+      <ns4:asutus xsi:type="xsd:string">adit</ns4:asutus>
+      <ns4:andmekogu xsi:type="xsd:string">dhl</ns4:andmekogu>
+      <ns4:isikukood xsi:type="xsd:string">EE38806190294</ns4:isikukood>
+      <ns4:id xsi:type="xsd:string">13a213c22e210391131-1095465132</ns4:id>
+      <ns4:nimi xsi:type="xsd:string">dhl.markDocumentsReceived.v3</ns4:nimi>
+   </soapenv:Header>
+<soapenv:Body>
+  <markDocumentsReceived>
+    <keha>
+      <dokumendid xsi:type="SOAP-ENC:Array" SOAP-ENC:arrayType="dhl:asutus[3]">
+        <item>
+          <dhl_id>1</dhl_id>
+          <vastuvotja_staatus_id>10</vastuvotja_staatus_id>
+          <fault>
+            <faultcode>100</faultcode>
+            <faultactor>CLIENT</faultactor>
+            <faultstring>Veateade</faultstring>
+            <faultdetail>vea kirjeldus</faultdetail>
+          </fault>
+          <metaxml>
+            <andmed_1>väärtus 1</andmed_1>
+            <andmed_2>väärtus 2</andmed_2>
+            <andmed_n>väärtus n</andmed_n>
+          </metaxml>
+          <staatuse_muutmise_aeg>2005-09-01T12:35:11</staatuse_muutmise_aeg>
+        </item>
+        <item>
+          <dhl_id>1</dhl_id>
+          <vastuvotja_staatus_id>7</vastuvotja_staatus_id>
+          <staatuse_muutmise_aeg>2005-09-02T14:15:00</staatuse_muutmise_aeg>
+        </item>
+        <item>
+          <dhl_id>1</dhl_id>
+        </item>
+      </dokumendid>
+      <kaust/>
+    </keha>
+  </markDocumentsReceived>
+</soapenv:Body>
+</soapenv:Envelope>

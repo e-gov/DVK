@@ -843,17 +843,17 @@ DECLARE
     aar_id_ integer := p_aar_id;
     p_id int4;
 BEGIN
-    IF ks_ametikoht_id_ IS NULL THEN
-        ks_ametikoht_id_ := 0;
+    IF ks_ametikoht_id_ = 0 then
+        ks_ametikoht_id_ := null;
     END IF;
-    IF asutus_id_ IS NULL THEN
-        asutus_id_ : := 0;
+    IF asutus_id_ = 0 then
+        asutus_id_ := null;
     END IF;
-    IF allyksus_id_ IS NULL THEN
-        allyksus_id_ := 0;
+    IF allyksus_id_ = 0 then
+        allyksus_id_ := null;
     END IF;
-    IF aar_id_ IS NULL THEN
-        aar_id_ := 0;
+    IF aar_id_ = 0 then
+        aar_id_ := null;
     END IF;
 
     p_id := nextval('sq_ametikoht_id');
@@ -1253,14 +1253,14 @@ BEGIN
     set dvkxtee.xtee_isikukood = p_xtee_isikukood;
     set dvkxtee.xtee_asutus = p_xtee_asutus;
 
-    if organization_id_ is null then
-        organization_id_ := 0;
+    if organization_id_ = 0 then
+        organization_id_ := null;
     end if;
-    if position_id_ is null then
-        position_id_ := 0;
+    if position_id_ = 0 then
+        position_id_ := null;
     end if;
-    if division_id_ is null then
-        division_id_ := 0;
+    if division_id_ = 0 then
+        division_id_ := null;
     end if;
 
     p_id := nextval('sq_vahendaja_id');
@@ -3115,17 +3115,17 @@ DECLARE
     aar_id_ integer := p_aar_id;
 
 BEGIN
-    if ks_ametikoht_id_ is null then
-        ks_ametikoht_id_ := 0;
+    if ks_ametikoht_id_ = 0 then
+        ks_ametikoht_id_ := null;
     end if;
-    if asutus_id_ is null then
-        asutus_id_ := 0;
+    if asutus_id_ = 0 then
+        asutus_id_ := null;
     end if;
-    if allyksus_id_ is null then
-        allyksus_id_ := 0;
+    if allyksus_id_ = 0 then
+        allyksus_id_ := null;
     end if;
-    if aar_id_ is null then
-        aar_id_ := 0;
+    if aar_id_ = 0 then
+        aar_id_ := null;
     end if;
 
     update  ametikoht

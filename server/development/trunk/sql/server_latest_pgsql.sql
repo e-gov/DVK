@@ -3767,14 +3767,18 @@ DECLARE
     tablename character varying := 'vastuvotja';
     primary_key_value integer := vastuvotja_old.vastuvotja_id;	
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;	
 
 BEGIN
 	
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -5040,15 +5044,19 @@ DECLARE
     pkey_col  character varying;
     tablename character varying := 'allkiri';
     primary_key_value integer := allkiri_old.allkiri_id;	
-	p_id int4;	
+	p_id int4;
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;	
 
 BEGIN	
 
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -5692,13 +5700,17 @@ DECLARE
     tablename character varying := 'allyksus';
     primary_key_value integer := allyksus_old.id;	
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;	
 
 BEGIN	
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -6337,13 +6349,17 @@ DECLARE
     tablename character varying := 'ametikoht';    
     primary_key_value integer := ametikoht_old.ametikoht_id;	
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;	
 
 BEGIN	
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -7073,13 +7089,17 @@ DECLARE
     tablename character varying := 'ametikoht_taitmine';    
     primary_key_value integer := ametikoht_taitmine_old.taitmine_id;
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;	
 
 BEGIN	
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -7793,13 +7813,17 @@ DECLARE
     tablename character varying := 'asutus';    
     primary_key_value integer := asutus_old.asutus_id;
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;	
 
 BEGIN	
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -9785,14 +9809,18 @@ DECLARE
     tablename character varying := 'dokumendi_ajalugu';    
     primary_key_value integer := dokumendi_ajalugu_old.ajalugu_id;
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;	
 
 BEGIN	
 
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -9973,13 +10001,17 @@ DECLARE
     tablename character varying := 'dokumendi_fail';    
 	primary_key_value integer := dokumendi_fail_old.fail_id;
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;	
 
 BEGIN	
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -10466,13 +10498,17 @@ DECLARE
     tablename character varying := 'dokumendi_metaandmed';    
 	primary_key_value integer := dokumendi_metaandmed_old.dokument_id;
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;	
 
 BEGIN	
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -11883,13 +11919,17 @@ DECLARE
     tablename character varying := 'dokument';    
 	primary_key_value integer := dokument_old.dokument_id;
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;	
 
 BEGIN	
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -12426,14 +12466,18 @@ DECLARE
     tablename character varying := 'dynaamilised_metaandmed';    
     primary_key_value integer := dynaamilised_metaandmed_old.dokument_id;
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;	
 
 BEGIN	
 
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -12664,13 +12708,17 @@ DECLARE
     tablename character varying := 'ehak';    
     primary_key_value integer := ehak_old.ehak_id;
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;	
 
 BEGIN	
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -13211,13 +13259,17 @@ DECLARE
     tablename character varying := 'isik';    
     primary_key_value integer := isik_old.i_id;
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;	
 
 BEGIN	
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -13978,13 +14030,17 @@ DECLARE
     tablename character varying := 'kaust';    
     primary_key_value integer := kaust_old.kaust_id;
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;	
 
 BEGIN	
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -14295,13 +14351,17 @@ DECLARE
     tablename character varying := 'klassifikaatori_tyyp';    
     primary_key_value integer := klassifikaatori_tyyp_old.klassifikaatori_tyyp_id;
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;	
 
 BEGIN	
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -14467,13 +14527,17 @@ DECLARE
     tablename character varying := 'klassifikaator';    
     primary_key_value integer := klassifikaator_old.klassifikaator_id;
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;	
 
 BEGIN	
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -14691,14 +14755,18 @@ DECLARE
     tablename character varying := 'konversioon';    
     primary_key_value integer := konversioon_old.id;
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;	
 
 BEGIN	
 
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -14940,13 +15008,17 @@ DECLARE
     tablename character varying := 'oigus_antud';    
     primary_key_value integer := oigus_antud_old.oigus_antud_id;
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;	
 
 BEGIN	
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -15614,13 +15686,17 @@ DECLARE
     tablename character varying := 'oigus_objektile';    
     primary_key_value integer := oigus_objektile_old.oigus_objektile_id;
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;	
 
 BEGIN	
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -16025,14 +16101,18 @@ DECLARE
     pkey_col  character varying;
     tablename character varying := 'parameetrid';    
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;	
 
 BEGIN	
 
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -16182,14 +16262,18 @@ DECLARE
     tablename character varying := 'saatja';  
     primary_key_value integer := saatja_old.saatja_id;		
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;		
 
 BEGIN	
 
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -16897,13 +16981,17 @@ DECLARE
     tablename character varying := 'server';  
     primary_key_value integer := server_old.server_id;
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;	
 
 BEGIN	
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -17143,13 +17231,17 @@ DECLARE
     tablename character varying := 'staatuse_ajalugu';  
     primary_key_value integer := staatuse_ajalugu_old.staatuse_ajalugu_id;
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;	
 
 BEGIN	
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -17668,13 +17760,17 @@ DECLARE
     tablename character varying := 'transport';  
     primary_key_value integer := transport_old.transport_id;
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;	
 
 BEGIN	
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -18016,13 +18112,17 @@ DECLARE
     tablename character varying := 'vahendaja';  
     primary_key_value integer := vahendaja_old.vahendaja_id;
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;	
 
 BEGIN	
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -18762,13 +18862,17 @@ DECLARE
     tablename character varying := 'vastuvotja_mall';  
     primary_key_value integer := vastuvotja_mall_old.vastuvotja_mall_id;
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;		
 
 BEGIN	
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -19519,13 +19623,18 @@ DECLARE
     tablename character varying := 'vastuvotja_staatus';  
     primary_key_value integer := vastuvotja_staatus_old.vastuvotja_staatus_id;
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;	
+
 
 BEGIN	
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -19722,13 +19831,17 @@ DECLARE
     tablename character varying := 'logi';  
     primary_key_value integer := logi_old.log_id;
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;		
 
 BEGIN	
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN
@@ -20747,14 +20860,18 @@ DECLARE
     tablename character varying := 'dokumendi_fragment';  
     primary_key_value integer := dokumendi_fragment_old.fragment_id;
 	p_id int4;	
+	xtee_isikukood character varying;	
+	xtee_asutus character varying;	
 
 BEGIN	
 
 	BEGIN
-		IF current_setting('dvkxtee.xtee_isikukood') = null THEN
+		SELECT current_setting('dvkxtee.xtee_isikukood') INTO xtee_isikukood;
+		SELECT current_setting('dvkxtee.xtee_asutus') INTO xtee_asutus;
+		IF xtee_isikukood = null THEN
 			SET dvkxtee.xtee_isikukood = '';
 		END IF;
-		IF current_setting('dvkxtee.xtee_asutus') = null THEN
+		IF xtee_asutus = null THEN
 			SET dvkxtee.xtee_asutus = '';
 		END IF;
 		EXCEPTION WHEN syntax_error_or_access_rule_violation THEN

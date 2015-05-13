@@ -1,7 +1,6 @@
 package dvk.api;
 
 import java.math.BigDecimal;
-import java.sql.Clob;
 import java.util.Date;
 
 /**
@@ -28,9 +27,9 @@ public interface IMessageObserver extends IElementObserver {
     /**
      * Returns message data.
      *
-     * @return {@link Clob}
+     * @return {@link String}
      */
-    Clob getData();
+    String getData();
 
     /**
      * Returns title text of this message.
@@ -196,9 +195,9 @@ public interface IMessageObserver extends IElementObserver {
     /**
      * Returns meta-xml data of this message.
      *
-     * @return {@link Clob}
+     * @return {@link String}
      */
-    Clob getMetaxml();
+    String getMetaxml();
 
     /**
      * Returns query ID of this message.

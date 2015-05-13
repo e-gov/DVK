@@ -3,7 +3,6 @@ package dvk.api.ml;
 import dvk.api.SelectCriteria;
 
 import java.math.BigDecimal;
-import java.sql.Clob;
 import java.util.Date;
 
 public class SelectCriteriaMessage extends SelectCriteria {
@@ -58,7 +57,7 @@ public class SelectCriteriaMessage extends SelectCriteria {
     @SuppressWarnings("unused")
     private Long statusUpdateNeeded;
     @SuppressWarnings("unused")
-    private Clob metaxml;
+    private String metaxml;
     @SuppressWarnings("unused")
     private String queryId;
     @SuppressWarnings("unused")
@@ -187,7 +186,7 @@ public class SelectCriteriaMessage extends SelectCriteria {
         this.statusUpdateNeeded = statusUpdateNeeded;
     }
 
-    public void setMetaxml(Clob metaxml) {
+    public void setMetaxml(String metaxml) {
         this.metaxml = metaxml;
     }
 

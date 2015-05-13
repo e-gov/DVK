@@ -669,7 +669,7 @@ public class Test
 		Date today = new Date();
 		//
 		msg.setIsIncoming(true);
-		msg.setData(Hibernate.createClob("Viimane kohtumine oli kell " + getCurrTime()));
+		msg.setData("Viimane kohtumine oli kell " + getCurrTime());
 		msg.setSendingStatusId(100);
 		msg.setUnitId(300);
 		msg.setTitle("Suur tervist!");
@@ -691,7 +691,7 @@ public class Test
 		msg.setFaultString("FaultString");
 		msg.setFaultDetail("FaultDetail");
 		msg.setStatusUpdateNeeded(new Long(1));
-		msg.setMetaxml(Hibernate.createClob("Metaxml"));
+		msg.setMetaxml("Metaxml");
 		msg.setQueryId("QueryId");
 		msg.setProxyOrgCode("ProxyOrgCode");
 		msg.setProxyOrgName("ProxyOrgName");
@@ -719,7 +719,7 @@ public class Test
 		msgRecip.setFaultCode("faultCode");
 		msgRecip.setFaultDetail("faultDetail");
 		msgRecip.setFaultString("faultString");
-		msgRecip.setMetaxml(Hibernate.createClob("metaxml"));
+		msgRecip.setMetaxml("metaxml");
 		msgRecip.setProducerName("producerName");
 		msgRecip.setQueryId("queryId");
 		msgRecip.setReceivedDate(today);

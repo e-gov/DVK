@@ -7,7 +7,6 @@ import dvk.api.IMessageRecipientObserver;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
-import java.sql.Clob;
 import java.util.Date;
 
 /**
@@ -61,7 +60,7 @@ public class PojoMessageRecipient implements IMessageRecipientObserver, java.io.
     protected String faultActor;
     protected String faultString;
     protected String faultDetail;
-    protected Clob metaxml;
+    protected String metaxml;
     protected BigDecimal dhlId;
     protected String queryId;
     protected String producerName;
@@ -156,11 +155,11 @@ public class PojoMessageRecipient implements IMessageRecipientObserver, java.io.
         this.faultDetail = faultDetail;
     }
 
-    public Clob getMetaxml() {
+    public String getMetaxml() {
         return this.metaxml;
     }
 
-    public void setMetaxml(Clob metaxml) {
+    public void setMetaxml(String metaxml) {
         this.metaxml = metaxml;
     }
 

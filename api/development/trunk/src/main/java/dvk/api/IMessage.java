@@ -1,7 +1,6 @@
 package dvk.api;
 
 import java.math.BigDecimal;
-import java.sql.Clob;
 import java.util.Date;
 
 /**
@@ -19,9 +18,9 @@ public interface IMessage extends IMessageObserver, IDvkElement {
     /**
      * Sets the data of the message.
      *
-     * @param data message data as {@link Clob}.
+     * @param data message data as {@link String}.
      */
-    void setData(Clob data);
+    void setData(String data);
 
     /**
      * Sets the title of the message.
@@ -189,7 +188,7 @@ public interface IMessage extends IMessageObserver, IDvkElement {
      *
      * @param metaxml meta-xml data
      */
-    void setMetaxml(Clob metaxml);
+    void setMetaxml(String metaxml);
 
     /**
      * Sets query ID of the message.

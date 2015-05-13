@@ -1,7 +1,6 @@
 package dvk.api;
 
 import java.math.BigDecimal;
-import java.sql.Clob;
 import java.util.Date;
 
 /**
@@ -84,9 +83,9 @@ public interface IMessageRecipientObserver extends IElementObserver {
     /**
      * Returns meta-xml data of this relation between message and recipient.
      *
-     * @return meta-xml data {@link Clob}
+     * @return meta-xml data {@link String}
      */
-    Clob getMetaxml();
+    String getMetaxml();
 
     /**
      * Returns DHL ID of this relation between message and recipient.

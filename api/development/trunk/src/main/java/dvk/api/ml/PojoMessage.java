@@ -7,7 +7,6 @@ import dvk.api.IMessageObserver;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
-import java.sql.Clob;
 import java.util.Date;
 
 /**
@@ -63,7 +62,7 @@ public class PojoMessage implements IMessageObserver, java.io.Serializable {
     private static final long serialVersionUID = 7862552201678593426L;
     protected long dhlMessageId = -1;
     protected boolean isIncoming;
-    protected Clob data;
+    protected String data;
     protected String title;
     protected String senderOrgCode;
     protected String senderOrgName;
@@ -87,7 +86,7 @@ public class PojoMessage implements IMessageObserver, java.io.Serializable {
     protected String faultString;
     protected String faultDetail;
     protected Long statusUpdateNeeded;
-    protected Clob metaxml;
+    protected String metaxml;
     protected String queryId;
     protected String proxyOrgCode;
     protected String proxyOrgName;
@@ -134,11 +133,11 @@ public class PojoMessage implements IMessageObserver, java.io.Serializable {
         this.isIncoming = isIncoming;
     }
 
-    public Clob getData() {
+    public String getData() {
         return this.data;
     }
 
-    public void setData(Clob data) {
+    public void setData(String data) {
         this.data = data;
     }
 
@@ -326,11 +325,11 @@ public class PojoMessage implements IMessageObserver, java.io.Serializable {
         this.statusUpdateNeeded = statusUpdateNeeded;
     }
 
-    public Clob getMetaxml() {
+    public String getMetaxml() {
         return this.metaxml;
     }
 
-    public void setMetaxml(Clob metaxml) {
+    public void setMetaxml(String metaxml) {
         this.metaxml = metaxml;
     }
 

@@ -7,7 +7,6 @@ import dvk.api.SelectCriteria;
 import org.hibernate.Transaction;
 
 import java.math.BigDecimal;
-import java.sql.Clob;
 import java.util.Date;
 import java.util.List;
 
@@ -289,11 +288,11 @@ class DvkMessageRecipient extends DescendantFacade<PojoMessageRecipient> impleme
         }
     }
 
-    public Clob getMetaxml() {
+    public String getMetaxml() {
         return pojo.metaxml;
     }
 
-    public void setMetaxml(Clob metaxml) {
+    public void setMetaxml(String metaxml) {
         if (!hasSameValue(pojo.metaxml, metaxml)) {
             pojo.metaxml = metaxml;
             setDirty(true);

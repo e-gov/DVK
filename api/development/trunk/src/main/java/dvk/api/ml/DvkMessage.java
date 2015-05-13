@@ -10,7 +10,6 @@ import dvk.api.SelectCriteria;
 import org.hibernate.Transaction;
 
 import java.math.BigDecimal;
-import java.sql.Clob;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -173,11 +172,11 @@ class DvkMessage extends DescendantsContainerFacade<PojoMessage> implements IMes
         }
     }
 
-    public Clob getData() {
+    public String getData() {
         return pojo.data;
     }
 
-    public void setData(Clob data) {
+    public void setData(String data) {
         if (!hasSameValue(pojo.data, data)) {
             pojo.data = data;
             setDirty(true);
@@ -438,11 +437,11 @@ class DvkMessage extends DescendantsContainerFacade<PojoMessage> implements IMes
     }
 
 
-    public Clob getMetaxml() {
+    public String getMetaxml() {
         return pojo.metaxml;
     }
 
-    public void setMetaxml(Clob metaxml) {
+    public void setMetaxml(String metaxml) {
         if (!hasSameValue(pojo.metaxml, metaxml)) {
             pojo.metaxml = metaxml;
             setDirty(true);

@@ -379,7 +379,7 @@ CREATE INDEX ametikoht_taitmine_i_id_idx ON ametikoht_taitmine (i_id);
 
 CREATE TABLE asutus (
 	asutus_id integer default nextval('sq_asutus_id') NOT NULL,
-	registrikood varchar(12) NOT NULL,
+	registrikood varchar(30) NOT NULL,
 	e_registrikood varchar(8) NULL,
 	ks_asutus_id integer NULL,
 	ks_asutus_kood varchar(20) NULL,

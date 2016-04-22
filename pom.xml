@@ -36,7 +36,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<dhl.properties>/WEB-INF/dhl.properties</dhl.properties>
 		<attachments.directory>./attachments</attachments.directory>
-		<server.log.file>../logs/dvkServer.log</server.log.file>
+		<server.log.file>${java.io.tmpdir}/logs/dvkServer.log</server.log.file>
 
 		<dvkCoreDir>${project.parent.basedir}/core</dvkCoreDir>
 
@@ -91,6 +91,15 @@
 	<profiles>
 		<profile>
 			<id>ci-trunk</id>
+			
+			<repositories>
+				<repository>
+					<id>ria</id>
+					<name>DVK repository</name>
+					<url>https://artifactory.tt.kit/artifactory/DVK-libs-release-local</url>
+				</repository>
+			</repositories>
+			
 			<properties>
 				<ignoreIntegrationTests>false</ignoreIntegrationTests>
 				<listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI.properties</listOfTestConfigs>
@@ -106,6 +115,15 @@
 			<!-- <activeByDefault>true</activeByDefault> -->
 			<!-- </activation> -->
 			<id>latestRelease</id>
+			
+			<repositories>
+				<repository>
+					<id>ria</id>
+					<name>DVK repository</name>
+					<url>https://artifactory.tt.kit/artifactory/DVK-libs-release-local</url>
+				</repository>
+			</repositories>
+			
 			<properties>
 				<ignoreIntegrationTests>true</ignoreIntegrationTests>
 				<listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI.properties</listOfTestConfigs>

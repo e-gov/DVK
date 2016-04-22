@@ -1,5 +1,0 @@
-1.0.5
--------------------------------------------------------------------------------
-- 2.1 kapsli tugi lisatud
-- Lisatud puuduolev element recordTypeSpecificMetadata kapsli 2.1 toele
-- Muudetud elementide järjekorda kapsli koostamisel (Valideerimise jaoks)

@@ -1,5 +1,5 @@
 @REM This script is meant to do two things for the DVK project:
-@REM 	1) install  3rd party libraries to the local repository
+@REM 	1) install 3rd party libraries to the local repository
 @REM 	2) deploy 3rd party libraries to the required repository
 
 

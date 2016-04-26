@@ -10,7 +10,15 @@
 	<packaging>jar</packaging>
 	
 	<name>dvk-api</name>
-
+	
+	<repositories>
+		<repository>
+			<id>ria</id>
+			<name>DVK releases</name>
+			<url>https://artifactory.tt.kit/artifactory/DVK-libs-release-local</url>
+		</repository>
+	</repositories>
+	
 	<build>
 		<finalName>${project.groupId}-${project.artifactId}-${project.version}</finalName>
 		<sourceDirectory>src/main/java</sourceDirectory>

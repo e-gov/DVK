@@ -11,18 +11,13 @@
 
 	<name>dvk-parent</name>
 
-	<distributionManagement>
+	<repositories>
 		<repository>
 			<id>ria</id>
 			<name>DVK releases</name>
 			<url>https://artifactory.tt.kit/artifactory/DVK-libs-release-local</url>
 		</repository>
-		<snapshotRepository>
-			<id>ria</id>
-			<name>DVK snapshots</name>
-			<url>https://artifactory.tt.kit/artifactory/DVK-libs-snapshot-local</url>
-		</snapshotRepository>
-	</distributionManagement>
+	</repositories>
 
 	<modules>
 		<module>core</module>

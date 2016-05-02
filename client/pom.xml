@@ -18,7 +18,6 @@
 	</parent>
 	
 	<properties>
-		
 		<ignoreIntegrationTests>true</ignoreIntegrationTests>
 	</properties>
 
@@ -123,48 +122,57 @@
 			<groupId>java</groupId>
 			<artifactId>jsse</artifactId>
 			<version>1.0</version>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>8.3-603.jdbc3</version>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate3</artifactId>
 			<version>3.3.2.GA</version>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>com.microsoft.sqlserver</groupId>
 			<artifactId>sqljdbc4</artifactId>
 			<version>2.0</version>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>com.sybase</groupId>
 			<artifactId>jconn3</artifactId>
 			<version>6.0</version>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>com.sybase</groupId>
 			<artifactId>jdbc3-tds</artifactId>
 			<version>6.0</version>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.3.2</version>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>2.0</version>
 			<scope>test</scope>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
 			<version>1.9</version>
 			<scope>test</scope>
+			<optional>true</optional>
 		</dependency>
 		<!-- <dependency>
 			<groupId>postgresql</groupId>
@@ -176,6 +184,7 @@
 			<artifactId>JUnitParams</artifactId>
 			<version>1.0.2</version>
 			<scope>test</scope>
+			<optional>true</optional>
 		</dependency>
 	</dependencies>
 

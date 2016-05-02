@@ -18,6 +18,13 @@
 			<url>https://artifactory.tt.kit/artifactory/DVK-libs-release-local</url>
 		</repository>
 	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>ria</id>
+			<name>DVK releases</name>
+			<url>https://artifactory.tt.kit/artifactory/DVK-libs-release-local</url>
+		</pluginRepository>
+	</pluginRepositories>
 
 	<modules>
 		<module>core</module>
@@ -32,8 +39,6 @@
 		<dhl.properties>/WEB-INF/dhl.properties</dhl.properties>
 		<attachments.directory>./attachments</attachments.directory>
 		<server.log.file>${java.io.tmpdir}/logs/dvkServer.log</server.log.file>
-
-		<dvkCoreDir>${project.parent.basedir}/core</dvkCoreDir>
 
 		<listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI.properties</listOfTestConfigs>
 		<serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_CI_serverIsMissing.properties</serverIsMissingConfigs>
@@ -134,7 +139,7 @@
 			<dependency>
 				<groupId>commons-logging</groupId>
 				<artifactId>commons-logging</artifactId>
-				<version>1.1</version>
+				<version>1.1.1</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-discovery</groupId>
@@ -182,14 +187,14 @@
 				<version>1.0</version>
 			</dependency>
 			<dependency>
-				<groupId>java</groupId>
+				<groupId>javax.mail</groupId>
 				<artifactId>mail</artifactId>
-				<version>1.0</version>
+				<version>1.4</version>
 			</dependency>
 			<dependency>
-				<groupId>java</groupId>
+				<groupId>javax.activation</groupId>
 				<artifactId>activation</artifactId>
-				<version>1.0</version>
+				<version>1.1</version>
 			</dependency>
 			<dependency>
 				<groupId>java</groupId>
@@ -231,11 +236,17 @@
 				<artifactId>serializer</artifactId>
 				<version>1.0</version>
 			</dependency>
-<!-- 			<dependency> -->
-<!-- 				<groupId>org.codehaus.woodstox</groupId> -->
-<!-- 				<artifactId>stax2-api</artifactId> -->
-<!-- 				<version>3.0.4</version> -->
-<!-- 			</dependency> -->
+			<dependency>
+				<groupId>org.codehaus.woodstox</groupId>
+				<artifactId>stax2-api</artifactId>
+				<version>3.0.0</version>
+				<exclusions>
+					<exclusion>
+						<groupId>stax</groupId>
+						<artifactId>stax-api</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
 			<dependency>
 				<groupId>org.codehaus.woodstox</groupId>
 				<artifactId>wstx-lgpl</artifactId>
@@ -291,11 +302,11 @@
 			<artifactId>axis</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>java</groupId>
+			<groupId>javax.mail</groupId>
 			<artifactId>mail</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>java</groupId>
+			<groupId>javax.activation</groupId>
 			<artifactId>activation</artifactId>
 		</dependency>
 		<dependency>
@@ -330,10 +341,10 @@
 			<groupId>java</groupId>
 			<artifactId>serializer</artifactId>
 		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.codehaus.woodstox</groupId> -->
-<!-- 			<artifactId>stax2-api</artifactId> -->
-<!-- 		</dependency> -->
+		<!-- <dependency>
+			<groupId>org.codehaus.woodstox</groupId>
+			<artifactId>stax2-api</artifactId>
+		</dependency> -->
 		<dependency>
 			<groupId>org.codehaus.woodstox</groupId>
 			<artifactId>wstx-lgpl</artifactId>

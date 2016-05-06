@@ -95,7 +95,7 @@ CREATE TABLE dhl_settings
 
 create table dhl_organization
 (
-    org_code varchar2 (20) not null,
+    org_code varchar2 (30) not null,
     org_name varchar2 (100) not null,
     dhl_capable number (1,0) default 0 not null,
     dhl_direct_capable number (1,0) default 0 not null,

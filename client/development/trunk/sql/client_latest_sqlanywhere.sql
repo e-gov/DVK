@@ -124,7 +124,7 @@ create unique index ix_dhl_settings_1 on dhl_settings("unit_id");
 
 create table dhl_organization
 (
-	"org_code" varchar(20) not null primary key,
+	"org_code" varchar(30) not null primary key,
 	"org_name" varchar(100) not null,
 	"dhl_capable" int not null default 0,
 	"dhl_direct_capable" int not null default 0,

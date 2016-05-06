@@ -133,7 +133,7 @@ GO
 
 create table dhl_organization
 (
-	org_code nvarchar(20) primary key not null,
+	org_code nvarchar(30) primary key not null,
 	org_name nvarchar(100) not null,
 	dhl_capable int not null default 0,
 	dhl_direct_capable int not null default 0,

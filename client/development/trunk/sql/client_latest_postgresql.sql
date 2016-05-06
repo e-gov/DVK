@@ -1505,7 +1505,7 @@ CREATE TABLE dhl_message (
 );
 
 CREATE TABLE dhl_organization (
-    org_code character varying(20) NOT NULL,
+    org_code character varying(30) NOT NULL,
     org_name character varying(100) NOT NULL,
     dhl_capable smallint DEFAULT 0 NOT NULL,
     dhl_direct_capable smallint DEFAULT 0 NOT NULL,

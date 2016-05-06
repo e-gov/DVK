@@ -9,16 +9,22 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 
 public class Settings {
-	static Logger logger = Logger.getLogger(Settings.class.getName());
+	
+	private static final Logger logger = Logger.getLogger(Settings.class.getName());
 
-	private static final long Client_DefaultFragmentSizeBytes = 1024 * 1024 * 10;
-    private static final int Server_DefaultDocumentDefaultLifetime = 30;
-    private static final int Server_DefaultExpiredDocumentGracePeriod = 1;
-    private static final String Client_DefaultProducerName = "dhl";
-    private static final String Server_DefaultProducerName = "dhl";
+    private static final int SERVER_DEFAULT_DOCUMENT_DEFAULT_LIFETIME = 30;
+    private static final int SERVER_DEFAULT_EXPIRED_DOCUMENT_GRACE_PERIOD = 1;
+    private static final int SERVER_DEFAULT_CENTRAL_RIGHTS_DATABASE_SYNC_PERIOD = 120;
+    private static final String SERVER_DEFAULT_PRODUCER_NAME = "dhl";
+    
+    private static final long CLIENT_DEFAULT_FRAGMENT_SIZE_BYTES = 1024 * 1024 * 10;
+    private static final String CLIENT_DEFAULT_PRODUCER_NAME = "dhl";
     private static final String CLIENT_DEFAULT_ADIT_PROCUCER_NAME = "adit";
     private static final String CLIENT_DEFAULT_ADIT_INFORMATION_SYSTEM_NAME = "DHS";
-    private static final int Server_DefaultCentralRightsDatabaseSyncPeriod = 120;
+    
+    private static final String XROAD_DRFAULT_INSTANCE = "EE";
+	private static final String XROAD_DEFAULT_MEMBER_CLASS = "GOV";
+	private static final String XROAD_DEFAULT_SUBSYSTEM_CODE = "dvk";
 
     public static Properties currentProperties;
 
@@ -31,8 +37,8 @@ public class Settings {
     public static String Client_ConfigFile = "config.xml";
     public static String Client_ServiceUrl = "";
     public static boolean Client_IntegratedAmphoraFunctions = false;
-    public static String Client_ProducerName = Client_DefaultProducerName;
-    public static long Client_FragmentSizeBytes = Client_DefaultFragmentSizeBytes;
+    public static String Client_ProducerName = CLIENT_DEFAULT_PRODUCER_NAME;
+    public static long Client_FragmentSizeBytes = CLIENT_DEFAULT_FRAGMENT_SIZE_BYTES;
     public static boolean Client_UseFragmenting = false;
     public static int Client_SentMessageDefaultLifetime = Client_SentMessageStatusFollowupDays;
     public static String Client_DefaultOrganizationCode;
@@ -49,14 +55,14 @@ public class Settings {
 
     // Server settings
     public static String Server_DatabaseEnvironmentVariable = "jdbc/dhloracle";
-    public static String Server_ProducerName = Server_DefaultProducerName;
-    public static int Server_DocumentDefaultLifetime = Server_DefaultDocumentDefaultLifetime;
-    public static int Server_ExpiredDocumentGracePeriod = Server_DefaultExpiredDocumentGracePeriod;
+    public static String Server_ProducerName = SERVER_DEFAULT_PRODUCER_NAME;
+    public static int Server_DocumentDefaultLifetime = SERVER_DEFAULT_DOCUMENT_DEFAULT_LIFETIME;
+    public static int Server_ExpiredDocumentGracePeriod = SERVER_DEFAULT_EXPIRED_DOCUMENT_GRACE_PERIOD;
     public static boolean Server_UseCentralRightsDatabase = false;
     public static String Server_CentralRightsDatabaseURL = "";
     public static String Server_CentralRightsDatabaseOrgCode = "";
     public static String Server_CentralRightsDatabasePersonCode = "";
-    public static int Server_CentralRightsDatabaseSyncPeriod = Server_DefaultCentralRightsDatabaseSyncPeriod;
+    public static int Server_CentralRightsDatabaseSyncPeriod = SERVER_DEFAULT_CENTRAL_RIGHTS_DATABASE_SYNC_PERIOD;
     public static boolean Server_RunOnClientDatabase = false;
     public static boolean Server_ValidateContainer = false;
     public static String Server_ValidationSchemaFile = "";
@@ -66,6 +72,11 @@ public class Settings {
     public static boolean Server_DocumentSenderMustMatchXroadHeader = true;
     public static boolean Server_AutoRegisterUnknownSenders = false;
     public static String serverJdigidocConfigLocation = "jar://jdigidoc.cfg";
+    
+    // X-Road protocol settings
+    private static String xroadInstance = XROAD_DRFAULT_INSTANCE;
+	private static String xroadMemberClass = XROAD_DEFAULT_MEMBER_CLASS;
+	private static String xroadSubsystemCode = XROAD_DEFAULT_SUBSYSTEM_CODE;
 
     // General settings (both client and server)
     public static boolean LogErrors = false;
@@ -205,7 +216,7 @@ public class Settings {
                 try {
                     Client_FragmentSizeBytes = Long.parseLong(currentProperties.getProperty("client_fragment_size_bytes"));
                 } catch (Exception ex1) {
-                    Client_FragmentSizeBytes = Client_DefaultFragmentSizeBytes;
+                    Client_FragmentSizeBytes = CLIENT_DEFAULT_FRAGMENT_SIZE_BYTES;
                 }
             }
 
@@ -261,10 +272,10 @@ public class Settings {
                     Server_DocumentDefaultLifetime = Integer.parseInt(
                             currentProperties.getProperty("server_document_default_lifetime"));
                     Server_DocumentDefaultLifetime = (Server_DocumentDefaultLifetime > 0)
-                            ? Server_DocumentDefaultLifetime : Server_DefaultDocumentDefaultLifetime;
+                            ? Server_DocumentDefaultLifetime : SERVER_DEFAULT_DOCUMENT_DEFAULT_LIFETIME;
                 }
             } catch (Exception ex1) {
-                Server_DocumentDefaultLifetime = Server_DefaultDocumentDefaultLifetime;
+                Server_DocumentDefaultLifetime = SERVER_DEFAULT_DOCUMENT_DEFAULT_LIFETIME;
             }
 
             try {
@@ -272,10 +283,10 @@ public class Settings {
                     Server_ExpiredDocumentGracePeriod = Integer.parseInt(
                             currentProperties.getProperty("server_expired_document_grace_period"));
                     Server_ExpiredDocumentGracePeriod = (Server_ExpiredDocumentGracePeriod > 0)
-                            ? Server_ExpiredDocumentGracePeriod : Server_DefaultExpiredDocumentGracePeriod;
+                            ? Server_ExpiredDocumentGracePeriod : SERVER_DEFAULT_EXPIRED_DOCUMENT_GRACE_PERIOD;
                 }
             } catch (Exception ex1) {
-                Server_ExpiredDocumentGracePeriod = Server_DefaultExpiredDocumentGracePeriod;
+                Server_ExpiredDocumentGracePeriod = SERVER_DEFAULT_EXPIRED_DOCUMENT_GRACE_PERIOD;
             }
 
             if ((currentProperties.getProperty("server_validate_container") != null)
@@ -352,10 +363,10 @@ public class Settings {
                             currentProperties.getProperty("server_rights_database_sync_period"));
                     Server_CentralRightsDatabaseSyncPeriod =
                             (Server_CentralRightsDatabaseSyncPeriod > 0)
-                                    ? Server_CentralRightsDatabaseSyncPeriod : Server_DefaultCentralRightsDatabaseSyncPeriod;
+                                    ? Server_CentralRightsDatabaseSyncPeriod : SERVER_DEFAULT_CENTRAL_RIGHTS_DATABASE_SYNC_PERIOD;
                 }
             } catch (Exception ex1) {
-                Server_CentralRightsDatabaseSyncPeriod = Server_DefaultCentralRightsDatabaseSyncPeriod;
+                Server_CentralRightsDatabaseSyncPeriod = SERVER_DEFAULT_CENTRAL_RIGHTS_DATABASE_SYNC_PERIOD;
             }
 
             // Serveri jooksutamine kliendi andmebaai peal
@@ -366,7 +377,17 @@ public class Settings {
                 Server_RunOnClientDatabase = true;
             }
 
-
+            // X-Road protocol configurations
+            if (currentProperties.getProperty("xRoad.instance") != null) {
+            	xroadInstance = currentProperties.getProperty("xRoad.instance");	
+            }
+            if (currentProperties.getProperty("xRoad.memberClass") != null) {
+            	xroadMemberClass = currentProperties.getProperty("xRoad.memberClass");	
+            }
+            if (currentProperties.getProperty("xRoad.subsystemCode") != null) {
+            	xroadSubsystemCode = currentProperties.getProperty("xRoad.subsystemCode");	
+            }
+            
             // Üldkasutatavad seaded
             if ((currentProperties.getProperty("log_errors") != null)
                     && (currentProperties.getProperty("log_errors").equalsIgnoreCase("yes")

@@ -55,7 +55,8 @@ public class CommonStructures {
 
     // Nimeruumid
     public static final String NS_XTEE_PREFIX = "xtee";
-    public static final String NS_XTEE_URI = "http://x-tee.riik.ee/xsd/xtee.xsd";
+    public static final String NS_XTEE_URI = "http://x-tee.riik.ee/xsd/xtee.xsd";	// X-Road protocol version 2.0
+    public static final String NS_XROAD_URI = "http://x-road.eu/xsd/xroad.xsd";		// X-Road protocol version 4.0
     public static final String NS_SOAPENC_PREFIX = "SOAP-ENC";
     public static final String NS_SOAPENC_URI = "http://schemas.xmlsoap.org/soap/encoding/";
     public static final String NS_XSI_PREFIX = "xsi";
@@ -82,4 +83,6 @@ public class CommonStructures {
     public static final String PROVIDER_TYPE_ORACLE_11G = "ORACLE_11G";
     public static final String PROVIDER_TYPE_POSTGRE = "POSTGRE";
 	public static final String PROVIDER_TYPE_SQLANYWHERE = "SQLANYWHERE";
+	
+	
 }

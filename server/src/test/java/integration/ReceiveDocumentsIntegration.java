@@ -2,6 +2,7 @@ package integration;
 
 import Utills.IntegrationTestUtills;
 import dvk.core.CommonStructures;
+import dvk.core.xroad.XRoadProtocolVersion;
 import oracle.jdbc.pool.OracleDataSource;
 
 import org.apache.axiom.soap.SOAP11Constants;
@@ -38,6 +39,7 @@ public class ReceiveDocumentsIntegration {
     private static Logger logger = Logger.getLogger(ReceiveDocumentsIntegration.class);
 
     private static Options options;
+    private static XRoadProtocolVersion xRoadProtocolVersion;
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -45,6 +47,12 @@ public class ReceiveDocumentsIntegration {
     	String serviceUrl = "http://0.0.0.0:8070/dvk/services/dhlHttpSoapPort";
         
         EndpointReference endpointReference = new EndpointReference(serviceUrl);
+        
+        ArrayList<Header> customHeaders = new ArrayList<Header>();
+        customHeaders.add(new Header("Connection", "close"));
+        customHeaders.add(new Header("Cache-control", "no-cache"));
+        customHeaders.add(new Header("Pragma", "no-cache"));
+        
         options = new Options();
         options.setTo(endpointReference);
         options.setProperty(Constants.Configuration.ENABLE_SWA, Constants.VALUE_TRUE);
@@ -52,11 +60,9 @@ public class ReceiveDocumentsIntegration {
         options.setSoapVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
         options.setProperty(HTTPConstants.HTTP_PROTOCOL_VERSION, HTTPConstants.HEADER_PROTOCOL_11);
         options.setProperty(HTTPConstants.CHUNKED, Boolean.FALSE);
-        ArrayList<Header> customHeaders = new ArrayList<Header>();
-        customHeaders.add(new Header("Connection", "close"));
-        customHeaders.add(new Header("Cache-control", "no-cache"));
-        customHeaders.add(new Header("Pragma", "no-cache"));
         options.setProperty(HTTPConstants.HTTP_HEADERS, customHeaders);
+        
+        xRoadProtocolVersion = XRoadProtocolVersion.V2_0;
     }
 
     private static XHeaderBuilder getDefaultXHeaderBuilder() {
@@ -72,14 +78,14 @@ public class ReceiveDocumentsIntegration {
     public void whenContainer_V1_isSentTo_sendDocuments_v1_receiveDocuments_mustRespondWithTheSameDocument() throws Exception {
         updatePreviouslySentDocumentsStatusToReceived();
 
-        SendDocumentsDvkSoapClient sendDocumentsDvkSoapClient = new SendDocumentsDvkSoapClient(options);
+        SendDocumentsDvkSoapClient sendDocumentsDvkSoapClient = new SendDocumentsDvkSoapClient(options, xRoadProtocolVersion);
 
         MessageContext sendDocumentsMessageContext = sendDocumentsDvkSoapClient.sendMessage(
                 "../testcontainers/v1_0/dvk_konteiner_v1.xml.gz", getDefaultXHeaderBuilder().build());
         SOAPEnvelope sendDocumentsResponse = sendDocumentsMessageContext.getEnvelope();
         Assert.assertTrue(sendDocumentsResponse.toString().contains("keha href=\"cid"));
 
-        ReceiveDocumentsDvkSoapClient receiveDocumentsDvkSoapClient = new ReceiveDocumentsDvkSoapClient(options);
+        ReceiveDocumentsDvkSoapClient receiveDocumentsDvkSoapClient = new ReceiveDocumentsDvkSoapClient(options, xRoadProtocolVersion);
         MessageContext receiveDocumentsMessageContext = receiveDocumentsDvkSoapClient.sendMessage(
                 getDefaultXHeaderBuilder().setNimi("dhl.receiveDocuments.v1").build());
         SOAPEnvelope receiveDocumentsResponse = receiveDocumentsMessageContext.getEnvelope();
@@ -101,7 +107,7 @@ public class ReceiveDocumentsIntegration {
     public void whenContainer_V21_isSentTo_sendDocuments_v4_receiveDocuments_v1_mustRespondWithTheSameDocument_withAutomaticMetadata() throws Exception {
         updatePreviouslySentDocumentsStatusToReceived();
 
-        SendDocumentsDvkSoapClient sendDocumentsDvkSoapClient = new SendDocumentsDvkSoapClient(options);
+        SendDocumentsDvkSoapClient sendDocumentsDvkSoapClient = new SendDocumentsDvkSoapClient(options, xRoadProtocolVersion);
 
         MessageContext sendDocumentsMessageContext = sendDocumentsDvkSoapClient.sendMessage(
                 "../testcontainers/v2_1/Dvk_kapsel_vers_2_1_n2ide3.xml.gz",
@@ -109,7 +115,7 @@ public class ReceiveDocumentsIntegration {
         SOAPEnvelope sendDocumentsResponse = sendDocumentsMessageContext.getEnvelope();
         Assert.assertTrue(sendDocumentsResponse.toString().contains("keha href=\"cid"));
 
-        ReceiveDocumentsDvkSoapClient receiveDocumentsDvkSoapClient = new ReceiveDocumentsDvkSoapClient(options);
+        ReceiveDocumentsDvkSoapClient receiveDocumentsDvkSoapClient = new ReceiveDocumentsDvkSoapClient(options, xRoadProtocolVersion);
         MessageContext receiveDocumentsMessageContext = receiveDocumentsDvkSoapClient.sendMessage(
                 getDefaultXHeaderBuilder().setNimi("dhl.receiveDocuments.v1").build());
         SOAPEnvelope receiveDocumentsResponse = receiveDocumentsMessageContext.getEnvelope();
@@ -132,14 +138,14 @@ public class ReceiveDocumentsIntegration {
     public void when_2_1_isSentWithoutDecMetaDataBlock_mustRespondWithProperMetaDataBlock() throws Exception {
         updatePreviouslySentDocumentsStatusToReceived();
 
-        SendDocumentsDvkSoapClient sendDocumentsDvkSoapClient = new SendDocumentsDvkSoapClient(options);
+        SendDocumentsDvkSoapClient sendDocumentsDvkSoapClient = new SendDocumentsDvkSoapClient(options, xRoadProtocolVersion);
 
         MessageContext sendDocumentsMessageContext = sendDocumentsDvkSoapClient.sendMessage(
                 "../testcontainers/v2_1/uus_kapsel_1.xml.gz", getDefaultXHeaderBuilder().setNimi("dhl.sendDocuments.v4").build());
         SOAPEnvelope sendDocumentsResponse = sendDocumentsMessageContext.getEnvelope();
         Assert.assertTrue(sendDocumentsResponse.toString().contains("keha href=\"cid"));
 
-        ReceiveDocumentsDvkSoapClient receiveDocumentsDvkSoapClient = new ReceiveDocumentsDvkSoapClient(options);
+        ReceiveDocumentsDvkSoapClient receiveDocumentsDvkSoapClient = new ReceiveDocumentsDvkSoapClient(options, xRoadProtocolVersion);
         MessageContext receiveDocumentsMessageContext = receiveDocumentsDvkSoapClient.sendMessage(
                 getDefaultXHeaderBuilder().setNimi("dhl.receiveDocuments.v1").build());
         SOAPEnvelope receiveDocumentsResponse = receiveDocumentsMessageContext.getEnvelope();
@@ -162,7 +168,7 @@ public class ReceiveDocumentsIntegration {
     public void when_2_1_isSentToOrgWith2_1ContainerSupport() throws Exception {
         updatePreviouslySentDocumentsStatusToReceived();
 
-        SendDocumentsDvkSoapClient sendDocumentsDvkSoapClient = new SendDocumentsDvkSoapClient(options);
+        SendDocumentsDvkSoapClient sendDocumentsDvkSoapClient = new SendDocumentsDvkSoapClient(options, xRoadProtocolVersion);
 
         MessageContext sendDocumentsMessageContext = sendDocumentsDvkSoapClient.sendMessage(
                 "../testcontainers/v2_1/2_1_container_for_org_2_1_container_support.xml.gz",
@@ -171,7 +177,7 @@ public class ReceiveDocumentsIntegration {
         SOAPEnvelope sendDocumentsResponse = sendDocumentsMessageContext.getEnvelope();
         Assert.assertTrue(sendDocumentsResponse.toString().contains("keha href=\"cid"));
 
-        ReceiveDocumentsDvkSoapClient receiveDocumentsDvkSoapClient = new ReceiveDocumentsDvkSoapClient(options);
+        ReceiveDocumentsDvkSoapClient receiveDocumentsDvkSoapClient = new ReceiveDocumentsDvkSoapClient(options, xRoadProtocolVersion);
         MessageContext receiveDocumentsMessageContext = receiveDocumentsDvkSoapClient.sendMessage(
                 getDefaultXHeaderBuilder().setNimi("dhl.receiveDocuments.v4").setAsutus("10434343")
                         .setAmetnik("EE36212240216").setIsikukood("EE36212240216").build());

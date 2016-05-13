@@ -1,6 +1,8 @@
 package integration;
 
 import dhl.iostructures.XHeader;
+import dvk.core.xroad.XRoadProtocolVersion;
+
 import org.apache.axiom.attachments.ConfigurableDataHandler;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
@@ -16,8 +18,8 @@ import java.util.Map;
 public class GetSendStatusDvkSoapClient extends AbstractDvkServiceSoapClient {
     private static Logger logger = Logger.getLogger(GetSendStatusDvkSoapClient.class);
 
-    public GetSendStatusDvkSoapClient(Options options) {
-        super(options);
+    public GetSendStatusDvkSoapClient(Options options, XRoadProtocolVersion xRoadProtocol) {
+        super(options, xRoadProtocol);
     }
 
     public MessageContext sendRequest(String attachmentName, XHeader xHeader) throws Exception {

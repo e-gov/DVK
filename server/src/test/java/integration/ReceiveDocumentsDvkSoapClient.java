@@ -5,6 +5,8 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axis2.client.Options;
 
+import dvk.core.xroad.XRoadProtocolVersion;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,8 +16,8 @@ import java.util.Map;
  */
 public class ReceiveDocumentsDvkSoapClient extends AbstractDvkServiceSoapClient {
 
-    public ReceiveDocumentsDvkSoapClient(Options options) {
-       super(options);
+    public ReceiveDocumentsDvkSoapClient(Options options, XRoadProtocolVersion xRoadProtocol) {
+       super(options, xRoadProtocol);
     }
 
     @Override

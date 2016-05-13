@@ -3,6 +3,7 @@ package integration;
 import Utills.IntegrationTestUtills;
 import dhl.iostructures.XHeader;
 import dvk.core.CommonMethods;
+import dvk.core.xroad.XRoadProtocolVersion;
 import junit.framework.Assert;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axis2.Constants;
@@ -25,14 +26,18 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 public class GetSendStatusIntegration {
+	
+	private static final String UTF8_ENCODING = "UTF-8";
+	private static final String encodedAmpersandSymbol = "&amp";
+	
     private static Options options;
     private static XHeaderBuilder xHeaderBuilder;
-    private static final String encodedAmpersandSymbol = "&amp";
-    private static final String UTF8_ENCODING = "UTF-8";
+    private static XRoadProtocolVersion xRoadProtocolVersion;
 
     @BeforeClass
     public static void setUp() throws Exception {
         xHeaderBuilder = new XHeaderBuilder();
+        xRoadProtocolVersion = XRoadProtocolVersion.V2_0;
         xHeaderBuilder.setAsutus("87654321").setAndmekogu("dhl")
         //xHeaderBuilder.setAsutus("70006317").setAndmekogu("dhl")
                 .setAmetnik("EE37001010001").setId("6cae248568b3db7e97ff784673a4d38c5906bee0")
@@ -93,12 +98,12 @@ public class GetSendStatusIntegration {
     }
 
     private MessageContext sendMessageWithAttachment(String attachmentName, XHeader xHeader,  Options options) throws Exception {
-        SendDocumentsDvkSoapClient sendDocumentsDvkSoapClient = new SendDocumentsDvkSoapClient(options);
+        SendDocumentsDvkSoapClient sendDocumentsDvkSoapClient = new SendDocumentsDvkSoapClient(options, xRoadProtocolVersion);
         return sendDocumentsDvkSoapClient.sendMessage(attachmentName, xHeader);
     }
 
     private MessageContext doGetSendStatusRequest(String attachmentName, XHeader xHeader) throws Exception {
-        GetSendStatusDvkSoapClient getSendStatusDvkSoapClient = new GetSendStatusDvkSoapClient(options);
+        GetSendStatusDvkSoapClient getSendStatusDvkSoapClient = new GetSendStatusDvkSoapClient(options, xRoadProtocolVersion);
         return getSendStatusDvkSoapClient.sendRequest(attachmentName, xHeader);
     }
 

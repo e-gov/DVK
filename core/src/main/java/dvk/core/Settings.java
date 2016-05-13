@@ -1,9 +1,7 @@
 package dvk.core;
 
-import dvk.core.CommonMethods;
 import java.io.FileInputStream;
 import java.io.InputStream;
-
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -22,7 +20,7 @@ public class Settings {
     private static final String CLIENT_DEFAULT_ADIT_PROCUCER_NAME = "adit";
     private static final String CLIENT_DEFAULT_ADIT_INFORMATION_SYSTEM_NAME = "DHS";
     
-    private static final String XROAD_DRFAULT_INSTANCE = "EE";
+    private static final String XROAD_DEFAULT_INSTANCE = "EE";
 	private static final String XROAD_DEFAULT_MEMBER_CLASS = "GOV";
 	private static final String XROAD_DEFAULT_SUBSYSTEM_CODE = "dvk";
 
@@ -74,9 +72,9 @@ public class Settings {
     public static String serverJdigidocConfigLocation = "jar://jdigidoc.cfg";
     
     // X-Road protocol settings
-    private static String xroadInstance = XROAD_DRFAULT_INSTANCE;
-	private static String xroadMemberClass = XROAD_DEFAULT_MEMBER_CLASS;
-	private static String xroadSubsystemCode = XROAD_DEFAULT_SUBSYSTEM_CODE;
+    public static String xroadInstance = XROAD_DEFAULT_INSTANCE;
+	public static String xroadMemberClass = XROAD_DEFAULT_MEMBER_CLASS;
+	public static String xroadSubsystemCode = XROAD_DEFAULT_SUBSYSTEM_CODE;
 
     // General settings (both client and server)
     public static boolean LogErrors = false;

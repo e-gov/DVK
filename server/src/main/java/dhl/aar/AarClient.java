@@ -12,6 +12,7 @@ import dhl.aar.iostructures.taitmisedRequestType;
 import dhl.iostructures.XHeader;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
+import dvk.core.xroad.XRoadProtocolVersion;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -46,16 +47,27 @@ import org.apache.logging.log4j.Logger;
  * Ühtse õiguste allsüsteemi klient.
  */
 public class AarClient {
+	
+	private static final Logger logger = LogManager.getLogger(AarClient.class.getName());
+	
+	private static final XRoadProtocolVersion X_ROAD_PROTOCOL_VERSION = XRoadProtocolVersion.V2_0;
+	
     private String orgCode;
     private String personCode;
     private EndpointReference sevrviceEndpoint;
     private ServiceClient serviceClient;
-    static Logger logger = LogManager.getLogger(AarClient.class.getName());
+    
     public AarClient(String serverURL, String requestOrgCode, String requestPersonCode) throws Exception {
         this.orgCode = requestOrgCode;
         this.personCode = requestPersonCode;
 
         sevrviceEndpoint = new EndpointReference(serverURL);
+        
+        ArrayList<Header> customHeaders = new ArrayList<Header>();
+        customHeaders.add(new Header("Connection", "close"));
+        customHeaders.add(new Header("Cache-control", "no-cache"));
+        customHeaders.add(new Header("Pragma", "no-cache"));
+        
         Options options = new Options();
         options.setTo(sevrviceEndpoint);
         options.setProperty(Constants.Configuration.ENABLE_SWA, Constants.VALUE_TRUE);
@@ -63,12 +75,9 @@ public class AarClient {
         options.setTimeOutInMilliSeconds(30000);
         options.setProperty(HTTPConstants.HTTP_PROTOCOL_VERSION, HTTPConstants.HEADER_PROTOCOL_11);
         options.setProperty(HTTPConstants.CHUNKED, Boolean.FALSE);
-        ArrayList<Header> customHeaders = new ArrayList<Header>();
-        customHeaders.add(new Header("Connection", "close"));
-        customHeaders.add(new Header("Cache-control", "no-cache"));
-        customHeaders.add(new Header("Pragma", "no-cache"));
         options.setProperty(HTTPConstants.HTTP_HEADERS, customHeaders);
         options.setAction("http://producers.aar.xtee.riik.ee/producer/aar");
+        
         serviceClient = new ServiceClient();
         serviceClient.setOptions(options);
     }
@@ -115,7 +124,7 @@ public class AarClient {
         elKeha.addChild(elAsutused);
         elRequest.addChild(elKeha);
         env.getBody().addChild(elRequest);
-        env = header.appendToSOAPHeader(env, fac);
+        env = header.appendToSOAPHeader(env, fac, X_ROAD_PROTOCOL_VERSION);
         requestMsg.setEnvelope(env);
 
         // Käivitame päringu
@@ -188,7 +197,7 @@ public class AarClient {
         elKeha.addChild(elMain);
         elRequest.addChild(elKeha);
         env.getBody().addChild(elRequest);
-        env = header.appendToSOAPHeader(env, fac);
+        env = header.appendToSOAPHeader(env, fac, X_ROAD_PROTOCOL_VERSION);
         requestMsg.setEnvelope(env);
 
         // Käivitame päringu
@@ -260,7 +269,7 @@ public class AarClient {
         elKeha.addChild(elMain);
         elRequest.addChild(elKeha);
         env.getBody().addChild(elRequest);
-        env = header.appendToSOAPHeader(env, fac);
+        env = header.appendToSOAPHeader(env, fac, X_ROAD_PROTOCOL_VERSION);
         requestMsg.setEnvelope(env);
 
         // Käivitame päringu
@@ -332,7 +341,7 @@ public class AarClient {
         elKeha.addChild(elMain);
         elRequest.addChild(elKeha);
         env.getBody().addChild(elRequest);
-        env = header.appendToSOAPHeader(env, fac);
+        env = header.appendToSOAPHeader(env, fac, X_ROAD_PROTOCOL_VERSION);
         requestMsg.setEnvelope(env);
 
         // Käivitame päringu
@@ -406,7 +415,7 @@ public class AarClient {
         elKeha.addChild(elMain);
         elRequest.addChild(elKeha);
         env.getBody().addChild(elRequest);
-        env = header.appendToSOAPHeader(env, fac);
+        env = header.appendToSOAPHeader(env, fac, X_ROAD_PROTOCOL_VERSION);
         requestMsg.setEnvelope(env);
 
         // Käivitame päringu

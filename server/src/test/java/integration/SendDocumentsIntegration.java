@@ -1,6 +1,7 @@
 package integration;
 
 import dhl.iostructures.XHeader;
+import dvk.core.xroad.XRoadProtocolVersion;
 import junit.framework.Assert;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -28,8 +29,10 @@ import java.util.List;
  */
 @RunWith(JUnitParamsRunner.class)
 public class SendDocumentsIntegration {
+	
     private static Options options;
     private static XHeaderBuilder xHeaderBuilder;
+    private static XRoadProtocolVersion xRoadProtocolVersion;
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -40,8 +43,15 @@ public class SendDocumentsIntegration {
                 .setNimi("dhl.sendDocuments.v1").setToimik("").setIsikukood("");
 
         //String serviceUrl = "http://0.0.0.0:9099/services/dhlHttpSoapPort";
-        String serviceUrl = "http://0.0.0.0:8070/dvk/services/dhlHttpSoapPort";        
+        String serviceUrl = "http://0.0.0.0:8070/dvk/services/dhlHttpSoapPort";
+        
         EndpointReference endpointReference = new EndpointReference(serviceUrl);
+        
+        ArrayList<Header> customHeaders = new ArrayList<Header>();
+        customHeaders.add(new Header("Connection", "close"));
+        customHeaders.add(new Header("Cache-control", "no-cache"));
+        customHeaders.add(new Header("Pragma", "no-cache"));
+        
         options = new Options();
         options.setTo(endpointReference);
         options.setProperty(Constants.Configuration.ENABLE_SWA, Constants.VALUE_TRUE);
@@ -49,11 +59,9 @@ public class SendDocumentsIntegration {
         options.setSoapVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
         options.setProperty(HTTPConstants.HTTP_PROTOCOL_VERSION, HTTPConstants.HEADER_PROTOCOL_11);
         options.setProperty(HTTPConstants.CHUNKED, Boolean.FALSE);
-        ArrayList<Header> customHeaders = new ArrayList<Header>();
-        customHeaders.add(new Header("Connection", "close"));
-        customHeaders.add(new Header("Cache-control", "no-cache"));
-        customHeaders.add(new Header("Pragma", "no-cache"));
         options.setProperty(HTTPConstants.HTTP_HEADERS, customHeaders);
+        
+        xRoadProtocolVersion = XRoadProtocolVersion.V2_0;
     }
 
     @Test
@@ -109,7 +117,7 @@ public class SendDocumentsIntegration {
     }
 
     private void sendMessageWithAttachment(String attachmentName, XHeader xHeader) throws Exception {
-        SendDocumentsDvkSoapClient sendDocumentsDvkSoapClient = new SendDocumentsDvkSoapClient(options);
+        SendDocumentsDvkSoapClient sendDocumentsDvkSoapClient = new SendDocumentsDvkSoapClient(options, xRoadProtocolVersion);
         MessageContext sendDocumentsMessageContext = sendDocumentsDvkSoapClient.sendMessage(attachmentName, xHeader);
         Assert.assertTrue(sendDocumentsMessageContext.getEnvelope().toString().contains("keha href=\"cid"));
     }

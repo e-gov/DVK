@@ -1,6 +1,9 @@
 package dvk.core;
 
 public class CommonStructures {
+	
+	public static final String RIA_REGISTRATION_NUMBER = "70006317";
+	
     public static final int SendingMethod_XTee = 1;
     public static final int SendingMethod_EMail = 2;
     public static final String SendingMethod_XTee_Name = "xtee";

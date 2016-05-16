@@ -1,25 +1,83 @@
 package dvk.core.xroad;
 
-public enum XRoadProtocolHeader {
+public class XRoadProtocolHeader {
 
-	CLIENT("client"),
-	SERVICE("service"),
-	CENTRAL_SERVICE("centralService"),
-	ID("id"),
-	USER_ID("userId"),
-	ISSUE("issue"),
-	PROTOCOL_VERSION("protocolVersion"),
-	REQUEST_HASH("requestHash"),
-	REQUEST_HASH_ALGORITHM_ID("requestHash/@algorithmId");
+	private XRoadClient xRoadClient;
 	
-	private final String field;
+	private XRoadService xRoadService;
 	
-	private XRoadProtocolHeader(String field) {
-		this.field = field;
+	private String id;
+	
+	private String userId;
+	
+	private String issue;
+	
+	private XRoadProtocolVersion protocolVersion;
+	
+	public XRoadProtocolHeader(XRoadClient xRoadClient, String id) {
+		this(xRoadClient, id, XRoadProtocolVersion.V4_0);
 	}
 	
-	public String getField() {
-		return field;
+	public XRoadProtocolHeader(XRoadClient xRoadClient, String id, XRoadProtocolVersion protocolVersion) {
+		this.xRoadClient = xRoadClient;
+		this.id = id;
+		this.protocolVersion = protocolVersion;
+	}
+	
+	public XRoadProtocolHeader(XRoadClient xRoadClient, XRoadService xRoadService, String id, String userId, String issue) {
+    	this(xRoadClient, id);
+    	
+    	this.xRoadService = xRoadService;
+    	this.userId = userId;
+    	this.issue = issue;
+    }
+
+	public XRoadClient getxRoadClient() {
+		return xRoadClient;
+	}
+
+	public void setxRoadClient(XRoadClient xRoadClient) {
+		this.xRoadClient = xRoadClient;
+	}
+
+	public XRoadService getxRoadService() {
+		return xRoadService;
+	}
+
+	public void setxRoadService(XRoadService xRoadService) {
+		this.xRoadService = xRoadService;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public String getIssue() {
+		return issue;
+	}
+
+	public void setIssue(String issue) {
+		this.issue = issue;
+	}
+
+	public XRoadProtocolVersion getProtocolVersion() {
+		return protocolVersion;
+	}
+
+	public void setProtocolVersion(XRoadProtocolVersion protocolVersion) {
+		this.protocolVersion = protocolVersion;
 	}
 	
 }

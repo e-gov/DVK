@@ -17,10 +17,10 @@ import org.apache.axis.Message;
 
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
-import dvk.core.Settings;
 import dvk.core.xroad.XRoadIdentifierType;
 import dvk.core.xroad.XRoadObjectType;
 import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadProtocolHeaderField;
 import dvk.core.xroad.XRoadProtocolVersion;
 
 /**
@@ -41,12 +41,10 @@ public final class XHeader {
     
     // Fields specific to X-Road protocol version 2.0
     public String nimi;
-    public String ametnik;		// deprecated; use isikukood instead
+    public String ametnik;		// deprecated; use "isikukood" instead
     
-    // Fields specific to X-Road protocol version 4.0
-    public String serviceCode;
-    public String serviceVersion;
-    public String centralService;
+    // SOAP header container for X-Road protocol version 4.0
+    public XRoadProtocolHeader xRoadHeader;
 
     /**
      * A constructor for X-Road protocol version 2.0
@@ -72,27 +70,20 @@ public final class XHeader {
     /**
      * A constructor for X-Road protocol version 4.0
      * 
-     * @param client identifies a service client – an entity that initiates the service call (e.g. organization code)
-     * @param subsystemCode identifies the service that is invoked by the request
-     * @param serviceCode code that uniquely identifies a service offered by given X-Road member or subsystem
-     * @param serviceVersion version of the service
-     * @param centralService identifies the central service that is invoked by the request (optional)
-     * @param userId user whose action initiated the request.
-     * 		  The user ID should be prefixed with two letter ISO country code (e.g. EE12345678901)
-     * @param id unique identifier for this message. The recommended form of message ID is UUID
-     * @param issue identifies received application, issue or document that was the cause of the service request (optional)
+     * @param xRoadHeader
      */
-    public XHeader(String client, String subsystemCode, String serviceCode, String serviceVersion, String centralService, String userId, String id, String issue) {
-        this.asutus = client;
-        this.andmekogu = subsystemCode;
-        this.serviceCode = serviceCode;
-        this.serviceVersion = serviceVersion;
-        this.centralService = centralService;
-        this.isikukood = userId;
-        this.id = id;
-        this.toimik = issue;
+    public XHeader(XRoadProtocolHeader xRoadHeader) {
+    	this.xRoadHeader = xRoadHeader;
+    	
+    	// For backward compatibility
+    	this.asutus = xRoadHeader.getxRoadClient().getMemberCode();
+        this.andmekogu = xRoadHeader.getxRoadService().getSubsystemCode();
+        this.ametnik = xRoadHeader.getUserId();
+        this.id = xRoadHeader.getId();
+        this.toimik = xRoadHeader.getIssue();
+        this.isikukood = xRoadHeader.getUserId();
     }
-
+    
     // Lisab käesoleva objekti andmed SOAP päisesse
     public SOAPEnvelope appendToSOAPHeader(SOAPEnvelope envelope, SOAPFactory factory, XRoadProtocolVersion xRoadProtocol) {
         try {
@@ -280,19 +271,20 @@ public final class XHeader {
     	OMNamespace nsXRoad = factory.createOMNamespace(CommonStructures.NS_XTEE_URI, CommonStructures.NS_XROAD_PREFIX);
     	OMNamespace nsId = factory.createOMNamespace(CommonStructures.NS_XROAD_IDENTIFIERS_URI, CommonStructures.NS_XROAD_IDENTIFIERS_PREFIX);
     	
+        envelope.declareNamespace(nsXRoad);
         envelope.declareNamespace(nsId);
         
         
         // Populating client block
-        SOAPHeaderBlock client = factory.createSOAPHeaderBlock(XRoadProtocolHeader.CLIENT.getField(), nsXRoad);
+        SOAPHeaderBlock client = factory.createSOAPHeaderBlock(XRoadProtocolHeaderField.CLIENT.getValue(), nsXRoad);
         client.addAttribute("objectType", XRoadObjectType.SUBSYSTEM.getName(), nsId);
         
         OMElement clientXRoadInstance = factory.createOMElement(XRoadIdentifierType.XROAD_INSTANCE.getName(), nsId);
-        clientXRoadInstance.setText(Settings.xroadInstance);
+        clientXRoadInstance.setText(this.xRoadHeader.getxRoadClient().getxRoadInstance());
         OMElement clientMemberClass = factory.createOMElement(XRoadIdentifierType.MEMBER_CLASS.getName(), nsId);
-        clientMemberClass.setText(Settings.xroadMemberClass);
+        clientMemberClass.setText(this.xRoadHeader.getxRoadClient().getMemberClass());
         OMElement clientMemberCode = factory.createOMElement(XRoadIdentifierType.MEMBER_CODE.getName(), nsId);
-        clientMemberCode.setText(asutus);
+        clientMemberCode.setText(this.xRoadHeader.getxRoadClient().getMemberCode());
         
         client.addChild(clientXRoadInstance);
         client.addChild(clientMemberClass);
@@ -300,22 +292,22 @@ public final class XHeader {
         
         
         // Populating service block
-        SOAPHeaderBlock service = factory.createSOAPHeaderBlock(XRoadProtocolHeader.SERVICE.getField(), nsXRoad);
+        SOAPHeaderBlock service = factory.createSOAPHeaderBlock(XRoadProtocolHeaderField.SERVICE.getValue(), nsXRoad);
         service.addAttribute("objectType", XRoadObjectType.SUBSYSTEM.getName(), nsId);
         
         OMElement serviceXRoadInstance = factory.createOMElement(XRoadIdentifierType.XROAD_INSTANCE.getName(), nsId);
-        serviceXRoadInstance.setText(Settings.xroadInstance);
+        serviceXRoadInstance.setText(this.xRoadHeader.getxRoadService().getxRoadInstance());
         OMElement serviceMemberClass = factory.createOMElement(XRoadIdentifierType.MEMBER_CLASS.getName(), nsId);
-        serviceMemberClass.setText(Settings.xroadMemberClass);
+        serviceMemberClass.setText(this.xRoadHeader.getxRoadService().getMemberClass());
         OMElement serviceMemberCode = factory.createOMElement(XRoadIdentifierType.MEMBER_CODE.getName(), nsId);
-        serviceMemberCode.setText("???");
+        serviceMemberCode.setText(this.xRoadHeader.getxRoadService().getMemberCode());
         
         OMElement subsystemCode = factory.createOMElement(XRoadIdentifierType.SUBSYSTEM_CODE.getName(), nsId);
-        subsystemCode.setText(andmekogu);
+        subsystemCode.setText(this.xRoadHeader.getxRoadService().getSubsystemCode());
         OMElement serviceCode = factory.createOMElement(XRoadIdentifierType.SERVICE_CODE.getName(), nsId);
-        serviceCode.setText(this.serviceCode);
+        serviceCode.setText(this.xRoadHeader.getxRoadService().getServiceCode());
         OMElement serviceVersion = factory.createOMElement(XRoadIdentifierType.SERVICE_VERSION.getName(), nsId);
-        serviceVersion.setText(this.serviceVersion);
+        serviceVersion.setText(this.xRoadHeader.getxRoadService().getServiceVersion());
         
         service.addChild(serviceXRoadInstance);
         service.addChild(serviceMemberClass);
@@ -325,16 +317,17 @@ public final class XHeader {
         service.addChild(serviceVersion);
         
         // Populating the remaining headers
-        SOAPHeaderBlock userId = factory.createSOAPHeaderBlock(XRoadProtocolHeader.USER_ID.getField(), nsXRoad);
-        userId.setText(isikukood);
-        SOAPHeaderBlock uniqueId = factory.createSOAPHeaderBlock(XRoadProtocolHeader.ID.getField(), nsXRoad);
-        uniqueId.setText(id);
-        SOAPHeaderBlock protocolVersion = factory.createSOAPHeaderBlock(XRoadProtocolHeader.PROTOCOL_VERSION.getField(), nsXRoad);
-        protocolVersion.setText(XRoadProtocolVersion.V4_0.getValue());
-        SOAPHeaderBlock issue = factory.createSOAPHeaderBlock(XRoadProtocolHeader.ISSUE.getField(), nsXRoad);
-        issue.setText(toimik);
+        SOAPHeaderBlock userId = factory.createSOAPHeaderBlock(XRoadProtocolHeaderField.USER_ID.getValue(), nsXRoad);
+        userId.setText(this.xRoadHeader.getUserId());
+        SOAPHeaderBlock uniqueId = factory.createSOAPHeaderBlock(XRoadProtocolHeaderField.ID.getValue(), nsXRoad);
+        uniqueId.setText(this.xRoadHeader.getId());
+        SOAPHeaderBlock protocolVersion = factory.createSOAPHeaderBlock(XRoadProtocolHeaderField.PROTOCOL_VERSION.getValue(), nsXRoad);
+        protocolVersion.setText(this.xRoadHeader.getProtocolVersion().getValue());
+        SOAPHeaderBlock issue = factory.createSOAPHeaderBlock(XRoadProtocolHeaderField.ISSUE.getValue(), nsXRoad);
+        issue.setText(this.xRoadHeader.getIssue());
         
         envelope.getHeader().addChild(client);
+        envelope.getHeader().addChild(service);
         envelope.getHeader().addChild(userId);
         envelope.getHeader().addChild(uniqueId);
         envelope.getHeader().addChild(protocolVersion);

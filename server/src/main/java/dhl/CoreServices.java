@@ -242,7 +242,7 @@ public class CoreServices implements Dhl {
                             Settings.Server_CentralRightsDatabaseOrgCode,
                             Settings.Server_CentralRightsDatabasePersonCode);
                     ArrayList<String> orgs = new ArrayList<String>();
-                    orgs.add("70006317");
+                    orgs.add(CommonStructures.RIA_REGISTRATION_NUMBER);
                     aarClient.asutusedRequest(orgs, null);
                 } catch (Exception ex) {
                     logger.error(ex.getMessage(), ex);

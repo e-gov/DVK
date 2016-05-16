@@ -1,30 +1,17 @@
 package dhl.aar;
 
-import dhl.aar.iostructures.AarAmetikohaTaitmine;
-import dhl.aar.iostructures.AarAmetikoht;
-import dhl.aar.iostructures.AarAsutus;
-import dhl.aar.iostructures.AarIsik;
-import dhl.aar.iostructures.AarOigus;
-import dhl.aar.iostructures.asutusedRequestType;
-import dhl.aar.iostructures.ametikohadRequestType;
-import dhl.aar.iostructures.isikudRequestType;
-import dhl.aar.iostructures.taitmisedRequestType;
-import dhl.iostructures.XHeader;
-import dvk.core.CommonMethods;
-import dvk.core.CommonStructures;
-import dvk.core.xroad.XRoadProtocolVersion;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
+
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 
 import org.apache.axiom.attachments.ConfigurableDataHandler;
 import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -42,6 +29,24 @@ import org.apache.commons.httpclient.Header;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import dhl.aar.iostructures.AarAmetikohaTaitmine;
+import dhl.aar.iostructures.AarAmetikoht;
+import dhl.aar.iostructures.AarAsutus;
+import dhl.aar.iostructures.AarIsik;
+import dhl.aar.iostructures.AarOigus;
+import dhl.aar.iostructures.ametikohadRequestType;
+import dhl.aar.iostructures.asutusedRequestType;
+import dhl.aar.iostructures.isikudRequestType;
+import dhl.aar.iostructures.taitmisedRequestType;
+import dhl.iostructures.XHeader;
+import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
+import dvk.core.Settings;
+import dvk.core.xroad.XRoadClient;
+import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadProtocolVersion;
+import dvk.core.xroad.XRoadService;
 
 /**
  * Ühtse õiguste allsüsteemi klient.
@@ -93,12 +98,26 @@ public class AarClient {
         String queryId = "aar" + orgCode + String.valueOf((new Date()).getTime());
         logger.log(Level.getLevel("SERVICEINFO"), "Väljaminev päring teenusele Asutused(xtee teenus:"+requestName+"). Asutusest:" + orgCode 
         		+" isikukood:" + this.personCode);
+        
         // Saadetava sõnumi päisesse kantavad parameetrid
-        XHeader header = new XHeader(
-                orgCode, "aar", personCode, queryId, requestName, "",
-                CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode);
+        XHeader xHeader = null;
+        if (X_ROAD_PROTOCOL_VERSION.equals(XRoadProtocolVersion.V4_0)) {
+        	XRoadClient xRoadClient = new XRoadClient(Settings.xroadInstance, Settings.xroadMemberClass, CommonStructures.RIA_REGISTRATION_NUMBER);
+        	XRoadService xRoadService = new XRoadService(Settings.xroadInstance, Settings.xroadMemberClass, "", "aar", "asutused", "v1");
+        	
+        	XRoadProtocolHeader xRoadProtocolHeader = new XRoadProtocolHeader(xRoadClient, xRoadService, queryId,
+        			CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode, "");
+        	
+        	xHeader = new XHeader(xRoadProtocolHeader);
+        } else {
+        	// Using X-Road protocol version 2.0 by default
+        	xHeader = new XHeader(
+        			orgCode, "aar", personCode, queryId, requestName, "",
+        			CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode);
+        }
+        
 
-        // Koodtame päringu faili
+        // Koostame päringu faili
         String requestFile = asutusedRequestType.createRequestFile(orgCodes, orgIDs, false);
 
         // SOAP sõnumi saatmine
@@ -124,7 +143,7 @@ public class AarClient {
         elKeha.addChild(elAsutused);
         elRequest.addChild(elKeha);
         env.getBody().addChild(elRequest);
-        env = header.appendToSOAPHeader(env, fac, X_ROAD_PROTOCOL_VERSION);
+        env = xHeader.appendToSOAPHeader(env, fac, X_ROAD_PROTOCOL_VERSION);
         requestMsg.setEnvelope(env);
 
         // Käivitame päringu

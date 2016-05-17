@@ -1,6 +1,6 @@
 package integration;
 
-import dhl.iostructures.XHeader;
+import dvk.core.xroad.XRoadProtocolHeader;
 import dvk.core.xroad.XRoadProtocolVersion;
 
 import org.apache.axiom.om.OMAbstractFactory;
@@ -29,7 +29,7 @@ public abstract class AbstractDvkServiceSoapClient {
 	
     private Options options;
     protected String attachmentName;
-    protected dhl.iostructures.XHeader xHeader;
+    protected dvk.core.xroad.XRoadProtocolHeader xHeader;
     protected SOAPFactory fac = OMAbstractFactory.getSOAP11Factory();
     protected SOAPEnvelope env = fac.getDefaultEnvelope();
     protected Map<String, OMNamespace> namespaces;
@@ -41,7 +41,7 @@ public abstract class AbstractDvkServiceSoapClient {
          this.xRoadProtocolVersion = xRoadProtocol;
     }
 
-    protected MessageContext sendMessage(XHeader xHeader) throws Exception {
+    protected MessageContext sendMessage(XRoadProtocolHeader xHeader) throws Exception {
         this.xHeader = xHeader;
 
         ServiceClient sender = new ServiceClient(null,null);
@@ -93,7 +93,7 @@ public abstract class AbstractDvkServiceSoapClient {
         env.getBody().addChild(createMessageBody());
 
         //message header
-        env = xHeader.appendToSOAPHeader(env, fac, xRoadProtocolVersion);
+        env = xHeader.appendToSOAPHeader(env, fac);
         messageContext.setEnvelope(env);
 
         addAttachmentTo(messageContext);

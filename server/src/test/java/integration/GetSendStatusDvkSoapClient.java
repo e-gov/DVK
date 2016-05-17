@@ -1,6 +1,6 @@
 package integration;
 
-import dhl.iostructures.XHeader;
+import dvk.core.xroad.XRoadProtocolHeader;
 import dvk.core.xroad.XRoadProtocolVersion;
 
 import org.apache.axiom.attachments.ConfigurableDataHandler;
@@ -22,7 +22,7 @@ public class GetSendStatusDvkSoapClient extends AbstractDvkServiceSoapClient {
         super(options, xRoadProtocol);
     }
 
-    public MessageContext sendRequest(String attachmentName, XHeader xHeader) throws Exception {
+    public MessageContext sendRequest(String attachmentName, XRoadProtocolHeader xHeader) throws Exception {
         super.attachmentName = attachmentName;
         super.xHeader = xHeader;
         return sendMessage(xHeader);

@@ -1,6 +1,23 @@
 package dvk.core;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.security.MessageDigest;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -9,25 +26,27 @@ import java.sql.Types;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.zip.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
+
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import org.w3c.dom.Document;
-import org.apache.axis.attachments.AttachmentPart;
-import org.apache.axis.encoding.Base64;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.soap.SOAPBody;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.transform.OutputKeys;
@@ -36,15 +55,25 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
 import org.apache.axis.AxisFault;
+import org.apache.axis.attachments.AttachmentPart;
+import org.apache.axis.encoding.Base64;
 import org.apache.log4j.Logger;
 import org.codehaus.stax2.XMLInputFactory2;
 import org.codehaus.stax2.XMLStreamReader2;
 import org.codehaus.stax2.validation.XMLValidationException;
 import org.codehaus.stax2.validation.XMLValidationSchema;
 import org.codehaus.stax2.validation.XMLValidationSchemaFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.xml.sax.InputSource;
+
+import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadProtocolVersion;
 
 
 public class CommonMethods {
@@ -673,13 +702,19 @@ public class CommonMethods {
         }
     }
 
-    public static String getXRoadRequestVersion(String xroadRequestName) {
-        String[] splitName = xroadRequestName.split("[.]");
-        if ((splitName != null) && (splitName.length > 0)) {
-            return splitName[splitName.length - 1];
-        } else {
-            return "";
-        }
+    public static String getXRoadRequestVersion(XRoadProtocolHeader xRoadProtocolHeader) {
+    	String requestVersion = "";
+    	
+    	if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
+    		requestVersion = xRoadProtocolHeader.getXRoadService().getServiceVersion();
+    	} else if (xRoadProtocolHeader.getService() != null) {
+    		String[] splitName = xRoadProtocolHeader.getService().split("[.]");
+	        if ((splitName != null) && (splitName.length > 0)) {
+	        	requestVersion = splitName[splitName.length - 1];
+	        }
+    	}
+        
+        return requestVersion;
     }
 
     public static CallableStatement setNullableIntParam(CallableStatement cs, int index, int value) throws SQLException {
@@ -1521,10 +1556,13 @@ public class CommonMethods {
 
     private static AttachmentExtractionResult getExtractedFileFromAttachmentWithHeaderSpecified(org.apache.axis.Message response, Boolean appendDocumentHeader) throws AxisFault {
         AttachmentExtractionResult result = new AttachmentExtractionResult();
-        Iterator attachments = response.getAttachments();
+        
+        @SuppressWarnings("rawtypes")
+		Iterator attachments = response.getAttachments();
         if (attachments.hasNext()) {
             result = getExtractedFileFromAttachmentPart((AttachmentPart)attachments.next(), appendDocumentHeader);
         }
+        
         return result;
     }
 

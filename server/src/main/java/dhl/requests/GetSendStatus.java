@@ -8,7 +8,6 @@ import dhl.DocumentStatusHistory;
 import dhl.Recipient;
 import dhl.RemoteServer;
 import dhl.Sending;
-import dhl.iostructures.XHeader;
 import dhl.iostructures.getSendStatusRequestType;
 import dhl.iostructures.getSendStatusResponse;
 import dhl.iostructures.getSendStatusV2RequestType;
@@ -24,6 +23,7 @@ import dvk.core.AttachmentExtractionResult;
 import dvk.core.Fault;
 import dvk.core.HeaderVariables;
 import dvk.core.Settings;
+import dvk.core.xroad.XRoadProtocolHeader;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -164,7 +164,7 @@ public class GetSendStatus {
                                         if (tmpEdastus != null) {
                                             // Save status information to local server
                                             r.copyStatusInformationFromAnotherInstance(tmpEdastus.getSaaja());
-                                            XHeader xTeePais = new XHeader(
+                                            XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
                                                     user.getOrganizationCode(), null, null,
                                                     null, null, null, user.getPersonCode());
                                             r.update(conn, xTeePais);
@@ -378,7 +378,7 @@ public class GetSendStatus {
 
                                         // Save status information to local server
                                         r.copyStatusInformationFromAnotherInstance(tmpEdastus.getSaaja());
-                                        XHeader xTeePais = new XHeader(
+                                        XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
                                                 user.getOrganizationCode(), null, null, null,
                                                 null, null, user.getPersonCode());
                                         r.update(conn, xTeePais);

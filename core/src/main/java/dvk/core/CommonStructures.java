@@ -57,14 +57,8 @@ public class CommonStructures {
     public static final String ROLL_ALLYKSUSE_ADMIN = "DHL: allyksuse administraator";
 
     // Nimeruumid
-    public static final String NS_XTEE_PREFIX = "xtee";								// X-Road protocol version 2.0
+    public static final String NS_XTEE_PREFIX = "xtee";
     public static final String NS_XTEE_URI = "http://x-tee.riik.ee/xsd/xtee.xsd";
-    
-    public static final String NS_XROAD_PREFIX = "xrd";								// X-Road protocol version 4.0
-    public static final String NS_XROAD_URI = "http://x-road.eu/xsd/xroad.xsd";
-    public static final String NS_XROAD_IDENTIFIERS_PREFIX = "id";
-    public static final String NS_XROAD_IDENTIFIERS_URI = "http://x-road.eu/xsd/identifiers";
-    
     public static final String NS_SOAPENC_PREFIX = "SOAP-ENC";
     public static final String NS_SOAPENC_URI = "http://schemas.xmlsoap.org/soap/encoding/";
     public static final String NS_XSI_PREFIX = "xsi";

@@ -3,9 +3,9 @@ package dhl.requests;
 import dhl.DocumentFragment;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
+import dvk.core.xroad.XRoadProtocolHeader;
 import dhl.Recipient;
 import dhl.Sending;
-import dhl.iostructures.XHeader;
 import dhl.iostructures.markDocumentsReceivedRequestType;
 import dhl.iostructures.markDocumentsReceivedV2Item;
 import dhl.iostructures.markDocumentsReceivedV3RequestType;
@@ -108,7 +108,7 @@ public class MarkDocumentsReceived {
                                 tmpRecipient.setSendStatusID(CommonStructures.SendStatus_Sent);
                                 tmpRecipient.setSendingEndDate(new Date());
                                 tmpRecipient.setStatusDate(new Date());
-                                XHeader xTeePais = new XHeader(
+                                XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
                                         user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
                                 tmpRecipient.update(conn, xTeePais);
                             }
@@ -126,7 +126,7 @@ public class MarkDocumentsReceived {
                     if (allSent && (tmpSending.getSendStatusID() != CommonStructures.SendStatus_Sent)) {
                         tmpSending.setSendStatusID(CommonStructures.SendStatus_Sent);
                         tmpSending.setEndDate(new Date());
-                        XHeader xTeePais = new XHeader(
+                        XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
                                 user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
                         tmpSending.update(false, conn, xTeePais);
                     }
@@ -257,7 +257,7 @@ public class MarkDocumentsReceived {
                                     tmpRecipient.setStatusDate(item.staatuseMuutmiseAeg);
                                 }
 
-                                XHeader xTeePais = new XHeader(
+                                XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
                                         user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
                                 tmpRecipient.update(conn, xTeePais);
                             }
@@ -276,7 +276,7 @@ public class MarkDocumentsReceived {
                     if (allSent && (tmpSending.getSendStatusID() != CommonStructures.SendStatus_Sent)) {
                         tmpSending.setSendStatusID(CommonStructures.SendStatus_Sent);
                         tmpSending.setEndDate(new Date());
-                        XHeader xTeePais = new XHeader(
+                        XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
                                 user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
                         tmpSending.update(false, conn, xTeePais);
                     }
@@ -380,7 +380,7 @@ public class MarkDocumentsReceived {
                                 tmpRecipient.setStatusDate(item.staatuseMuutmiseAeg);
                             }
 
-                            XHeader xTeePais = new XHeader(
+                            XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
                                     user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
                             tmpRecipient.update(conn, xTeePais);
                         }
@@ -399,7 +399,7 @@ public class MarkDocumentsReceived {
                 if (allSent && (tmpSending.getSendStatusID() != CommonStructures.SendStatus_Sent)) {
                     tmpSending.setSendStatusID(CommonStructures.SendStatus_Sent);
                     tmpSending.setEndDate(new Date());
-                    XHeader xTeePais = new XHeader(
+                    XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
                             user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
                     tmpSending.update(false, conn, xTeePais);
                 }

@@ -14,10 +14,10 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 
-import dhl.iostructures.XHeader;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import dvk.core.Fault;
+import dvk.core.xroad.XRoadProtocolHeader;
 
 public class DocumentStatusHistory {
     static Logger logger = Logger.getLogger(DocumentStatusHistory.class.getName());
@@ -162,7 +162,7 @@ public class DocumentStatusHistory {
         this.m_occupationShortName = value;
     }
 
-    public int addToDB(Connection conn, XHeader xTeePais) throws SQLException, IllegalArgumentException {
+    public int addToDB(Connection conn, XRoadProtocolHeader xTeePais) throws SQLException, IllegalArgumentException {
         if (conn != null) {
             Calendar cal = Calendar.getInstance();
             StringReader r = new StringReader(m_metaXML);
@@ -190,8 +190,8 @@ public class DocumentStatusHistory {
             cs.setCharacterStream(11, r, m_metaXML.length());
             
             if (xTeePais != null) {
-                cs.setString(12, xTeePais.isikukood);
-                cs.setString(13, xTeePais.asutus);
+                cs.setString(12, xTeePais.getUserId());
+                cs.setString(13, xTeePais.getConsumer());
             } else {
                 cs.setString(12, null);
                 cs.setString(13, null);

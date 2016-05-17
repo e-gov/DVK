@@ -1,7 +1,7 @@
 package dhl.requests;
 
 import dvk.core.CommonStructures;
-import dhl.iostructures.XHeader;
+import dvk.core.xroad.XRoadProtocolHeader;
 import dhl.iostructures.changeOrganizationDataRequestType;
 import dhl.users.Asutus;
 import dhl.users.UserProfile;
@@ -162,7 +162,7 @@ public class ChangeOrganizationData {
         }
 
         // Salvestame muudatused. Kasutame X-tee päist lihtsalt mugavaks andmete edastamiseks.
-        XHeader xTeePais = new XHeader(user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
+        XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
 
         asutus.saveToDB(conn, xTeePais);
 

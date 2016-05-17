@@ -1,12 +1,12 @@
 package dhl.users;
 
-import dvk.core.CommonStructures;
-import dhl.iostructures.XHeader;
-
 import java.sql.Connection;
 import java.util.ArrayList;
 
 import org.apache.axis.AxisFault;
+
+import dvk.core.CommonStructures;
+import dvk.core.xroad.XRoadProtocolHeader;
 
 public class UserProfile {
     private int m_organizationID;
@@ -87,24 +87,24 @@ public class UserProfile {
         m_divisions = new ArrayList<Integer>();
     }
 
-    public static UserProfile getFromHeaders(XHeader header, Connection conn) throws AxisFault {
+    public static UserProfile getFromHeaders(XRoadProtocolHeader header, Connection conn) throws AxisFault {
         UserProfile result = new UserProfile();
 
         // Kontrollime, et vajalik X-Tee päis anti kaasa ja et see sisaldaks
         // infot vähemalt sõnumi saatnud asutuse kohta.
         if (header == null) {
             throw new AxisFault(CommonStructures.VIGA_XTEE_PAISED_PUUDU);
-        } else if ((header.asutus == null) || (header.asutus.length() == 0)) {
+        } else if ((header.getConsumer() == null) || (header.getConsumer().length() == 0)) {
             throw new AxisFault(CommonStructures.VIGA_XTEE_ASUTUSE_PAIS_PUUDU);
         }
 
         // Laeme asutuste registrist esitatud asutuse koodile vastava
         // asutuse andmed.
-        result.setOrganizationCode(header.asutus);
-        result.setOrganizationID(Asutus.getIDByRegNr(header.asutus, false, conn));
+        result.setOrganizationCode(header.getConsumer());
+        result.setOrganizationID(Asutus.getIDByRegNr(header.getConsumer(), false, conn));
         if (result.getOrganizationID() <= 0) {
             throw new AxisFault(CommonStructures.VIGA_TUNDMATU_ASUTUS
-                    .replaceFirst("#1", header.asutus));
+                    .replaceFirst("#1", header.getConsumer()));
         }
 
         // Make sure that current users organization has not been disabled.
@@ -117,12 +117,13 @@ public class UserProfile {
         // Leiame sõnumi saatnud isiku ID oma isikute registrist
         // Kui isikut registrist leida ei õnnestu, siis pole hullu - enamuse
         // päringute puhul võib päringu teostajaks olla iaikute registris registreerimata isik
-        if ((header.isikukood != null) && (header.isikukood.length() > 2)) {
-            result.setPersonCode(header.isikukood.substring(2));
-            result.setPersonID(Isik.getIDByCode(header.isikukood.substring(2), conn));
+        if ((header.getUserId() != null) && (header.getUserId().length() > 2)) {
+            //result.setPersonCode(header.isikukood.substring(2));
+            result.setPersonCode(header.getUserId());
+            result.setPersonID(Isik.getIDByCode(header.getUserId().substring(2), conn));
         } else {
-            result.setPersonCode(header.ametnik);
-            result.setPersonID(Isik.getIDByCode(header.ametnik, conn));
+            result.setPersonCode(header.official);
+            result.setPersonID(Isik.getIDByCode(header.official, conn));
         }
         /*if (result.getPersonID() <= 0) {
             throw new AxisFault( CommonStructures.VIGA_TUNDMATU_ISIK );

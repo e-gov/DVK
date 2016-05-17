@@ -1,10 +1,10 @@
 package dhl;
 
 import dvk.core.Settings;
+import dvk.core.xroad.XRoadProtocolHeader;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import dvk.core.Fault;
-import dhl.iostructures.XHeader;
 import dhl.users.Allyksus;
 import dhl.users.Ametikoht;
 import dhl.users.Asutus;
@@ -342,7 +342,7 @@ public class Recipient {
     }
     
     
-    public int addToDB(Connection conn, XHeader xTeePais) throws SQLException, IllegalArgumentException {
+    public int addToDB(Connection conn, XRoadProtocolHeader xTeePais) throws SQLException, IllegalArgumentException {
         if (conn != null) {
             Calendar cal = Calendar.getInstance();
             boolean defaultAutoCommit = conn.getAutoCommit();
@@ -385,8 +385,8 @@ public class Recipient {
                 cs.setString(24, m_positionShortName);
 
                 if (xTeePais != null) {
-                    cs.setString(25, xTeePais.isikukood);
-                    cs.setString(26, xTeePais.asutus);
+                    cs.setString(25, xTeePais.getUserId());
+                    cs.setString(26, xTeePais.getConsumer());
                 } else {
                     cs.setString(25, "");
                     cs.setString(26, "");
@@ -415,7 +415,7 @@ public class Recipient {
     }
     
 
-    public boolean updateProc(Connection conn, XHeader xTeePais) throws SQLException, IllegalArgumentException {
+    public boolean updateProc(Connection conn, XRoadProtocolHeader xTeePais) throws SQLException, IllegalArgumentException {
         if (conn != null) {
             Calendar cal = Calendar.getInstance();
             boolean defaultAutoCommit = conn.getAutoCommit();
@@ -458,8 +458,8 @@ public class Recipient {
                 cs.setString(24, m_positionShortName);
 
                 if (xTeePais != null) {
-                    cs.setString(25, xTeePais.isikukood);
-                    cs.setString(26, xTeePais.asutus);
+                    cs.setString(25, xTeePais.getUserId());
+                    cs.setString(26, xTeePais.getConsumer());
                 } else {
                     cs.setString(25, "");
                     cs.setString(26, "");
@@ -488,7 +488,7 @@ public class Recipient {
     }
     
     
-    public boolean update(Connection conn, XHeader xTeePais) throws SQLException, IllegalArgumentException {
+    public boolean update(Connection conn, XRoadProtocolHeader xTeePais) throws SQLException, IllegalArgumentException {
         if (conn != null) {
             Calendar cal = Calendar.getInstance();
             boolean defaultAutoCommit = conn.getAutoCommit();
@@ -638,7 +638,7 @@ public class Recipient {
         }
     }
 
-    public static Recipient fromXML(XMLStreamReader xmlReader, Connection conn, XHeader xTeePais) throws AxisFault {
+    public static Recipient fromXML(XMLStreamReader xmlReader, Connection conn, XRoadProtocolHeader xTeePais) throws AxisFault {
         try {
             Recipient result = new Recipient();
 

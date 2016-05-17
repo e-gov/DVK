@@ -5,13 +5,13 @@ import dhl.aar.AarClient;
 import dhl.aar.iostructures.AarAmetikoht;
 import dhl.aar.iostructures.AarAsutus;
 import dhl.aar.iostructures.AarOigus;
-import dhl.iostructures.XHeader;
 import dvk.client.ClientAPI;
 import dvk.client.businesslayer.DhlCapability;
 import dvk.client.iostructures.GetSendingOptionsV3ResponseType;
 import dvk.core.CommonMethods;
 import dvk.core.HeaderVariables;
 import dvk.core.Settings;
+import dvk.core.xroad.XRoadProtocolHeader;
 
 import java.sql.CallableStatement;
 import java.sql.Statement;
@@ -669,7 +669,7 @@ public class Asutus {
     
 
     
-    public void addToDB(Connection conn, XHeader xTeePais) {    	
+    public void addToDB(Connection conn, XRoadProtocolHeader xTeePais) {    	
         try {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
@@ -718,8 +718,8 @@ public class Asutus {
                 CommonMethods.setNullableIntParam(cs, 38, m_aarID);
 
                 if (xTeePais != null) {
-                    cs.setString(39, xTeePais.isikukood);
-                    cs.setString(40, xTeePais.asutus);
+                    cs.setString(39, xTeePais.getUserId());
+                    cs.setString(40, xTeePais.getConsumer());
                 } else {
                     cs.setString(39, null);
                     cs.setString(40, null);
@@ -736,7 +736,7 @@ public class Asutus {
         }
     }
     
-    public void updateInDB(Connection conn, XHeader xTeePais) {
+    public void updateInDB(Connection conn, XRoadProtocolHeader xTeePais) {
         try {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
@@ -784,8 +784,8 @@ public class Asutus {
                 CommonMethods.setNullableIntParam(cs, 38, m_aarID);
                 
                 if (xTeePais != null) {
-                    cs.setString(39, xTeePais.isikukood);
-                    cs.setString(40, xTeePais.asutus);
+                    cs.setString(39, xTeePais.getUserId());
+                    cs.setString(40, xTeePais.getConsumer());
                 } else {
                     cs.setString(39, null);
                     cs.setString(40, null);
@@ -800,7 +800,7 @@ public class Asutus {
         }
     }
 
-    public void saveToDB(Connection conn, XHeader xTeePais) {
+    public void saveToDB(Connection conn, XRoadProtocolHeader xTeePais) {
         if (m_id > 0) {
             updateInDB(conn, xTeePais);
         } else {
@@ -812,7 +812,7 @@ public class Asutus {
      * Laeb kõigist teistest teadaolevatest serveritest asutuste nimekirjad
      * ja sünkroniseerib kohaliku asutuste registri saadud andmetega.
      */
-    public static void getOrgsFromAllKnownServers(String orgCodeToFind, Connection conn, XHeader xTeePais) throws Exception {
+    public static void getOrgsFromAllKnownServers(String orgCodeToFind, Connection conn, XRoadProtocolHeader xTeePais) throws Exception {
         boolean foundMissingOrg = false;
         ArrayList<RemoteServer> servers = RemoteServer.getList(conn);
         if (!servers.isEmpty()) {

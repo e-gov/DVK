@@ -1,6 +1,6 @@
 package integration;
 
-import dhl.iostructures.XHeader;
+import dvk.core.xroad.XRoadProtocolHeader;
 import dvk.core.xroad.XRoadProtocolVersion;
 import junit.framework.Assert;
 import junitparams.JUnitParamsRunner;
@@ -110,13 +110,13 @@ public class SendDocumentsIntegration {
         sendMessageWithAttachment(attachmentNames, xHeaderBuilder.setNimi("dhl.sendDocuments.v4").build());
     }
 
-    private void sendMessageWithAttachment(List<String> attachmentNames, XHeader xHeader) throws Exception {
+    private void sendMessageWithAttachment(List<String> attachmentNames, XRoadProtocolHeader xHeader) throws Exception {
         for(String attachmentName: attachmentNames) {
             sendMessageWithAttachment(attachmentName, xHeader);
         }
     }
 
-    private void sendMessageWithAttachment(String attachmentName, XHeader xHeader) throws Exception {
+    private void sendMessageWithAttachment(String attachmentName, XRoadProtocolHeader xHeader) throws Exception {
         SendDocumentsDvkSoapClient sendDocumentsDvkSoapClient = new SendDocumentsDvkSoapClient(options, xRoadProtocolVersion);
         MessageContext sendDocumentsMessageContext = sendDocumentsDvkSoapClient.sendMessage(attachmentName, xHeader);
         Assert.assertTrue(sendDocumentsMessageContext.getEnvelope().toString().contains("keha href=\"cid"));

@@ -1,5 +1,24 @@
 package dhl.requests;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.List;
+
+import javax.activation.DataSource;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.axis.AxisFault;
+import org.apache.axis.MessageContext;
+import org.apache.log4j.Logger;
+
 import dhl.Document;
 import dhl.DocumentFile;
 import dhl.DocumentFragment;
@@ -14,7 +33,6 @@ import dhl.exceptions.FragmentedDataProcessingException;
 import dhl.exceptions.IncorrectSignatureException;
 import dhl.exceptions.RequestProcessingException;
 import dhl.iostructures.OrgForwardHelper;
-import dhl.iostructures.XHeader;
 import dhl.iostructures.sendDocumentsRequestType;
 import dhl.iostructures.sendDocumentsV2RequestType;
 import dhl.sys.Timer;
@@ -35,30 +53,14 @@ import dvk.core.FileSplitResult;
 import dvk.core.HeaderVariables;
 import dvk.core.Settings;
 import dvk.core.XmlValidator;
-import org.apache.axis.AxisFault;
-import org.apache.axis.MessageContext;
-import org.apache.log4j.Logger;
-
-import javax.activation.DataSource;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.List;
+import dvk.core.xroad.XRoadProtocolHeader;
 
 public class SendDocuments {
     private static Logger logger = Logger.getLogger(SendDocuments.class);
 
     public static RequestInternalResult V1(
             org.apache.axis.MessageContext context, Connection conn, UserProfile user,
-            OrgSettings hostOrgSettings, XHeader xTeePais) throws Exception {
+            OrgSettings hostOrgSettings, XRoadProtocolHeader xTeePais) throws Exception {
         logger.info("SendDocuments.V1 invoked.");
 
         Timer t = new Timer();
@@ -260,8 +262,8 @@ public class SendDocuments {
                         tmpMsg.setSendingStatusID(Settings.Client_StatusReceived);
                         tmpMsg.setReceivedDate(new Date());
                         tmpMsg.setRecipientStatusID(hostOrgSettings.getDvkSettings().getDefaultStatusID());
-                        tmpMsg.setQueryID(xTeePais.id);
-                        tmpMsg.setCaseName(xTeePais.toimik);
+                        tmpMsg.setQueryID(xTeePais.getId());
+                        tmpMsg.setCaseName(xTeePais.getIssue());
                         tmpMsg.setDhlFolderName(bodyData.kaust);
 
                         // Salvestame dokumendi andmebaasi
@@ -328,7 +330,7 @@ public class SendDocuments {
         return result;
     }
 
-    public static RequestInternalResult V2(org.apache.axis.MessageContext context, Connection conn, UserProfile user, OrgSettings hostOrgSettings, XHeader xTeePais) throws Exception, ParserConfigurationException {
+    public static RequestInternalResult V2(org.apache.axis.MessageContext context, Connection conn, UserProfile user, OrgSettings hostOrgSettings, XRoadProtocolHeader xTeePais) throws Exception, ParserConfigurationException {
 
         logger.info("SendDocuments.V2 invoked.");
 
@@ -617,8 +619,8 @@ public class SendDocuments {
                             tmpMsg.setSendingStatusID(Settings.Client_StatusReceived);
                             tmpMsg.setReceivedDate(new Date());
                             tmpMsg.setRecipientStatusID(hostOrgSettings.getDvkSettings().getDefaultStatusID());
-                            tmpMsg.setQueryID(xTeePais.id);
-                            tmpMsg.setCaseName(xTeePais.toimik);
+                            tmpMsg.setQueryID(xTeePais.getId());
+                            tmpMsg.setCaseName(xTeePais.getIssue());
                             tmpMsg.setDhlFolderName(bodyData.kaust);
 
                             // Salvestame dokumendi andmebaasi
@@ -705,7 +707,7 @@ public class SendDocuments {
      * @throws AxisFault
      * @throws ParserConfigurationException
      */
-    public static RequestInternalResult V3(org.apache.axis.MessageContext context, Connection conn, UserProfile user, OrgSettings hostOrgSettings, XHeader xTeePais) throws Exception, ParserConfigurationException {
+    public static RequestInternalResult V3(org.apache.axis.MessageContext context, Connection conn, UserProfile user, OrgSettings hostOrgSettings, XRoadProtocolHeader xTeePais) throws Exception, ParserConfigurationException {
 
         logger.info("SendDocuments.V3 invoked.");
 
@@ -993,8 +995,8 @@ public class SendDocuments {
                             tmpMsg.setSendingStatusID(Settings.Client_StatusReceived);
                             tmpMsg.setReceivedDate(new Date());
                             tmpMsg.setRecipientStatusID(hostOrgSettings.getDvkSettings().getDefaultStatusID());
-                            tmpMsg.setQueryID(xTeePais.id);
-                            tmpMsg.setCaseName(xTeePais.toimik);
+                            tmpMsg.setQueryID(xTeePais.getId());
+                            tmpMsg.setCaseName(xTeePais.getIssue());
                             tmpMsg.setDhlFolderName(bodyData.kaust);
 
                             // Salvestame dokumendi andmebaasi
@@ -1112,7 +1114,7 @@ public class SendDocuments {
 
 
     // Edastab dokumendi teise DVK serverisse
-    private static ArrayList<Sending> ForwardDocument(dhl.Document doc, String kaust, Connection conn, int requestVersion, XHeader xTeePais) throws Exception {
+    private static ArrayList<Sending> ForwardDocument(dhl.Document doc, String kaust, Connection conn, int requestVersion, XRoadProtocolHeader xTeePais) throws Exception {
         ArrayList<Sending> sendingList = doc.getSendingList();
         int lastSendingIndex = -1;
         if ((sendingList != null) && !sendingList.isEmpty()) {
@@ -1312,7 +1314,7 @@ public class SendDocuments {
      */
     public static RequestInternalResult v4(
             MessageContext context, Connection connection, UserProfile user,
-            OrgSettings hostOrgSettings, XHeader xTeePais) throws Exception {
+            OrgSettings hostOrgSettings, XRoadProtocolHeader xTeePais) throws Exception {
         logger.info("SendDocuments.v4 invoked.");
 
         return generalSendDocuments(context, connection, user, hostOrgSettings, xTeePais);
@@ -1321,7 +1323,7 @@ public class SendDocuments {
 
     private static RequestInternalResult generalSendDocuments(
             MessageContext context, Connection conn, UserProfile user,
-            OrgSettings hostOrgSettings, XHeader xTeePais) throws Exception {
+            OrgSettings hostOrgSettings, XRoadProtocolHeader xTeePais) throws Exception {
         Timer t = new Timer();
         RequestInternalResult result = new RequestInternalResult();
         String pipelineDataFile = CommonMethods.createPipelineFile(0);
@@ -1612,8 +1614,8 @@ public class SendDocuments {
                             tmpMsg.setSendingStatusID(Settings.Client_StatusReceived);
                             tmpMsg.setReceivedDate(new Date());
                             tmpMsg.setRecipientStatusID(hostOrgSettings.getDvkSettings().getDefaultStatusID());
-                            tmpMsg.setQueryID(xTeePais.id);
-                            tmpMsg.setCaseName(xTeePais.toimik);
+                            tmpMsg.setQueryID(xTeePais.getId());
+                            tmpMsg.setCaseName(xTeePais.getIssue());
                             tmpMsg.setDhlFolderName(bodyData.kaust);
 
                             // Salvestame dokumendi andmebaasi

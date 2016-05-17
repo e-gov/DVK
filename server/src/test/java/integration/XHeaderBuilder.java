@@ -1,9 +1,9 @@
 package integration;
 
-import dhl.iostructures.XHeader;
+import dvk.core.xroad.XRoadProtocolHeader;
 
 /**
- * {@link dhl.iostructures.XHeader} builder class for simpler testing purposes.
+ * {@link dvk.core.xroad.XRoadProtocolHeader} builder class for simpler testing purposes.
  */
 class XHeaderBuilder {
     private String asutus;
@@ -49,8 +49,8 @@ class XHeaderBuilder {
         return this;
     }
 
-    public XHeader build() {
-        return new XHeader(
+    public XRoadProtocolHeader build() {
+        return new XRoadProtocolHeader(
                 asutus, andmekogu, ametnik, id, nimi, toimik, isikukood);
     }
 }

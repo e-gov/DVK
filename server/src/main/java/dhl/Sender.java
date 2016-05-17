@@ -1,12 +1,12 @@
 package dhl;
 
-import dhl.iostructures.XHeader;
 import dhl.users.Allyksus;
 import dhl.users.Ametikoht;
 import dhl.users.Asutus;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import dvk.core.Settings;
+import dvk.core.xroad.XRoadProtocolHeader;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -230,7 +230,7 @@ public class Sender {
         }
     }
 
-    public int addToDB(Connection conn, XHeader xTeePais) throws IllegalArgumentException, SQLException {
+    public int addToDB(Connection conn, XRoadProtocolHeader xTeePais) throws IllegalArgumentException, SQLException {
     	if (conn != null) {
             CallableStatement cs = conn.prepareCall("{? = call \"Add_Sender\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
             cs.registerOutParameter(1, Types.INTEGER);
@@ -251,8 +251,8 @@ public class Sender {
                         
             
             if (xTeePais != null) {
-                cs.setString(14, xTeePais.isikukood);
-                cs.setString(15, xTeePais.asutus);
+                cs.setString(14, xTeePais.getUserId());
+                cs.setString(15, xTeePais.getConsumer());
             } else {
                 cs.setString(14, null);
                 cs.setString(15, null);
@@ -268,7 +268,7 @@ public class Sender {
     }
     
     
-    public static Sender fromXML(XMLStreamReader xmlReader, Connection conn, XHeader xTeePais) throws AxisFault {
+    public static Sender fromXML(XMLStreamReader xmlReader, Connection conn, XRoadProtocolHeader xTeePais) throws AxisFault {
         try {
             Sender result = new Sender();
 

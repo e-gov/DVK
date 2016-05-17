@@ -1,14 +1,6 @@
 package dhl;
 
 
-import dhl.DocumentFile;
-import dhl.Folder;
-import dhl.Sending;
-import dhl.iostructures.ExpiredDocumentData;
-import dhl.iostructures.XHeader;
-import dvk.core.CommonMethods;
-import dvk.core.CommonStructures;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,6 +23,11 @@ import org.apache.axis.AxisFault;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import dhl.iostructures.ExpiredDocumentData;
+import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
+import dvk.core.xroad.XRoadProtocolHeader;
 
 public class Document {
     static Logger logger = Logger.getLogger(Document.class.getName());
@@ -207,7 +204,7 @@ public class Document {
     }
     
 
-    public int addToDB(Connection conn, XHeader xTeePais) throws AxisFault {
+    public int addToDB(Connection conn, XRoadProtocolHeader xTeePais) throws AxisFault {
         FileInputStream inStream = null;
         InputStreamReader inReader = null;
         BufferedReader reader = null;
@@ -243,8 +240,8 @@ public class Document {
                     cs.setInt(7, m_dvkContainerVersion);
                     cs.setString(8, m_guid);
                     if (xTeePais != null) {
-                        cs.setString(9, xTeePais.isikukood);
-                        cs.setString(10, xTeePais.asutus);
+                        cs.setString(9, xTeePais.getUserId());
+                        cs.setString(10, xTeePais.getConsumer());
                     } else {
                         cs.setString(9, null);
                         cs.setString(10, null);
@@ -477,7 +474,7 @@ public class Document {
      * @throws AxisFault
      */
     public static Document fromXML(String dataFile, int organizationID,
-                                   boolean extractFiles, Connection conn, XHeader xTeePais) throws AxisFault {
+                                   boolean extractFiles, Connection conn, XRoadProtocolHeader xTeePais) throws AxisFault {
         try {
             Document result = new Document();
             result.setFilePath(dataFile);

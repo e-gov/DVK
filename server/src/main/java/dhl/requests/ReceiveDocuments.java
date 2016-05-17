@@ -8,7 +8,6 @@ import dhl.Folder;
 import dhl.Recipient;
 import dhl.Sending;
 import dhl.iostructures.FragmentationResult;
-import dhl.iostructures.XHeader;
 import dhl.iostructures.receiveDocumentsRequestType;
 import dhl.iostructures.receiveDocumentsV2RequestType;
 import dhl.iostructures.receiveDocumentsV3RequestType;
@@ -27,6 +26,8 @@ import java.util.Calendar;
 import java.util.List;
 
 import dvk.core.ContainerVersion;
+import dvk.core.xroad.XRoadProtocolHeader;
+
 import org.apache.axis.AxisFault;
 import org.apache.log4j.Logger;
 import org.w3c.dom.*;
@@ -64,7 +65,7 @@ public class ReceiveDocuments {
                 int resultLimit = bodyData.arv;
                 for (int folderNr = 0; folderNr < bodyData.kaust.size(); ++folderNr) {
                     // Tuvastame, millisesse kausta soovitakse dokumenti salvestada
-                    XHeader xTeePais = new XHeader(
+                    XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
                             user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
                     int requestTargetFolder = Folder.getFolderIdByPath(
                             bodyData.kaust.get(folderNr).trim(), user.getOrganizationID(), conn, true, false, xTeePais);
@@ -260,7 +261,7 @@ public class ReceiveDocuments {
                     int resultLimit = bodyData.arv;
                     for (int folderNr = 0; folderNr < bodyData.kaust.size(); ++folderNr) {
                         // Tuvastame, millisesse kausta soovitakse dokumenti salvestada
-                        XHeader xTeePais = new XHeader(
+                        XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
                                 user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
                         int requestTargetFolder = Folder.getFolderIdByPath(
                                 bodyData.kaust.get(folderNr).trim(),
@@ -385,7 +386,7 @@ public class ReceiveDocuments {
                 if ((bodyData.edastusID != null)
                         && !bodyData.edastusID.equalsIgnoreCase("")
                         && (bodyData.fragmentNr >= 0)) {
-                    XHeader xTeePais = new XHeader(
+                    XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
                             user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
 
                     FragmentationResult fragResult = DocumentFragment.getFragments(
@@ -464,7 +465,7 @@ public class ReceiveDocuments {
                     int resultLimit = bodyData.arv;
                     for (int folderNr = 0; folderNr < bodyData.kaust.size(); ++folderNr) {
                         // Tuvastame, millisesse kausta soovitakse dokumenti salvestada
-                        XHeader xTeePais = new XHeader(
+                        XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
                                 user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
                         int requestTargetFolder = Folder.getFolderIdByPath(
                                 bodyData.kaust.get(folderNr).trim(), user.getOrganizationID(), conn, true, false, xTeePais);
@@ -607,7 +608,7 @@ public class ReceiveDocuments {
                         && !bodyData.edastusID.equalsIgnoreCase("")
                         && (bodyData.fragmentNr >= 0)) {
 
-                    XHeader xTeePais = new XHeader(
+                    XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
                             user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
 
                     FragmentationResult fragResult = DocumentFragment.getFragments(
@@ -688,7 +689,7 @@ public class ReceiveDocuments {
                     int resultLimit = bodyData.arv;
                     for (int folderNr = 0; folderNr < bodyData.kaust.size(); ++folderNr) {
                         // Tuvastame, millisesse kausta soovitakse dokumenti salvestada
-                        XHeader xTeePais = new XHeader(
+                        XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
                                 user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
                         int requestTargetFolder = Folder.getFolderIdByPath(
                                 bodyData.kaust.get(folderNr).trim(), user.getOrganizationID(), conn, true, false, xTeePais);
@@ -829,7 +830,7 @@ public class ReceiveDocuments {
                         && !bodyData.edastusID.equalsIgnoreCase("")
                         && (bodyData.fragmentNr >= 0)) {
                     logger.debug("Vastust soovitakse fragmenteeritud kujul. Tükeldame faili.");
-                    XHeader xTeePais = new XHeader(
+                    XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
                             user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
                     FragmentationResult fragResult = DocumentFragment.getFragments(
                             result.responseFile, bodyData.fragmentSizeBytes,
@@ -1205,7 +1206,7 @@ public class ReceiveDocuments {
                                         final UserProfile user, final Connection conn) throws AxisFault {
         if ((folders != null) && (folders.size() > 0)) {
             List<String> nonExistingFolders = new ArrayList<String>();
-            XHeader xTeePais = new XHeader(user.getOrganizationCode(), null,
+            XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(user.getOrganizationCode(), null,
                     null, null, null, null, user.getPersonCode());
 
             for (String folderName : folders) {

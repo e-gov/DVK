@@ -1,12 +1,5 @@
 package dhl;
 
-import dhl.iostructures.XHeader;
-import dhl.users.Allyksus;
-import dhl.users.Ametikoht;
-import dhl.users.Asutus;
-import dvk.core.CommonMethods;
-import dvk.core.CommonStructures;
-
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -18,6 +11,13 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.axis.AxisFault;
+
+import dhl.users.Allyksus;
+import dhl.users.Ametikoht;
+import dhl.users.Asutus;
+import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
+import dvk.core.xroad.XRoadProtocolHeader;
 
 public class Proxy {
     private int m_id;
@@ -218,7 +218,7 @@ public class Proxy {
         }
     }
 
-    public int addToDB(Connection conn, XHeader xTeePais) throws IllegalArgumentException, SQLException {
+    public int addToDB(Connection conn, XRoadProtocolHeader xTeePais) throws IllegalArgumentException, SQLException {
         if (conn != null) {
             CallableStatement cs = conn.prepareCall("{? = call \"Add_Proxy\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
             cs.registerOutParameter(1, Types.INTEGER);
@@ -237,8 +237,8 @@ public class Proxy {
             cs.setString(13, m_divisionShortName);
 
             if (xTeePais != null) {
-                cs.setString(14, xTeePais.isikukood);
-                cs.setString(15, xTeePais.asutus);
+                cs.setString(14, xTeePais.getUserId());
+                cs.setString(15, xTeePais.getConsumer());
             } else {
                 cs.setString(14, null);
                 cs.setString(15, null);

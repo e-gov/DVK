@@ -1,8 +1,8 @@
 package integration;
 
 import Utills.IntegrationTestUtills;
-import dhl.iostructures.XHeader;
 import dvk.core.CommonMethods;
+import dvk.core.xroad.XRoadProtocolHeader;
 import dvk.core.xroad.XRoadProtocolVersion;
 import junit.framework.Assert;
 import org.apache.axiom.soap.SOAP11Constants;
@@ -97,12 +97,12 @@ public class GetSendStatusIntegration {
         return getDhlIdOfMessage(sendMessageWithAttachment(path, xHeaderBuilderForSending.build(), optionsForSending));
     }
 
-    private MessageContext sendMessageWithAttachment(String attachmentName, XHeader xHeader,  Options options) throws Exception {
+    private MessageContext sendMessageWithAttachment(String attachmentName, XRoadProtocolHeader xHeader,  Options options) throws Exception {
         SendDocumentsDvkSoapClient sendDocumentsDvkSoapClient = new SendDocumentsDvkSoapClient(options, xRoadProtocolVersion);
         return sendDocumentsDvkSoapClient.sendMessage(attachmentName, xHeader);
     }
 
-    private MessageContext doGetSendStatusRequest(String attachmentName, XHeader xHeader) throws Exception {
+    private MessageContext doGetSendStatusRequest(String attachmentName, XRoadProtocolHeader xHeader) throws Exception {
         GetSendStatusDvkSoapClient getSendStatusDvkSoapClient = new GetSendStatusDvkSoapClient(options, xRoadProtocolVersion);
         return getSendStatusDvkSoapClient.sendRequest(attachmentName, xHeader);
     }

@@ -1,7 +1,7 @@
 package dhl;
 
-import dhl.iostructures.XHeader;
 import dvk.core.CommonMethods;
+import dvk.core.xroad.XRoadProtocolHeader;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -82,7 +82,7 @@ public class Folder {
     }
 
     public static int getFolderIdByPath(String path, int organizationID, Connection conn,
-                                        boolean allowUnspecified, boolean allowNew, XHeader xTeePais) {
+                                        boolean allowUnspecified, boolean allowNew, XRoadProtocolHeader xTeePais) {
         if ((path == null) || (path.length() < 1)) {
             return allowUnspecified ? UNSPECIFIED_FOLDER : GLOBAL_ROOT_FOLDER;
         }
@@ -180,7 +180,7 @@ public class Folder {
 
 
     
-    public static int createFolder(String fullPath, int parentID, int orgID, String folderNumber, Connection conn, XHeader xTeePais) {
+    public static int createFolder(String fullPath, int parentID, int orgID, String folderNumber, Connection conn, XRoadProtocolHeader xTeePais) {
     	try {
             if (conn != null) {
                 while (fullPath.startsWith(DELIMITER)) {
@@ -214,8 +214,8 @@ public class Folder {
                         }
 
                         if (xTeePais != null) {
-                            cs.setString(6, xTeePais.isikukood);
-                            cs.setString(7, xTeePais.asutus);
+                            cs.setString(6, xTeePais.getUserId());
+                            cs.setString(7, xTeePais.getConsumer());
                         } else {
                             cs.setString(6, null);
                             cs.setString(7, null);

@@ -5,6 +5,7 @@ import java.io.OutputStreamWriter;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Iterator;
+
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPBodyElement;
 import javax.xml.soap.SOAPElement;
@@ -14,8 +15,10 @@ import org.apache.axis.AxisFault;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 import dhl.DocumentStatusHistory;
 import dvk.core.CommonStructures;
+import dvk.core.xroad.XRoadProtocolVersion;
 
 public class getSendStatusV2ResponseType implements SOAPOutputBodyRepresentation {
     public Element paring;
@@ -28,15 +31,16 @@ public class getSendStatusV2ResponseType implements SOAPOutputBodyRepresentation
         kehaHref = "";
     }
 
-    public void addToSOAPBody(org.apache.axis.Message msg) throws AxisFault, SOAPException {
+    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolVersion xRoadProtocolVersion) throws AxisFault, SOAPException {
         // get SOAP envelope from SOAP message
         org.apache.axis.message.SOAPEnvelope se = msg.getSOAPEnvelope();
         SOAPBody body = se.getBody();
 
-        se.addNamespaceDeclaration(CommonStructures.NS_XTEE_PREFIX, CommonStructures.NS_XTEE_URI);
+        se.addNamespaceDeclaration(xRoadProtocolVersion.getNamespacePrefix(), xRoadProtocolVersion.getNamespaceURI());
         se.addNamespaceDeclaration(CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI);
 
-        Iterator items = body.getChildElements();
+        @SuppressWarnings("rawtypes")
+		Iterator items = body.getChildElements();
         if (items.hasNext()) {
             body.removeContents();
         }

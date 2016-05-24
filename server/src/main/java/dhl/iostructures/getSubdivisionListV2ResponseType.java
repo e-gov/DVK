@@ -14,6 +14,7 @@ import org.apache.axis.AxisFault;
 import dhl.users.Allyksus;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
+import dvk.core.xroad.XRoadProtocolVersion;
 
 public class getSubdivisionListV2ResponseType implements SOAPOutputBodyRepresentation {
     public getSubdivisionListV2RequestType paring;
@@ -28,13 +29,14 @@ public class getSubdivisionListV2ResponseType implements SOAPOutputBodyRepresent
         dataMd5Hash = "";
     }
 
-    public void addToSOAPBody(org.apache.axis.Message msg) {
+    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolVersion xRoadProtocolVersion) {
         try {
             // get SOAP envelope from SOAP message
             org.apache.axis.message.SOAPEnvelope se = msg.getSOAPEnvelope();
             SOAPBody body = se.getBody();
 
-            Iterator items = body.getChildElements();
+            @SuppressWarnings("rawtypes")
+			Iterator items = body.getChildElements();
             if (items.hasNext()) {
                 body.removeContents();
             }

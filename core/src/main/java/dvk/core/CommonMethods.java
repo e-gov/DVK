@@ -706,7 +706,9 @@ public class CommonMethods {
     	String requestVersion = "";
     	
     	if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-    		requestVersion = xRoadProtocolHeader.getXRoadService().getServiceVersion();
+    		if (xRoadProtocolHeader.getXRoadService() != null && xRoadProtocolHeader.getXRoadService().getServiceVersion() != null) {
+    			requestVersion = xRoadProtocolHeader.getXRoadService().getServiceVersion();
+    		}
     	} else if (xRoadProtocolHeader.getService() != null) {
     		String[] splitName = xRoadProtocolHeader.getService().split("[.]");
 	        if ((splitName != null) && (splitName.length > 0)) {

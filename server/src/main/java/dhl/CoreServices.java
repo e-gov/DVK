@@ -68,10 +68,11 @@ import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import dvk.core.Settings;
 import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadProtocolVersion;
 
 public class CoreServices implements Dhl {
-    public static String XTEE_URI = "http://x-tee.riik.ee/xsd/xtee.xsd";
-    static Logger logger = LogManager.getLogger(CoreServices.class.getName());
+	
+	public static Logger logger = LogManager.getLogger(CoreServices.class.getName());
 
     public CoreServices() throws AxisFault {
         try {
@@ -180,10 +181,15 @@ public class CoreServices implements Dhl {
                                 producer + ".getSubdivisionList.v2"
                         };
             }
+            
             org.apache.axis.MessageContext context = org.apache.axis.MessageContext.getCurrentContext();
             org.apache.axis.Message response = context.getResponseMessage();
+            
+            XRoadProtocolHeader xRoadHeader = XRoadProtocolHeader.getFromSOAPHeaderAxis(context);
+            
             listMethodsResponseType body = new listMethodsResponseType(keha);
-            body.addToSOAPBody(response);
+            body.addToSOAPBody(response, xRoadHeader.getProtocolVersion());
+            
             response.saveChanges();
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
@@ -235,7 +241,7 @@ public class CoreServices implements Dhl {
             }
 
             // Proovime, kas õiguste kesksüsteemi liides toimib
-            if (Settings.Server_UseCentralRightsDatabase == false) {
+            if (Settings.Server_UseCentralRightsDatabase) {
                 try {
                     AarClient aarClient = new AarClient(
                             Settings.Server_CentralRightsDatabaseURL,
@@ -249,29 +255,46 @@ public class CoreServices implements Dhl {
                     throw new AxisFault("DVK tarkvaraline viga: Keskse õiguste andmekoguga ühendamine ebaõnnestus!");
                 }
             }
+            
 
             org.apache.axis.MessageContext context = org.apache.axis.MessageContext.getCurrentContext();
             org.apache.axis.Message response = context.getResponseMessage();
-            String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage());
+            
+            XRoadProtocolHeader xRoadHeader = XRoadProtocolHeader.getFromSOAPHeaderAxis(context);
+            
+            String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xRoadHeader.getProtocolVersion().getNamespaceURI());
             if ((xroadNamespacePrefix != null) && (xroadNamespacePrefix.length() > 0)) {
-                response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, XTEE_URI);
+                response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xRoadHeader.getProtocolVersion().getNamespaceURI());
             }
+            if (xRoadHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
+            	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_PREFIX, XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_URI);
+            }
+            
             response.getSOAPEnvelope().removeHeaders();
-            Vector headers = context.getRequestMessage().getSOAPEnvelope().getHeaders();
+            
+            @SuppressWarnings("rawtypes")
+			Vector headers = context.getRequestMessage().getSOAPEnvelope().getHeaders();
             for (int i = 0; i < headers.size(); ++i) {
                 response.getSOAPEnvelope().addHeader((SOAPHeaderElement) headers.get(i));
             }
+            
             response.getSOAPEnvelope().removeBody();
             response.getSOAPEnvelope().addBody();
+            
             runSystemCheckResponseType body = new runSystemCheckResponseType();
-            body.setRequestElement(getXRoadRequestBodyElement(context, "runSystemCheck"));
-            body.addToSOAPBody(response);
+            if (xRoadHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
+            	body.setRequestElement(getXRoadRequestBodyElement(context, "runSystemCheck"));
+            }
+            body.addToSOAPBody(response, xRoadHeader.getProtocolVersion());
+            
             response.saveChanges();
         } catch (AxisFault a) {
             CommonMethods.logError(a, this.getClass().getName(), "runSystemCheck");
+            
             throw a;
         } catch (Exception ex) {
             CommonMethods.logError(ex, this.getClass().getName(), "runSystemCheck");
+            
             throw new AxisFault(ex.getMessage());
         } finally {
             if (conn != null) {
@@ -296,24 +319,42 @@ public class CoreServices implements Dhl {
             Connection conn = null;
             try {
             	logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele DeleteOldDocuments");
+            	
                 conn = getConnection();
                 DeleteOldDocuments.V1(conn);
+                
                 org.apache.axis.MessageContext context = org.apache.axis.MessageContext.getCurrentContext();
+                
+                XRoadProtocolHeader xRoadHeader = XRoadProtocolHeader.getFromSOAPHeaderAxis(context);
+                
                 deleteOldDocumentsResponseType body = new deleteOldDocumentsResponseType();
-                body.setRequestElement(getXRoadRequestBodyElement(context, "deleteOldDocuments"));
-                org.apache.axis.Message response = context.getResponseMessage();
-                String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage());
-                if ((xroadNamespacePrefix != null) && (xroadNamespacePrefix.length() > 0)) {
-                    response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, XTEE_URI);
+                if (xRoadHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
+                	body.setRequestElement(getXRoadRequestBodyElement(context, "deleteOldDocuments"));
                 }
+                
+                org.apache.axis.Message response = context.getResponseMessage();
+                
+                String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xRoadHeader.getProtocolVersion().getNamespaceURI());
+                if ((xroadNamespacePrefix != null) && (xroadNamespacePrefix.length() > 0)) {
+                    response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xRoadHeader.getProtocolVersion().getNamespaceURI());
+                }
+                if (xRoadHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
+                	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_PREFIX, XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_URI);
+                }
+                
                 response.getSOAPEnvelope().removeHeaders();
-                Vector headers = context.getRequestMessage().getSOAPEnvelope().getHeaders();
+                
+                @SuppressWarnings("rawtypes")
+				Vector headers = context.getRequestMessage().getSOAPEnvelope().getHeaders();
                 for (int i = 0; i < headers.size(); ++i) {
                     response.getSOAPEnvelope().addHeader((SOAPHeaderElement) headers.get(i));
                 }
+                
                 response.getSOAPEnvelope().removeBody();
+                
                 response.getSOAPEnvelope().addBody();
-                body.addToSOAPBody(response);
+                body.addToSOAPBody(response, xRoadHeader.getProtocolVersion());
+                
                 response.saveChanges();
             } catch (Exception ex) {
                 logger.error(ex.getMessage(), ex);
@@ -350,20 +391,33 @@ public class CoreServices implements Dhl {
 
                     // Koostame vastuse
                     org.apache.axis.Message response = context.getResponseMessage();
+                    
                     changeOrganizationDataResponseType body = new changeOrganizationDataResponseType();
-                    body.setRequestElement(getXRoadRequestBodyElement(context, "changeOrganizationData"));
-                    String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage());
-                    if ((xroadNamespacePrefix != null) && (xroadNamespacePrefix.length() > 0)) {
-                        response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, XTEE_URI);
+                    if (xTeePais.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
+                    	body.setRequestElement(getXRoadRequestBodyElement(context, "changeOrganizationData"));
                     }
+                    
+                    String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xTeePais.getProtocolVersion().getNamespaceURI());
+                    if ((xroadNamespacePrefix != null) && (xroadNamespacePrefix.length() > 0)) {
+                        response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getProtocolVersion().getNamespaceURI());
+                    }
+                    if (xTeePais.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
+                    	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_PREFIX, XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_URI);
+                    }
+                    
                     response.getSOAPEnvelope().removeHeaders();
-                    Vector headers = context.getRequestMessage().getSOAPEnvelope().getHeaders();
+                    
+                    @SuppressWarnings("rawtypes")
+					Vector headers = context.getRequestMessage().getSOAPEnvelope().getHeaders();
                     for (int i = 0; i < headers.size(); ++i) {
                         response.getSOAPEnvelope().addHeader((SOAPHeaderElement) headers.get(i));
                     }
+                    
                     response.getSOAPEnvelope().removeBody();
+                    
                     response.getSOAPEnvelope().addBody();
-                    body.addToSOAPBody(response);
+                    body.addToSOAPBody(response, xTeePais.getProtocolVersion());
+                    
                     response.saveChanges();
                 }
             } catch (AxisFault fault) {
@@ -409,6 +463,7 @@ public class CoreServices implements Dhl {
 
                 // Laeme sõnumi X-Tee päised endale sobivasse andmestruktuuri
                 XRoadProtocolHeader xTeePais = XRoadProtocolHeader.getFromSOAPHeaderAxis(context);
+                
                 // Tuvastame, millist päringu versiooni välja kutsuti
                 String ver = CommonMethods.getXRoadRequestVersion(xTeePais);
                 logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele GetSendingOptions(xtee teenus: " 
@@ -446,15 +501,23 @@ public class CoreServices implements Dhl {
 
                 // Koostame väljundsõnumi keha
                 org.apache.axis.Message response = context.getResponseMessage();
-                String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage());
+                
+                String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xTeePais.getProtocolVersion().getNamespaceURI());
                 if ((xroadNamespacePrefix != null) && (xroadNamespacePrefix.length() > 0)) {
-                    response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, XTEE_URI);
+                    response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getProtocolVersion().getNamespaceURI());
                 }
+                if (xTeePais.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
+                	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_PREFIX, XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_URI);
+                }
+                
                 response.getSOAPEnvelope().removeHeaders();
-                Vector headers = context.getRequestMessage().getSOAPEnvelope().getHeaders();
+                
+                @SuppressWarnings("rawtypes")
+				Vector headers = context.getRequestMessage().getSOAPEnvelope().getHeaders();
                 for (int i = 0; i < headers.size(); ++i) {
                     response.getSOAPEnvelope().addHeader((SOAPHeaderElement) headers.get(i));
                 }
+                
                 response.getSOAPEnvelope().removeBody();
                 response.getSOAPEnvelope().addBody();
 
@@ -469,7 +532,8 @@ public class CoreServices implements Dhl {
                     ((getSendingOptionsV3ResponseType) result).kehaHref = a1.getContentId();
                 }
 
-                result.addToSOAPBody(response);
+                result.addToSOAPBody(response, xTeePais.getProtocolVersion());
+                
                 response.saveChanges();
             } else {
                 throw new AxisFault("Süsteemi sisemine viga! Päringu konteksti laadimine ebaõnnestus!");
@@ -575,16 +639,25 @@ public class CoreServices implements Dhl {
 
                 try {
                     t.reset();
+                    
                     org.apache.axis.Message response = context.getResponseMessage();
-                    String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage());
+                    
+                    String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xTeePais.getProtocolVersion().getNamespaceURI());
                     if ((xroadNamespacePrefix != null) && (xroadNamespacePrefix.length() > 0)) {
-                        response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, XTEE_URI);
+                        response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getProtocolVersion().getNamespaceURI());
                     }
+                    if (xTeePais.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
+                    	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_PREFIX, XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_URI);
+                    }
+                    
                     response.getSOAPEnvelope().removeHeaders();
-                    Vector headers = context.getRequestMessage().getSOAPEnvelope().getHeaders();
+                    
+                    @SuppressWarnings("rawtypes")
+					Vector headers = context.getRequestMessage().getSOAPEnvelope().getHeaders();
                     for (int i = 0; i < headers.size(); ++i) {
                         response.getSOAPEnvelope().addHeader((SOAPHeaderElement) headers.get(i));
                     }
+                    
                     response.getSOAPEnvelope().removeBody();
                     response.getSOAPEnvelope().addBody();
 
@@ -600,7 +673,7 @@ public class CoreServices implements Dhl {
                     responseBody.paring.dokumendid = result.dataMd5Hash;
                     responseBody.paring.kaust = result.folder;
                     responseBody.kehaHref = a1.getContentId();
-                    responseBody.addToSOAPBody(response);
+                    responseBody.addToSOAPBody(response, xTeePais.getProtocolVersion());
 
                     response.saveChanges();
                     t.markElapsed("Creating response message");
@@ -688,13 +761,21 @@ public class CoreServices implements Dhl {
 
                     try {
                         t.reset();
+                        
                         org.apache.axis.Message response = context.getResponseMessage();
-                        String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage());
+                        
+                        String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xTeePais.getProtocolVersion().getNamespaceURI());
                         if ((xroadNamespacePrefix != null) && (xroadNamespacePrefix.length() > 0)) {
-                            response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, XTEE_URI);
+                            response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getProtocolVersion().getNamespaceURI());
                         }
+                        if (xTeePais.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
+                        	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_PREFIX, XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_URI);
+                        }
+                        
                         response.getSOAPEnvelope().removeHeaders();
-                        Vector headers = context.getRequestMessage().getSOAPEnvelope().getHeaders();
+                        
+                        @SuppressWarnings("rawtypes")
+						Vector headers = context.getRequestMessage().getSOAPEnvelope().getHeaders();
                         for (int i = 0; i < headers.size(); ++i) {
                             response.getSOAPEnvelope().addHeader((SOAPHeaderElement) headers.get(i));
                         }
@@ -714,7 +795,7 @@ public class CoreServices implements Dhl {
                             responseBody.paring.arv = result.count;
                             responseBody.paring.kaust = result.folders;
                             responseBody.kehaHref = a1.getContentId();
-                            responseBody.addToSOAPBody(response);
+                            responseBody.addToSOAPBody(response, xTeePais.getProtocolVersion());
                         } else if (ver.equalsIgnoreCase("v2")) {
                             receiveDocumentsV2ResponseType responseBody = new receiveDocumentsV2ResponseType();
                             responseBody.paring.arv = result.count;
@@ -726,7 +807,7 @@ public class CoreServices implements Dhl {
                             responseBody.edastusID = result.deliverySessionID;
                             responseBody.fragmenteKokku = result.totalFragments;
                             responseBody.fragmentNr = result.fragmentNr;
-                            responseBody.addToSOAPBody(response);
+                            responseBody.addToSOAPBody(response, xTeePais.getProtocolVersion());
                         } else if (ver.equalsIgnoreCase("v3")) {
                             receiveDocumentsV3ResponseType responseBody = new receiveDocumentsV3ResponseType();
                             responseBody.paring = getXRoadRequestBodyElement(context, "receiveDocuments");
@@ -734,7 +815,7 @@ public class CoreServices implements Dhl {
                             responseBody.edastusID = result.deliverySessionID;
                             responseBody.fragmenteKokku = result.totalFragments;
                             responseBody.fragmentNr = result.fragmentNr;
-                            responseBody.addToSOAPBody(response);
+                            responseBody.addToSOAPBody(response, xTeePais.getProtocolVersion());
                         } else if (ver.equalsIgnoreCase("v4")) {
                             receiveDocumentsV4ResponseType responseBody = new receiveDocumentsV4ResponseType();
                             responseBody.paring = getXRoadRequestBodyElement(context, "receiveDocuments");
@@ -742,7 +823,7 @@ public class CoreServices implements Dhl {
                             responseBody.edastusID = result.deliverySessionID;
                             responseBody.fragmenteKokku = result.totalFragments;
                             responseBody.fragmentNr = result.fragmentNr;
-                            responseBody.addToSOAPBody(response);
+                            responseBody.addToSOAPBody(response, xTeePais.getProtocolVersion());
                         }
 
                         response.saveChanges();
@@ -811,15 +892,23 @@ public class CoreServices implements Dhl {
                     // Koostame vastussõnumi keha
                     try {
                         org.apache.axis.Message response = context.getResponseMessage();
-                        String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage());
+                        
+                        String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xTeePais.getProtocolVersion().getNamespaceURI());
                         if ((xroadNamespacePrefix != null) && (xroadNamespacePrefix.length() > 0)) {
-                            response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, XTEE_URI);
+                            response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getProtocolVersion().getNamespaceURI());
                         }
+                        if (xTeePais.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
+                        	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_PREFIX, XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_URI);
+                        }
+                        
                         response.getSOAPEnvelope().removeHeaders();
-                        Vector headers = context.getRequestMessage().getSOAPEnvelope().getHeaders();
+                        
+                        @SuppressWarnings("rawtypes")
+						Vector headers = context.getRequestMessage().getSOAPEnvelope().getHeaders();
                         for (int i = 0; i < headers.size(); ++i) {
                             response.getSOAPEnvelope().addHeader((SOAPHeaderElement) headers.get(i));
                         }
+                        
                         response.getSOAPEnvelope().removeBody();
                         response.getSOAPEnvelope().addBody();
 
@@ -827,13 +916,13 @@ public class CoreServices implements Dhl {
                             markDocumentsReceivedV3ResponseType responseBody = new markDocumentsReceivedV3ResponseType();
                             responseBody.paring = result.requestElement;
                             responseBody.keha = "OK";
-                            responseBody.addToSOAPBody(response);
+                            responseBody.addToSOAPBody(response, xTeePais.getProtocolVersion());
                         } else {
                             markDocumentsReceivedResponseType responseBody = new markDocumentsReceivedResponseType();
                             responseBody.paring.dokumendid = result.dataMd5Hash;
                             responseBody.paring.kaust = result.folder;
                             responseBody.keha = "OK";
-                            responseBody.addToSOAPBody(response);
+                            responseBody.addToSOAPBody(response, xTeePais.getProtocolVersion());
                         }
                         response.saveChanges();
                     } catch (Exception ex) {
@@ -888,10 +977,10 @@ public class CoreServices implements Dhl {
                 // Loeme SOAP sõnumi detailandmetest välja X-Tee päise andmed ja
                 // sõnumiga MIME lisadena kaasa pandud andmed.
                 XRoadProtocolHeader xTeePais = XRoadProtocolHeader.getFromSOAPHeaderAxis(context);
-                logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele GetSendStatus(xtee teenus:" 
-                		+ xTeePais.getService() +"). Asutusest:" + xTeePais.getConsumer() 
-                		+ " ametnik:" + xTeePais.getOfficial()
-                		+" isikukood:" + xTeePais.getUserId());
+                logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele GetSendStatus(xtee teenus: " 
+                		+ xTeePais.getService() +"). Asutusest: " + xTeePais.getConsumer() 
+                		+ " ametnik: " + xTeePais.getOfficial()
+                		+" isikukood: " + xTeePais.getUserId());
                 // Tuvastame, millist päringu versiooni välja kutsuti
                 String ver = CommonMethods.getXRoadRequestVersion(xTeePais);
 
@@ -924,15 +1013,23 @@ public class CoreServices implements Dhl {
 
                 try {
                     org.apache.axis.Message response = context.getResponseMessage();
-                    String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage());
+                    
+                    String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xTeePais.getProtocolVersion().getNamespaceURI());
                     if ((xroadNamespacePrefix != null) && (xroadNamespacePrefix.length() > 0)) {
-                        response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, XTEE_URI);
+                        response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getProtocolVersion().getNamespaceURI());
                     }
+                    if (xTeePais.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
+                    	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_PREFIX, XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_URI);
+                    }
+                    
                     response.getSOAPEnvelope().removeHeaders();
-                    Vector headers = context.getRequestMessage().getSOAPEnvelope().getHeaders();
+                    
+                    @SuppressWarnings("rawtypes")
+					Vector headers = context.getRequestMessage().getSOAPEnvelope().getHeaders();
                     for (int i = 0; i < headers.size(); ++i) {
                         response.getSOAPEnvelope().addHeader((SOAPHeaderElement) headers.get(i));
                     }
+                    
                     response.getSOAPEnvelope().removeBody();
                     response.getSOAPEnvelope().addBody();
 
@@ -948,13 +1045,13 @@ public class CoreServices implements Dhl {
                         getSendStatusResponseType responseBody = new getSendStatusResponseType();
                         responseBody.paringKehaHash = result.dataMd5Hash;
                         responseBody.kehaHref = a1.getContentId();
-                        responseBody.addToSOAPBody(response);
+                        responseBody.addToSOAPBody(response, xTeePais.getProtocolVersion());
                     } else if (ver.equalsIgnoreCase("v2")) {
                         getSendStatusV2ResponseType responseBody = new getSendStatusV2ResponseType();
                         responseBody.paring = CommonMethods.getXRoadRequestBodyElement(context, "getSendStatus");
                         responseBody.dataMd5Hash = result.dataMd5Hash;
                         responseBody.kehaHref = a1.getContentId();
-                        responseBody.addToSOAPBody(response);
+                        responseBody.addToSOAPBody(response, xTeePais.getProtocolVersion());
                     }
 
                     response.saveChanges();
@@ -1015,15 +1112,23 @@ public class CoreServices implements Dhl {
 
                     // Koostame väljundsõnumi keha
                     org.apache.axis.Message response = context.getResponseMessage();
-                    String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage());
+                    
+                    String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xTeePais.getProtocolVersion().getNamespaceURI());
                     if ((xroadNamespacePrefix != null) && (xroadNamespacePrefix.length() > 0)) {
-                        response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, XTEE_URI);
+                        response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getProtocolVersion().getNamespaceURI());
                     }
+                    if (xTeePais.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
+                    	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_PREFIX, XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_URI);
+                    }
+                    
                     response.getSOAPEnvelope().removeHeaders();
-                    Vector headers = context.getRequestMessage().getSOAPEnvelope().getHeaders();
+                    
+                    @SuppressWarnings("rawtypes")
+					Vector headers = context.getRequestMessage().getSOAPEnvelope().getHeaders();
                     for (int i = 0; i < headers.size(); ++i) {
                         response.getSOAPEnvelope().addHeader((SOAPHeaderElement) headers.get(i));
                     }
+                    
                     response.getSOAPEnvelope().removeBody();
                     response.getSOAPEnvelope().addBody();
 
@@ -1038,7 +1143,7 @@ public class CoreServices implements Dhl {
                         ((getOccupationListV2ResponseType) result).ametikohadHref = a1.getContentId();
                     }
 
-                    result.addToSOAPBody(response);
+                    result.addToSOAPBody(response, xTeePais.getProtocolVersion());
                     response.saveChanges();
                 } else {
                     throw new AxisFault("Süsteemi sisemine viga! Päringu konteksti laadimine ebaõnnestus!");
@@ -1093,15 +1198,23 @@ public class CoreServices implements Dhl {
 
                     // Koostame väljundsõnumi keha
                     org.apache.axis.Message response = context.getResponseMessage();
-                    String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage());
+                    
+                    String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xTeePais.getProtocolVersion().getNamespaceURI());
                     if ((xroadNamespacePrefix != null) && (xroadNamespacePrefix.length() > 0)) {
-                        response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, XTEE_URI);
+                        response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getProtocolVersion().getNamespaceURI());
                     }
+                    if (xTeePais.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
+                    	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_PREFIX, XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_URI);
+                    }
+                    
                     response.getSOAPEnvelope().removeHeaders();
-                    Vector headers = context.getRequestMessage().getSOAPEnvelope().getHeaders();
+                    
+                    @SuppressWarnings("rawtypes")
+					Vector headers = context.getRequestMessage().getSOAPEnvelope().getHeaders();
                     for (int i = 0; i < headers.size(); ++i) {
                         response.getSOAPEnvelope().addHeader((SOAPHeaderElement) headers.get(i));
                     }
+                    
                     response.getSOAPEnvelope().removeBody();
                     response.getSOAPEnvelope().addBody();
 
@@ -1116,7 +1229,7 @@ public class CoreServices implements Dhl {
                         ((getSubdivisionListV2ResponseType) result).allyksusedHref = a1.getContentId();
                     }
 
-                    result.addToSOAPBody(response);
+                    result.addToSOAPBody(response, xTeePais.getProtocolVersion());
                     response.saveChanges();
                 } else {
                     throw new AxisFault("Süsteemi sisemine viga! Päringu konteksti laadimine ebaõnnestus!");
@@ -1153,20 +1266,27 @@ public class CoreServices implements Dhl {
         return result;
     }
 
-    private String getXroadNamespacePrefix(org.apache.axis.Message msg) {
+    private String getXroadNamespacePrefix(org.apache.axis.Message msg, String requiredNameSpaceUri) {
+    	String nameSpacePrefix = "";
+    	
         try {
             SOAPEnvelope env = msg.getSOAPEnvelope();
-            Iterator prefixes = env.getNamespacePrefixes();
+            
+            @SuppressWarnings("rawtypes")
+			Iterator prefixes = env.getNamespacePrefixes();
             while (prefixes.hasNext()) {
                 String prefix = String.valueOf(prefixes.next());
-                if (env.getNamespaceURI(prefix).equalsIgnoreCase(XTEE_URI)) {
-                    return prefix;
+                if (env.getNamespaceURI(prefix).equalsIgnoreCase(requiredNameSpaceUri)) {
+                	nameSpacePrefix = prefix;
+                	
+                	break;
                 }
             }
-            return "";
         } catch (Exception ex) {
-            return "";
+            logger.debug("Error when searching for namespace prefix", ex);
         }
+        
+        return nameSpacePrefix;
     }
 
     /**

@@ -2,7 +2,7 @@ package dhl.iostructures;
 
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
-
+import dvk.core.xroad.XRoadProtocolVersion;
 import dhl.users.Asutus;
 
 import java.util.ArrayList;
@@ -13,6 +13,7 @@ import javax.xml.soap.SOAPBodyElement;
 import javax.xml.soap.SOAPElement;
 
 public class getSendingOptionsResponseType implements SOAPOutputBodyRepresentation {
+	
     public getSendingOptionsRequestType paring;
     public ArrayList<Asutus> asutused;
 
@@ -26,17 +27,18 @@ public class getSendingOptionsResponseType implements SOAPOutputBodyRepresentati
         paring = null;
     }
 
-    public void addToSOAPBody(org.apache.axis.Message msg) {
+    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolVersion xRoadProtocolVersion) {
         try {
             // get SOAP envelope from SOAP message
             org.apache.axis.message.SOAPEnvelope se = msg.getSOAPEnvelope();
             SOAPBody body = se.getBody();
 
-            se.addNamespaceDeclaration(CommonStructures.NS_XTEE_PREFIX, CommonStructures.NS_XTEE_URI);
+            se.addNamespaceDeclaration(xRoadProtocolVersion.getNamespacePrefix(), xRoadProtocolVersion.getNamespaceURI());
             se.addNamespaceDeclaration(CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI);
             se.addNamespaceDeclaration(CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_URI);
 
-            Iterator items = body.getChildElements();
+            @SuppressWarnings("rawtypes")
+			Iterator items = body.getChildElements();
             if (items.hasNext()) {
                 body.removeContents();
             }

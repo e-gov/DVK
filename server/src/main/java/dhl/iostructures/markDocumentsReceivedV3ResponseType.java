@@ -9,6 +9,9 @@ import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import dvk.core.CommonStructures;
+import dvk.core.xroad.XRoadProtocolVersion;
+
 public class markDocumentsReceivedV3ResponseType implements SOAPOutputBodyRepresentation {
     static Logger logger = Logger.getLogger(markDocumentsReceivedV3ResponseType.class.getName());
     public Element paring;
@@ -19,21 +22,17 @@ public class markDocumentsReceivedV3ResponseType implements SOAPOutputBodyRepres
         keha = "OK";
     }
 
-    public void addToSOAPBody(org.apache.axis.Message msg) {
+    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolVersion xRoadProtocolVersion) {
         try {
-            String XTEE_PREFIX = "xtee";
-            String XTEE_URI = "http://x-tee.riik.ee/xsd/xtee.xsd";
-            String SOAPENC_PREFIX = "SOAP-ENC";
-            String SOAPENC_URI = "http://schemas.xmlsoap.org/soap/encoding/";
-
             // get SOAP envelope from SOAP message
             org.apache.axis.message.SOAPEnvelope se = msg.getSOAPEnvelope();
             SOAPBody body = se.getBody();
 
-            se.addNamespaceDeclaration(XTEE_PREFIX, XTEE_URI);
-            se.addNamespaceDeclaration(SOAPENC_PREFIX, SOAPENC_URI);
+            se.addNamespaceDeclaration(xRoadProtocolVersion.getNamespacePrefix(), xRoadProtocolVersion.getNamespaceURI());
+            se.addNamespaceDeclaration(CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI);
 
-            Iterator items = body.getChildElements();
+            @SuppressWarnings("rawtypes")
+			Iterator items = body.getChildElements();
             if (items.hasNext()) {
                 body.removeContents();
             }

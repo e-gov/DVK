@@ -1,7 +1,7 @@
 package dhl.iostructures;
 
-import dvk.core.CommonMethods;
 import java.util.Iterator;
+
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPBodyElement;
 import javax.xml.soap.SOAPElement;
@@ -9,6 +9,8 @@ import javax.xml.soap.SOAPElement;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import dvk.core.xroad.XRoadProtocolVersion;
 
 public class receiveDocumentsV3ResponseType implements SOAPOutputBodyRepresentation {
 	static Logger logger = Logger.getLogger(receiveDocumentsV4ResponseType.class.getName());
@@ -26,12 +28,13 @@ public class receiveDocumentsV3ResponseType implements SOAPOutputBodyRepresentat
         fragmenteKokku = 0;
     }
 
-    public void addToSOAPBody(org.apache.axis.Message msg) {
+    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolVersion xRoadProtocolVersion) {
         try {
             org.apache.axis.message.SOAPEnvelope se = msg.getSOAPEnvelope();
             SOAPBody body = se.getBody();
 
-            Iterator items = body.getChildElements();
+            @SuppressWarnings("rawtypes")
+			Iterator items = body.getChildElements();
             if (items.hasNext()) {
                 body.removeContents();
             }
@@ -39,8 +42,8 @@ public class receiveDocumentsV3ResponseType implements SOAPOutputBodyRepresentat
             SOAPBodyElement element = body.addBodyElement(se.createName("receiveDocumentsResponse"));
 
             // Sõnumi päringu osa
-            if (paring != null) {
-            SOAPElement elParing = element.addChildElement(se.createName("paring"));
+            if (paring != null && xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+            	SOAPElement elParing = element.addChildElement(se.createName("paring"));
                 if (paring != null) {
                     NodeList nl = paring.getChildNodes();
                     for (int i = 0; i < nl.getLength(); ++i) {

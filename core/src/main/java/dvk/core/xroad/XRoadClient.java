@@ -9,6 +9,8 @@ package dvk.core.xroad;
  */
 public class XRoadClient extends XRoadIdentifier {
 	
+	public XRoadClient() {}
+	
 	public XRoadClient(String xRoadInstance, String memberClass, String memberCode) {
 		this.xRoadInstance = xRoadInstance;
 		this.memberClass = memberClass;

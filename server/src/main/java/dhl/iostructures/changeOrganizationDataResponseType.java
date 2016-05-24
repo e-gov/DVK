@@ -1,7 +1,5 @@
 package dhl.iostructures;
 
-import dvk.core.CommonMethods;
-
 import java.util.Iterator;
 
 import javax.xml.soap.SOAPBody;
@@ -11,7 +9,12 @@ import javax.xml.soap.SOAPElement;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
+import dvk.core.xroad.XRoadProtocolVersion;
+
 public class changeOrganizationDataResponseType {
+	
     public changeOrganizationDataResponseType() {
     }
 
@@ -25,29 +28,27 @@ public class changeOrganizationDataResponseType {
         m_requestElement = value;
     }
 
-    public void addToSOAPBody(org.apache.axis.Message msg) {
+    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolVersion xRoadProtocolVersion) {
         try {
-            String XTEE_PREFIX = "xtee";
-            String XTEE_URI = "http://x-tee.riik.ee/xsd/xtee.xsd";
-            String SOAPENC_PREFIX = "SOAP-ENC";
-            String SOAPENC_URI = "http://schemas.xmlsoap.org/soap/encoding/";
-
             // get SOAP envelope from SOAP message
             org.apache.axis.message.SOAPEnvelope se = msg.getSOAPEnvelope();
             SOAPBody body = se.getBody();
 
-            se.addNamespaceDeclaration(XTEE_PREFIX, XTEE_URI);
-            se.addNamespaceDeclaration(SOAPENC_PREFIX, SOAPENC_URI);
+            se.addNamespaceDeclaration(xRoadProtocolVersion.getNamespacePrefix(), xRoadProtocolVersion.getNamespaceURI());
+            se.addNamespaceDeclaration(CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI);
 
-            Iterator items = body.getChildElements();
+            @SuppressWarnings("rawtypes")
+			Iterator items = body.getChildElements();
             if (items.hasNext()) {
                 body.removeContents();
             }
 
-            SOAPBodyElement element = body.addBodyElement(se.createName("changeOrganizationDataResponse", XTEE_PREFIX, XTEE_URI));
+            SOAPBodyElement element = body.addBodyElement(se.createName("changeOrganizationDataResponse",
+            				xRoadProtocolVersion.getNamespacePrefix(),
+            				xRoadProtocolVersion.getNamespaceURI()));
             SOAPElement elParing = element.addChildElement(se.createName("paring"));
 
-            if (m_requestElement != null) {
+            if (m_requestElement != null && xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
                 NodeList nl = m_requestElement.getChildNodes();
                 for (int i = 0; i < nl.getLength(); ++i) {
                     elParing.appendChild(nl.item(i));

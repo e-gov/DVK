@@ -19,7 +19,8 @@
 
 	<properties>
 		<packageName>dhl</packageName>
-		<dvkServerJettyEnvLocation>${project.basedir}/src/test/resources/jetty-env.xml</dvkServerJettyEnvLocation>
+		<dvkServerJettyEnvLocation>src/test/resources/jetty-env.xml</dvkServerJettyEnvLocation>
+		<jettyWebXml>src/test/resources/web-test.xml</jettyWebXml>
 	</properties>
 
 	<build>
@@ -96,7 +97,7 @@
 					<stopKey>foo</stopKey>
 					<stopPort>9999</stopPort>
 					<jettyEnvXml>${dvkServerJettyEnvLocation}</jettyEnvXml>
-					<overrideWebXml>src/test/resources/web-test.xml</overrideWebXml>
+					<overrideWebXml>${jettyWebXml}</overrideWebXml>
 					<webAppSourceDirectory>target/dhl</webAppSourceDirectory>
 					<contextPath>/</contextPath>
 				</configuration>

@@ -1,16 +1,8 @@
 package dhl.iostructures;
 
-import dvk.core.CommonMethods;
-import dvk.core.CommonStructures;
-import dhl.iostructures.getSendingOptionsV3RequestType;
-import dhl.users.Allyksus;
-import dhl.users.Ametikoht;
-import dhl.users.Asutus;
-
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -19,6 +11,13 @@ import javax.xml.soap.SOAPBodyElement;
 import javax.xml.soap.SOAPElement;
 
 import org.apache.axis.AxisFault;
+
+import dhl.users.Allyksus;
+import dhl.users.Ametikoht;
+import dhl.users.Asutus;
+import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
+import dvk.core.xroad.XRoadProtocolVersion;
 
 public class getSendingOptionsV3ResponseType implements SOAPOutputBodyRepresentation {
     public getSendingOptionsV3RequestType paring;
@@ -33,13 +32,14 @@ public class getSendingOptionsV3ResponseType implements SOAPOutputBodyRepresenta
         dataMd5Hash = "";
     }
 
-    public void addToSOAPBody(org.apache.axis.Message msg) {
+    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolVersion xRoadProtocolVersion) {
         try {
             // get SOAP envelope from SOAP message
             org.apache.axis.message.SOAPEnvelope se = msg.getSOAPEnvelope();
             SOAPBody body = se.getBody();
 
-            Iterator items = body.getChildElements();
+            @SuppressWarnings("rawtypes")
+			Iterator items = body.getChildElements();
             if (items.hasNext()) {
                 body.removeContents();
             }

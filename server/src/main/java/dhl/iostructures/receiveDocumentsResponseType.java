@@ -1,11 +1,13 @@
 package dhl.iostructures;
 
-import dvk.core.CommonMethods;
-
 import java.util.Iterator;
+
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPBodyElement;
 import javax.xml.soap.SOAPElement;
+
+import dvk.core.CommonMethods;
+import dvk.core.xroad.XRoadProtocolVersion;
 
 public class receiveDocumentsResponseType implements SOAPOutputBodyRepresentation {
     public receiveDocumentsRequestType paring;
@@ -16,12 +18,13 @@ public class receiveDocumentsResponseType implements SOAPOutputBodyRepresentatio
         kehaHref = "";
     }
 
-    public void addToSOAPBody(org.apache.axis.Message msg) {
+    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolVersion xRoadProtocolVersion) {
         try {
             org.apache.axis.message.SOAPEnvelope se = msg.getSOAPEnvelope();
             SOAPBody body = se.getBody();
 
-            Iterator items = body.getChildElements();
+            @SuppressWarnings("rawtypes")
+			Iterator items = body.getChildElements();
             if (items.hasNext()) {
                 body.removeContents();
             }

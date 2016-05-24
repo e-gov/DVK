@@ -1,6 +1,7 @@
 package dhl.iostructures;
 
 import dvk.core.CommonMethods;
+import dvk.core.xroad.XRoadProtocolVersion;
 
 import java.util.Iterator;
 import javax.xml.soap.SOAPBody;
@@ -16,13 +17,14 @@ public class markDocumentsReceivedResponseType implements SOAPOutputBodyRepresen
         keha = "OK";
     }
 
-    public void addToSOAPBody(org.apache.axis.Message msg) {
+    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolVersion xRoadProtocolVersion) {
         try {
             // get SOAP envelope from SOAP message
             org.apache.axis.message.SOAPEnvelope se = msg.getSOAPEnvelope();
             SOAPBody body = se.getBody();
 
-            Iterator items = body.getChildElements();
+            @SuppressWarnings("rawtypes")
+			Iterator items = body.getChildElements();
             if (items.hasNext()) {
                 body.removeContents();
             }

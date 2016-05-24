@@ -1,15 +1,17 @@
 package dhl.iostructures;
 
-import dhl.users.Ametikoht;
-import dvk.core.CommonStructures;
-
 import java.util.ArrayList;
 import java.util.Iterator;
+
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPBodyElement;
 import javax.xml.soap.SOAPElement;
 
 import org.apache.log4j.Logger;
+
+import dhl.users.Ametikoht;
+import dvk.core.CommonStructures;
+import dvk.core.xroad.XRoadProtocolVersion;
 
 public class getOccupationListResponseType implements SOAPOutputBodyRepresentation {
     static Logger logger = Logger.getLogger(getOccupationListResponseType.class.getName());
@@ -26,17 +28,18 @@ public class getOccupationListResponseType implements SOAPOutputBodyRepresentati
         paring = null;
     }
 
-    public void addToSOAPBody(org.apache.axis.Message msg) {
+    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolVersion xRoadProtocolVersion) {
         try {
             // get SOAP envelope from SOAP message
             org.apache.axis.message.SOAPEnvelope se = msg.getSOAPEnvelope();
             SOAPBody body = se.getBody();
 
-            se.addNamespaceDeclaration(CommonStructures.NS_XTEE_PREFIX, CommonStructures.NS_XTEE_URI);
+            se.addNamespaceDeclaration(xRoadProtocolVersion.getNamespacePrefix(), xRoadProtocolVersion.getNamespaceURI());
             se.addNamespaceDeclaration(CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI);
             se.addNamespaceDeclaration(CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_URI);
 
-            Iterator items = body.getChildElements();
+            @SuppressWarnings("rawtypes")
+			Iterator items = body.getChildElements();
             if (items.hasNext()) {
                 body.removeContents();
             }

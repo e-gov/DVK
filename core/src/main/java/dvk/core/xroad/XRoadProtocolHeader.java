@@ -26,8 +26,8 @@ import dvk.core.CommonMethods;
  */
 public final class XRoadProtocolHeader {
 	
-	public static final String XROAD_NS_IDENTIFIERS_PREFIX = "id";
-    public static final String XROAD_NS_IDENTIFIERS_URI = "http://x-road.eu/xsd/identifiers";
+	public static final String NAMESPACE_IDENTIFIERS_PREFIX = "id";
+    public static final String NAMESPACE_IDENTIFIERS_URI = "http://x-road.eu/xsd/identifiers";
 
     // Fields specific to X-Road protocol version 2.0, 3.0 and 3.1
     private String consumer;	// "asutus" in the X-Road protocol version 2.0
@@ -253,14 +253,14 @@ public final class XRoadProtocolHeader {
 
 	private SOAPEnvelope prepareXRoadProtocol_4_0_Header(SOAPEnvelope envelope, SOAPFactory factory) {
 		OMNamespace nsXRoad = factory.createOMNamespace(XRoadProtocolVersion.V4_0.getNamespaceURI(), XRoadProtocolVersion.V4_0.getNamespacePrefix());
-		OMNamespace nsId = factory.createOMNamespace(XROAD_NS_IDENTIFIERS_URI, XROAD_NS_IDENTIFIERS_PREFIX);
+		OMNamespace nsId = factory.createOMNamespace(NAMESPACE_IDENTIFIERS_URI, NAMESPACE_IDENTIFIERS_PREFIX);
 
 		envelope.declareNamespace(nsXRoad);
 		envelope.declareNamespace(nsId);
 
 		// Populating client block
 		SOAPHeaderBlock clientHeaderBlock = factory.createSOAPHeaderBlock(XRoadProtocolHeaderField.CLIENT.getValue(), nsXRoad);
-		clientHeaderBlock.addAttribute("objectType", XRoadObjectType.SUBSYSTEM.getName(), nsId);
+		clientHeaderBlock.addAttribute("objectType", XRoadObjectType.MEMBER.getName(), nsId);
 
 		OMElement clientXRoadInstance = factory.createOMElement(XRoadIdentifierType.XROAD_INSTANCE.getName(), nsId);
 		clientXRoadInstance.setText(xRoadClient.getxRoadInstance());
@@ -275,7 +275,7 @@ public final class XRoadProtocolHeader {
 
 		// Populating service block
 		SOAPHeaderBlock serviceHeaderBlock = factory.createSOAPHeaderBlock(XRoadProtocolHeaderField.SERVICE.getValue(), nsXRoad);
-		serviceHeaderBlock.addAttribute("objectType", XRoadObjectType.SUBSYSTEM.getName(), nsId);
+		serviceHeaderBlock.addAttribute("objectType", XRoadObjectType.SERVICE.getName(), nsId);
 
 		OMElement serviceXRoadInstance = factory.createOMElement(XRoadIdentifierType.XROAD_INSTANCE.getName(), nsId);
 		serviceXRoadInstance.setText(xRoadService.getxRoadInstance());
@@ -372,13 +372,13 @@ public final class XRoadProtocolHeader {
 		String userId = "";
 		String issue = "";
 		
-		QName xRoadInstanceQNname = new QName(XROAD_NS_IDENTIFIERS_URI, XRoadIdentifierType.XROAD_INSTANCE.getName());
-		QName memberClassQNname = new QName(XROAD_NS_IDENTIFIERS_URI, XRoadIdentifierType.MEMBER_CLASS.getName());
-		QName memberCodeQNname = new QName(XROAD_NS_IDENTIFIERS_URI, XRoadIdentifierType.MEMBER_CODE.getName());
+		QName xRoadInstanceQNname = new QName(NAMESPACE_IDENTIFIERS_URI, XRoadIdentifierType.XROAD_INSTANCE.getName());
+		QName memberClassQNname = new QName(NAMESPACE_IDENTIFIERS_URI, XRoadIdentifierType.MEMBER_CLASS.getName());
+		QName memberCodeQNname = new QName(NAMESPACE_IDENTIFIERS_URI, XRoadIdentifierType.MEMBER_CODE.getName());
 
-		QName subsystemCodeQNname = new QName(XROAD_NS_IDENTIFIERS_URI, XRoadIdentifierType.SUBSYSTEM_CODE.getName());
-		QName serviceCodeQNname = new QName(XROAD_NS_IDENTIFIERS_URI, XRoadIdentifierType.SERVICE_CODE.getName());
-		QName serviceVersionQNname = new QName(XROAD_NS_IDENTIFIERS_URI, XRoadIdentifierType.SERVICE_VERSION.getName());
+		QName subsystemCodeQNname = new QName(NAMESPACE_IDENTIFIERS_URI, XRoadIdentifierType.SUBSYSTEM_CODE.getName());
+		QName serviceCodeQNname = new QName(NAMESPACE_IDENTIFIERS_URI, XRoadIdentifierType.SERVICE_CODE.getName());
+		QName serviceVersionQNname = new QName(NAMESPACE_IDENTIFIERS_URI, XRoadIdentifierType.SERVICE_VERSION.getName());
 		
 		/***** Retrieving data from the CLIENT header block *****/
 		org.apache.axis.message.SOAPHeaderElement clientHeaderBlock =

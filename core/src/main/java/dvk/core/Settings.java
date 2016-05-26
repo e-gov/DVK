@@ -20,9 +20,11 @@ public class Settings {
     private static final String CLIENT_DEFAULT_ADIT_PROCUCER_NAME = "adit";
     private static final String CLIENT_DEFAULT_ADIT_INFORMATION_SYSTEM_NAME = "DHS";
     
+    // X-Road protocol version 4.0 related default settings
     private static final String XROAD_DEFAULT_INSTANCE = "EE";
 	private static final String XROAD_DEFAULT_MEMBER_CLASS = "GOV";
-	private static final String XROAD_DEFAULT_SUBSYSTEM_CODE = "dvk";
+	private static final String XROAD_DEFAULT_MEMBER_CODE = "70006317";
+	private static final String XROAD_DEFAULT_SUBSYSTEM_CODE = "dhl";
 
     public static Properties currentProperties;
 
@@ -71,10 +73,11 @@ public class Settings {
     public static boolean Server_AutoRegisterUnknownSenders = false;
     public static String serverJdigidocConfigLocation = "jar://jdigidoc.cfg";
     
-    // X-Road protocol settings
-    public static String xroadInstance = XROAD_DEFAULT_INSTANCE;
-	public static String xroadMemberClass = XROAD_DEFAULT_MEMBER_CLASS;
-	public static String xroadSubsystemCode = XROAD_DEFAULT_SUBSYSTEM_CODE;
+    // X-Road protocol version 4.0 settings
+    public static String xRoadInstance = XROAD_DEFAULT_INSTANCE;
+	public static String xRoadMemberClass = XROAD_DEFAULT_MEMBER_CLASS;
+	public static String xRoadMemberCode = XROAD_DEFAULT_MEMBER_CODE;
+	public static String xRoadSubsystemCode = XROAD_DEFAULT_SUBSYSTEM_CODE;
 
     // General settings (both client and server)
     public static boolean LogErrors = false;
@@ -367,7 +370,7 @@ public class Settings {
                 Server_CentralRightsDatabaseSyncPeriod = SERVER_DEFAULT_CENTRAL_RIGHTS_DATABASE_SYNC_PERIOD;
             }
 
-            // Serveri jooksutamine kliendi andmebaai peal
+            // Serveri jooksutamine kliendi andmebaasi peal
             if ((currentProperties.getProperty("server_run_on_client_database") != null)
                     && (currentProperties.getProperty("server_run_on_client_database").equalsIgnoreCase("yes")
                     || currentProperties.getProperty("server_run_on_client_database").equalsIgnoreCase("true")
@@ -377,13 +380,16 @@ public class Settings {
 
             // X-Road protocol configurations
             if (currentProperties.getProperty("xRoad.instance") != null) {
-            	xroadInstance = currentProperties.getProperty("xRoad.instance");	
+            	xRoadInstance = currentProperties.getProperty("xRoad.instance");	
             }
             if (currentProperties.getProperty("xRoad.memberClass") != null) {
-            	xroadMemberClass = currentProperties.getProperty("xRoad.memberClass");	
+            	xRoadMemberClass = currentProperties.getProperty("xRoad.memberClass");	
+            }
+            if (currentProperties.getProperty("xRoad.memberCode") != null) {
+            	xRoadMemberCode = currentProperties.getProperty("xRoad.memberCode");	
             }
             if (currentProperties.getProperty("xRoad.subsystemCode") != null) {
-            	xroadSubsystemCode = currentProperties.getProperty("xRoad.subsystemCode");	
+            	xRoadSubsystemCode = currentProperties.getProperty("xRoad.subsystemCode");	
             }
             
             // Üldkasutatavad seaded
@@ -413,4 +419,21 @@ public class Settings {
         	logger.error(ex);
         }
     }
+
+	public static String getXRoadInstance() {
+		return xRoadInstance;
+	}
+
+	public static String getXRoadMemberClass() {
+		return xRoadMemberClass;
+	}
+
+	public static String getxRoadMemberCode() {
+		return xRoadMemberCode;
+	}
+
+	public static String getXRoadSubsystemCode() {
+		return xRoadSubsystemCode;
+	}
+	
 }

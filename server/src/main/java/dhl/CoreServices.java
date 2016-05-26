@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 
 import javax.activation.DataHandler;
@@ -21,6 +22,7 @@ import org.apache.axis.MessageContext;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.axis.transport.http.HTTPConstants;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -69,10 +71,17 @@ import dvk.core.CommonStructures;
 import dvk.core.Settings;
 import dvk.core.xroad.XRoadProtocolHeader;
 import dvk.core.xroad.XRoadProtocolVersion;
+import dvk.core.xroad.XRoadService;
 
 public class CoreServices implements Dhl {
 	
-	public static Logger logger = LogManager.getLogger(CoreServices.class.getName());
+	public static final Logger LOGGER = LogManager.getLogger(CoreServices.class.getName());
+	
+	private String[] mehodsListWhenRunOnClientDatabase;
+	private String[] methodsListFull;
+	
+	private List<XRoadService> serviceMethodsWhenRunOnClientDatabase = new ArrayList<XRoadService>();
+	private List<XRoadService> serviceMethodsFull = new ArrayList<XRoadService>();
 
     public CoreServices() throws AxisFault {
         try {
@@ -94,6 +103,8 @@ public class CoreServices implements Dhl {
             File configFile = new File(configFileName);
             Settings.loadProperties(configFile.getAbsolutePath());
 
+            initializeServiceMethodsMetaData();
+            
             // Start a cleaner object that cleans up temporary files in a separate thread.
             // Temporary files should not be deleted immediately after use because some of them
             // are needed for SOAP response. Deleting such files would cause an error while
@@ -109,11 +120,69 @@ public class CoreServices implements Dhl {
                 // Opened database connection will be closed by AarSyncronizer thread when it finishes
             }
         } catch (Exception ex) {
-            logger.fatal(ex.getMessage(), ex);
+            LOGGER.fatal(ex.getMessage(), ex);
             throw new AxisFault(ex.getMessage());
         }
     }
 
+    private void initializeServiceMethodsMetaData() {
+    	// Initializing service methods list for use with X-Road protocol version 2.0
+    	String producer = Settings.Server_ProducerName;
+		mehodsListWhenRunOnClientDatabase = new String[] {
+			producer + ".sendDocuments.v1",
+			producer + ".sendDocuments.v2",
+			producer + ".sendDocuments.v3",
+			producer + ".sendDocuments.v4",
+			producer + ".getSendStatus.v1",
+			producer + ".getSendStatus.v2",
+			producer + ".getSendingOptions.v1",
+			producer + ".getSendingOptions.v2",
+			producer + ".getSendingOptions.v3"
+		};
+		methodsListFull = (String[]) ArrayUtils.addAll(mehodsListWhenRunOnClientDatabase, new String[] {
+			producer + ".receiveDocuments.v1",
+			producer + ".receiveDocuments.v2",
+			producer + ".receiveDocuments.v3",
+			producer + ".receiveDocuments.v4",
+			producer + ".markDocumentsReceived.v1",
+			producer + ".markDocumentsReceived.v2",
+			producer + ".markDocumentsReceived.v3",
+			producer + ".deleteOldDocuments.v1",
+			producer + ".changeOrganizationData.v1",
+			producer + ".runSystemCheck.v1",
+			producer + ".getOccupationList.v1",
+			producer + ".getOccupationList.v2",
+			producer + ".getSubdivisionList.v1",
+			producer + ".getSubdivisionList.v2"
+		});
+		
+		// Initializing service methods list for use with X-Road protocol version 4.0
+		serviceMethodsWhenRunOnClientDatabase.add(new XRoadService("sendDocuments", "v1"));
+		serviceMethodsWhenRunOnClientDatabase.add(new XRoadService("sendDocuments", "v2"));
+		serviceMethodsWhenRunOnClientDatabase.add(new XRoadService("sendDocuments", "v3"));
+		serviceMethodsWhenRunOnClientDatabase.add(new XRoadService("sendDocuments", "v4"));
+		serviceMethodsWhenRunOnClientDatabase.add(new XRoadService("getSendStatus", "v1"));
+		serviceMethodsWhenRunOnClientDatabase.add(new XRoadService("getSendStatus", "v2"));
+		serviceMethodsWhenRunOnClientDatabase.add(new XRoadService("getSendingOptions", "v1"));
+		serviceMethodsWhenRunOnClientDatabase.add(new XRoadService("getSendingOptions", "v2"));
+		serviceMethodsWhenRunOnClientDatabase.add(new XRoadService("getSendingOptions", "v3"));
+		
+		serviceMethodsFull.addAll(serviceMethodsWhenRunOnClientDatabase);
+		serviceMethodsFull.add(new XRoadService("receiveDocuments", "v1"));
+		serviceMethodsFull.add(new XRoadService("receiveDocuments", "v2"));
+		serviceMethodsFull.add(new XRoadService("receiveDocuments", "v3"));
+		serviceMethodsFull.add(new XRoadService("receiveDocuments", "v4"));
+		serviceMethodsFull.add(new XRoadService("markDocumentsReceived", "v1"));
+		serviceMethodsFull.add(new XRoadService("markDocumentsReceived", "v2"));
+		serviceMethodsFull.add(new XRoadService("markDocumentsReceived", "v3"));
+		serviceMethodsFull.add(new XRoadService("deleteOldDocuments", "v1"));
+		serviceMethodsFull.add(new XRoadService("changeOrganizationData", "v1"));
+		serviceMethodsFull.add(new XRoadService("runSystemCheck", "v1"));
+		serviceMethodsFull.add(new XRoadService("getOccupationList", "v1"));
+		serviceMethodsFull.add(new XRoadService("getOccupationList", "v2"));
+		serviceMethodsFull.add(new XRoadService("getSubdivisionList", "v1"));
+		serviceMethodsFull.add(new XRoadService("getSubdivisionList", "v2"));
+    }
 
     protected void finalize() {
         //        Runtime r = Runtime.getRuntime();
@@ -127,7 +196,7 @@ public class CoreServices implements Dhl {
             javax.sql.DataSource ds = (javax.sql.DataSource) envContext.lookup(Settings.Server_DatabaseEnvironmentVariable);
             return ds.getConnection();
         } catch (Exception ex) {
-            logger.fatal(ex.getMessage(), ex);
+            LOGGER.fatal(ex.getMessage(), ex);
             throw new AxisFault("DVK Internal error. Error connecting to database: " + ex.getMessage());
         }
     }
@@ -136,63 +205,43 @@ public class CoreServices implements Dhl {
      * @webmethod
      */
     public void listMethods() throws AxisFault {
+    	LOGGER.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele ListMethods");
+    	
         try {
-        	logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele ListMethods");
-            String producer = Settings.Server_ProducerName;
-            String[] keha = null;
-            if (Settings.Server_RunOnClientDatabase) {
-                keha = new String[]
-                        {
-                                producer + ".sendDocuments.v1",
-                                producer + ".sendDocuments.v2",
-                                producer + ".sendDocuments.v3",
-                                producer + ".sendDocuments.v4",
-                                producer + ".getSendStatus.v1",
-                                producer + ".getSendStatus.v2",
-                                producer + ".getSendingOptions.v1",
-                                producer + ".getSendingOptions.v2",
-                                producer + ".getSendingOptions.v3"
-                        };
-            } else {
-                keha = new String[]
-                        {
-                                producer + ".sendDocuments.v1",
-                                producer + ".sendDocuments.v2",
-                                producer + ".sendDocuments.v3",
-                                producer + ".sendDocuments.v4",
-                                producer + ".getSendStatus.v1",
-                                producer + ".getSendStatus.v2",
-                                producer + ".receiveDocuments.v1",
-                                producer + ".receiveDocuments.v2",
-                                producer + ".receiveDocuments.v3",
-                                producer + ".receiveDocuments.v4",
-                                producer + ".markDocumentsReceived.v1",
-                                producer + ".markDocumentsReceived.v2",
-                                producer + ".markDocumentsReceived.v3",
-                                producer + ".getSendingOptions.v1",
-                                producer + ".getSendingOptions.v2",
-                                producer + ".getSendingOptions.v3",
-                                producer + ".deleteOldDocuments.v1",
-                                producer + ".changeOrganizationData.v1",
-                                producer + ".runSystemCheck.v1",
-                                producer + ".getOccupationList.v1",
-                                producer + ".getOccupationList.v2",
-                                producer + ".getSubdivisionList.v1",
-                                producer + ".getSubdivisionList.v2"
-                        };
-            }
+        	org.apache.axis.MessageContext context = org.apache.axis.MessageContext.getCurrentContext();
+        	org.apache.axis.Message response = context.getResponseMessage();
+        	
+        	XRoadProtocolHeader xRoadHeader = XRoadProtocolHeader.getFromSOAPHeaderAxis(context);
+        	
+            listMethodsResponseType body = null;
+        	if (xRoadHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
+        		if (Settings.Server_RunOnClientDatabase) {
+        			body = new listMethodsResponseType(mehodsListWhenRunOnClientDatabase);
+	        	} else {
+	        		body = new listMethodsResponseType(methodsListFull);
+	        	}
+        	} else if (xRoadHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
+        		@SuppressWarnings("rawtypes")
+    			Vector headers = context.getRequestMessage().getSOAPEnvelope().getHeaders();
+                for (int i = 0; i < headers.size(); ++i) {
+                    response.getSOAPEnvelope().addHeader((SOAPHeaderElement) headers.get(i));
+                }
+                
+        		if (Settings.Server_RunOnClientDatabase) {
+        			body = new listMethodsResponseType(serviceMethodsWhenRunOnClientDatabase);
+        		} else {
+        			body = new listMethodsResponseType(serviceMethodsFull);
+        		}
+        	}
             
-            org.apache.axis.MessageContext context = org.apache.axis.MessageContext.getCurrentContext();
-            org.apache.axis.Message response = context.getResponseMessage();
-            
-            XRoadProtocolHeader xRoadHeader = XRoadProtocolHeader.getFromSOAPHeaderAxis(context);
-            
-            listMethodsResponseType body = new listMethodsResponseType(keha);
-            body.addToSOAPBody(response, xRoadHeader.getProtocolVersion());
+        	if (body != null) {
+        		body.addToSOAPBody(response, xRoadHeader.getProtocolVersion());
+        	}
             
             response.saveChanges();
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            LOGGER.error(ex.getMessage(), ex);
+            
             throw new AxisFault(ex.getMessage());
         }
     }
@@ -203,7 +252,7 @@ public class CoreServices implements Dhl {
     public void runSystemCheck(Object keha) throws AxisFault {
         Connection conn = null;
         try {
-        	logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele RunSystemCheck");
+        	LOGGER.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele RunSystemCheck");
             // Kontrollime, kas konfiguratsioonifail on edukalt sisse loetud
             if ((Settings.currentProperties == null) || (Settings.currentProperties.size() < 1)) {
                 throw new AxisFault("DVK tarkvaraline viga: Rakenduse seadistuse laadimine ebaõnnestus!");
@@ -241,7 +290,7 @@ public class CoreServices implements Dhl {
             }
 
             // Proovime, kas õiguste kesksüsteemi liides toimib
-            if (Settings.Server_UseCentralRightsDatabase) {
+            if (Settings.Server_UseCentralRightsDatabase == false) {
                 try {
                     AarClient aarClient = new AarClient(
                             Settings.Server_CentralRightsDatabaseURL,
@@ -251,7 +300,7 @@ public class CoreServices implements Dhl {
                     orgs.add(CommonStructures.RIA_REGISTRATION_NUMBER);
                     aarClient.asutusedRequest(orgs, null);
                 } catch (Exception ex) {
-                    logger.error(ex.getMessage(), ex);
+                    LOGGER.error(ex.getMessage(), ex);
                     throw new AxisFault("DVK tarkvaraline viga: Keskse õiguste andmekoguga ühendamine ebaõnnestus!");
                 }
             }
@@ -267,7 +316,7 @@ public class CoreServices implements Dhl {
                 response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xRoadHeader.getProtocolVersion().getNamespaceURI());
             }
             if (xRoadHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-            	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_PREFIX, XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_URI);
+            	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX, XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_URI);
             }
             
             response.getSOAPEnvelope().removeHeaders();
@@ -318,7 +367,7 @@ public class CoreServices implements Dhl {
         if (!Settings.Server_RunOnClientDatabase) {
             Connection conn = null;
             try {
-            	logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele DeleteOldDocuments");
+            	LOGGER.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele DeleteOldDocuments");
             	
                 conn = getConnection();
                 DeleteOldDocuments.V1(conn);
@@ -339,7 +388,7 @@ public class CoreServices implements Dhl {
                     response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xRoadHeader.getProtocolVersion().getNamespaceURI());
                 }
                 if (xRoadHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-                	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_PREFIX, XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_URI);
+                	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX, XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_URI);
                 }
                 
                 response.getSOAPEnvelope().removeHeaders();
@@ -357,7 +406,7 @@ public class CoreServices implements Dhl {
                 
                 response.saveChanges();
             } catch (Exception ex) {
-                logger.error(ex.getMessage(), ex);
+                LOGGER.error(ex.getMessage(), ex);
                 throw new AxisFault(ex.getMessage());
             } finally {
                 CommonMethods.safeCloseDatabaseConnection(conn);
@@ -379,7 +428,7 @@ public class CoreServices implements Dhl {
 
                     // Laeme sõnumi X-Tee päised endale sobivasse andmestruktuuri
                     XRoadProtocolHeader xTeePais = XRoadProtocolHeader.getFromSOAPHeaderAxis(context);
-                    logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele ChangeOrganizationData(xtee teenus: " 
+                    LOGGER.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele ChangeOrganizationData(xtee teenus: " 
                     		+ xTeePais.getService() +"). Asutusest: " + xTeePais.getConsumer() 
                     		+ " ametnik: " + xTeePais.getOfficial()
                     		+ " isikukood: " + xTeePais.getUserId());
@@ -402,7 +451,7 @@ public class CoreServices implements Dhl {
                         response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getProtocolVersion().getNamespaceURI());
                     }
                     if (xTeePais.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-                    	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_PREFIX, XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_URI);
+                    	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX, XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_URI);
                     }
                     
                     response.getSOAPEnvelope().removeHeaders();
@@ -421,10 +470,10 @@ public class CoreServices implements Dhl {
                     response.saveChanges();
                 }
             } catch (AxisFault fault) {
-                logger.error(fault.getMessage(), fault);
+                LOGGER.error(fault.getMessage(), fault);
                 throw fault;
             } catch (Exception ex) {
-                logger.error(ex.getMessage(), ex);
+                LOGGER.error(ex.getMessage(), ex);
                 throw new AxisFault(ex.getMessage());
             } finally {
                 CommonMethods.safeCloseDatabaseConnection(conn);
@@ -466,7 +515,7 @@ public class CoreServices implements Dhl {
                 
                 // Tuvastame, millist päringu versiooni välja kutsuti
                 String ver = CommonMethods.getXRoadRequestVersion(xTeePais);
-                logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele GetSendingOptions(xtee teenus: " 
+                LOGGER.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele GetSendingOptions(xtee teenus: " 
                 		+ xTeePais.getService() +"). Asutusest: " + xTeePais.getConsumer() 
                 		+ " ametnik: " + xTeePais.getOfficial()
                 		+ " isikukood: " + xTeePais.getUserId());
@@ -507,7 +556,7 @@ public class CoreServices implements Dhl {
                     response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getProtocolVersion().getNamespaceURI());
                 }
                 if (xTeePais.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-                	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_PREFIX, XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_URI);
+                	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX, XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_URI);
                 }
                 
                 response.getSOAPEnvelope().removeHeaders();
@@ -539,10 +588,10 @@ public class CoreServices implements Dhl {
                 throw new AxisFault("Süsteemi sisemine viga! Päringu konteksti laadimine ebaõnnestus!");
             }
         } catch (AxisFault fault) {
-            logger.error(fault.getMessage(), fault);
+            LOGGER.error(fault.getMessage(), fault);
             throw fault;
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            LOGGER.error(ex.getMessage(), ex);
             throw new AxisFault(ex.getMessage());
         } finally {
             CommonMethods.safeCloseDatabaseConnection(conn);
@@ -589,7 +638,7 @@ public class CoreServices implements Dhl {
                 // Laeme sõnumi X-Tee päised endale sobivasse andmestruktuuri
                 t.reset();
                 XRoadProtocolHeader xTeePais = XRoadProtocolHeader.getFromSOAPHeaderAxis(context);
-                logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele SendDocuments(xtee teenus:" 
+                LOGGER.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele SendDocuments(xtee teenus:" 
                 		+ xTeePais.getService() +"). Asutusest:" + xTeePais.getConsumer() 
                 		+ " ametnik:" + xTeePais.getOfficial()
                 		+" isikukood:" + xTeePais.getUserId());
@@ -647,7 +696,7 @@ public class CoreServices implements Dhl {
                         response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getProtocolVersion().getNamespaceURI());
                     }
                     if (xTeePais.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-                    	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_PREFIX, XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_URI);
+                    	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX, XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_URI);
                     }
                     
                     response.getSOAPEnvelope().removeHeaders();
@@ -678,7 +727,7 @@ public class CoreServices implements Dhl {
                     response.saveChanges();
                     t.markElapsed("Creating response message");
                 } catch (Exception ex) {
-                    logger.error(ex.getMessage(), ex);
+                    LOGGER.error(ex.getMessage(), ex);
                     logResponseFileProblems(result);
                     throw new ResponseProcessingException(CommonStructures.VIGA_VASTUSSONUMI_KOOSTAMISEL, ex);
                 }
@@ -686,10 +735,10 @@ public class CoreServices implements Dhl {
                 throw new AxisFault("Süsteemi sisemine viga! Päringu konteksti laadimine ebaõnnestus!");
             }
         } catch (AxisFault fault) {
-            logger.error(fault.getMessage(), fault);
+            LOGGER.error(fault.getMessage(), fault);
             throw fault;
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            LOGGER.error(ex.getMessage(), ex);
             throw new AxisFault(ex.getMessage());
         } finally {
             CommonMethods.safeCloseDatabaseConnection(conn);
@@ -725,7 +774,7 @@ public class CoreServices implements Dhl {
                     // sõnumiga MIME lisadena kaasa pandud andmed.
                     t.reset();
                     XRoadProtocolHeader xTeePais = XRoadProtocolHeader.getFromSOAPHeaderAxis(context);
-                    logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele ReceiveDocuments(xtee teenus:" 
+                    LOGGER.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele ReceiveDocuments(xtee teenus:" 
                     		+ xTeePais.getService() +"). Asutusest:" + xTeePais.getConsumer() 
                     		+ " ametnik:" + xTeePais.getOfficial()
                     		+" isikukood:" + xTeePais.getUserId());
@@ -769,7 +818,7 @@ public class CoreServices implements Dhl {
                             response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getProtocolVersion().getNamespaceURI());
                         }
                         if (xTeePais.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-                        	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_PREFIX, XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_URI);
+                        	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX, XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_URI);
                         }
                         
                         response.getSOAPEnvelope().removeHeaders();
@@ -829,7 +878,7 @@ public class CoreServices implements Dhl {
                         response.saveChanges();
                         t.markElapsed("Creating response message");
                     } catch (Exception ex) {
-                        logger.error(ex.getMessage(), ex);
+                        LOGGER.error(ex.getMessage(), ex);
                         logResponseFileProblems(result);
                         throw new AxisFault(CommonStructures.VIGA_VASTUSSONUMI_KOOSTAMISEL);
                     }
@@ -837,10 +886,10 @@ public class CoreServices implements Dhl {
                     throw new AxisFault("Süsteemi sisemine viga! Päringu konteksti laadimine ebaõnnestus!");
                 }
             } catch (AxisFault fault) {
-                logger.error(fault.getMessage(), fault);
+                LOGGER.error(fault.getMessage(), fault);
                 throw fault;
             } catch (Exception ex) {
-                logger.error(ex.getMessage(), ex);
+                LOGGER.error(ex.getMessage(), ex);
                 throw new AxisFault(ex.getMessage());
             } finally {
                 CommonMethods.safeCloseDatabaseConnection(conn);
@@ -865,7 +914,7 @@ public class CoreServices implements Dhl {
                     // Loeme SOAP sõnumi detailandmetest välja X-Tee päise andmed ja
                     // sõnumiga MIME lisadena kaasa pandud andmed.
                     XRoadProtocolHeader xTeePais = XRoadProtocolHeader.getFromSOAPHeaderAxis(context);
-                    logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele MarkDocumentsReceived(xtee teenus:" 
+                    LOGGER.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele MarkDocumentsReceived(xtee teenus:" 
                     		+ xTeePais.getService() +"). Asutusest:" + xTeePais.getConsumer() 
                     		+ " ametnik:" + xTeePais.getOfficial()
                     		+" isikukood:" + xTeePais.getUserId());
@@ -898,7 +947,7 @@ public class CoreServices implements Dhl {
                             response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getProtocolVersion().getNamespaceURI());
                         }
                         if (xTeePais.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-                        	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_PREFIX, XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_URI);
+                        	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX, XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_URI);
                         }
                         
                         response.getSOAPEnvelope().removeHeaders();
@@ -926,7 +975,7 @@ public class CoreServices implements Dhl {
                         }
                         response.saveChanges();
                     } catch (Exception ex) {
-                        logger.error(ex.getMessage(), ex);
+                        LOGGER.error(ex.getMessage(), ex);
                         logResponseFileProblems(result);
                         throw new AxisFault(CommonStructures.VIGA_VASTUSSONUMI_KOOSTAMISEL);
                     }
@@ -934,10 +983,10 @@ public class CoreServices implements Dhl {
                     throw new AxisFault("Süsteemi sisemine viga! Päringu konteksti laadimine ebaõnnestus!");
                 }
             } catch (AxisFault fault) {
-                logger.error(fault.getMessage(), fault);
+                LOGGER.error(fault.getMessage(), fault);
                 throw fault;
             } catch (Exception ex) {
-                logger.error(ex.getMessage(), ex);
+                LOGGER.error(ex.getMessage(), ex);
                 throw new AxisFault(ex.getMessage());
             } finally {
                 CommonMethods.safeCloseDatabaseConnection(conn);
@@ -977,7 +1026,7 @@ public class CoreServices implements Dhl {
                 // Loeme SOAP sõnumi detailandmetest välja X-Tee päise andmed ja
                 // sõnumiga MIME lisadena kaasa pandud andmed.
                 XRoadProtocolHeader xTeePais = XRoadProtocolHeader.getFromSOAPHeaderAxis(context);
-                logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele GetSendStatus(xtee teenus: " 
+                LOGGER.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele GetSendStatus(xtee teenus: " 
                 		+ xTeePais.getService() +"). Asutusest: " + xTeePais.getConsumer() 
                 		+ " ametnik: " + xTeePais.getOfficial()
                 		+" isikukood: " + xTeePais.getUserId());
@@ -1019,7 +1068,7 @@ public class CoreServices implements Dhl {
                         response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getProtocolVersion().getNamespaceURI());
                     }
                     if (xTeePais.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-                    	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_PREFIX, XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_URI);
+                    	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX, XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_URI);
                     }
                     
                     response.getSOAPEnvelope().removeHeaders();
@@ -1056,7 +1105,7 @@ public class CoreServices implements Dhl {
 
                     response.saveChanges();
                 } catch (Exception ex) {
-                    logger.error(ex.getMessage(), ex);
+                    LOGGER.error(ex.getMessage(), ex);
                     logResponseFileProblems(result);
                     throw new AxisFault(CommonStructures.VIGA_VASTUSSONUMI_KOOSTAMISEL);
                 }
@@ -1064,10 +1113,10 @@ public class CoreServices implements Dhl {
                 throw new AxisFault("Süsteemi sisemine viga! Päringu konteksti laadimine ebaõnnestus!");
             }
         } catch (AxisFault fault) {
-            logger.error(fault.getMessage(), fault);
+            LOGGER.error(fault.getMessage(), fault);
             throw fault;
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            LOGGER.error(ex.getMessage(), ex);
             throw new AxisFault(ex.getMessage());
         } finally {
             CommonMethods.safeCloseDatabaseConnection(conn);
@@ -1089,7 +1138,7 @@ public class CoreServices implements Dhl {
 
                     // Laeme sõnumi X-Tee päised endale sobivasse andmestruktuuri
                     XRoadProtocolHeader xTeePais = XRoadProtocolHeader.getFromSOAPHeaderAxis(context);
-                    logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele GetOccupationList(xtee teenus:" 
+                    LOGGER.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele GetOccupationList(xtee teenus:" 
                     		+ xTeePais.getService() +"). Asutusest:" + xTeePais.getConsumer() 
                     		+ " ametnik:" + xTeePais.getOfficial()
                     		+" isikukood:" + xTeePais.getUserId());
@@ -1118,7 +1167,7 @@ public class CoreServices implements Dhl {
                         response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getProtocolVersion().getNamespaceURI());
                     }
                     if (xTeePais.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-                    	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_PREFIX, XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_URI);
+                    	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX, XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_URI);
                     }
                     
                     response.getSOAPEnvelope().removeHeaders();
@@ -1149,10 +1198,10 @@ public class CoreServices implements Dhl {
                     throw new AxisFault("Süsteemi sisemine viga! Päringu konteksti laadimine ebaõnnestus!");
                 }
             } catch (AxisFault fault) {
-                logger.error(fault.getMessage(), fault);
+                LOGGER.error(fault.getMessage(), fault);
                 throw fault;
             } catch (Exception ex) {
-                logger.error(ex.getMessage(), ex);
+                LOGGER.error(ex.getMessage(), ex);
                 throw new AxisFault(ex.getMessage());
             } finally {
                 CommonMethods.safeCloseDatabaseConnection(conn);
@@ -1175,7 +1224,7 @@ public class CoreServices implements Dhl {
 
                     // Laeme sõnumi X-Tee päised endale sobivasse andmestruktuuri
                     XRoadProtocolHeader xTeePais = XRoadProtocolHeader.getFromSOAPHeaderAxis(context);
-                    logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele GetSubdivisionList(xtee teenus:" 
+                    LOGGER.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele GetSubdivisionList(xtee teenus:" 
                     		+ xTeePais.getService() +"). Asutusest:" + xTeePais.getConsumer() 
                     		+ " ametnik:" + xTeePais.getOfficial()
                     		+" isikukood:" + xTeePais.getUserId());
@@ -1204,7 +1253,7 @@ public class CoreServices implements Dhl {
                         response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getProtocolVersion().getNamespaceURI());
                     }
                     if (xTeePais.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-                    	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_PREFIX, XRoadProtocolHeader.XROAD_NS_IDENTIFIERS_URI);
+                    	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX, XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_URI);
                     }
                     
                     response.getSOAPEnvelope().removeHeaders();
@@ -1235,10 +1284,10 @@ public class CoreServices implements Dhl {
                     throw new AxisFault("Süsteemi sisemine viga! Päringu konteksti laadimine ebaõnnestus!");
                 }
             } catch (AxisFault fault) {
-                logger.error(fault.getMessage(), fault);
+                LOGGER.error(fault.getMessage(), fault);
                 throw fault;
             } catch (Exception ex) {
-                logger.error(ex.getMessage(), ex);
+                LOGGER.error(ex.getMessage(), ex);
                 throw new AxisFault(ex.getMessage());
             } finally {
                 CommonMethods.safeCloseDatabaseConnection(conn);
@@ -1283,7 +1332,7 @@ public class CoreServices implements Dhl {
                 }
             }
         } catch (Exception ex) {
-            logger.debug("Error when searching for namespace prefix", ex);
+            LOGGER.debug("Error when searching for namespace prefix", ex);
         }
         
         return nameSpacePrefix;
@@ -1306,7 +1355,7 @@ public class CoreServices implements Dhl {
                     errorMessage += " File size " + String.valueOf(responseFile.length()) + " bytes.";
                 }
             }
-            logger.error(errorMessage);
+            LOGGER.error(errorMessage);
         }
     }
 }

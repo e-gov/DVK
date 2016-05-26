@@ -101,8 +101,8 @@ public class AarClient {
         // Saadetava sõnumi päisesse kantavad parameetrid
         XRoadProtocolHeader xHeader = null;
         if (X_ROAD_PROTOCOL_VERSION.equals(XRoadProtocolVersion.V4_0)) {
-        	XRoadClient xRoadClient = new XRoadClient(Settings.xroadInstance, Settings.xroadMemberClass, CommonStructures.RIA_REGISTRATION_NUMBER);
-        	XRoadService xRoadService = new XRoadService(Settings.xroadInstance, Settings.xroadMemberClass, "Member code unknown yet", "aar", "asutused", "v1");
+        	XRoadClient xRoadClient = new XRoadClient(Settings.xRoadInstance, Settings.xRoadMemberClass, orgCode);
+        	XRoadService xRoadService = new XRoadService(Settings.xRoadInstance, Settings.xRoadMemberClass, "Member code unknown yet", "aar", "asutused", "v1");
         	
         	xHeader = new XRoadProtocolHeader(xRoadClient, xRoadService, queryId,
         			CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode, "");

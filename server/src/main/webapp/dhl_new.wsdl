@@ -34,7 +34,7 @@
 							<element name="asutus" type="string" maxOccurs="unbounded">
 								<annotation>
 									<appinfo>
-										<xtee:title>Asutuse registrinumber</xtee:title>
+										<xrd:title>Asutuse registrinumber</xrd:title>
 									</appinfo>
 								</annotation>
 							</element>
@@ -49,7 +49,7 @@
 							<element name="saatmisviis" type="string" maxOccurs="unbounded">
 								<annotation>
 									<appinfo>
-										<xtee:title>Saatmisviis</xtee:title>
+										<xrd:title>Saatmisviis</xrd:title>
 									</appinfo>
 								</annotation>
 							</element>
@@ -72,7 +72,7 @@
 							<element name="asutus" type="tns:institutionType" maxOccurs="unbounded">
 								<annotation>
 									<appinfo>
-										<xtee:title>Asutuse andmed</xtee:title>
+										<xrd:title>Asutuse andmed</xrd:title>
 									</appinfo>
 								</annotation>
 							</element>
@@ -95,7 +95,7 @@
 							<element name="ametikoht" type="tns:occupationType" maxOccurs="unbounded">
 								<annotation>
 									<appinfo>
-										<xtee:title>Ametikoha andmed</xtee:title>
+										<xrd:title>Ametikoha andmed</xrd:title>
 									</appinfo>
 								</annotation>
 							</element>
@@ -118,7 +118,7 @@
 							<element name="allyksus" type="tns:subdivisionType" maxOccurs="unbounded">
 								<annotation>
 									<appinfo>
-										<xtee:title>Allüksuse andmed</xtee:title>
+										<xrd:title>Allüksuse andmed</xrd:title>
 									</appinfo>
 								</annotation>
 							</element>
@@ -133,7 +133,7 @@
 							<element name="dhl_id" type="dhlma:dhlDokIDType" maxOccurs="unbounded">
 								<annotation>
 									<appinfo>
-										<xtee:title>Dokumendi dhl_id</xtee:title>
+										<xrd:title>Dokumendi dhl_id</xrd:title>
 									</appinfo>
 								</annotation>
 							</element>
@@ -148,7 +148,7 @@
 							<element name="dokument" type="dhl:dhlDokumentType" minOccurs="0" maxOccurs="unbounded">
 								<annotation>
 									<appinfo>
-										<xtee:title>Dokument</xtee:title>
+										<xrd:title>Dokument</xrd:title>
 									</appinfo>
 								</annotation>
 							</element>
@@ -163,7 +163,7 @@
 							<element name="item" type="dhl:tagasisideType" maxOccurs="unbounded">
 								<annotation>
 									<appinfo>
-										<xtee:title>Adressaadipoolne tagasiside dokumendi vastuvõtmise kohta</xtee:title>
+										<xrd:title>Adressaadipoolne tagasiside dokumendi vastuvõtmise kohta</xrd:title>
 									</appinfo>
 								</annotation>
 							</element>
@@ -184,14 +184,14 @@
 					<element name="arv" type="integer" minOccurs="0">
 						<annotation>
 							<appinfo>
-								<xtee:title>Maksimaalne tagastatav kirjete arv, vaikimisi 10</xtee:title>
+								<xrd:title>Maksimaalne tagastatav kirjete arv, vaikimisi 10</xrd:title>
 							</appinfo>
 						</annotation>
 					</element>
 					<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0">
 						<annotation>
 							<appinfo>
-								<xtee:title>Kaust, kust dokumentid loetakse</xtee:title>
+								<xrd:title>Kaust, kust dokumentid loetakse</xrd:title>
 							</appinfo>
 						</annotation>
 					</element>
@@ -207,14 +207,14 @@
 					<element name="arv" type="integer" minOccurs="0">
 						<annotation>
 							<appinfo>
-								<xtee:title>Maksimaalne tagastatav kirjete arv, vaikimisi 10</xtee:title>
+								<xrd:title>Maksimaalne tagastatav kirjete arv, vaikimisi 10</xrd:title>
 							</appinfo>
 						</annotation>
 					</element>
 					<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0">
 						<annotation>
 							<appinfo>
-								<xtee:title>Kaust, kust dokumentid loetakse</xtee:title>
+								<xrd:title>Kaust, kust dokumentid loetakse</xrd:title>
 							</appinfo>
 						</annotation>
 					</element>
@@ -491,72 +491,72 @@
 	</message>
 	<portType name="dhlPortType">
 		<operation name="getSendingOptions">
-			<documentation><xtee:title>Asutuste saatmisviisid</xtee:title><xtee:notes>Asutste toetatavate saatmisviiside loetelu</xtee:notes></documentation>
+			<documentation><xrd:title>Asutuste saatmisviisid</xrd:title><xrd:notes>Asutste toetatavate saatmisviiside loetelu</xrd:notes></documentation>
 			<input message="tns:getSendingOptions" name="getSendingOptions"/>
 			<output message="tns:getSendingOptionsResponse" name="getSendingOptionsResponse"/>
 		</operation>
 		<operation name="getSendingOptions">
-			<documentation><xtee:title>Asutuste saatmisviisid</xtee:title><xtee:notes>Asutste toetatavate saatmisviiside loetelu</xtee:notes></documentation>
+			<documentation><xrd:title>Asutuste saatmisviisid</xrd:title><xrd:notes>Asutste toetatavate saatmisviiside loetelu</xrd:notes></documentation>
 			<input message="tns:getSendingOptionsV2" name="getSendingOptionsV2"/>
 			<output message="tns:getSendingOptionsV2Response" name="getSendingOptionsV2Response"/>
 		</operation>
 		<operation name="sendDocuments">
-			<documentation><xtee:title>Dokumentide edastamine</xtee:title><xtee:notes>Dokumentide edastamine dokumendihoidlasse</xtee:notes></documentation>
+			<documentation><xrd:title>Dokumentide edastamine</xrd:title><xrd:notes>Dokumentide edastamine dokumendihoidlasse</xrd:notes></documentation>
 			<input message="tns:sendDocuments" name="sendDocuments"/>
 			<output message="tns:sendDocumentsResponse"  name="sendDocumentsResponse"/>
 		</operation>
 		<operation name="sendDocuments">
-			<documentation><xtee:title>Dokumentide edastamine</xtee:title><xtee:notes>Dokumentide edastamine dokumendihoidlasse</xtee:notes></documentation>
+			<documentation><xrd:title>Dokumentide edastamine</xrd:title><xrd:notes>Dokumentide edastamine dokumendihoidlasse</xrd:notes></documentation>
 			<input message="tns:sendDocumentsV2" name="sendDocumentsV2"/>
 			<output message="tns:sendDocumentsV2Response" name="sendDocumentsV2Response"/>
 		</operation>
 		<operation name="receiveDocuments">
-			<documentation><xtee:title>Uute dokumentide lugemine</xtee:title><xtee:notes>Uute veel lugemata saabunud dokumentide allalaadimine dokumendihoidlast</xtee:notes></documentation>
+			<documentation><xrd:title>Uute dokumentide lugemine</xrd:title><xrd:notes>Uute veel lugemata saabunud dokumentide allalaadimine dokumendihoidlast</xrd:notes></documentation>
 			<input message="tns:receiveDocuments" name="receiveDocuments"/>
 			<output message="tns:receiveDocumentsResponse" name="receiveDocumentsResponse"/>
 		</operation>
 		<operation name="receiveDocuments">
-			<documentation><xtee:title>Uute dokumentide lugemine</xtee:title><xtee:notes>Uute veel lugemata saabunud dokumentide allalaadimine dokumendihoidlast</xtee:notes></documentation>
+			<documentation><xrd:title>Uute dokumentide lugemine</xrd:title><xrd:notes>Uute veel lugemata saabunud dokumentide allalaadimine dokumendihoidlast</xrd:notes></documentation>
 			<input message="tns:receiveDocumentsV2" name="receiveDocumentsV2"/>
 			<output message="tns:receiveDocumentsV2Response" name="receiveDocumentsV2Response"/>
 		</operation>
 		<operation name="markDocumentsReceived">
-			<documentation><xtee:title>Uute dokumentide loetuks märkimine</xtee:title><xtee:notes>Uute saabunud dokumentide loetuks märkimine</xtee:notes></documentation>
+			<documentation><xrd:title>Uute dokumentide loetuks märkimine</xrd:title><xrd:notes>Uute saabunud dokumentide loetuks märkimine</xrd:notes></documentation>
 			<input name="markDocumentsReceived" message="tns:markDocumentsReceived"/>
 			<output name="markDocumentsReceivedResponse" message="tns:markDocumentsReceivedResponse"/>
 		</operation>
 		<operation name="markDocumentsReceived">
-			<documentation><xtee:title>Uute dokumentide loetuks märkimine</xtee:title><xtee:notes>Uute saabunud dokumentide loetuks märkimine</xtee:notes></documentation>
+			<documentation><xrd:title>Uute dokumentide loetuks märkimine</xrd:title><xrd:notes>Uute saabunud dokumentide loetuks märkimine</xrd:notes></documentation>
 			<input name="markDocumentsReceivedV2" message="tns:markDocumentsReceivedV2"/>
 			<output name="markDocumentsReceivedV2Response" message="tns:markDocumentsReceivedV2Response"/>
 		</operation>
 		<operation name="getSendStatus">
-			<documentation><xtee:title>Saadetud dokumentide oleku kontrollimine</xtee:title><xtee:notes>Kontrollib, kas saadetud dokumendid on kõigile adressaatidele edukalt edastatud</xtee:notes></documentation>
+			<documentation><xrd:title>Saadetud dokumentide oleku kontrollimine</xrd:title><xrd:notes>Kontrollib, kas saadetud dokumendid on kõigile adressaatidele edukalt edastatud</xrd:notes></documentation>
 			<input message="tns:getSendStatus"/>
 			<output message="tns:getSendStatusResponse"/>
 		</operation>
 		<operation name="deleteOldDocuments">
-			<documentation><xtee:title>Aegunud dokumentide kustutamine</xtee:title><xtee:notes>Kustutab dokumendid, mille säilitustähtaeg on möödas</xtee:notes></documentation>
+			<documentation><xrd:title>Aegunud dokumentide kustutamine</xrd:title><xrd:notes>Kustutab dokumendid, mille säilitustähtaeg on möödas</xrd:notes></documentation>
 			<input message="tns:deleteOldDocuments"/>
 			<output message="tns:deleteOldDocumentsResponse"/>
 		</operation>
 		<operation name="changeOrganizationData">
-			<documentation><xtee:title>Asutuse andmete muutmine</xtee:title><xtee:notes>Asutuse andmete muutmine</xtee:notes></documentation>
+			<documentation><xrd:title>Asutuse andmete muutmine</xrd:title><xrd:notes>Asutuse andmete muutmine</xrd:notes></documentation>
 			<input message="tns:changeOrganizationData"/>
 			<output message="tns:changeOrganizationDataResponse"/>
 		</operation>
 		<operation name="runSystemCheck">
-			<documentation><xtee:title>Serveri toimimise kontroll</xtee:title><xtee:notes>Kontrollib, kas DVK serveri põhifunktsionaalsus toimib</xtee:notes></documentation>
+			<documentation><xrd:title>Serveri toimimise kontroll</xrd:title><xrd:notes>Kontrollib, kas DVK serveri põhifunktsionaalsus toimib</xrd:notes></documentation>
 			<input message="tns:runSystemCheck"/>
 			<output message="tns:runSystemCheckResponse"/>
 		</operation>
 		<operation name="getOccupationList">
-			<documentation><xtee:title>Ametikohtade nimekiri</xtee:title><xtee:notes>Ametikohtade nimekirja laadimine</xtee:notes></documentation>
+			<documentation><xrd:title>Ametikohtade nimekiri</xrd:title><xrd:notes>Ametikohtade nimekirja laadimine</xrd:notes></documentation>
 			<input message="tns:getOccupationList"/>
 			<output message="tns:getOccupationListResponse"/>
 		</operation>
 		<operation name="getSubdivisionList">
-			<documentation><xtee:title>Allüksuste nimekiri</xtee:title><xtee:notes>Allüksuste nimekirja laadimine</xtee:notes></documentation>
+			<documentation><xrd:title>Allüksuste nimekiri</xrd:title><xrd:notes>Allüksuste nimekirja laadimine</xrd:notes></documentation>
 			<input message="tns:getSubdivisionList"/>
 			<output message="tns:getSubdivisionListResponse"/>
 		</operation>
@@ -945,9 +945,8 @@
 	<service name="dhlService">
 		<port name="dhlHttpSoapPort" binding="tns:dhlSoapBinding">
 			<soap:address location="http://TURVASERVER/cgi-bin/consumer_proxy"/>
-			<xtee:title>Dokumendihoidla</xtee:title>
-			<xtee:title xml:lang="en">Document repository</xtee:title>
-			<xtee:address producer="dhl"/>
+			<xrd:title>Dokumendihoidla</xrd:title>
+			<xrd:title xml:lang="en">Document repository</xrd:title>
 		</port>
 	</service>
 </definitions>

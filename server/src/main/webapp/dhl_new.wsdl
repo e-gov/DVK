@@ -482,12 +482,12 @@
 		<part name="keha" type="tns:subdivisionArrayType"/>
 	</message>
 	<message name="requestHeader">
-		<wsdl:part name="client" element="xrd:client" />
-		<wsdl:part name="service" element="xrd:service" />
-		<wsdl:part name="id" element="xrd:id" />
-		<wsdl:part name="userId" element="xrd:userId" />
-		<wsdl:part name="issue" element="xrd:issue" />
-		<wsdl:part name="protocolVersion" element="xrd:protocolVersion" />
+		<part name="client" element="xrd:client" />
+		<part name="service" element="xrd:service" />
+		<part name="id" element="xrd:id" />
+		<part name="userId" element="xrd:userId" />
+		<part name="issue" element="xrd:issue" />
+		<part name="protocolVersion" element="xrd:protocolVersion" />
 	</message>
 	<portType name="dhlPortType">
 		<operation name="getSendingOptions">

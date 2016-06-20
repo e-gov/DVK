@@ -491,72 +491,114 @@
 	</message>
 	<portType name="dhlPortType">
 		<operation name="getSendingOptions">
-			<documentation><xrd:title>Asutuste saatmisviisid</xrd:title><xrd:notes>Asutste toetatavate saatmisviiside loetelu</xrd:notes></documentation>
+			<documentation>
+				<xrd:title>Asutuste saatmisviisid</xrd:title>
+				<xrd:notes>Asutste toetatavate saatmisviiside loetelu</xrd:notes>
+			</documentation>
 			<input message="tns:getSendingOptions" name="getSendingOptions"/>
 			<output message="tns:getSendingOptionsResponse" name="getSendingOptionsResponse"/>
 		</operation>
 		<operation name="getSendingOptions">
-			<documentation><xrd:title>Asutuste saatmisviisid</xrd:title><xrd:notes>Asutste toetatavate saatmisviiside loetelu</xrd:notes></documentation>
+			<documentation>
+				<xrd:title>Asutuste saatmisviisid</xrd:title>
+				<xrd:notes>Asutste toetatavate saatmisviiside loetelu</xrd:notes>
+			</documentation>
 			<input message="tns:getSendingOptionsV2" name="getSendingOptionsV2"/>
 			<output message="tns:getSendingOptionsV2Response" name="getSendingOptionsV2Response"/>
 		</operation>
 		<operation name="sendDocuments">
-			<documentation><xrd:title>Dokumentide edastamine</xrd:title><xrd:notes>Dokumentide edastamine dokumendihoidlasse</xrd:notes></documentation>
+			<documentation>
+				<xrd:title>Dokumentide edastamine</xrd:title>
+				<xrd:notes>Dokumentide edastamine dokumendihoidlasse</xrd:notes>
+			</documentation>
 			<input message="tns:sendDocuments" name="sendDocuments"/>
 			<output message="tns:sendDocumentsResponse"  name="sendDocumentsResponse"/>
 		</operation>
 		<operation name="sendDocuments">
-			<documentation><xrd:title>Dokumentide edastamine</xrd:title><xrd:notes>Dokumentide edastamine dokumendihoidlasse</xrd:notes></documentation>
+			<documentation>
+				<xrd:title>Dokumentide edastamine</xrd:title>
+				<xrd:notes>Dokumentide edastamine dokumendihoidlasse</xrd:notes>
+			</documentation>
 			<input message="tns:sendDocumentsV2" name="sendDocumentsV2"/>
 			<output message="tns:sendDocumentsV2Response" name="sendDocumentsV2Response"/>
 		</operation>
 		<operation name="receiveDocuments">
-			<documentation><xrd:title>Uute dokumentide lugemine</xrd:title><xrd:notes>Uute veel lugemata saabunud dokumentide allalaadimine dokumendihoidlast</xrd:notes></documentation>
+			<documentation>
+				<xrd:title>Uute dokumentide lugemine</xrd:title>
+				<xrd:notes>Uute veel lugemata saabunud dokumentide allalaadimine dokumendihoidlast</xrd:notes>
+			</documentation>
 			<input message="tns:receiveDocuments" name="receiveDocuments"/>
 			<output message="tns:receiveDocumentsResponse" name="receiveDocumentsResponse"/>
 		</operation>
 		<operation name="receiveDocuments">
-			<documentation><xrd:title>Uute dokumentide lugemine</xrd:title><xrd:notes>Uute veel lugemata saabunud dokumentide allalaadimine dokumendihoidlast</xrd:notes></documentation>
+			<documentation>
+				<xrd:title>Uute dokumentide lugemine</xrd:title>
+				<xrd:notes>Uute veel lugemata saabunud dokumentide allalaadimine dokumendihoidlast</xrd:notes>
+			</documentation>
 			<input message="tns:receiveDocumentsV2" name="receiveDocumentsV2"/>
 			<output message="tns:receiveDocumentsV2Response" name="receiveDocumentsV2Response"/>
 		</operation>
 		<operation name="markDocumentsReceived">
-			<documentation><xrd:title>Uute dokumentide loetuks märkimine</xrd:title><xrd:notes>Uute saabunud dokumentide loetuks märkimine</xrd:notes></documentation>
+			<documentation>
+				<xrd:title>Uute dokumentide loetuks märkimine</xrd:title>
+				<xrd:notes>Uute saabunud dokumentide loetuks märkimine</xrd:notes>
+			</documentation>
 			<input name="markDocumentsReceived" message="tns:markDocumentsReceived"/>
 			<output name="markDocumentsReceivedResponse" message="tns:markDocumentsReceivedResponse"/>
 		</operation>
 		<operation name="markDocumentsReceived">
-			<documentation><xrd:title>Uute dokumentide loetuks märkimine</xrd:title><xrd:notes>Uute saabunud dokumentide loetuks märkimine</xrd:notes></documentation>
+			<documentation>
+				<xrd:title>Uute dokumentide loetuks märkimine</xrd:title>
+				<xrd:notes>Uute saabunud dokumentide loetuks märkimine</xrd:notes>
+			</documentation>
 			<input name="markDocumentsReceivedV2" message="tns:markDocumentsReceivedV2"/>
 			<output name="markDocumentsReceivedV2Response" message="tns:markDocumentsReceivedV2Response"/>
 		</operation>
 		<operation name="getSendStatus">
-			<documentation><xrd:title>Saadetud dokumentide oleku kontrollimine</xrd:title><xrd:notes>Kontrollib, kas saadetud dokumendid on kõigile adressaatidele edukalt edastatud</xrd:notes></documentation>
+			<documentation>
+				<xrd:title>Saadetud dokumentide oleku kontrollimine</xrd:title>
+				<xrd:notes>Kontrollib, kas saadetud dokumendid on kõigile adressaatidele edukalt edastatud</xrd:notes>
+			</documentation>
 			<input message="tns:getSendStatus"/>
 			<output message="tns:getSendStatusResponse"/>
 		</operation>
 		<operation name="deleteOldDocuments">
-			<documentation><xrd:title>Aegunud dokumentide kustutamine</xrd:title><xrd:notes>Kustutab dokumendid, mille säilitustähtaeg on möödas</xrd:notes></documentation>
+			<documentation>
+				<xrd:title>Aegunud dokumentide kustutamine</xrd:title>
+				<xrd:notes>Kustutab dokumendid, mille säilitustähtaeg on möödas</xrd:notes>
+			</documentation>
 			<input message="tns:deleteOldDocuments"/>
 			<output message="tns:deleteOldDocumentsResponse"/>
 		</operation>
 		<operation name="changeOrganizationData">
-			<documentation><xrd:title>Asutuse andmete muutmine</xrd:title><xrd:notes>Asutuse andmete muutmine</xrd:notes></documentation>
+			<documentation>
+				<xrd:title>Asutuse andmete muutmine</xrd:title>
+				<xrd:notes>Asutuse andmete muutmine</xrd:notes>
+			</documentation>
 			<input message="tns:changeOrganizationData"/>
 			<output message="tns:changeOrganizationDataResponse"/>
 		</operation>
 		<operation name="runSystemCheck">
-			<documentation><xrd:title>Serveri toimimise kontroll</xrd:title><xrd:notes>Kontrollib, kas DVK serveri põhifunktsionaalsus toimib</xrd:notes></documentation>
+			<documentation>
+				<xrd:title>Serveri toimimise kontroll</xrd:title>
+				<xrd:notes>Kontrollib, kas DVK serveri põhifunktsionaalsus toimib</xrd:notes>
+			</documentation>
 			<input message="tns:runSystemCheck"/>
 			<output message="tns:runSystemCheckResponse"/>
 		</operation>
 		<operation name="getOccupationList">
-			<documentation><xrd:title>Ametikohtade nimekiri</xrd:title><xrd:notes>Ametikohtade nimekirja laadimine</xrd:notes></documentation>
+			<documentation>
+				<xrd:title>Ametikohtade nimekiri</xrd:title>
+				<xrd:notes>Ametikohtade nimekirja laadimine</xrd:notes>
+			</documentation>
 			<input message="tns:getOccupationList"/>
 			<output message="tns:getOccupationListResponse"/>
 		</operation>
 		<operation name="getSubdivisionList">
-			<documentation><xrd:title>Allüksuste nimekiri</xrd:title><xrd:notes>Allüksuste nimekirja laadimine</xrd:notes></documentation>
+			<documentation>
+				<xrd:title>Allüksuste nimekiri</xrd:title>
+				<xrd:notes>Allüksuste nimekirja laadimine</xrd:notes>
+			</documentation>
 			<input message="tns:getSubdivisionList"/>
 			<output message="tns:getSubdivisionListResponse"/>
 		</operation>

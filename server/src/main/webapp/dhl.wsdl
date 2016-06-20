@@ -1,7 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<definitions xmlns:tns="http://producers.dhl.xtee.riik.ee/producer/dhl" xmlns:xtee="http://x-tee.riik.ee/xsd/xtee.xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.w3.org/2000/09/xmldsig#" xmlns:ns1="http://www.sk.ee/DigiDoc/v1.3.0#" xmlns:ns2="http://www.riik.ee/schemas/dhl" xmlns:ns4="http://www.w3.org/1999/xlink" xmlns:ns5="http://www.w3.org/2001/XMLSchema" xmlns:ns6="http://www.riik.ee/schemas/dhl-meta-manual" xmlns:ns7="http://www.riik.ee/schemas/dhl-meta-automatic" name="dhlDefinitions" targetNamespace="http://producers.dhl.xtee.riik.ee/producer/dhl">
+<definitions xmlns:tns="http://producers.dhl.xtee.riik.ee/producer/dhl"
+		xmlns:xtee="http://x-tee.riik.ee/xsd/xtee.xsd"
+		xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+		xmlns="http://schemas.xmlsoap.org/wsdl/"
+		xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+		xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+		xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+		xmlns:ns="http://www.w3.org/2000/09/xmldsig#"
+		xmlns:ns1="http://www.sk.ee/DigiDoc/v1.3.0#"
+		xmlns:ns2="http://www.riik.ee/schemas/dhl"
+		xmlns:ns4="http://www.w3.org/1999/xlink"
+		xmlns:ns5="http://www.w3.org/2001/XMLSchema"
+		xmlns:ns6="http://www.riik.ee/schemas/dhl-meta-manual"
+		xmlns:ns7="http://www.riik.ee/schemas/dhl-meta-automatic"
+		name="dhlDefinitions"
+		targetNamespace="http://producers.dhl.xtee.riik.ee/producer/dhl">
 	<types>
-		<schema targetNamespace="http://producers.dhl.xtee.riik.ee/producer/dhl" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://producers.dhl.xtee.riik.ee/producer/dhl" xmlns:dhlma="http://www.riik.ee/schemas/dhl-meta-automatic" xmlns:dhl="http://www.riik.ee/schemas/dhl" xmlns:dd="http://www.sk.ee/DigiDoc/v1.3.0#">
+		<schema targetNamespace="http://producers.dhl.xtee.riik.ee/producer/dhl"
+				xmlns="http://www.w3.org/2001/XMLSchema"
+				xmlns:tns="http://producers.dhl.xtee.riik.ee/producer/dhl"
+				xmlns:dhlma="http://www.riik.ee/schemas/dhl-meta-automatic"
+				xmlns:dhl="http://www.riik.ee/schemas/dhl"
+				xmlns:dd="http://www.sk.ee/DigiDoc/v1.3.0#">
 			<import namespace="http://schemas.xmlsoap.org/soap/encoding/" schemaLocation="http://schemas.xmlsoap.org/soap/encoding/"/>
 			<import namespace="http://x-tee.riik.ee/xsd/xtee.xsd" schemaLocation="http://x-tee.riik.ee/xsd/xtee.xsd"/>
 			<import namespace="http://www.sk.ee/DigiDoc/v1.3.0#" schemaLocation="http://www.riik.ee/schemas/dhl/DigiDoc-1.3.xsd"/>

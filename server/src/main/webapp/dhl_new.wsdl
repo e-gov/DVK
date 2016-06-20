@@ -1,0 +1,954 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns:tns="http://producers.dhl.xtee.riik.ee/producer/dhl"
+		xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+		xmlns="http://schemas.xmlsoap.org/wsdl/"
+		xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+		xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+		xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+		xmlns:xrd="http://x-road.eu/xsd/xroad.xsd"
+		xmlns:ns="http://www.w3.org/2000/09/xmldsig#"
+		xmlns:ns1="http://www.sk.ee/DigiDoc/v1.3.0#"
+		xmlns:ns2="http://www.riik.ee/schemas/dhl"
+		xmlns:ns4="http://www.w3.org/1999/xlink"
+		xmlns:ns5="http://www.w3.org/2001/XMLSchema"
+		xmlns:ns6="http://www.riik.ee/schemas/dhl-meta-manual"
+		xmlns:ns7="http://www.riik.ee/schemas/dhl-meta-automatic"
+		name="dhlDefinitions"
+		targetNamespace="http://producers.dhl.xtee.riik.ee/producer/dhl">
+	<types>
+		<schema targetNamespace="http://producers.dhl.xtee.riik.ee/producer/dhl"
+				xmlns="http://www.w3.org/2001/XMLSchema"
+				xmlns:tns="http://producers.dhl.xtee.riik.ee/producer/dhl"
+				xmlns:dhlma="http://www.riik.ee/schemas/dhl-meta-automatic"
+				xmlns:dhl="http://www.riik.ee/schemas/dhl"
+				xmlns:dd="http://www.sk.ee/DigiDoc/v1.3.0#">
+			<import namespace="http://schemas.xmlsoap.org/soap/encoding/" schemaLocation="http://schemas.xmlsoap.org/soap/encoding/"/>
+			<import namespace="http://x-road.eu/xsd/xroad.xsd" schemaLocation="http://x-road.eu/xsd/xroad.xsd" />
+			<import namespace="http://www.sk.ee/DigiDoc/v1.3.0#" schemaLocation="http://www.riik.ee/schemas/dhl/DigiDoc-1.3.xsd"/>
+			<import namespace="http://www.riik.ee/schemas/dhl" schemaLocation="http://www.riik.ee/schemas/dhl/dhl.xsd"/>
+			<import namespace="http://www.riik.ee/schemas/dhl-meta-automatic" schemaLocation="http://www.riik.ee/schemas/dhl/dhl-meta-automatic.xsd"/>
+			<complexType name="institutionRefsArrayType">
+				<complexContent>
+					<restriction base="SOAP-ENC:Array">
+						<sequence>
+							<element name="asutus" type="string" maxOccurs="unbounded">
+								<annotation>
+									<appinfo>
+										<xtee:title>Asutuse registrinumber</xtee:title>
+									</appinfo>
+								</annotation>
+							</element>
+						</sequence>
+					</restriction>
+				</complexContent>
+			</complexType>
+			<complexType name="sendingOptionArrayType">
+				<complexContent>
+					<restriction base="SOAP-ENC:Array">
+						<sequence>
+							<element name="saatmisviis" type="string" maxOccurs="unbounded">
+								<annotation>
+									<appinfo>
+										<xtee:title>Saatmisviis</xtee:title>
+									</appinfo>
+								</annotation>
+							</element>
+						</sequence>
+					</restriction>
+				</complexContent>
+			</complexType>
+			<complexType name="institutionType">
+				<sequence>
+					<element name="regnr" type="string"/>
+					<element name="nimi" type="string"/>
+					<element name="saatmine" type="tns:sendingOptionArrayType"/>
+					<element name="ks_asutuse_regnr" type="string" minOccurs="0" maxOccurs="1"/>
+				</sequence>
+			</complexType>
+			<complexType name="institutionArrayType">
+				<complexContent>
+					<restriction base="SOAP-ENC:Array">
+						<sequence>
+							<element name="asutus" type="tns:institutionType" maxOccurs="unbounded">
+								<annotation>
+									<appinfo>
+										<xtee:title>Asutuse andmed</xtee:title>
+									</appinfo>
+								</annotation>
+							</element>
+						</sequence>
+					</restriction>
+				</complexContent>
+			</complexType>
+			<complexType name="occupationType">
+				<sequence>
+					<element name="kood" type="string"/>
+					<element name="nimetus" type="string"/>
+					<element name="asutuse_kood" type="string"/>
+					<element name="ks_allyksuse_kood" type="string" minOccurs="0" maxOccurs="1"/>
+				</sequence>
+			</complexType>
+			<complexType name="occupationArrayType">
+				<complexContent>
+					<restriction base="SOAP-ENC:Array">
+						<sequence>
+							<element name="ametikoht" type="tns:occupationType" maxOccurs="unbounded">
+								<annotation>
+									<appinfo>
+										<xtee:title>Ametikoha andmed</xtee:title>
+									</appinfo>
+								</annotation>
+							</element>
+						</sequence>
+					</restriction>
+				</complexContent>
+			</complexType>
+			<complexType name="subdivisionType">
+				<sequence>
+					<element name="kood" type="string"/>
+					<element name="nimetus" type="string"/>
+					<element name="asutuse_kood" type="string"/>
+					<element name="ks_allyksuse_kood" type="string" minOccurs="0" maxOccurs="1"/>
+				</sequence>
+			</complexType>
+			<complexType name="subdivisionArrayType">
+				<complexContent>
+					<restriction base="SOAP-ENC:Array">
+						<sequence>
+							<element name="allyksus" type="tns:subdivisionType" maxOccurs="unbounded">
+								<annotation>
+									<appinfo>
+										<xtee:title>Allüksuse andmed</xtee:title>
+									</appinfo>
+								</annotation>
+							</element>
+						</sequence>
+					</restriction>
+				</complexContent>
+			</complexType>
+			<complexType name="documentRefsArrayType">
+				<complexContent>
+					<restriction base="SOAP-ENC:Array">
+						<sequence>
+							<element name="dhl_id" type="dhlma:dhlDokIDType" maxOccurs="unbounded">
+								<annotation>
+									<appinfo>
+										<xtee:title>Dokumendi dhl_id</xtee:title>
+									</appinfo>
+								</annotation>
+							</element>
+						</sequence>
+					</restriction>
+				</complexContent>
+			</complexType>
+			<complexType name="documentsArrayType">
+				<complexContent>
+					<restriction base="SOAP-ENC:Array">
+						<sequence>
+							<element name="dokument" type="dhl:dhlDokumentType" minOccurs="0" maxOccurs="unbounded">
+								<annotation>
+									<appinfo>
+										<xtee:title>Dokument</xtee:title>
+									</appinfo>
+								</annotation>
+							</element>
+						</sequence>
+					</restriction>
+				</complexContent>
+			</complexType>
+			<complexType name="tagasisideArrayType">
+				<complexContent>
+					<restriction base="SOAP-ENC:Array">
+						<sequence>
+							<element name="item" type="dhl:tagasisideType" maxOccurs="unbounded">
+								<annotation>
+									<appinfo>
+										<xtee:title>Adressaadipoolne tagasiside dokumendi vastuvõtmise kohta</xtee:title>
+									</appinfo>
+								</annotation>
+							</element>
+						</sequence>
+					</restriction>
+				</complexContent>
+			</complexType>
+			<complexType name="getSendingOptionsV2RequestType">
+				<sequence>
+					<element name="vastuvotmata_dokumente_ootel" type="boolean" minOccurs="0" maxOccurs="1"/>
+					<element name="vahetatud_dokumente_vahemalt" type="integer" minOccurs="0" maxOccurs="1"/>
+					<element name="vahetatud_dokumente_kuni" type="integer" minOccurs="0" maxOccurs="1"/>
+					<element name="asutused" type="tns:institutionRefsArrayType" minOccurs="0" maxOccurs="1"/>
+				</sequence>
+			</complexType>
+			<complexType name="receiveDocumentsRequestType">
+				<sequence>
+					<element name="arv" type="integer" minOccurs="0">
+						<annotation>
+							<appinfo>
+								<xtee:title>Maksimaalne tagastatav kirjete arv, vaikimisi 10</xtee:title>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0">
+						<annotation>
+							<appinfo>
+								<xtee:title>Kaust, kust dokumentid loetakse</xtee:title>
+							</appinfo>
+						</annotation>
+					</element>
+				</sequence>
+			</complexType>
+			<complexType name="receiveDocumentsResponseType">
+				<simpleContent>
+					<extension base="base64Binary"/>
+				</simpleContent>
+			</complexType>
+			<complexType name="receiveDocumentsV2RequestType">
+				<sequence>
+					<element name="arv" type="integer" minOccurs="0">
+						<annotation>
+							<appinfo>
+								<xtee:title>Maksimaalne tagastatav kirjete arv, vaikimisi 10</xtee:title>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0">
+						<annotation>
+							<appinfo>
+								<xtee:title>Kaust, kust dokumentid loetakse</xtee:title>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="edastus_id" type="string" minOccurs="0"/>
+					<element name="fragment_nr" type="integer" minOccurs="0"/>
+					<element name="fragmendi_suurus_baitides" type="integer" minOccurs="0"/>
+				</sequence>
+			</complexType>
+			<complexType name="markDocumentsReceivedRequestType">
+				<sequence>
+					<element name="dokumendid" type="base64Binary"/>
+					<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0"/>
+				</sequence>
+			</complexType>
+			<complexType name="markDocumentsReceivedRequestTypeUnencoded">
+				<sequence>
+					<element name="dokumendid" type="tns:documentRefsArrayType"/>
+					<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0"/>
+				</sequence>
+			</complexType>
+			<complexType name="markDocumentsReceivedV2RequestTypeUnencoded">
+				<sequence>
+					<element name="dokumendid" type="tns:tagasisideArrayType"/>
+					<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0"/>
+				</sequence>
+			</complexType>
+			<simpleType name="markDocumentsReceivedResponseType">
+				<restriction base="string"/>
+			</simpleType>
+			<complexType name="sendDocumentsRequestType">
+				<sequence>
+					<element name="dokumendid" type="base64Binary"/>
+					<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0"/>
+				</sequence>
+			</complexType>
+			<complexType name="sendDocumentsRequestTypeUnencoded">
+				<sequence>
+					<element name="dokumendid" type="tns:documentsArrayType"/>
+					<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0"/>
+				</sequence>
+			</complexType>
+			<complexType name="sendDocumentsV2RequestType">
+				<sequence>
+					<element name="dokumendid" type="base64Binary"/>
+					<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0"/>
+					<element name="sailitustahtaeg" type="date" minOccurs="0"/>
+					<element name="edastus_id" type="string" minOccurs="0"/>
+					<element name="fragment_nr" type="integer" minOccurs="0"/>
+					<element name="fragmente_kokku" type="integer" minOccurs="0"/>
+				</sequence>
+			</complexType>
+			<complexType name="sendDocumentsV2RequestTypeUnencoded">
+				<sequence>
+					<element name="dokumendid" type="tns:documentsArrayType"/>
+					<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0"/>
+					<element name="sailitustahtaeg" type="date" minOccurs="0"/>
+					<element name="edastus_id" type="string" minOccurs="0"/>
+					<element name="fragment_nr" type="integer" minOccurs="0"/>
+					<element name="fragmente_kokku" type="integer" minOccurs="0"/>
+				</sequence>
+			</complexType>
+			<complexType name="sendDocumentsResponseType">
+				<simpleContent>
+					<extension base="base64Binary"/>
+				</simpleContent>
+			</complexType>
+			<complexType name="sendDocumentsResponseTypeUnencoded">
+				<complexContent>
+					<extension base="tns:documentRefsArrayType"/>
+				</complexContent>
+			</complexType>
+			<complexType name="getSendStatusRequestType">
+				<simpleContent>
+					<extension base="base64Binary"/>
+				</simpleContent>
+			</complexType>
+			<complexType name="getSendStatusRequestTypeUnencoded">
+				<complexContent>
+					<extension base="tns:documentRefsArrayType"/>
+				</complexContent>
+			</complexType>
+			<complexType name="getSendStatusResponseType">
+				<simpleContent>
+					<extension base="base64Binary"/>
+				</simpleContent>
+			</complexType>
+			<complexType name="getSendStatusResponseTypeUnencoded">
+				<complexContent>
+					<restriction base="SOAP-ENC:Array">
+						<sequence>
+							<element name="item" maxOccurs="unbounded">
+								<complexType>
+									<sequence>
+										<element ref="dhlma:dhl_id"/>
+										<element ref="dhl:edastus" minOccurs="0" maxOccurs="unbounded"/>
+										<element name="olek" type="string"/>
+									</sequence>
+								</complexType>
+							</element>
+						</sequence>
+					</restriction>
+				</complexContent>
+			</complexType>
+			<complexType name="receiveDocumentsResponseTypeUnencoded">
+				<complexContent>
+					<extension base="tns:documentsArrayType"/>
+				</complexContent>
+			</complexType>
+			<complexType name="deleteOldDocumentsRequestType"/>
+			<simpleType name="deleteOldDocumentsResponseType">
+				<restriction base="string"/>
+			</simpleType>
+			<complexType name="changeOrganizationDataRequestType">
+				<sequence>
+					<element name="registrikood" type="string" minOccurs="1"/>
+					<element name="endine_registrikood" type="string" minOccurs="0"/>
+					<element name="korgemalseisva_asutuse_registrikood" type="string" minOccurs="0"/>
+					<element name="nimi" type="string" minOccurs="0"/>
+					<element name="nime_lyhend" type="string" minOccurs="0"/>
+					<element name="liik1" type="string" minOccurs="0"/>
+					<element name="liik2" type="string" minOccurs="0"/>
+					<element name="tegevusala" type="string" minOccurs="0"/>
+					<element name="tegevuspiirkond" type="string" minOccurs="0"/>
+					<element name="maakond" type="string" minOccurs="0"/>
+					<element name="asukoht" type="string" minOccurs="0"/>
+					<element name="aadress" type="string" minOccurs="0"/>
+					<element name="postikood" type="string" minOccurs="0"/>
+					<element name="telefon" type="string" minOccurs="0"/>
+					<element name="faks" type="string" minOccurs="0"/>
+					<element name="e_post" type="string" minOccurs="0"/>
+					<element name="www" type="string" minOccurs="0"/>
+					<element name="logo" type="string" minOccurs="0"/>
+					<element name="asutamise_kuupaev" type="date" minOccurs="0"/>
+					<element name="moodustamise_akti_nimi" type="string" minOccurs="0"/>
+					<element name="moodustamise_akti_number" type="string" minOccurs="0"/>
+					<element name="moodustamise_akti_kuupaev" type="date" minOccurs="0"/>
+					<element name="pohimaaruse_akti_nimi" type="string" minOccurs="0"/>
+					<element name="pohimaaruse_akti_number" type="string" minOccurs="0"/>
+					<element name="pohimaaruse_kinnitamise_kuupaev" type="date" minOccurs="0"/>
+					<element name="pohimaaruse_kande_kuupaev" type="date" minOccurs="0"/>
+					<element name="parameetrid" type="string" minOccurs="0"/>
+					<element name="dvk_saatmine" type="boolean" minOccurs="0"/>
+					<element name="dvk_otse_saatmine" type="boolean" minOccurs="0"/>
+					<element name="toetatav_dvk_versioon" type="string" minOccurs="0"/>
+					<element name="dokumendihaldussysteemi_nimetus" type="string" minOccurs="0"/>
+				</sequence>
+			</complexType>
+			<simpleType name="changeOrganizationDataResponseType">
+				<restriction base="string"/>
+			</simpleType>
+			<complexType name="runSystemCheckRequestType"/>
+			<simpleType name="runSystemCheckResponseType">
+				<restriction base="string"/>
+			</simpleType>
+		</schema>
+	</types>
+	<message name="getSendingOptions">
+		<part name="keha" type="tns:institutionRefsArrayType"/>
+	</message>
+	<message name="getSendingOptionsResponse">
+		<part name="paring" type="tns:institutionRefsArrayType"/>
+		<part name="keha" type="tns:institutionArrayType"/>
+	</message>
+	<message name="getSendingOptionsV2">
+		<part name="keha" type="tns:getSendingOptionsV2RequestType"/>
+	</message>
+	<message name="getSendingOptionsV2Response">
+		<part name="paring" type="tns:getSendingOptionsV2RequestType"/>
+		<part name="keha" type="tns:institutionArrayType"/>
+	</message>
+	<message name="receiveDocuments">
+		<part name="keha" type="tns:receiveDocumentsRequestType"/>
+	</message>
+	<message name="receiveDocumentsResponse">
+		<part name="paring" type="tns:receiveDocumentsRequestType"/>
+		<part name="keha" type="tns:receiveDocumentsResponseType"/>
+		<part name="p1" type="ns5:base64Binary"/>
+	</message>
+	<message name="receiveDocumentsV2">
+		<part name="keha" type="tns:receiveDocumentsV2RequestType"/>
+	</message>
+	<message name="receiveDocumentsV2Response">
+		<part name="paring" type="tns:receiveDocumentsV2RequestType"/>
+		<part name="keha" type="tns:receiveDocumentsResponseType"/>
+		<part name="p1" type="ns5:base64Binary"/>
+	</message>
+	<message name="sendDocuments">
+		<part name="keha" type="tns:sendDocumentsRequestType"/>
+		<part name="p1" type="ns5:base64Binary"/>
+	</message>
+	<message name="sendDocumentsResponse">
+		<part name="paring" type="tns:sendDocumentsRequestType"/>
+		<part name="keha" type="tns:sendDocumentsResponseType"/>
+		<part name="p2" type="ns5:base64Binary"/>
+	</message>
+	<message name="sendDocumentsV2">
+		<part name="keha" type="tns:sendDocumentsV2RequestType"/>
+		<part name="p1" type="ns5:base64Binary"/>
+	</message>
+	<message name="sendDocumentsV2Response">
+		<part name="paring" type="tns:sendDocumentsV2RequestType"/>
+		<part name="keha" type="tns:sendDocumentsResponseType"/>
+		<part name="p2" type="ns5:base64Binary"/>
+	</message>
+	<message name="markDocumentsReceived">
+		<part name="keha" type="tns:markDocumentsReceivedRequestType"/>
+		<part name="p1" type="ns5:base64Binary"/>
+	</message>
+	<message name="markDocumentsReceivedResponse">
+		<part name="paring" type="tns:markDocumentsReceivedRequestType"/>
+		<part name="keha" type="tns:markDocumentsReceivedResponseType"/>
+		<part name="p2" type="ns5:base64Binary"/>
+	</message>
+	<message name="markDocumentsReceivedV2">
+		<part name="keha" type="tns:markDocumentsReceivedRequestType"/>
+		<part name="p1" type="ns5:base64Binary"/>
+	</message>
+	<message name="markDocumentsReceivedV2Response">
+		<part name="paring" type="tns:markDocumentsReceivedRequestType"/>
+		<part name="keha" type="tns:markDocumentsReceivedResponseType"/>
+		<part name="p2" type="ns5:base64Binary"/>
+	</message>
+	<message name="getSendStatus">
+		<part name="keha" type="tns:getSendStatusRequestType"/>
+		<part name="p1" type="ns5:base64Binary"/>
+	</message>
+	<message name="getSendStatusResponse">
+		<part name="paring" type="tns:getSendStatusRequestType"/>
+		<part name="keha" type="tns:getSendStatusResponseType"/>
+		<part name="p2" type="ns5:base64Binary"/>
+	</message>
+	<message name="deleteOldDocuments">
+		<part name="keha" type="tns:deleteOldDocumentsRequestType"/>
+	</message>
+	<message name="deleteOldDocumentsResponse">
+		<part name="paring" type="tns:deleteOldDocumentsRequestType"/>
+		<part name="keha" type="tns:deleteOldDocumentsResponseType"/>
+	</message>
+	<message name="changeOrganizationData">
+		<part name="keha" type="tns:changeOrganizationDataRequestType"/>
+	</message>
+	<message name="changeOrganizationDataResponse">
+		<part name="paring" type="tns:changeOrganizationDataRequestType"/>
+		<part name="keha" type="tns:changeOrganizationDataResponseType"/>
+	</message>
+	<message name="runSystemCheck">
+		<part name="keha" type="tns:runSystemCheckRequestType"/>
+	</message>
+	<message name="runSystemCheckResponse">
+		<part name="paring" type="tns:runSystemCheckRequestType"/>
+		<part name="keha" type="tns:runSystemCheckResponseType"/>
+	</message>
+	<message name="getOccupationList">
+		<part name="keha" type="tns:institutionRefsArrayType"/>
+	</message>
+	<message name="getOccupationListResponse">
+		<part name="paring" type="tns:institutionRefsArrayType"/>
+		<part name="keha" type="tns:occupationArrayType"/>
+	</message>
+	<message name="getSubdivisionList">
+		<part name="keha" type="tns:institutionRefsArrayType"/>
+	</message>
+	<message name="getSubdivisionListResponse">
+		<part name="paring" type="tns:institutionRefsArrayType"/>
+		<part name="keha" type="tns:subdivisionArrayType"/>
+	</message>
+	<message name="requestHeader">
+		<wsdl:part name="client" element="xrd:client" />
+		<wsdl:part name="service" element="xrd:service" />
+		<wsdl:part name="id" element="xrd:id" />
+		<wsdl:part name="userId" element="xrd:userId" />
+		<wsdl:part name="issue" element="xrd:issue" />
+		<wsdl:part name="protocolVersion" element="xrd:protocolVersion" />
+	</message>
+	<portType name="dhlPortType">
+		<operation name="getSendingOptions">
+			<documentation><xtee:title>Asutuste saatmisviisid</xtee:title><xtee:notes>Asutste toetatavate saatmisviiside loetelu</xtee:notes></documentation>
+			<input message="tns:getSendingOptions" name="getSendingOptions"/>
+			<output message="tns:getSendingOptionsResponse" name="getSendingOptionsResponse"/>
+		</operation>
+		<operation name="getSendingOptions">
+			<documentation><xtee:title>Asutuste saatmisviisid</xtee:title><xtee:notes>Asutste toetatavate saatmisviiside loetelu</xtee:notes></documentation>
+			<input message="tns:getSendingOptionsV2" name="getSendingOptionsV2"/>
+			<output message="tns:getSendingOptionsV2Response" name="getSendingOptionsV2Response"/>
+		</operation>
+		<operation name="sendDocuments">
+			<documentation><xtee:title>Dokumentide edastamine</xtee:title><xtee:notes>Dokumentide edastamine dokumendihoidlasse</xtee:notes></documentation>
+			<input message="tns:sendDocuments" name="sendDocuments"/>
+			<output message="tns:sendDocumentsResponse"  name="sendDocumentsResponse"/>
+		</operation>
+		<operation name="sendDocuments">
+			<documentation><xtee:title>Dokumentide edastamine</xtee:title><xtee:notes>Dokumentide edastamine dokumendihoidlasse</xtee:notes></documentation>
+			<input message="tns:sendDocumentsV2" name="sendDocumentsV2"/>
+			<output message="tns:sendDocumentsV2Response" name="sendDocumentsV2Response"/>
+		</operation>
+		<operation name="receiveDocuments">
+			<documentation><xtee:title>Uute dokumentide lugemine</xtee:title><xtee:notes>Uute veel lugemata saabunud dokumentide allalaadimine dokumendihoidlast</xtee:notes></documentation>
+			<input message="tns:receiveDocuments" name="receiveDocuments"/>
+			<output message="tns:receiveDocumentsResponse" name="receiveDocumentsResponse"/>
+		</operation>
+		<operation name="receiveDocuments">
+			<documentation><xtee:title>Uute dokumentide lugemine</xtee:title><xtee:notes>Uute veel lugemata saabunud dokumentide allalaadimine dokumendihoidlast</xtee:notes></documentation>
+			<input message="tns:receiveDocumentsV2" name="receiveDocumentsV2"/>
+			<output message="tns:receiveDocumentsV2Response" name="receiveDocumentsV2Response"/>
+		</operation>
+		<operation name="markDocumentsReceived">
+			<documentation><xtee:title>Uute dokumentide loetuks märkimine</xtee:title><xtee:notes>Uute saabunud dokumentide loetuks märkimine</xtee:notes></documentation>
+			<input name="markDocumentsReceived" message="tns:markDocumentsReceived"/>
+			<output name="markDocumentsReceivedResponse" message="tns:markDocumentsReceivedResponse"/>
+		</operation>
+		<operation name="markDocumentsReceived">
+			<documentation><xtee:title>Uute dokumentide loetuks märkimine</xtee:title><xtee:notes>Uute saabunud dokumentide loetuks märkimine</xtee:notes></documentation>
+			<input name="markDocumentsReceivedV2" message="tns:markDocumentsReceivedV2"/>
+			<output name="markDocumentsReceivedV2Response" message="tns:markDocumentsReceivedV2Response"/>
+		</operation>
+		<operation name="getSendStatus">
+			<documentation><xtee:title>Saadetud dokumentide oleku kontrollimine</xtee:title><xtee:notes>Kontrollib, kas saadetud dokumendid on kõigile adressaatidele edukalt edastatud</xtee:notes></documentation>
+			<input message="tns:getSendStatus"/>
+			<output message="tns:getSendStatusResponse"/>
+		</operation>
+		<operation name="deleteOldDocuments">
+			<documentation><xtee:title>Aegunud dokumentide kustutamine</xtee:title><xtee:notes>Kustutab dokumendid, mille säilitustähtaeg on möödas</xtee:notes></documentation>
+			<input message="tns:deleteOldDocuments"/>
+			<output message="tns:deleteOldDocumentsResponse"/>
+		</operation>
+		<operation name="changeOrganizationData">
+			<documentation><xtee:title>Asutuse andmete muutmine</xtee:title><xtee:notes>Asutuse andmete muutmine</xtee:notes></documentation>
+			<input message="tns:changeOrganizationData"/>
+			<output message="tns:changeOrganizationDataResponse"/>
+		</operation>
+		<operation name="runSystemCheck">
+			<documentation><xtee:title>Serveri toimimise kontroll</xtee:title><xtee:notes>Kontrollib, kas DVK serveri põhifunktsionaalsus toimib</xtee:notes></documentation>
+			<input message="tns:runSystemCheck"/>
+			<output message="tns:runSystemCheckResponse"/>
+		</operation>
+		<operation name="getOccupationList">
+			<documentation><xtee:title>Ametikohtade nimekiri</xtee:title><xtee:notes>Ametikohtade nimekirja laadimine</xtee:notes></documentation>
+			<input message="tns:getOccupationList"/>
+			<output message="tns:getOccupationListResponse"/>
+		</operation>
+		<operation name="getSubdivisionList">
+			<documentation><xtee:title>Allüksuste nimekiri</xtee:title><xtee:notes>Allüksuste nimekirja laadimine</xtee:notes></documentation>
+			<input message="tns:getSubdivisionList"/>
+			<output message="tns:getSubdivisionListResponse"/>
+		</operation>
+	</portType>
+	<binding name="dhlSoapBinding" type="tns:dhlPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+		<operation name="getSendingOptions">
+			<soap:operation soapAction="http://producers.dhl.xtee.riik.ee/producer/dhl/getSendingOptions" style="document"/>
+			<xrd:version>v1</xrd:version>
+			<input name="getSendingOptions">
+				<soap:body use="literal" />
+				<soap:header message="tns:requestHeader" part="client" use="literal" />
+				<soap:header message="tns:requestHeader" part="service" use="literal" />
+				<soap:header message="tns:requestHeader" part="id" use="literal" />
+				<soap:header message="tns:requestHeader" part="userId" use="literal" />
+				<soap:header message="tns:requestHeader" part="issue" use="literal" />
+				<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+			</input>
+			<output name="getSendingOptionsResponse">
+				<soap:body use="literal" />
+				<soap:header message="tns:requestHeader" part="client" use="literal" />
+				<soap:header message="tns:requestHeader" part="service" use="literal" />
+				<soap:header message="tns:requestHeader" part="id" use="literal" />
+				<soap:header message="tns:requestHeader" part="userId" use="literal" />
+				<soap:header message="tns:requestHeader" part="issue" use="literal" />
+				<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+			</output>
+		</operation>
+		<operation name="getSendingOptions">
+			<soap:operation soapAction="http://producers.dhl.xtee.riik.ee/producer/dhl/getSendingOptions" style="document"/>
+			<xrd:version>v2</xrd:version>
+			<input name="getSendingOptionsV2">
+				<soap:body use="literal" />
+				<soap:header message="tns:requestHeader" part="client" use="literal" />
+				<soap:header message="tns:requestHeader" part="service" use="literal" />
+				<soap:header message="tns:requestHeader" part="id" use="literal" />
+				<soap:header message="tns:requestHeader" part="userId" use="literal" />
+				<soap:header message="tns:requestHeader" part="issue" use="literal" />
+				<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+			</input>
+			<output name="getSendingOptionsV2Response">
+				<soap:body use="literal" />
+				<soap:header message="tns:requestHeader" part="client" use="literal" />
+				<soap:header message="tns:requestHeader" part="service" use="literal" />
+				<soap:header message="tns:requestHeader" part="id" use="literal" />
+				<soap:header message="tns:requestHeader" part="userId" use="literal" />
+				<soap:header message="tns:requestHeader" part="issue" use="literal" />
+				<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+			</output>
+		</operation>
+		<operation name="sendDocuments">
+			<soap:operation soapAction="http://producers.dhl.xtee.riik.ee/producer/dhl/sendDocuments" style="document"/>
+			<xrd:version>v1</xrd:version>
+			<input name="sendDocuments">
+				<mime:multipartRelated>
+					<mime:part>
+						<soap:body use="literal" />
+						<soap:header message="tns:requestHeader" part="client" use="literal" />
+						<soap:header message="tns:requestHeader" part="service" use="literal" />
+						<soap:header message="tns:requestHeader" part="id" use="literal" />
+						<soap:header message="tns:requestHeader" part="userId" use="literal" />
+						<soap:header message="tns:requestHeader" part="issue" use="literal" />
+						<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+					</mime:part>
+					<mime:part>
+						<mime:content part="p1" type="application/binary"/>
+					</mime:part>
+				</mime:multipartRelated>
+			</input>
+			<output name="sendDocumentsResponse">
+				<mime:multipartRelated>
+					<mime:part>
+						<soap:body use="literal" />
+						<soap:header message="tns:requestHeader" part="client" use="literal" />
+						<soap:header message="tns:requestHeader" part="service" use="literal" />
+						<soap:header message="tns:requestHeader" part="id" use="literal" />
+						<soap:header message="tns:requestHeader" part="userId" use="literal" />
+						<soap:header message="tns:requestHeader" part="issue" use="literal" />
+						<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+					</mime:part>
+					<mime:part>
+						<mime:content part="p2" type="application/binary"/>
+					</mime:part>
+				</mime:multipartRelated>
+			</output>
+		</operation>
+		<operation name="sendDocuments">
+			<soap:operation  soapAction="http://producers.dhl.xtee.riik.ee/producer/dhl/sendDocuments" style="document"/>
+			<xrd:version>v2</xrd:version>
+			<input name="sendDocumentsV2">
+				<mime:multipartRelated>
+					<mime:part>
+						<soap:body use="literal" />
+						<soap:header message="tns:requestHeader" part="client" use="literal" />
+						<soap:header message="tns:requestHeader" part="service" use="literal" />
+						<soap:header message="tns:requestHeader" part="id" use="literal" />
+						<soap:header message="tns:requestHeader" part="userId" use="literal" />
+						<soap:header message="tns:requestHeader" part="issue" use="literal" />
+						<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+					</mime:part>
+					<mime:part>
+						<mime:content part="p1" type="application/binary"/>
+					</mime:part>
+				</mime:multipartRelated>
+			</input>
+			<output name="sendDocumentsV2Response">
+				<mime:multipartRelated>
+					<mime:part>
+						<soap:body use="literal" />
+						<soap:header message="tns:requestHeader" part="client" use="literal" />
+						<soap:header message="tns:requestHeader" part="service" use="literal" />
+						<soap:header message="tns:requestHeader" part="id" use="literal" />
+						<soap:header message="tns:requestHeader" part="userId" use="literal" />
+						<soap:header message="tns:requestHeader" part="issue" use="literal" />
+						<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+					</mime:part>
+					<mime:part>
+						<mime:content part="p2" type="application/binary"/>
+					</mime:part>
+				</mime:multipartRelated>
+			</output>
+		</operation>
+		<operation name="receiveDocuments">
+			<soap:operation soapAction="http://producers.dhl.xtee.riik.ee/producer/dhl/receiveDocuments" style="document"/>
+			<xrd:version>v1</xrd:version>
+			<input name="receiveDocuments">
+				<soap:body use="literal" />
+				<soap:header message="tns:requestHeader" part="client" use="literal" />
+				<soap:header message="tns:requestHeader" part="service" use="literal" />
+				<soap:header message="tns:requestHeader" part="id" use="literal" />
+				<soap:header message="tns:requestHeader" part="userId" use="literal" />
+				<soap:header message="tns:requestHeader" part="issue" use="literal" />
+				<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+			</input>
+			<output name="receiveDocumentsResponse">
+				<mime:multipartRelated>
+					<mime:part>
+						<soap:body use="literal" />
+						<soap:header message="tns:requestHeader" part="client" use="literal" />
+						<soap:header message="tns:requestHeader" part="service" use="literal" />
+						<soap:header message="tns:requestHeader" part="id" use="literal" />
+						<soap:header message="tns:requestHeader" part="userId" use="literal" />
+						<soap:header message="tns:requestHeader" part="issue" use="literal" />
+						<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+					</mime:part>
+					<mime:part>
+						<mime:content part="p1" type="application/binary"/>
+					</mime:part>
+				</mime:multipartRelated>
+			</output>
+		</operation>
+		<operation name="receiveDocuments">
+			<soap:operation soapAction="http://producers.dhl.xtee.riik.ee/producer/dhl/receiveDocuments" style="document"/>
+			<xrd:version>v2</xrd:version>
+			<input name="receiveDocumentsV2">
+				<soap:body use="literal" />
+				<soap:header message="tns:requestHeader" part="client" use="literal" />
+				<soap:header message="tns:requestHeader" part="service" use="literal" />
+				<soap:header message="tns:requestHeader" part="id" use="literal" />
+				<soap:header message="tns:requestHeader" part="userId" use="literal" />
+				<soap:header message="tns:requestHeader" part="issue" use="literal" />
+				<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+			</input>
+			<output name="receiveDocumentsV2Response">
+				<mime:multipartRelated>
+					<mime:part>
+						<soap:body use="literal" />
+						<soap:header message="tns:requestHeader" part="client" use="literal" />
+						<soap:header message="tns:requestHeader" part="service" use="literal" />
+						<soap:header message="tns:requestHeader" part="id" use="literal" />
+						<soap:header message="tns:requestHeader" part="userId" use="literal" />
+						<soap:header message="tns:requestHeader" part="issue" use="literal" />
+						<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+					</mime:part>
+					<mime:part>
+						<mime:content part="p1" type="application/binary"/>
+					</mime:part>
+				</mime:multipartRelated>
+			</output>
+		</operation>
+		<operation name="markDocumentsReceived">
+			<soap:operation soapAction="http://producers.dhl.xtee.riik.ee/producer/dhl/markDocumentsReceived" style="document"/>
+			<xrd:version>v1</xrd:version>
+			<input name="markDocumentsReceived">
+				<mime:multipartRelated>
+					<mime:part>
+						<soap:body use="literal" />
+						<soap:header message="tns:requestHeader" part="client" use="literal" />
+						<soap:header message="tns:requestHeader" part="service" use="literal" />
+						<soap:header message="tns:requestHeader" part="id" use="literal" />
+						<soap:header message="tns:requestHeader" part="userId" use="literal" />
+						<soap:header message="tns:requestHeader" part="issue" use="literal" />
+						<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+					</mime:part>
+					<mime:part>
+						<mime:content part="p1" type="application/binary"/>
+					</mime:part>
+				</mime:multipartRelated>
+			</input>
+			<output name="markDocumentsReceivedResponse">
+				<soap:body use="literal" />
+				<soap:header message="tns:requestHeader" part="client" use="literal" />
+				<soap:header message="tns:requestHeader" part="service" use="literal" />
+				<soap:header message="tns:requestHeader" part="id" use="literal" />
+				<soap:header message="tns:requestHeader" part="userId" use="literal" />
+				<soap:header message="tns:requestHeader" part="issue" use="literal" />
+				<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+			</output>
+		</operation>
+		<operation name="markDocumentsReceived">
+			<soap:operation soapAction="http://producers.dhl.xtee.riik.ee/producer/dhl/markDocumentsReceived" style="document"/>
+			<xrd:version>v2</xrd:version>
+			<input name="markDocumentsReceivedV2">
+				<mime:multipartRelated>
+					<mime:part>
+						<soap:body use="literal" />
+						<soap:header message="tns:requestHeader" part="client" use="literal" />
+						<soap:header message="tns:requestHeader" part="service" use="literal" />
+						<soap:header message="tns:requestHeader" part="id" use="literal" />
+						<soap:header message="tns:requestHeader" part="userId" use="literal" />
+						<soap:header message="tns:requestHeader" part="issue" use="literal" />
+						<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+					</mime:part>
+					<mime:part>
+						<mime:content part="p1" type="application/binary"/>
+					</mime:part>
+				</mime:multipartRelated>
+			</input>
+			<output name="markDocumentsReceivedV2Response">
+				<soap:body use="literal" />
+				<soap:header message="tns:requestHeader" part="client" use="literal" />
+				<soap:header message="tns:requestHeader" part="service" use="literal" />
+				<soap:header message="tns:requestHeader" part="id" use="literal" />
+				<soap:header message="tns:requestHeader" part="userId" use="literal" />
+				<soap:header message="tns:requestHeader" part="issue" use="literal" />
+				<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+			</output>
+		</operation>
+		<operation name="getSendStatus">
+			<soap:operation soapAction="http://producers.dhl.xtee.riik.ee/producer/dhl/getSendStatus" style="document"/>
+			<xrd:version>v1</xrd:version>
+			<input>
+				<mime:multipartRelated>
+					<mime:part>
+						<soap:body use="literal" />
+						<soap:header message="tns:requestHeader" part="client" use="literal" />
+						<soap:header message="tns:requestHeader" part="service" use="literal" />
+						<soap:header message="tns:requestHeader" part="id" use="literal" />
+						<soap:header message="tns:requestHeader" part="userId" use="literal" />
+						<soap:header message="tns:requestHeader" part="issue" use="literal" />
+						<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+					</mime:part>
+					<mime:part>
+						<mime:content part="p1" type="application/binary"/>
+					</mime:part>
+				</mime:multipartRelated>
+			</input>
+			<output>
+				<mime:multipartRelated>
+					<mime:part>
+						<soap:body use="literal" />
+						<soap:header message="tns:requestHeader" part="client" use="literal" />
+						<soap:header message="tns:requestHeader" part="service" use="literal" />
+						<soap:header message="tns:requestHeader" part="id" use="literal" />
+						<soap:header message="tns:requestHeader" part="userId" use="literal" />
+						<soap:header message="tns:requestHeader" part="issue" use="literal" />
+						<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+					</mime:part>
+					<mime:part>
+						<mime:content part="p1" type="application/binary"/>
+					</mime:part>
+				</mime:multipartRelated>
+			</output>
+		</operation>
+		<operation name="deleteOldDocuments">
+			<soap:operation soapAction="http://producers.dhl.xtee.riik.ee/producer/dhl/deleteOldDocuments" style="document"/>
+			<xrd:version>v1</xrd:version>
+			<input>
+				<soap:body use="literal" />
+				<soap:header message="tns:requestHeader" part="client" use="literal" />
+				<soap:header message="tns:requestHeader" part="service" use="literal" />
+				<soap:header message="tns:requestHeader" part="id" use="literal" />
+				<soap:header message="tns:requestHeader" part="userId" use="literal" />
+				<soap:header message="tns:requestHeader" part="issue" use="literal" />
+				<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+			</input>
+			<output>
+				<soap:body use="literal" />
+				<soap:header message="tns:requestHeader" part="client" use="literal" />
+				<soap:header message="tns:requestHeader" part="service" use="literal" />
+				<soap:header message="tns:requestHeader" part="id" use="literal" />
+				<soap:header message="tns:requestHeader" part="userId" use="literal" />
+				<soap:header message="tns:requestHeader" part="issue" use="literal" />
+				<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+			</output>
+		</operation>
+		<operation name="changeOrganizationData">
+			<soap:operation soapAction="http://producers.dhl.xtee.riik.ee/producer/dhl/changeOrganizationData" style="document"/>
+			<xrd:version>v1</xrd:version>
+			<input>
+				<soap:body use="literal" />
+				<soap:header message="tns:requestHeader" part="client" use="literal" />
+				<soap:header message="tns:requestHeader" part="service" use="literal" />
+				<soap:header message="tns:requestHeader" part="id" use="literal" />
+				<soap:header message="tns:requestHeader" part="userId" use="literal" />
+				<soap:header message="tns:requestHeader" part="issue" use="literal" />
+				<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+			</input>
+			<output>
+				<soap:body use="literal" />
+				<soap:header message="tns:requestHeader" part="client" use="literal" />
+				<soap:header message="tns:requestHeader" part="service" use="literal" />
+				<soap:header message="tns:requestHeader" part="id" use="literal" />
+				<soap:header message="tns:requestHeader" part="userId" use="literal" />
+				<soap:header message="tns:requestHeader" part="issue" use="literal" />
+				<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+			</output>
+		</operation>
+		<operation name="runSystemCheck">
+			<soap:operation soapAction="http://producers.dhl.xtee.riik.ee/producer/dhl/runSystemCheck" style="document"/>
+			<xrd:version>v1</xrd:version>
+			<input>
+				<soap:body use="literal" />
+				<soap:header message="tns:requestHeader" part="client" use="literal" />
+				<soap:header message="tns:requestHeader" part="service" use="literal" />
+				<soap:header message="tns:requestHeader" part="id" use="literal" />
+				<soap:header message="tns:requestHeader" part="userId" use="literal" />
+				<soap:header message="tns:requestHeader" part="issue" use="literal" />
+				<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+			</input>
+			<output>
+				<soap:body use="literal" />
+				<soap:header message="tns:requestHeader" part="client" use="literal" />
+				<soap:header message="tns:requestHeader" part="service" use="literal" />
+				<soap:header message="tns:requestHeader" part="id" use="literal" />
+				<soap:header message="tns:requestHeader" part="userId" use="literal" />
+				<soap:header message="tns:requestHeader" part="issue" use="literal" />
+				<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+			</output>
+		</operation>
+		<operation name="getOccupationList">
+			<soap:operation soapAction="http://producers.dhl.xtee.riik.ee/producer/dhl/getOccupationList" style="document"/>
+			<xrd:version>v1</xrd:version>
+			<input>
+				<soap:body use="literal" />
+				<soap:header message="tns:requestHeader" part="client" use="literal" />
+				<soap:header message="tns:requestHeader" part="service" use="literal" />
+				<soap:header message="tns:requestHeader" part="id" use="literal" />
+				<soap:header message="tns:requestHeader" part="userId" use="literal" />
+				<soap:header message="tns:requestHeader" part="issue" use="literal" />
+				<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+			</input>
+			<output>
+				<soap:body use="literal" />
+				<soap:header message="tns:requestHeader" part="client" use="literal" />
+				<soap:header message="tns:requestHeader" part="service" use="literal" />
+				<soap:header message="tns:requestHeader" part="id" use="literal" />
+				<soap:header message="tns:requestHeader" part="userId" use="literal" />
+				<soap:header message="tns:requestHeader" part="issue" use="literal" />
+				<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+			</output>
+		</operation>
+		<operation name="getSubdivisionList">
+			<soap:operation soapAction="http://producers.dhl.xtee.riik.ee/producer/dhl/getSubdivisionList" style="document"/>
+			<xrd:version>v1</xrd:version>
+			<input>
+				<soap:body use="literal" />
+				<soap:header message="tns:requestHeader" part="client" use="literal" />
+				<soap:header message="tns:requestHeader" part="service" use="literal" />
+				<soap:header message="tns:requestHeader" part="id" use="literal" />
+				<soap:header message="tns:requestHeader" part="userId" use="literal" />
+				<soap:header message="tns:requestHeader" part="issue" use="literal" />
+				<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+			</input>
+			<output>
+				<soap:body use="literal" />
+				<soap:header message="tns:requestHeader" part="client" use="literal" />
+				<soap:header message="tns:requestHeader" part="service" use="literal" />
+				<soap:header message="tns:requestHeader" part="id" use="literal" />
+				<soap:header message="tns:requestHeader" part="userId" use="literal" />
+				<soap:header message="tns:requestHeader" part="issue" use="literal" />
+				<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
+			</output>
+		</operation>
+	</binding>
+	<service name="dhlService">
+		<port name="dhlHttpSoapPort" binding="tns:dhlSoapBinding">
+			<soap:address location="http://TURVASERVER/cgi-bin/consumer_proxy"/>
+			<xtee:title>Dokumendihoidla</xtee:title>
+			<xtee:title xml:lang="en">Document repository</xtee:title>
+			<xtee:address producer="dhl"/>
+		</port>
+	</service>
+</definitions>
+

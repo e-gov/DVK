@@ -36,25 +36,27 @@ public class receiveDocumentsV2ResponseType implements SOAPOutputBodyRepresentat
 
             SOAPBodyElement element = body.addBodyElement(se.createName("receiveDocumentsResponse"));
 
-            // Sõnumi päringu osa
-            SOAPElement elParing = element.addChildElement(se.createName("paring"));
-            SOAPElement elArv = elParing.addChildElement("arv");
-            elArv.addTextNode(String.valueOf(paring.arv));
-            for (int i = 0; i < paring.kaust.size(); ++i) {
-                SOAPElement elKaust = elParing.addChildElement("kaust");
-                elKaust.addTextNode(paring.kaust.get(i));
-            }
-            if ((paring.edastusID != null) && !paring.edastusID.equalsIgnoreCase("")) {
-                SOAPElement elParEdastusID = elParing.addChildElement("edastus_id");
-                elParEdastusID.addTextNode(paring.edastusID);
-            }
-            if (paring.fragmentNr >= 0) {
-                SOAPElement elParFragmentNr = elParing.addChildElement("fragment_nr");
-                elParFragmentNr.addTextNode(String.valueOf(paring.fragmentNr));
-            }
-            if (paring.fragmentSizeBytesOrig > 0) {
-                SOAPElement elParFragmentSize = elParing.addChildElement("fragmendi_suurus_baitides");
-                elParFragmentSize.addTextNode(String.valueOf(paring.fragmentSizeBytesOrig));
+            if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+	            // Sõnumi päringu osa
+	            SOAPElement elParing = element.addChildElement(se.createName("paring"));
+	            SOAPElement elArv = elParing.addChildElement("arv");
+	            elArv.addTextNode(String.valueOf(paring.arv));
+	            for (int i = 0; i < paring.kaust.size(); ++i) {
+	                SOAPElement elKaust = elParing.addChildElement("kaust");
+	                elKaust.addTextNode(paring.kaust.get(i));
+	            }
+	            if ((paring.edastusID != null) && !paring.edastusID.equalsIgnoreCase("")) {
+	                SOAPElement elParEdastusID = elParing.addChildElement("edastus_id");
+	                elParEdastusID.addTextNode(paring.edastusID);
+	            }
+	            if (paring.fragmentNr >= 0) {
+	                SOAPElement elParFragmentNr = elParing.addChildElement("fragment_nr");
+	                elParFragmentNr.addTextNode(String.valueOf(paring.fragmentNr));
+	            }
+	            if (paring.fragmentSizeBytesOrig > 0) {
+	                SOAPElement elParFragmentSize = elParing.addChildElement("fragmendi_suurus_baitides");
+	                elParFragmentSize.addTextNode(String.valueOf(paring.fragmentSizeBytesOrig));
+	            }
             }
 
             // Sõnumi keha osa

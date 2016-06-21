@@ -30,11 +30,15 @@ public class markDocumentsReceivedResponseType implements SOAPOutputBodyRepresen
             }
 
             SOAPBodyElement element = body.addBodyElement(se.createName("markDocumentsReceivedResponse"));
-            SOAPElement elParing = element.addChildElement(se.createName("paring"));
-            SOAPElement elDok = elParing.addChildElement("dokumendid");
-            elDok.addTextNode(paring.dokumendid);
-            SOAPElement elKaust = elParing.addChildElement("kaust");
-            elKaust.addTextNode(paring.kaust);
+            
+            if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+	            SOAPElement elParing = element.addChildElement(se.createName("paring"));
+	            SOAPElement elDok = elParing.addChildElement("dokumendid");
+	            elDok.addTextNode(paring.dokumendid);
+	            SOAPElement elKaust = elParing.addChildElement("kaust");
+	            elKaust.addTextNode(paring.kaust);
+            }
+            
             SOAPElement elKeha = element.addChildElement(se.createName("keha"));
             elKeha.addTextNode(keha);
         } catch (Exception ex) {

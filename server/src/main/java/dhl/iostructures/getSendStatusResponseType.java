@@ -30,8 +30,12 @@ public class getSendStatusResponseType implements SOAPOutputBodyRepresentation {
             }
 
             SOAPBodyElement element = body.addBodyElement(se.createName("getSendStatusResponse"));
-            SOAPElement elParing = element.addChildElement(se.createName("paring"));
-            elParing.addTextNode(paringKehaHash);
+            
+            if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+	            SOAPElement elParing = element.addChildElement(se.createName("paring"));
+	            elParing.addTextNode(paringKehaHash);
+            }
+            
             SOAPElement elKeha = element.addChildElement(se.createName("keha"));
             elKeha.addAttribute(se.createName("href"), "cid:" + kehaHref);
         } catch (Exception ex) {

@@ -45,8 +45,11 @@ public class getSendingOptionsV3ResponseType implements SOAPOutputBodyRepresenta
             }
 
             SOAPBodyElement element = body.addBodyElement(se.createName("getSendingOptionsResponse", CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_URI));
-            SOAPElement elParing = element.addChildElement(se.createName("paring"));
-            elParing.addTextNode(this.dataMd5Hash);
+            
+            if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+	            SOAPElement elParing = element.addChildElement(se.createName("paring"));
+	            elParing.addTextNode(this.dataMd5Hash);
+            }
 
             // X-road "keha" part in SOAP message
             SOAPElement elKeha = element.addChildElement(se.createName("keha"));

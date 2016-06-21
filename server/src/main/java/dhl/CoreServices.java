@@ -538,11 +538,11 @@ public class CoreServices implements Dhl {
                 // Käivitame päringust vajaliku versiooni
                 SOAPOutputBodyRepresentation result = null;
                 if (ver.equalsIgnoreCase("v1")) {
-                    result = GetSendingOptions.V1(context, conn, hostOrgSettings);
+                    result = GetSendingOptions.V1(context, conn, hostOrgSettings, xTeePais.getProtocolVersion());
                 } else if (ver.equalsIgnoreCase("v2")) {
-                    result = GetSendingOptions.V2(context, conn, hostOrgSettings);
+                    result = GetSendingOptions.V2(context, conn, hostOrgSettings, xTeePais.getProtocolVersion());
                 } else if (ver.equalsIgnoreCase("v3")) {
-                    result = GetSendingOptions.V3(context, conn, hostOrgSettings, user);
+                    result = GetSendingOptions.V3(context, conn, hostOrgSettings, user, xTeePais.getProtocolVersion());
                 } else {
                     // Vale versioon
                     throw new AxisFault(CommonStructures.VIGA_PARINGU_VERSIOONIS);
@@ -1151,9 +1151,9 @@ public class CoreServices implements Dhl {
                     // Käivitame päringust vajaliku versiooni
                     SOAPOutputBodyRepresentation result = null;
                     if (ver.equalsIgnoreCase("v1")) {
-                        result = GetOccupationList.V1(context, conn);
+                        result = GetOccupationList.V1(context, conn, xTeePais.getProtocolVersion());
                     } else if (ver.equalsIgnoreCase("v2")) {
-                        result = GetOccupationList.V2(context, conn, user);
+                        result = GetOccupationList.V2(context, conn, user, xTeePais.getProtocolVersion());
                     } else {
                         // Vale versioon
                         throw new AxisFault(CommonStructures.VIGA_PARINGU_VERSIOONIS);
@@ -1237,9 +1237,9 @@ public class CoreServices implements Dhl {
                     // Käivitame päringust vajaliku versiooni
                     SOAPOutputBodyRepresentation result = null;
                     if (ver.equalsIgnoreCase("v1")) {
-                        result = GetSubdivisionList.V1(context, conn);
+                        result = GetSubdivisionList.V1(context, conn, xTeePais.getProtocolVersion());
                     } else if (ver.equalsIgnoreCase("v2")) {
-                        result = GetSubdivisionList.V2(context, conn, user);
+                        result = GetSubdivisionList.V2(context, conn, user, xTeePais.getProtocolVersion());
                     } else {
                         // Vale versioon
                         throw new AxisFault(CommonStructures.VIGA_PARINGU_VERSIOONIS);

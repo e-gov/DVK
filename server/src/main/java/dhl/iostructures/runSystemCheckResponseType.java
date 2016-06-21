@@ -47,12 +47,14 @@ public class runSystemCheckResponseType implements SOAPOutputBodyRepresentation 
             SOAPBodyElement element = body.addBodyElement(
             		se.createName("runSystemCheckResponse", xRoadProtocolVersion.getNamespacePrefix(), xRoadProtocolVersion.getNamespaceURI()));
 
-            SOAPElement elParing = element.addChildElement(se.createName("paring"));
-            if (m_requestElement != null && xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
-                NodeList nl = m_requestElement.getChildNodes();
-                for (int i = 0; i < nl.getLength(); ++i) {
-                    elParing.appendChild(nl.item(i));
-                }
+            if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+            	SOAPElement elParing = element.addChildElement(se.createName("paring"));
+            	if (m_requestElement != null) {
+            		NodeList nl = m_requestElement.getChildNodes();
+            		for (int i = 0; i < nl.getLength(); ++i) {
+            			elParing.appendChild(nl.item(i));
+            		}
+            	}
             }
 
             SOAPElement elKeha = element.addChildElement("keha");

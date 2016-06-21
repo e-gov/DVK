@@ -10,6 +10,7 @@ import dhl.users.Asutus;
 import dhl.users.UserProfile;
 import dvk.core.AttachmentExtractionResult;
 import dvk.core.CommonMethods;
+import dvk.core.xroad.XRoadProtocolVersion;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -21,8 +22,8 @@ public class GetSubdivisionList {
 
     private static Logger logger = Logger.getLogger(GetSubdivisionList.class);
 
-    public static getSubdivisionListResponseType V1(
-            org.apache.axis.MessageContext context, Connection conn) throws AxisFault, RequestProcessingException {
+    public static getSubdivisionListResponseType V1(org.apache.axis.MessageContext context, Connection conn,
+    		XRoadProtocolVersion xRoadProtocolVersion) throws AxisFault, RequestProcessingException {
 
         logger.info("GetSubdivisionList.V1 invoked.");
 
@@ -30,7 +31,9 @@ public class GetSubdivisionList {
 
         // Laeme päringu keha endale sobivasse andmestruktuuri
         getSubdivisionListRequestType bodyData = getSubdivisionListRequestType.getFromSOAPBody(context);
-        result.paring = bodyData;
+        if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+        	result.paring = bodyData;
+        }
 
         // Leiame andmebaasist soovitud ametikohad
         ArrayList<Allyksus> list = new ArrayList<Allyksus>();
@@ -47,11 +50,12 @@ public class GetSubdivisionList {
         }
 
         result.allyksused = list;
+        
         return result;
     }
 
-    public static getSubdivisionListV2ResponseType V2(
-            org.apache.axis.MessageContext context, Connection conn, UserProfile user) throws Exception {
+    public static getSubdivisionListV2ResponseType V2(org.apache.axis.MessageContext context, Connection conn,
+    		UserProfile user, XRoadProtocolVersion xRoadProtocolVersion) throws Exception {
 
         logger.info("GetSubdivisionList.V2 invoked.");
 
@@ -59,7 +63,9 @@ public class GetSubdivisionList {
 
         // Laeme päringu keha endale sobivasse andmestruktuuri
         getSubdivisionListV2RequestType bodyData = getSubdivisionListV2RequestType.getFromSOAPBody(context);
-        result.paring = bodyData;
+        if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+        	result.paring = bodyData;
+        }
 
         // Laeme sisendparameetrid SOAP sõnumi manuses asuvast XML failist
         AttachmentExtractionResult exResult = CommonMethods.getExtractedFileFromAttachment(context, bodyData.asutusedHref);
@@ -82,6 +88,8 @@ public class GetSubdivisionList {
 
         // Koostame XML faili
         result.createResponseFile(list, user.getOrganizationCode());
+        
         return result;
     }
+    
 }

@@ -39,15 +39,17 @@ public class receiveDocumentsV4ResponseType implements SOAPOutputBodyRepresentat
 
             SOAPBodyElement element = body.addBodyElement(se.createName("receiveDocumentsResponse"));
 
-            // Sõnumi päringu osa
-            if (paring != null) {
-            	SOAPElement elParing = element.addChildElement(se.createName("paring"));
-                if (paring != null) {
-                    NodeList nl = paring.getChildNodes();
-                    for (int i = 0; i < nl.getLength(); ++i) {
-                        elParing.appendChild(nl.item(i));
-                    }
-                }
+            if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+	            // Sõnumi päringu osa
+	            if (paring != null) {
+	            	SOAPElement elParing = element.addChildElement(se.createName("paring"));
+	                if (paring != null) {
+	                    NodeList nl = paring.getChildNodes();
+	                    for (int i = 0; i < nl.getLength(); ++i) {
+	                        elParing.appendChild(nl.item(i));
+	                    }
+	                }
+	            }
             }
 
             // Sõnumi keha osa

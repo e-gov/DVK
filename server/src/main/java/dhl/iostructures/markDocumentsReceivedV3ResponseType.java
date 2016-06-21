@@ -38,12 +38,15 @@ public class markDocumentsReceivedV3ResponseType implements SOAPOutputBodyRepres
             }
 
             SOAPBodyElement element = body.addBodyElement(se.createName("markDocumentsReceivedResponse"));
-            SOAPElement elParing = element.addChildElement(se.createName("paring"));
-            if (paring != null) {
-                NodeList nl = paring.getChildNodes();
-                for (int i = 0; i < nl.getLength(); ++i) {
-                    elParing.appendChild(nl.item(i));
-                }
+            
+            if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+	            SOAPElement elParing = element.addChildElement(se.createName("paring"));
+	            if (paring != null) {
+	                NodeList nl = paring.getChildNodes();
+	                for (int i = 0; i < nl.getLength(); ++i) {
+	                    elParing.appendChild(nl.item(i));
+	                }
+	            }
             }
 
             SOAPElement elKeha = element.addChildElement(se.createName("keha"));

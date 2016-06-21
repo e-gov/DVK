@@ -46,16 +46,19 @@ public class getSendStatusV2ResponseType implements SOAPOutputBodyRepresentation
         }
 
         SOAPBodyElement element = body.addBodyElement(se.createName("getSendStatusResponse"));
-        SOAPElement elParing = element.addChildElement(se.createName("paring"));
-        if (paring != null) {
-            NodeList nl = paring.getChildNodes();
-            for (int i = 0; i < nl.getLength(); ++i) {
-                Node addedNode = elParing.appendChild(nl.item(i));
-                if ((addedNode != null) && (addedNode.getLocalName().equalsIgnoreCase("dokumendid")) && (addedNode.getNodeType() == Node.ELEMENT_NODE)) {
-                    ((Element) addedNode).removeAttribute("href");
-                    ((SOAPElement) addedNode).addTextNode(dataMd5Hash);
-                }
-            }
+        
+        if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+	        SOAPElement elParing = element.addChildElement(se.createName("paring"));
+	        if (paring != null) {
+	            NodeList nl = paring.getChildNodes();
+	            for (int i = 0; i < nl.getLength(); ++i) {
+	                Node addedNode = elParing.appendChild(nl.item(i));
+	                if ((addedNode != null) && (addedNode.getLocalName().equalsIgnoreCase("dokumendid")) && (addedNode.getNodeType() == Node.ELEMENT_NODE)) {
+	                    ((Element) addedNode).removeAttribute("href");
+	                    ((SOAPElement) addedNode).addTextNode(dataMd5Hash);
+	                }
+	            }
+	        }
         }
 
         SOAPElement elKeha = element.addChildElement(se.createName("keha"));

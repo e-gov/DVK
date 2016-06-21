@@ -17,6 +17,7 @@ import dvk.core.AttachmentExtractionResult;
 import dvk.core.CommonMethods;
 import dvk.core.Settings;
 import dvk.core.ShortName;
+import dvk.core.xroad.XRoadProtocolVersion;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -27,15 +28,18 @@ import org.apache.log4j.Logger;
 public class GetSendingOptions {
     private static Logger logger = Logger.getLogger(GetSendingOptions.class);
 
-    public static getSendingOptionsResponseType V1(org.apache.axis.MessageContext context,
-                                                   Connection conn, OrgSettings hostOrgSettings) throws AxisFault {
+    public static getSendingOptionsResponseType V1(org.apache.axis.MessageContext context, Connection conn,
+    		OrgSettings hostOrgSettings, XRoadProtocolVersion xRoadProtocolVersion) throws AxisFault {
+    	
         logger.info("GetSendingOptions.V1 invoked.");
 
         getSendingOptionsResponseType result = new getSendingOptionsResponseType();
 
         // Laeme päringu keha endale sobivasse andmestruktuuri
         getSendingOptionsRequestType bodyData = getSendingOptionsRequestType.getFromSOAPBody(context);
-        result.paring = bodyData;
+        if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+        	result.paring = bodyData;
+        }
 
         // Leiame andmebaasist soovitud asutused
         ArrayList<Asutus> org = new ArrayList<Asutus>();
@@ -96,15 +100,18 @@ public class GetSendingOptions {
         return result;
     }
 
-    public static getSendingOptionsV2ResponseType V2(org.apache.axis.MessageContext context,
-                                                     Connection conn, OrgSettings hostOrgSettings) throws Exception {
+    public static getSendingOptionsV2ResponseType V2(org.apache.axis.MessageContext context, Connection conn,
+    		OrgSettings hostOrgSettings, XRoadProtocolVersion xRoadProtocolVersion) throws Exception {
+    	
         logger.info("GetSendingOptions.V2 invoked.");
 
         getSendingOptionsV2ResponseType result = new getSendingOptionsV2ResponseType();
 
         // Laeme päringu keha endale sobivasse andmestruktuuri
         getSendingOptionsV2RequestType bodyData = getSendingOptionsV2RequestType.getFromSOAPBody(context);
-        result.paring = bodyData;
+        if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+        	result.paring = bodyData;
+        }
 
         // Leiame andmebaasist soovitud asutused
         ArrayList<Asutus> org = new ArrayList<Asutus>();
@@ -201,15 +208,18 @@ public class GetSendingOptions {
         return result;
     }
 
-    public static getSendingOptionsV3ResponseType V3(org.apache.axis.MessageContext context,
-                                      Connection conn, OrgSettings hostOrgSettings, UserProfile user) throws AxisFault {
+    public static getSendingOptionsV3ResponseType V3(org.apache.axis.MessageContext context, Connection conn,
+    		OrgSettings hostOrgSettings, UserProfile user, XRoadProtocolVersion xRoadProtocolVersion) throws AxisFault {
+    	
         logger.info("GetSendingOptions.V3 invoked. Parameter values: ");
 
         getSendingOptionsV3ResponseType result = new getSendingOptionsV3ResponseType();
         try {
             // Laeme päringu keha endale sobivasse andmestruktuuri
             getSendingOptionsV3RequestType bodyData = getSendingOptionsV3RequestType.getFromSOAPBody(context);
-            result.paring = bodyData;
+            if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+            	result.paring = bodyData;
+            }
 
             logger.debug("vahetatudDokumenteKuni: " + bodyData.vahetatudDokumenteKuni);
             logger.debug("vahetatudDokumenteVahemalt: " + bodyData.vahetatudDokumenteVahemalt);

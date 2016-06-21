@@ -30,13 +30,17 @@ public class receiveDocumentsResponseType implements SOAPOutputBodyRepresentatio
             }
 
             SOAPBodyElement element = body.addBodyElement(se.createName("receiveDocumentsResponse"));
-            SOAPElement elParing = element.addChildElement(se.createName("paring"));
-            SOAPElement elArv = elParing.addChildElement("arv");
-            elArv.addTextNode(String.valueOf(paring.arv));
-            for (int i = 0; i < paring.kaust.size(); ++i) {
-                SOAPElement elKaust = elParing.addChildElement("kaust");
-                elKaust.addTextNode(paring.kaust.get(i));
+            
+            if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+	            SOAPElement elParing = element.addChildElement(se.createName("paring"));
+	            SOAPElement elArv = elParing.addChildElement("arv");
+	            elArv.addTextNode(String.valueOf(paring.arv));
+	            for (int i = 0; i < paring.kaust.size(); ++i) {
+	                SOAPElement elKaust = elParing.addChildElement("kaust");
+	                elKaust.addTextNode(paring.kaust.get(i));
+	            }
             }
+            
             SOAPElement elKeha = element.addChildElement(se.createName("keha"));
             elKeha.addAttribute(se.createName("href"), "cid:" + kehaHref);
         } catch (Exception ex) {

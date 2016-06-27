@@ -27,22 +27,24 @@
 			<import namespace="http://www.sk.ee/DigiDoc/v1.3.0#" schemaLocation="http://www.riik.ee/schemas/dhl/DigiDoc-1.3.xsd"/>
 			<import namespace="http://www.riik.ee/schemas/dhl" schemaLocation="http://www.riik.ee/schemas/dhl/dhl.xsd"/>
 			<import namespace="http://www.riik.ee/schemas/dhl-meta-automatic" schemaLocation="http://www.riik.ee/schemas/dhl/dhl-meta-automatic.xsd"/>
-			<complexType name="institutionRefsArrayType">
-				<complexContent>
-					<restriction base="SOAP-ENC:Array">
-						<sequence>
-							<element name="asutus" type="string" maxOccurs="unbounded">
-								<annotation>
-									<appinfo>
-										<xrd:title>Asutuse registrinumber</xrd:title>
-									</appinfo>
-								</annotation>
-							</element>
-						</sequence>
-					</restriction>
-				</complexContent>
-			</complexType>
-			<complexType name="sendingOptionArrayType">
+			<element name="institutionRefsArrayType">
+				<complexType>
+					<complexContent>
+						<restriction base="SOAP-ENC:Array">
+							<sequence>
+								<element name="asutus" type="string" maxOccurs="unbounded">
+									<annotation>
+										<appinfo>
+											<xrd:title>Asutuse registrinumber</xrd:title>
+										</appinfo>
+									</annotation>
+								</element>
+							</sequence>
+						</restriction>
+					</complexContent>
+				</complexType>
+			</element>
+			<complexType  name="sendingOptionArrayType">
 				<complexContent>
 					<restriction base="SOAP-ENC:Array">
 						<sequence>
@@ -57,7 +59,7 @@
 					</restriction>
 				</complexContent>
 			</complexType>
-			<complexType name="institutionType">
+			<complexType  name="institutionType">
 				<sequence>
 					<element name="regnr" type="string"/>
 					<element name="nimi" type="string"/>
@@ -65,21 +67,23 @@
 					<element name="ks_asutuse_regnr" type="string" minOccurs="0" maxOccurs="1"/>
 				</sequence>
 			</complexType>
-			<complexType name="institutionArrayType">
-				<complexContent>
-					<restriction base="SOAP-ENC:Array">
-						<sequence>
-							<element name="asutus" type="tns:institutionType" maxOccurs="unbounded">
-								<annotation>
-									<appinfo>
-										<xrd:title>Asutuse andmed</xrd:title>
-									</appinfo>
-								</annotation>
-							</element>
-						</sequence>
-					</restriction>
-				</complexContent>
-			</complexType>
+			<element name="institutionArrayType">
+				<complexType>
+					<complexContent>
+						<restriction base="SOAP-ENC:Array">
+							<sequence>
+								<element name="asutus" type="tns:institutionType" maxOccurs="unbounded">
+									<annotation>
+										<appinfo>
+											<xrd:title>Asutuse andmed</xrd:title>
+										</appinfo>
+									</annotation>
+								</element>
+							</sequence>
+						</restriction>
+					</complexContent>
+				</complexType>
+			</element>
 			<complexType name="occupationType">
 				<sequence>
 					<element name="kood" type="string"/>
@@ -88,21 +92,23 @@
 					<element name="ks_allyksuse_kood" type="string" minOccurs="0" maxOccurs="1"/>
 				</sequence>
 			</complexType>
-			<complexType name="occupationArrayType">
-				<complexContent>
-					<restriction base="SOAP-ENC:Array">
-						<sequence>
-							<element name="ametikoht" type="tns:occupationType" maxOccurs="unbounded">
-								<annotation>
-									<appinfo>
-										<xrd:title>Ametikoha andmed</xrd:title>
-									</appinfo>
-								</annotation>
-							</element>
-						</sequence>
-					</restriction>
-				</complexContent>
-			</complexType>
+			<element name="occupationArrayType">
+				<complexType>
+					<complexContent>
+						<restriction base="SOAP-ENC:Array">
+							<sequence>
+								<element name="ametikoht" type="tns:occupationType" maxOccurs="unbounded">
+									<annotation>
+										<appinfo>
+											<xrd:title>Ametikoha andmed</xrd:title>
+										</appinfo>
+									</annotation>
+								</element>
+							</sequence>
+						</restriction>
+					</complexContent>
+				</complexType>
+			</element>
 			<complexType name="subdivisionType">
 				<sequence>
 					<element name="kood" type="string"/>
@@ -111,21 +117,23 @@
 					<element name="ks_allyksuse_kood" type="string" minOccurs="0" maxOccurs="1"/>
 				</sequence>
 			</complexType>
-			<complexType name="subdivisionArrayType">
-				<complexContent>
-					<restriction base="SOAP-ENC:Array">
-						<sequence>
-							<element name="allyksus" type="tns:subdivisionType" maxOccurs="unbounded">
-								<annotation>
-									<appinfo>
-										<xrd:title>Allüksuse andmed</xrd:title>
-									</appinfo>
-								</annotation>
-							</element>
-						</sequence>
-					</restriction>
-				</complexContent>
-			</complexType>
+			<element  name="subdivisionArrayType">
+				<complexType>
+					<complexContent>
+						<restriction base="SOAP-ENC:Array">
+							<sequence>
+								<element name="allyksus" type="tns:subdivisionType" maxOccurs="unbounded">
+									<annotation>
+										<appinfo>
+											<xrd:title>Allüksuse andmed</xrd:title>
+										</appinfo>
+									</annotation>
+								</element>
+							</sequence>
+						</restriction>
+					</complexContent>
+				</complexType>
+			</element>
 			<complexType name="documentRefsArrayType">
 				<complexContent>
 					<restriction base="SOAP-ENC:Array">
@@ -171,204 +179,260 @@
 					</restriction>
 				</complexContent>
 			</complexType>
-			<complexType name="getSendingOptionsV2RequestType">
-				<sequence>
-					<element name="vastuvotmata_dokumente_ootel" type="boolean" minOccurs="0" maxOccurs="1"/>
-					<element name="vahetatud_dokumente_vahemalt" type="integer" minOccurs="0" maxOccurs="1"/>
-					<element name="vahetatud_dokumente_kuni" type="integer" minOccurs="0" maxOccurs="1"/>
-					<element name="asutused" type="tns:institutionRefsArrayType" minOccurs="0" maxOccurs="1"/>
-				</sequence>
-			</complexType>
-			<complexType name="receiveDocumentsRequestType">
-				<sequence>
-					<element name="arv" type="integer" minOccurs="0">
-						<annotation>
-							<appinfo>
-								<xrd:title>Maksimaalne tagastatav kirjete arv, vaikimisi 10</xrd:title>
-							</appinfo>
-						</annotation>
-					</element>
-					<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0">
-						<annotation>
-							<appinfo>
-								<xrd:title>Kaust, kust dokumentid loetakse</xrd:title>
-							</appinfo>
-						</annotation>
-					</element>
-				</sequence>
-			</complexType>
-			<complexType name="receiveDocumentsResponseType">
-				<simpleContent>
-					<extension base="base64Binary"/>
-				</simpleContent>
-			</complexType>
-			<complexType name="receiveDocumentsV2RequestType">
-				<sequence>
-					<element name="arv" type="integer" minOccurs="0">
-						<annotation>
-							<appinfo>
-								<xrd:title>Maksimaalne tagastatav kirjete arv, vaikimisi 10</xrd:title>
-							</appinfo>
-						</annotation>
-					</element>
-					<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0">
-						<annotation>
-							<appinfo>
-								<xrd:title>Kaust, kust dokumentid loetakse</xrd:title>
-							</appinfo>
-						</annotation>
-					</element>
-					<element name="edastus_id" type="string" minOccurs="0"/>
-					<element name="fragment_nr" type="integer" minOccurs="0"/>
-					<element name="fragmendi_suurus_baitides" type="integer" minOccurs="0"/>
-				</sequence>
-			</complexType>
-			<complexType name="markDocumentsReceivedRequestType">
-				<sequence>
-					<element name="dokumendid" type="base64Binary"/>
-					<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0"/>
-				</sequence>
-			</complexType>
-			<complexType name="markDocumentsReceivedRequestTypeUnencoded">
-				<sequence>
-					<element name="dokumendid" type="tns:documentRefsArrayType"/>
-					<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0"/>
-				</sequence>
-			</complexType>
-			<complexType name="markDocumentsReceivedV2RequestTypeUnencoded">
-				<sequence>
-					<element name="dokumendid" type="tns:tagasisideArrayType"/>
-					<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0"/>
-				</sequence>
-			</complexType>
-			<simpleType name="markDocumentsReceivedResponseType">
-				<restriction base="string"/>
-			</simpleType>
-			<complexType name="sendDocumentsRequestType">
-				<sequence>
-					<element name="dokumendid" type="base64Binary"/>
-					<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0"/>
-				</sequence>
-			</complexType>
-			<complexType name="sendDocumentsRequestTypeUnencoded">
-				<sequence>
-					<element name="dokumendid" type="tns:documentsArrayType"/>
-					<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0"/>
-				</sequence>
-			</complexType>
-			<complexType name="sendDocumentsV2RequestType">
-				<sequence>
-					<element name="dokumendid" type="base64Binary"/>
-					<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0"/>
-					<element name="sailitustahtaeg" type="date" minOccurs="0"/>
-					<element name="edastus_id" type="string" minOccurs="0"/>
-					<element name="fragment_nr" type="integer" minOccurs="0"/>
-					<element name="fragmente_kokku" type="integer" minOccurs="0"/>
-				</sequence>
-			</complexType>
-			<complexType name="sendDocumentsV2RequestTypeUnencoded">
-				<sequence>
-					<element name="dokumendid" type="tns:documentsArrayType"/>
-					<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0"/>
-					<element name="sailitustahtaeg" type="date" minOccurs="0"/>
-					<element name="edastus_id" type="string" minOccurs="0"/>
-					<element name="fragment_nr" type="integer" minOccurs="0"/>
-					<element name="fragmente_kokku" type="integer" minOccurs="0"/>
-				</sequence>
-			</complexType>
-			<complexType name="sendDocumentsResponseType">
-				<simpleContent>
-					<extension base="base64Binary"/>
-				</simpleContent>
-			</complexType>
-			<complexType name="sendDocumentsResponseTypeUnencoded">
-				<complexContent>
-					<extension base="tns:documentRefsArrayType"/>
-				</complexContent>
-			</complexType>
-			<complexType name="getSendStatusRequestType">
-				<simpleContent>
-					<extension base="base64Binary"/>
-				</simpleContent>
-			</complexType>
-			<complexType name="getSendStatusRequestTypeUnencoded">
-				<complexContent>
-					<extension base="tns:documentRefsArrayType"/>
-				</complexContent>
-			</complexType>
-			<complexType name="getSendStatusResponseType">
-				<simpleContent>
-					<extension base="base64Binary"/>
-				</simpleContent>
-			</complexType>
-			<complexType name="getSendStatusResponseTypeUnencoded">
-				<complexContent>
-					<restriction base="SOAP-ENC:Array">
-						<sequence>
-							<element name="item" maxOccurs="unbounded">
-								<complexType>
-									<sequence>
-										<element ref="dhlma:dhl_id"/>
-										<element ref="dhl:edastus" minOccurs="0" maxOccurs="unbounded"/>
-										<element name="olek" type="string"/>
-									</sequence>
-								</complexType>
-							</element>
-						</sequence>
-					</restriction>
-				</complexContent>
-			</complexType>
-			<complexType name="receiveDocumentsResponseTypeUnencoded">
-				<complexContent>
-					<extension base="tns:documentsArrayType"/>
-				</complexContent>
-			</complexType>
-			<complexType name="deleteOldDocumentsRequestType"/>
-			<simpleType name="deleteOldDocumentsResponseType">
-				<restriction base="string"/>
-			</simpleType>
-			<complexType name="changeOrganizationDataRequestType">
-				<sequence>
-					<element name="registrikood" type="string" minOccurs="1"/>
-					<element name="endine_registrikood" type="string" minOccurs="0"/>
-					<element name="korgemalseisva_asutuse_registrikood" type="string" minOccurs="0"/>
-					<element name="nimi" type="string" minOccurs="0"/>
-					<element name="nime_lyhend" type="string" minOccurs="0"/>
-					<element name="liik1" type="string" minOccurs="0"/>
-					<element name="liik2" type="string" minOccurs="0"/>
-					<element name="tegevusala" type="string" minOccurs="0"/>
-					<element name="tegevuspiirkond" type="string" minOccurs="0"/>
-					<element name="maakond" type="string" minOccurs="0"/>
-					<element name="asukoht" type="string" minOccurs="0"/>
-					<element name="aadress" type="string" minOccurs="0"/>
-					<element name="postikood" type="string" minOccurs="0"/>
-					<element name="telefon" type="string" minOccurs="0"/>
-					<element name="faks" type="string" minOccurs="0"/>
-					<element name="e_post" type="string" minOccurs="0"/>
-					<element name="www" type="string" minOccurs="0"/>
-					<element name="logo" type="string" minOccurs="0"/>
-					<element name="asutamise_kuupaev" type="date" minOccurs="0"/>
-					<element name="moodustamise_akti_nimi" type="string" minOccurs="0"/>
-					<element name="moodustamise_akti_number" type="string" minOccurs="0"/>
-					<element name="moodustamise_akti_kuupaev" type="date" minOccurs="0"/>
-					<element name="pohimaaruse_akti_nimi" type="string" minOccurs="0"/>
-					<element name="pohimaaruse_akti_number" type="string" minOccurs="0"/>
-					<element name="pohimaaruse_kinnitamise_kuupaev" type="date" minOccurs="0"/>
-					<element name="pohimaaruse_kande_kuupaev" type="date" minOccurs="0"/>
-					<element name="parameetrid" type="string" minOccurs="0"/>
-					<element name="dvk_saatmine" type="boolean" minOccurs="0"/>
-					<element name="dvk_otse_saatmine" type="boolean" minOccurs="0"/>
-					<element name="toetatav_dvk_versioon" type="string" minOccurs="0"/>
-					<element name="dokumendihaldussysteemi_nimetus" type="string" minOccurs="0"/>
-				</sequence>
-			</complexType>
-			<simpleType name="changeOrganizationDataResponseType">
-				<restriction base="string"/>
-			</simpleType>
-			<complexType name="runSystemCheckRequestType"/>
-			<simpleType name="runSystemCheckResponseType">
-				<restriction base="string"/>
-			</simpleType>
+			<element name="getSendingOptionsV2RequestType">
+				<complexType>
+					<sequence>
+						<element name="vastuvotmata_dokumente_ootel" type="boolean" minOccurs="0" maxOccurs="1"/>
+						<element name="vahetatud_dokumente_vahemalt" type="integer" minOccurs="0" maxOccurs="1"/>
+						<element name="vahetatud_dokumente_kuni" type="integer" minOccurs="0" maxOccurs="1"/>
+						<element name="asutused" minOccurs="0" maxOccurs="1">
+							<complexType>
+								<sequence>
+									<element ref="tns:institutionRefsArrayType" />
+								</sequence>
+							</complexType>
+						</element>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="receiveDocumentsRequestType">
+				<complexType>
+					<sequence>
+						<element name="arv" type="integer" minOccurs="0">
+							<annotation>
+								<appinfo>
+									<xrd:title>Maksimaalne tagastatav kirjete arv, vaikimisi 10</xrd:title>
+								</appinfo>
+							</annotation>
+						</element>
+						<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0">
+							<annotation>
+								<appinfo>
+									<xrd:title>Kaust, kust dokumentid loetakse</xrd:title>
+								</appinfo>
+							</annotation>
+						</element>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="receiveDocumentsResponseType">
+				<complexType>
+					<simpleContent>
+						<extension base="base64Binary"/>
+					</simpleContent>
+				</complexType>
+			</element>
+			<element name="receiveDocumentsV2RequestType">
+				<complexType>
+					<sequence>
+						<element name="arv" type="integer" minOccurs="0">
+							<annotation>
+								<appinfo>
+									<xrd:title>Maksimaalne tagastatav kirjete arv, vaikimisi 10</xrd:title>
+								</appinfo>
+							</annotation>
+						</element>
+						<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0">
+							<annotation>
+								<appinfo>
+									<xrd:title>Kaust, kust dokumentid loetakse</xrd:title>
+								</appinfo>
+							</annotation>
+						</element>
+						<element name="edastus_id" type="string" minOccurs="0"/>
+						<element name="fragment_nr" type="integer" minOccurs="0"/>
+						<element name="fragmendi_suurus_baitides" type="integer" minOccurs="0"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="markDocumentsReceivedRequestType">
+				<complexType>
+					<sequence>
+						<element name="dokumendid" type="base64Binary"/>
+						<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="markDocumentsReceivedRequestTypeUnencoded">
+				<complexType>
+					<sequence>
+						<element name="dokumendid" type="tns:documentRefsArrayType"/>
+						<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="markDocumentsReceivedV2RequestTypeUnencoded">
+				<complexType>
+					<sequence>
+						<element name="dokumendid" type="tns:tagasisideArrayType"/>
+						<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="markDocumentsReceivedResponseType">
+				<simpleType>
+					<restriction base="string"/>
+				</simpleType>
+			</element>
+			<element name="sendDocumentsRequestType">
+				<complexType>
+					<sequence>
+						<element name="dokumendid" type="base64Binary"/>
+						<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="sendDocumentsRequestTypeUnencoded">
+				<complexType>
+					<sequence>
+						<element name="dokumendid" type="tns:documentsArrayType"/>
+						<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="sendDocumentsV2RequestType">
+				<complexType>
+					<sequence>
+						<element name="dokumendid" type="base64Binary"/>
+						<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0"/>
+						<element name="sailitustahtaeg" type="date" minOccurs="0"/>
+						<element name="edastus_id" type="string" minOccurs="0"/>
+						<element name="fragment_nr" type="integer" minOccurs="0"/>
+						<element name="fragmente_kokku" type="integer" minOccurs="0"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="sendDocumentsV2RequestTypeUnencoded">
+				<complexType>
+					<sequence>
+						<element name="dokumendid" type="tns:documentsArrayType"/>
+						<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0"/>
+						<element name="sailitustahtaeg" type="date" minOccurs="0"/>
+						<element name="edastus_id" type="string" minOccurs="0"/>
+						<element name="fragment_nr" type="integer" minOccurs="0"/>
+						<element name="fragmente_kokku" type="integer" minOccurs="0"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="sendDocumentsResponseType">
+				<complexType>
+					<simpleContent>
+						<extension base="base64Binary"/>
+					</simpleContent>
+				</complexType>
+			</element>
+			<element name="sendDocumentsResponseTypeUnencoded">
+				<complexType>
+					<complexContent>
+						<extension base="tns:documentRefsArrayType"/>
+					</complexContent>
+				</complexType>
+			</element>
+			<element name="getSendStatusRequestType">
+				<complexType>
+					<simpleContent>
+						<extension base="base64Binary"/>
+					</simpleContent>
+				</complexType>
+			</element>
+			<element name="getSendStatusRequestTypeUnencoded">
+				<complexType>
+					<complexContent>
+						<extension base="tns:documentRefsArrayType"/>
+					</complexContent>
+				</complexType>
+			</element>
+			<element name="getSendStatusResponseType">
+				<complexType>
+					<simpleContent>
+						<extension base="base64Binary"/>
+					</simpleContent>
+				</complexType>
+			</element>
+			<element name="getSendStatusResponseTypeUnencoded">
+				<complexType>
+					<complexContent>
+						<restriction base="SOAP-ENC:Array">
+							<sequence>
+								<element name="item" maxOccurs="unbounded">
+									<complexType>
+										<sequence>
+											<element ref="dhlma:dhl_id"/>
+											<element ref="dhl:edastus" minOccurs="0" maxOccurs="unbounded"/>
+											<element name="olek" type="string"/>
+										</sequence>
+									</complexType>
+								</element>
+							</sequence>
+						</restriction>
+					</complexContent>
+				</complexType>
+			</element>
+			<element name="receiveDocumentsResponseTypeUnencoded">
+				<complexType>
+					<complexContent>
+						<extension base="tns:documentsArrayType"/>
+					</complexContent>
+				</complexType>
+			</element>
+			<element name="deleteOldDocumentsRequestType">
+				<complexType />
+			</element>
+			<element name="deleteOldDocumentsResponseType">
+				<simpleType>
+					<restriction base="string"/>
+				</simpleType>
+			</element>
+			<element name="changeOrganizationDataRequestType">
+				<complexType>
+					<sequence>
+						<element name="registrikood" type="string" minOccurs="1"/>
+						<element name="endine_registrikood" type="string" minOccurs="0"/>
+						<element name="korgemalseisva_asutuse_registrikood" type="string" minOccurs="0"/>
+						<element name="nimi" type="string" minOccurs="0"/>
+						<element name="nime_lyhend" type="string" minOccurs="0"/>
+						<element name="liik1" type="string" minOccurs="0"/>
+						<element name="liik2" type="string" minOccurs="0"/>
+						<element name="tegevusala" type="string" minOccurs="0"/>
+						<element name="tegevuspiirkond" type="string" minOccurs="0"/>
+						<element name="maakond" type="string" minOccurs="0"/>
+						<element name="asukoht" type="string" minOccurs="0"/>
+						<element name="aadress" type="string" minOccurs="0"/>
+						<element name="postikood" type="string" minOccurs="0"/>
+						<element name="telefon" type="string" minOccurs="0"/>
+						<element name="faks" type="string" minOccurs="0"/>
+						<element name="e_post" type="string" minOccurs="0"/>
+						<element name="www" type="string" minOccurs="0"/>
+						<element name="logo" type="string" minOccurs="0"/>
+						<element name="asutamise_kuupaev" type="date" minOccurs="0"/>
+						<element name="moodustamise_akti_nimi" type="string" minOccurs="0"/>
+						<element name="moodustamise_akti_number" type="string" minOccurs="0"/>
+						<element name="moodustamise_akti_kuupaev" type="date" minOccurs="0"/>
+						<element name="pohimaaruse_akti_nimi" type="string" minOccurs="0"/>
+						<element name="pohimaaruse_akti_number" type="string" minOccurs="0"/>
+						<element name="pohimaaruse_kinnitamise_kuupaev" type="date" minOccurs="0"/>
+						<element name="pohimaaruse_kande_kuupaev" type="date" minOccurs="0"/>
+						<element name="parameetrid" type="string" minOccurs="0"/>
+						<element name="dvk_saatmine" type="boolean" minOccurs="0"/>
+						<element name="dvk_otse_saatmine" type="boolean" minOccurs="0"/>
+						<element name="toetatav_dvk_versioon" type="string" minOccurs="0"/>
+						<element name="dokumendihaldussysteemi_nimetus" type="string" minOccurs="0"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="changeOrganizationDataResponseType">
+				<simpleType>
+					<restriction base="string"/>
+				</simpleType>
+			</element>
+			<element name="runSystemCheckRequestType">
+				<complexType />
+			</element>
+			<element name="runSystemCheckResponseType">
+				<simpleType>
+					<restriction base="string"/>
+				</simpleType>
+			</element>
 		</schema>
 	</types>
 	<message name="getSendingOptions">

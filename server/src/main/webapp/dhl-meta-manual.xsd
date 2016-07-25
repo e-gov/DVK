@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
-<xs:schema targetNamespace="http://www.riik.ee/schemas/dhl-meta-manual/2010/2" xmlns:tns="http://www.riik.ee/schemas/dhl-meta-manual/2010/2" xmlns:dhlma="http://www.riik.ee/schemas/dhl-meta-automatic" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+<xs:schema targetNamespace="http://www.riik.ee/schemas/dhl-meta-manual"
+		xmlns:tns="http://www.riik.ee/schemas/dhl-meta-manual"
+		xmlns:dhlma="http://www.riik.ee/schemas/dhl-meta-automatic"
+		xmlns:xs="http://www.w3.org/2001/XMLSchema"
+		elementFormDefault="unqualified"
+		attributeFormDefault="unqualified">
 	<xs:annotation>
 	  	<xs:documentation xml:lang="ee">
 	  		DVK XML konteiner - manuaalselt lisatavad andmed.

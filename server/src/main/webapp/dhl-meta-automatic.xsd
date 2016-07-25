@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xs:schema targetNamespace="http://www.riik.ee/schemas/dhl-meta-automatic" xmlns:tns="http://www.riik.ee/schemas/dhl-meta-automatic" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+<xs:schema targetNamespace="http://www.riik.ee/schemas/dhl-meta-automatic"
+		xmlns:tns="http://www.riik.ee/schemas/dhl-meta-automatic"
+		xmlns:xs="http://www.w3.org/2001/XMLSchema"
+		
+		elementFormDefault="unqualified"
+		attributeFormDefault="unqualified">
 	<xs:annotation>
 	  	<xs:documentation xml:lang="ee">
 	  		DVK XML konteiner - automaatselt DVK tarkvara poolt lisatavad andmed.

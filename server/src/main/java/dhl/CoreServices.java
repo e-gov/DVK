@@ -77,9 +77,11 @@ public class CoreServices implements Dhl {
 	
 	public static final Logger LOGGER = LogManager.getLogger(CoreServices.class.getName());
 	
+	// List of methods/services offered by this producer (legacy X-Road protocol v.2.0)
 	private String[] mehodsListWhenRunOnClientDatabase;
 	private String[] methodsListFull;
 	
+	// List of methods/services offered by this producer (X-Road protocol v.4.0)
 	private List<XRoadService> serviceMethodsWhenRunOnClientDatabase = new ArrayList<XRoadService>();
 	private List<XRoadService> serviceMethodsFull = new ArrayList<XRoadService>();
 
@@ -200,8 +202,10 @@ public class CoreServices implements Dhl {
             throw new AxisFault("DVK Internal error. Error connecting to database: " + ex.getMessage());
         }
     }
-
+    
     /**
+     * Lists all services offered by a service provider
+     * 
      * @webmethod
      */
     public void listMethods() throws AxisFault {
@@ -602,6 +606,14 @@ public class CoreServices implements Dhl {
     /**
      * @webmethod
      */
+    @Override
+	public void getSendingOptionsV2(Object keha) throws AxisFault {
+		getSendingOptions(keha);
+	}
+    
+    /**
+     * @webmethod
+     */
     public void sendDocuments(Object p1, Object keha) throws AxisFault {
         Timer t1 = new Timer();
         t1.reset();
@@ -747,6 +759,13 @@ public class CoreServices implements Dhl {
         t1.markElapsed("Entire request duration");
     }
 
+    /**
+     * @webmethod
+     */
+    @Override
+	public void sendDocumentsV2(Object p1, Object keha) throws AxisFault {
+    	sendDocuments(p1, keha);
+	}
 
     /**
      * @webmethod
@@ -902,6 +921,14 @@ public class CoreServices implements Dhl {
     /**
      * @webmethod
      */
+    @Override
+	public void receiveDocumentsV2(Object keha) throws AxisFault {
+		receiveDocuments(keha);
+	}
+    
+    /**
+     * @webmethod
+     */
     public void markDocumentsReceived(Object p1, Object keha) throws AxisFault {
         if (!Settings.Server_RunOnClientDatabase) {
             Connection conn = null;
@@ -995,6 +1022,14 @@ public class CoreServices implements Dhl {
         }
     }
 
+    /**
+     * @webmethod
+     */
+    @Override
+	public void markDocumentsReceivedV2(Object p1, Object keha) throws AxisFault {
+		markDocumentsReceived(p1, keha);
+    }
+    
     /**
      * @webmethod
      */
@@ -1358,4 +1393,5 @@ public class CoreServices implements Dhl {
             LOGGER.error(errorMessage);
         }
     }
+	
 }

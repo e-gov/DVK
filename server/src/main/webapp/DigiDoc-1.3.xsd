@@ -7,8 +7,10 @@
 	xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
 	elementFormDefault="qualified" >
 
-<xsd:import namespace="http://www.w3.org/2000/09/xmldsig#" 
-schemaLocation="http://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd"/>
+<!-- <xsd:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="http://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd"/> -->
+
+<!-- Using locally stored xmldsig-core-schema.xsd file, because the related request for the online instance (when validating) takes too long -->
+<xsd:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
 
 <!-- Root element for SignedDoc -->
 

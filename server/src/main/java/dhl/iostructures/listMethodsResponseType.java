@@ -18,8 +18,14 @@ import dvk.core.xroad.XRoadService;
 
 public class listMethodsResponseType implements SOAPOutputBodyRepresentation {
 	
+	/**
+	 * For storing list of methods/services offered by this producer when using X-Road protocol v2.0 (legacy)
+	 */
     private String[] methodsList;
     
+    /**
+	 * For storing list of methods/services offered by this producer when using X-Road protocol v4.0
+	 */
     private List<XRoadService> xRoadServices;
 
     public listMethodsResponseType(String[] methodsList) {
@@ -32,7 +38,7 @@ public class listMethodsResponseType implements SOAPOutputBodyRepresentation {
 
     public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolVersion xRoadProtocolVersion) {
         try {
-            // get SOAP envelope from SOAP message
+            // Get SOAP envelope from SOAP message
             org.apache.axis.message.SOAPEnvelope soapEnvelope = msg.getSOAPEnvelope();
             SOAPBody body = soapEnvelope.getBody();
 

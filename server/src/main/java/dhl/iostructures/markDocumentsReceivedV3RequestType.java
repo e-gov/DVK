@@ -1,7 +1,6 @@
 package dhl.iostructures;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 import javax.xml.soap.SOAPBody;
 
@@ -9,7 +8,10 @@ import org.apache.axis.AxisFault;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
 import dvk.core.CommonMethods;
+import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadProtocolVersion;
 
 public class markDocumentsReceivedV3RequestType {
     static Logger logger = Logger.getLogger(markDocumentsReceivedV3RequestType.class.getName());
@@ -27,11 +29,16 @@ public class markDocumentsReceivedV3RequestType {
         this.ametikohaLyhinimetus = "";
     }
 
-    public static markDocumentsReceivedV3RequestType getFromSOAPBody(org.apache.axis.MessageContext context) {
+    public static markDocumentsReceivedV3RequestType getFromSOAPBody(org.apache.axis.MessageContext context, XRoadProtocolHeader xRoadProtocolHeader) {
         try {
             org.apache.axis.Message msg = context.getRequestMessage();
             SOAPBody body = msg.getSOAPBody();
+            
             NodeList msgNodes = body.getElementsByTagName("markDocumentsReceived");
+            if (msgNodes.getLength() == 0 && xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
+            	msgNodes = body.getElementsByTagName("markDocumentsReceivedV3");
+            }
+            
             if (msgNodes.getLength() > 0) {
                 Element msgNode = (Element) msgNodes.item(0);
                 NodeList bodyNodes = msgNode.getElementsByTagName("keha");

@@ -4,15 +4,17 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import dvk.core.CommonMethods;
-import dvk.core.ShortName;
-
 import javax.xml.soap.SOAPBody;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import dvk.core.CommonMethods;
+import dvk.core.ShortName;
+import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadProtocolVersion;
 
 public class getSendingOptionsV3RequestType {
     static Logger logger = Logger.getLogger(getSendingOptionsV3RequestType.class.getName());
@@ -47,10 +49,15 @@ public class getSendingOptionsV3RequestType {
         vastuvotmataDokumenteOotel = false;
     }
 
-    public static getSendingOptionsV3RequestType getFromSOAPBody(org.apache.axis.MessageContext context) throws Exception {
+    public static getSendingOptionsV3RequestType getFromSOAPBody(org.apache.axis.MessageContext context, XRoadProtocolHeader xRoadProtocolHeader) throws Exception {
         org.apache.axis.Message msg = context.getRequestMessage();
         SOAPBody body = msg.getSOAPBody();
+        
         NodeList msgNodes = body.getElementsByTagName("getSendingOptions");
+        if (msgNodes.getLength() == 0 && xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
+        	msgNodes = body.getElementsByTagName("getSendingOptionsV3");
+        }
+        
         if (msgNodes.getLength() > 0) {
             Element msgNode = (Element) msgNodes.item(0);
             NodeList bodyNodes = msgNode.getElementsByTagName("keha");

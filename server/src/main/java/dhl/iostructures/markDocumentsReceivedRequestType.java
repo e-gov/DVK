@@ -1,12 +1,14 @@
 package dhl.iostructures;
 
-import dvk.core.CommonMethods;
-
 import javax.xml.soap.SOAPBody;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import dvk.core.CommonMethods;
+import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadProtocolVersion;
 
 public class markDocumentsReceivedRequestType {
     static Logger logger = Logger.getLogger(markDocumentsReceivedRequestType.class.getName());
@@ -24,11 +26,19 @@ public class markDocumentsReceivedRequestType {
         ametikohtId = 0;
     }
 
-    public static markDocumentsReceivedRequestType getFromSOAPBody(org.apache.axis.MessageContext context) {
+    public static markDocumentsReceivedRequestType getFromSOAPBody(org.apache.axis.MessageContext context, XRoadProtocolHeader xRoadProtocolHeader) {
         try {
             org.apache.axis.Message msg = context.getRequestMessage();
             SOAPBody body = msg.getSOAPBody();
+            
             NodeList msgNodes = body.getElementsByTagName("markDocumentsReceived");
+            if (msgNodes.getLength() == 0 && xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
+            	if (xRoadProtocolHeader.getXRoadService().getServiceVersion().equals("v2")) {
+            		// NB! For some reason version 2 is defined identically to v1 in the related WSDL
+            		msgNodes = body.getElementsByTagName("markDocumentsReceivedV2");
+            	}
+            }
+            
             if (msgNodes.getLength() > 0) {
                 Element msgNode = (Element) msgNodes.item(0);
                 NodeList bodyNodes = msgNode.getElementsByTagName("keha");

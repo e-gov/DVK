@@ -341,7 +341,7 @@ public class SendDocuments {
 
         try {
             // Laeme päringu keha endale sobivasse andmestruktuuri
-            sendDocumentsV2RequestType bodyData = sendDocumentsV2RequestType.getFromSOAPBody(context);
+            sendDocumentsV2RequestType bodyData = sendDocumentsV2RequestType.getFromSOAPBody(context, xTeePais);
             if (bodyData == null) {
                 throw new RequestProcessingException(CommonStructures.VIGA_VIGANE_KEHA);
             }
@@ -718,7 +718,7 @@ public class SendDocuments {
 
         try {
             // Laeme päringu keha endale sobivasse andmestruktuuri
-            sendDocumentsV2RequestType bodyData = sendDocumentsV2RequestType.getFromSOAPBody(context);
+            sendDocumentsV2RequestType bodyData = sendDocumentsV2RequestType.getFromSOAPBody(context, xTeePais);
             if (bodyData == null) {
                 throw new RequestProcessingException(CommonStructures.VIGA_VIGANE_KEHA);
             }
@@ -1331,7 +1331,7 @@ public class SendDocuments {
 
         try {
             // Laeme päringu keha endale sobivasse andmestruktuuri
-            sendDocumentsV2RequestType bodyData = sendDocumentsV2RequestType.getFromSOAPBody(context);
+            sendDocumentsV2RequestType bodyData = sendDocumentsV2RequestType.getFromSOAPBody(context, xTeePais);
             if (bodyData == null) {
                 throw new RequestProcessingException(CommonStructures.VIGA_VIGANE_KEHA);
             }

@@ -1,13 +1,16 @@
 package dhl.requests;
 
-import dvk.core.CommonStructures;
-import dvk.core.xroad.XRoadProtocolHeader;
+import java.sql.Connection;
+import java.util.Date;
+
+import org.apache.axis.AxisFault;
+
 import dhl.iostructures.changeOrganizationDataRequestType;
 import dhl.users.Asutus;
 import dhl.users.UserProfile;
-import java.sql.Connection;
-import java.util.Date;
-import org.apache.axis.AxisFault;
+import dvk.core.CommonStructures;
+import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadProtocolVersion;
 
 public class ChangeOrganizationData {
     public static RequestInternalResult V1(org.apache.axis.MessageContext context, Connection conn, UserProfile user) throws AxisFault {
@@ -162,7 +165,7 @@ public class ChangeOrganizationData {
         }
 
         // Salvestame muudatused. Kasutame X-tee päist lihtsalt mugavaks andmete edastamiseks.
-        XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
+        XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode(), XRoadProtocolVersion.V2_0);
 
         asutus.saveToDB(conn, xTeePais);
 

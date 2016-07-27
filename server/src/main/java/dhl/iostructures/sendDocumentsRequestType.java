@@ -1,11 +1,11 @@
 package dhl.iostructures;
 
-import dvk.core.CommonMethods;
-
 import javax.xml.soap.SOAPBody;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import dvk.core.CommonMethods;
 
 public class sendDocumentsRequestType {
     public String dokumendid;
@@ -20,7 +20,9 @@ public class sendDocumentsRequestType {
         try {
             org.apache.axis.Message msg = context.getRequestMessage();
             SOAPBody body = msg.getSOAPBody();
+            
             NodeList msgNodes = body.getElementsByTagName("sendDocuments");
+            
             if (msgNodes.getLength() > 0) {
                 Element msgNode = (Element) msgNodes.item(0);
                 NodeList bodyNodes = msgNode.getElementsByTagName("keha");

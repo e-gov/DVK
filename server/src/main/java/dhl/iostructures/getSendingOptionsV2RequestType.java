@@ -1,11 +1,13 @@
 package dhl.iostructures;
 
-import dvk.core.CommonMethods;
-
 import javax.xml.soap.SOAPBody;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import dvk.core.CommonMethods;
+import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadProtocolVersion;
 
 public class getSendingOptionsV2RequestType {
     public String[] asutused;
@@ -23,7 +25,7 @@ public class getSendingOptionsV2RequestType {
         vastuvotmataDokumenteOotel = false;
     }
 
-    public static getSendingOptionsV2RequestType getFromSOAPBody(org.apache.axis.MessageContext context) {
+    public static getSendingOptionsV2RequestType getFromSOAPBody(org.apache.axis.MessageContext context, XRoadProtocolHeader xRoadProtocolHeader) {
         org.apache.axis.Message msg = null;
         SOAPBody body = null;
         NodeList nodes = null;
@@ -34,7 +36,12 @@ public class getSendingOptionsV2RequestType {
         try {
             msg = context.getRequestMessage();
             body = msg.getSOAPBody();
+            
             nodes = body.getElementsByTagName("getSendingOptions");
+            if (nodes.getLength() == 0 && xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
+            	nodes = body.getElementsByTagName("getSendingOptionsV2");
+            }
+            
             if (nodes.getLength() > 0) {
                 el = (Element) nodes.item(0);
                 nodes = el.getElementsByTagName("keha");

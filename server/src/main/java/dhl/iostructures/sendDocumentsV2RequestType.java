@@ -1,14 +1,16 @@
 package dhl.iostructures;
 
-import dvk.core.CommonMethods;
-
 import java.util.Date;
+
 import javax.xml.soap.SOAPBody;
 
 import org.apache.axis.AxisFault;
-
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import dvk.core.CommonMethods;
+import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadProtocolVersion;
 
 public class sendDocumentsV2RequestType {
     public String dokumendid;
@@ -27,13 +29,18 @@ public class sendDocumentsV2RequestType {
         fragmenteKokku = 0;
     }
 
-    public static sendDocumentsV2RequestType getFromSOAPBody(org.apache.axis.MessageContext context) throws AxisFault {
+    public static sendDocumentsV2RequestType getFromSOAPBody(org.apache.axis.MessageContext context, XRoadProtocolHeader xRoadProtocolHeader) throws AxisFault {
         try {
             org.apache.axis.Message msg = context.getRequestMessage();
             SOAPBody body = msg.getSOAPBody();
             NodeList tmpNodes = null;
             Element el = null;
+            
             NodeList msgNodes = body.getElementsByTagName("sendDocuments");
+            if (msgNodes.getLength() == 0 && xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
+            	msgNodes = body.getElementsByTagName("sendDocumentsV2");
+            }
+            
             if (msgNodes.getLength() > 0) {
                 Element msgNode = (Element) msgNodes.item(0);
                 NodeList bodyNodes = msgNode.getElementsByTagName("keha");

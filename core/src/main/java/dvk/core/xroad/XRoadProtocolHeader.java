@@ -48,7 +48,7 @@ public final class XRoadProtocolHeader {
     private String issue;
 
     /**
-     * A constructor for X-Road protocol version 2.0
+     * A constructor for X-Road protocol versions 2.0, 3.0, 3.1
      * 
      * @param asutus
      * @param andmekogu
@@ -58,7 +58,7 @@ public final class XRoadProtocolHeader {
      * @param toimik
      * @param isikukood
      */
-    public XRoadProtocolHeader(String asutus, String andmekogu, String ametnik, String id, String nimi, String toimik, String isikukood) {
+    public XRoadProtocolHeader(String asutus, String andmekogu, String ametnik, String id, String nimi, String toimik, String isikukood, XRoadProtocolVersion xRoadProtocolVersion) {
         this.consumer = asutus;
         this.producer = andmekogu;
         this.official = ametnik;
@@ -66,8 +66,7 @@ public final class XRoadProtocolHeader {
         this.service = nimi;
         this.issue = toimik;
         this.userId = isikukood;
-        
-        this.protocolVersion = XRoadProtocolVersion.V2_0;
+        this.protocolVersion = xRoadProtocolVersion;
     }
     
     /**
@@ -191,7 +190,7 @@ public final class XRoadProtocolHeader {
                 }
             }
 
-            return new XRoadProtocolHeader(asutus, andmekogu, ametnik, id, nimi, toimik, isikukood);
+            return new XRoadProtocolHeader(asutus, andmekogu, ametnik, id, nimi, toimik, isikukood, XRoadProtocolVersion.V2_0);
         } catch (Exception ex) {
             CommonMethods.logError(ex, XRoadProtocolHeader.class.getCanonicalName(), "getFromSOAPHeader");
             
@@ -362,7 +361,7 @@ public final class XRoadProtocolHeader {
             isikukood = element.getValue();
         }
 
-        return new XRoadProtocolHeader(asutus, andmekogu, ametnik, id, nimi, toimik, isikukood);
+        return new XRoadProtocolHeader(asutus, andmekogu, ametnik, id, nimi, toimik, isikukood, XRoadProtocolVersion.V2_0);
 	}
     
 	private static XRoadProtocolHeader buildXRoadProtocol_v4_0_HeaderFromSoap(org.apache.axis.message.SOAPEnvelope soapEnvelope) throws AxisFault {

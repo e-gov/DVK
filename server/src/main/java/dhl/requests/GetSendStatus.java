@@ -1,13 +1,24 @@
 package dhl.requests;
 
-import dhl.iostructures.edastus;
-import dvk.core.CommonMethods;
-import dvk.core.CommonStructures;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.sql.Connection;
+import java.util.ArrayList;
+
+import javax.xml.soap.SOAPException;
+
+import org.apache.axis.AxisFault;
+import org.apache.axis.MessageContext;
+import org.apache.log4j.Logger;
+
 import dhl.Document;
 import dhl.DocumentStatusHistory;
 import dhl.Recipient;
 import dhl.RemoteServer;
 import dhl.Sending;
+import dhl.iostructures.edastus;
 import dhl.iostructures.getSendStatusRequestType;
 import dhl.iostructures.getSendStatusResponse;
 import dhl.iostructures.getSendStatusV2RequestType;
@@ -20,23 +31,13 @@ import dvk.client.businesslayer.MessageRecipient;
 import dvk.client.conf.OrgSettings;
 import dvk.client.iostructures.GetSendStatusResponseItem;
 import dvk.core.AttachmentExtractionResult;
+import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
 import dvk.core.Fault;
 import dvk.core.HeaderVariables;
 import dvk.core.Settings;
 import dvk.core.xroad.XRoadProtocolHeader;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import javax.xml.soap.SOAPException;
-
-import org.apache.axis.AxisFault;
-import org.apache.axis.MessageContext;
-import org.apache.log4j.Logger;
+import dvk.core.xroad.XRoadProtocolVersion;
 
 public class GetSendStatus {
     static Logger logger = Logger.getLogger(GetSendStatus.class.getName());
@@ -166,7 +167,7 @@ public class GetSendStatus {
                                             r.copyStatusInformationFromAnotherInstance(tmpEdastus.getSaaja());
                                             XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
                                                     user.getOrganizationCode(), null, null,
-                                                    null, null, null, user.getPersonCode());
+                                                    null, null, null, user.getPersonCode(), XRoadProtocolVersion.V2_0);
                                             r.update(conn, xTeePais);
 
                                             resp.edastus.add(tmpEdastus);
@@ -380,7 +381,7 @@ public class GetSendStatus {
                                         r.copyStatusInformationFromAnotherInstance(tmpEdastus.getSaaja());
                                         XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
                                                 user.getOrganizationCode(), null, null, null,
-                                                null, null, user.getPersonCode());
+                                                null, null, user.getPersonCode(), XRoadProtocolVersion.V2_0);
                                         r.update(conn, xTeePais);
 
                                         edastusList.add(tmpEdastus);

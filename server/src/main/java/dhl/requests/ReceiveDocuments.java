@@ -1,9 +1,24 @@
 package dhl.requests;
 
-import dhl.DocumentFragment;
-import dvk.core.CommonMethods;
-import dvk.core.CommonStructures;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
+import org.apache.axis.AxisFault;
+import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
+
 import dhl.Conversion;
+import dhl.DocumentFragment;
 import dhl.Folder;
 import dhl.Recipient;
 import dhl.Sending;
@@ -15,22 +30,11 @@ import dhl.iostructures.receiveDocumentsV4RequestType;
 import dhl.sys.Timer;
 import dhl.users.Asutus;
 import dhl.users.UserProfile;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-
+import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
 import dvk.core.ContainerVersion;
 import dvk.core.xroad.XRoadProtocolHeader;
-
-import org.apache.axis.AxisFault;
-import org.apache.log4j.Logger;
-import org.w3c.dom.*;
+import dvk.core.xroad.XRoadProtocolVersion;
 
 public class ReceiveDocuments {
 
@@ -66,7 +70,7 @@ public class ReceiveDocuments {
                 for (int folderNr = 0; folderNr < bodyData.kaust.size(); ++folderNr) {
                     // Tuvastame, millisesse kausta soovitakse dokumenti salvestada
                     XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
-                            user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
+                            user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode(), XRoadProtocolVersion.V2_0);
                     int requestTargetFolder = Folder.getFolderIdByPath(
                             bodyData.kaust.get(folderNr).trim(), user.getOrganizationID(), conn, true, false, xTeePais);
 
@@ -223,7 +227,7 @@ public class ReceiveDocuments {
     }
 
     public static RequestInternalResult V2(
-            org.apache.axis.MessageContext context, Connection conn, UserProfile user) throws Exception {
+            org.apache.axis.MessageContext context, Connection conn, UserProfile user, XRoadProtocolHeader xRoadProtocolHeader) throws Exception {
         logger.info("ReceiveDocuments.V2 invoked.");
 
         Timer t = new Timer();
@@ -233,7 +237,7 @@ public class ReceiveDocuments {
         try {
             // Laeme SOAP keha endale sobivasse andmestruktuuri
             t.reset();
-            receiveDocumentsV2RequestType bodyData = receiveDocumentsV2RequestType.getFromSOAPBody(context);
+            receiveDocumentsV2RequestType bodyData = receiveDocumentsV2RequestType.getFromSOAPBody(context, xRoadProtocolHeader);
             result.count = bodyData.arv;
             result.folders = bodyData.kaust;
             result.deliverySessionID = bodyData.edastusID;
@@ -262,7 +266,7 @@ public class ReceiveDocuments {
                     for (int folderNr = 0; folderNr < bodyData.kaust.size(); ++folderNr) {
                         // Tuvastame, millisesse kausta soovitakse dokumenti salvestada
                         XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
-                                user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
+                                user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode(), XRoadProtocolVersion.V2_0);
                         int requestTargetFolder = Folder.getFolderIdByPath(
                                 bodyData.kaust.get(folderNr).trim(),
                                 user.getOrganizationID(), conn, true, false, xTeePais);
@@ -387,7 +391,7 @@ public class ReceiveDocuments {
                         && !bodyData.edastusID.equalsIgnoreCase("")
                         && (bodyData.fragmentNr >= 0)) {
                     XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
-                            user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
+                            user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode(), XRoadProtocolVersion.V2_0);
 
                     FragmentationResult fragResult = DocumentFragment.getFragments(
                             result.responseFile, bodyData.fragmentSizeBytes,
@@ -410,7 +414,7 @@ public class ReceiveDocuments {
     }
 
     public static RequestInternalResult V3(
-            org.apache.axis.MessageContext context, Connection conn, UserProfile user) throws Exception {
+            org.apache.axis.MessageContext context, Connection conn, UserProfile user, XRoadProtocolHeader xRoadProtocolHeader) throws Exception {
         logger.info("ReceiveDocuments.V3 invoked.");
 
         Timer t = new Timer();
@@ -420,7 +424,7 @@ public class ReceiveDocuments {
         try {
             // Laeme SOAP keha endale sobivasse andmestruktuuri
             t.reset();
-            receiveDocumentsV3RequestType bodyData = receiveDocumentsV3RequestType.getFromSOAPBody(context);
+            receiveDocumentsV3RequestType bodyData = receiveDocumentsV3RequestType.getFromSOAPBody(context, xRoadProtocolHeader);
             result.count = bodyData.arv;
             result.folders = bodyData.kaust;
             result.deliverySessionID = bodyData.edastusID;
@@ -466,7 +470,7 @@ public class ReceiveDocuments {
                     for (int folderNr = 0; folderNr < bodyData.kaust.size(); ++folderNr) {
                         // Tuvastame, millisesse kausta soovitakse dokumenti salvestada
                         XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
-                                user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
+                                user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode(), XRoadProtocolVersion.V2_0);
                         int requestTargetFolder = Folder.getFolderIdByPath(
                                 bodyData.kaust.get(folderNr).trim(), user.getOrganizationID(), conn, true, false, xTeePais);
 
@@ -609,7 +613,7 @@ public class ReceiveDocuments {
                         && (bodyData.fragmentNr >= 0)) {
 
                     XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
-                            user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
+                            user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode(), XRoadProtocolVersion.V2_0);
 
                     FragmentationResult fragResult = DocumentFragment.getFragments(
                             result.responseFile, bodyData.fragmentSizeBytes, user.getOrganizationID(),
@@ -632,7 +636,7 @@ public class ReceiveDocuments {
     }
 
     public static RequestInternalResult V4(
-            org.apache.axis.MessageContext context, Connection conn, UserProfile user) throws Exception {
+            org.apache.axis.MessageContext context, Connection conn, UserProfile user, XRoadProtocolHeader xRoadProtocolHeader) throws Exception {
         logger.info("ReceiveDocuments.V4 invoked.");
 
         Timer t = new Timer();
@@ -642,7 +646,7 @@ public class ReceiveDocuments {
         try {
             // Laeme SOAP keha endale sobivasse andmestruktuuri
             t.reset();
-            receiveDocumentsV4RequestType bodyData = receiveDocumentsV4RequestType.getFromSOAPBody(context);
+            receiveDocumentsV4RequestType bodyData = receiveDocumentsV4RequestType.getFromSOAPBody(context, xRoadProtocolHeader);
             result.count = bodyData.arv;
             result.folders = bodyData.kaust;
             result.deliverySessionID = bodyData.edastusID;
@@ -690,7 +694,7 @@ public class ReceiveDocuments {
                     for (int folderNr = 0; folderNr < bodyData.kaust.size(); ++folderNr) {
                         // Tuvastame, millisesse kausta soovitakse dokumenti salvestada
                         XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
-                                user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
+                                user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode(), XRoadProtocolVersion.V2_0);
                         int requestTargetFolder = Folder.getFolderIdByPath(
                                 bodyData.kaust.get(folderNr).trim(), user.getOrganizationID(), conn, true, false, xTeePais);
 
@@ -831,7 +835,7 @@ public class ReceiveDocuments {
                         && (bodyData.fragmentNr >= 0)) {
                     logger.debug("Vastust soovitakse fragmenteeritud kujul. Tükeldame faili.");
                     XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
-                            user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode());
+                            user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode(), XRoadProtocolVersion.V2_0);
                     FragmentationResult fragResult = DocumentFragment.getFragments(
                             result.responseFile, bodyData.fragmentSizeBytes,
                             user.getOrganizationID(), bodyData.edastusID, false, conn, xTeePais);
@@ -1207,7 +1211,7 @@ public class ReceiveDocuments {
         if ((folders != null) && (folders.size() > 0)) {
             List<String> nonExistingFolders = new ArrayList<String>();
             XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(user.getOrganizationCode(), null,
-                    null, null, null, null, user.getPersonCode());
+                    null, null, null, null, user.getPersonCode(), XRoadProtocolVersion.V2_0);
 
             for (String folderName : folders) {
                 int folderId = Folder.getFolderIdByPath(folderName,

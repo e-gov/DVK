@@ -542,11 +542,11 @@ public class CoreServices implements Dhl {
                 // Käivitame päringust vajaliku versiooni
                 SOAPOutputBodyRepresentation result = null;
                 if (ver.equalsIgnoreCase("v1")) {
-                    result = GetSendingOptions.V1(context, conn, hostOrgSettings, xTeePais.getProtocolVersion());
+                    result = GetSendingOptions.V1(context, conn, hostOrgSettings, xTeePais);
                 } else if (ver.equalsIgnoreCase("v2")) {
-                    result = GetSendingOptions.V2(context, conn, hostOrgSettings, xTeePais.getProtocolVersion());
+                    result = GetSendingOptions.V2(context, conn, hostOrgSettings, xTeePais);
                 } else if (ver.equalsIgnoreCase("v3")) {
-                    result = GetSendingOptions.V3(context, conn, hostOrgSettings, user, xTeePais.getProtocolVersion());
+                    result = GetSendingOptions.V3(context, conn, hostOrgSettings, user, xTeePais);
                 } else {
                     // Vale versioon
                     throw new AxisFault(CommonStructures.VIGA_PARINGU_VERSIOONIS);
@@ -816,11 +816,11 @@ public class CoreServices implements Dhl {
                     if (ver.equalsIgnoreCase("v1")) {
                         result = ReceiveDocuments.V1(context, conn, user);
                     } else if (ver.equalsIgnoreCase("v2")) {
-                        result = ReceiveDocuments.V2(context, conn, user);
+                        result = ReceiveDocuments.V2(context, conn, user, xTeePais);
                     } else if (ver.equalsIgnoreCase("v3")) {
-                        result = ReceiveDocuments.V3(context, conn, user);
+                        result = ReceiveDocuments.V3(context, conn, user, xTeePais);
                     } else if (ver.equalsIgnoreCase("v4")) {
-                        result = ReceiveDocuments.V4(context, conn, user);
+                        result = ReceiveDocuments.V4(context, conn, user, xTeePais);
                     } else {
                         // Vale versioon
                         throw new AxisFault(CommonStructures.VIGA_PARINGU_VERSIOONIS);
@@ -955,11 +955,11 @@ public class CoreServices implements Dhl {
                     // Käivitame päringust vajaliku versiooni
                     RequestInternalResult result = new RequestInternalResult();
                     if (ver.equalsIgnoreCase("v1")) {
-                        result = MarkDocumentsReceived.V1(context, conn, user);
+                        result = MarkDocumentsReceived.V1(context, conn, user, xTeePais);
                     } else if (ver.equalsIgnoreCase("v2")) {
-                        result = MarkDocumentsReceived.V2(context, conn, user);
+                        result = MarkDocumentsReceived.V2(context, conn, user, xTeePais);
                     } else if (ver.equalsIgnoreCase("v3")) {
-                        result = MarkDocumentsReceived.V3(context, conn, user);
+                        result = MarkDocumentsReceived.V3(context, conn, user, xTeePais);
                     } else {
                         // Vale versioon
                         throw new AxisFault(CommonStructures.VIGA_PARINGU_VERSIOONIS);

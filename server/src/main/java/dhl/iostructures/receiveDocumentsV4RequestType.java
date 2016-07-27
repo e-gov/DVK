@@ -1,13 +1,17 @@
 package dhl.iostructures;
 
 import java.util.ArrayList;
+
 import javax.xml.soap.SOAPBody;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
 import dvk.core.CommonMethods;
 import dvk.core.Settings;
+import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadProtocolVersion;
 
 public class receiveDocumentsV4RequestType {
     static Logger logger = Logger.getLogger(receiveDocumentsV4RequestType.class.getName());
@@ -31,11 +35,16 @@ public class receiveDocumentsV4RequestType {
         fragmentSizeBytesOrig = 0;
     }
 
-    public static receiveDocumentsV4RequestType getFromSOAPBody(org.apache.axis.MessageContext context) {
+    public static receiveDocumentsV4RequestType getFromSOAPBody(org.apache.axis.MessageContext context, XRoadProtocolHeader xRoadProtocolHeader) {
         try {
             org.apache.axis.Message msg = context.getRequestMessage();
             SOAPBody body = msg.getSOAPBody();
+            
             NodeList nodes = body.getElementsByTagName("receiveDocuments");
+            if (nodes.getLength() == 0 && xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
+            	nodes = body.getElementsByTagName("receiveDocumentsV4");
+            }
+            
             if (nodes.getLength() > 0) {
                 Element el = (Element) nodes.item(0);
                 nodes = el.getElementsByTagName("keha");

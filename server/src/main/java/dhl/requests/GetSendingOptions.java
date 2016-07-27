@@ -1,5 +1,11 @@
 package dhl.requests;
 
+import java.sql.Connection;
+import java.util.ArrayList;
+
+import org.apache.axis.AxisFault;
+import org.apache.log4j.Logger;
+
 import dhl.iostructures.getSendingOptionsRequestType;
 import dhl.iostructures.getSendingOptionsResponseType;
 import dhl.iostructures.getSendingOptionsV2RequestType;
@@ -17,19 +23,14 @@ import dvk.core.AttachmentExtractionResult;
 import dvk.core.CommonMethods;
 import dvk.core.Settings;
 import dvk.core.ShortName;
+import dvk.core.xroad.XRoadProtocolHeader;
 import dvk.core.xroad.XRoadProtocolVersion;
-
-import java.sql.Connection;
-import java.util.ArrayList;
-
-import org.apache.axis.AxisFault;
-import org.apache.log4j.Logger;
 
 public class GetSendingOptions {
     private static Logger logger = Logger.getLogger(GetSendingOptions.class);
 
     public static getSendingOptionsResponseType V1(org.apache.axis.MessageContext context, Connection conn,
-    		OrgSettings hostOrgSettings, XRoadProtocolVersion xRoadProtocolVersion) throws AxisFault {
+    		OrgSettings hostOrgSettings, XRoadProtocolHeader xRoadProtocolHeader) throws AxisFault {
     	
         logger.info("GetSendingOptions.V1 invoked.");
 
@@ -37,7 +38,7 @@ public class GetSendingOptions {
 
         // Laeme päringu keha endale sobivasse andmestruktuuri
         getSendingOptionsRequestType bodyData = getSendingOptionsRequestType.getFromSOAPBody(context);
-        if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+        if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
         	result.paring = bodyData;
         }
 
@@ -101,15 +102,15 @@ public class GetSendingOptions {
     }
 
     public static getSendingOptionsV2ResponseType V2(org.apache.axis.MessageContext context, Connection conn,
-    		OrgSettings hostOrgSettings, XRoadProtocolVersion xRoadProtocolVersion) throws Exception {
+    		OrgSettings hostOrgSettings, XRoadProtocolHeader xRoadProtocolHeader) throws Exception {
     	
         logger.info("GetSendingOptions.V2 invoked.");
 
         getSendingOptionsV2ResponseType result = new getSendingOptionsV2ResponseType();
 
         // Laeme päringu keha endale sobivasse andmestruktuuri
-        getSendingOptionsV2RequestType bodyData = getSendingOptionsV2RequestType.getFromSOAPBody(context);
-        if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+        getSendingOptionsV2RequestType bodyData = getSendingOptionsV2RequestType.getFromSOAPBody(context, xRoadProtocolHeader);
+        if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
         	result.paring = bodyData;
         }
 
@@ -209,15 +210,15 @@ public class GetSendingOptions {
     }
 
     public static getSendingOptionsV3ResponseType V3(org.apache.axis.MessageContext context, Connection conn,
-    		OrgSettings hostOrgSettings, UserProfile user, XRoadProtocolVersion xRoadProtocolVersion) throws AxisFault {
+    		OrgSettings hostOrgSettings, UserProfile user, XRoadProtocolHeader xRoadProtocolHeader) throws AxisFault {
     	
         logger.info("GetSendingOptions.V3 invoked. Parameter values: ");
 
         getSendingOptionsV3ResponseType result = new getSendingOptionsV3ResponseType();
         try {
             // Laeme päringu keha endale sobivasse andmestruktuuri
-            getSendingOptionsV3RequestType bodyData = getSendingOptionsV3RequestType.getFromSOAPBody(context);
-            if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+            getSendingOptionsV3RequestType bodyData = getSendingOptionsV3RequestType.getFromSOAPBody(context, xRoadProtocolHeader);
+            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
             	result.paring = bodyData;
             }
 

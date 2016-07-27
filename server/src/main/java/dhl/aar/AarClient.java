@@ -110,7 +110,7 @@ public class AarClient {
         	// Using X-Road protocol version 2.0 by default
         	xHeader = new XRoadProtocolHeader(
         			orgCode, "aar", personCode, queryId, requestName, "",
-        			CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode);
+        			CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode, XRoadProtocolVersion.V2_0);
         }
         
 
@@ -185,7 +185,7 @@ public class AarClient {
         // Saadetava sõnumi päisesse kantavad parameetrid
         XRoadProtocolHeader header = new XRoadProtocolHeader(
                 orgCode, "aar", personCode, queryId, requestName, "",
-                CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode);
+                CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode, XRoadProtocolVersion.V2_0);
 
         // Koodtame päringu faili
         String requestFile = ametikohadRequestType.createRequestFile();
@@ -257,7 +257,7 @@ public class AarClient {
         // Saadetava sõnumi päisesse kantavad parameetrid
         XRoadProtocolHeader header = new XRoadProtocolHeader(
                 orgCode, "aar", personCode, queryId, requestName, "",
-                CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode);
+                CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode, XRoadProtocolVersion.V2_0);
 
         // Koodtame päringu faili
         String requestFile = isikudRequestType.createRequestFile();
@@ -329,7 +329,7 @@ public class AarClient {
         // Saadetava sõnumi päisesse kantavad parameetrid
         XRoadProtocolHeader header = new XRoadProtocolHeader(
                 orgCode, "aar", personCode, queryId, requestName, "",
-                CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode);
+                CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode, XRoadProtocolVersion.V2_0);
 
         // Koodtame päringu faili
         String requestFile = taitmisedRequestType.createRequestFile();
@@ -398,7 +398,7 @@ public class AarClient {
         // Saadetava sõnumi päisesse kantavad parameetrid
         XRoadProtocolHeader header = new XRoadProtocolHeader(
                 this.orgCode, "aar", this.personCode, queryId, requestName, "",
-                CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode);
+                CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode, XRoadProtocolVersion.V2_0);
 
         // SOAP sõnumi saatmine
         serviceClient.getOptions().setProperty(Constants.Configuration.ENABLE_SWA, Constants.VALUE_FALSE);

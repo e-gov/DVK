@@ -1,15 +1,5 @@
 package dhl.requests;
 
-import dhl.CoreServices;
-import dhl.requests.RequestInternalResult;
-import dvk.core.CommonStructures;
-import dvk.core.Settings;
-import dhl.Document;
-import dvk.core.Fault;
-import dhl.Recipient;
-import dhl.Sending;
-import dhl.iostructures.ExpiredDocumentData;
-
 import java.sql.Connection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -17,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
+
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -25,6 +16,14 @@ import javax.mail.internet.MimeMessage;
 
 import org.apache.axis.AxisFault;
 import org.apache.log4j.Logger;
+
+import dhl.Document;
+import dhl.Recipient;
+import dhl.Sending;
+import dhl.iostructures.ExpiredDocumentData;
+import dvk.core.CommonStructures;
+import dvk.core.Fault;
+import dvk.core.Settings;
 
 public class DeleteOldDocuments {
     static Logger LOGGER = Logger.getLogger(DeleteOldDocuments.class);

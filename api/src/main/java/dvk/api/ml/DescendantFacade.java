@@ -1,8 +1,9 @@
 package dvk.api.ml;
 
-import dvk.api.IElementObserver;
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
+
+import dvk.api.IElementObserver;
 
 
 public abstract class DescendantFacade<POJO extends IElementObserver> extends PojoFacade<POJO> {

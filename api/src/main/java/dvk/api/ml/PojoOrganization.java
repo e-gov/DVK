@@ -1,9 +1,9 @@
 package dvk.api.ml;
 
+import java.lang.reflect.Field;
+
 import dvk.api.DVKAPI.DvkType;
 import dvk.api.IOrganizationObserver;
-
-import java.lang.reflect.Field;
 
 // Generated 4.02.2010 13:44:05 by Hibernate Tools 3.2.4.GA
 

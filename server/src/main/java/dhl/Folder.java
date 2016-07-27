@@ -1,11 +1,11 @@
 package dhl;
 
-import dvk.core.CommonMethods;
-import dvk.core.xroad.XRoadProtocolHeader;
-
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Types;
+
+import dvk.core.CommonMethods;
+import dvk.core.xroad.XRoadProtocolHeader;
 
 public class Folder {
     public static final int NONEXISTING_FOLDER = Integer.MIN_VALUE;

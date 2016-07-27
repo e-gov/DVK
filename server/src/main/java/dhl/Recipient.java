@@ -1,14 +1,5 @@
 package dhl;
 
-import dvk.core.Settings;
-import dvk.core.xroad.XRoadProtocolHeader;
-import dvk.core.CommonMethods;
-import dvk.core.CommonStructures;
-import dvk.core.Fault;
-import dhl.users.Allyksus;
-import dhl.users.Ametikoht;
-import dhl.users.Asutus;
-
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.sql.CallableStatement;
@@ -17,14 +8,24 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Calendar;
+import java.util.Date;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.axis.AxisFault;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
+
+import dhl.users.Allyksus;
+import dhl.users.Ametikoht;
+import dhl.users.Asutus;
+import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
+import dvk.core.Fault;
+import dvk.core.Settings;
+import dvk.core.xroad.XRoadProtocolHeader;
 
 public class Recipient {
     private static Logger logger = Logger.getLogger(Recipient.class);

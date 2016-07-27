@@ -1,15 +1,16 @@
 package dhl.iostructures;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import javax.xml.soap.SOAPBody;
+import javax.xml.soap.SOAPBodyElement;
+import javax.xml.soap.SOAPElement;
+
 import dhl.users.Allyksus;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import dvk.core.xroad.XRoadProtocolVersion;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import javax.xml.soap.SOAPBody;
-import javax.xml.soap.SOAPBodyElement;
-import javax.xml.soap.SOAPElement;
 
 public class getSubdivisionListResponseType implements SOAPOutputBodyRepresentation {
     public getSubdivisionListRequestType paring;

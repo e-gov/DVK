@@ -1,12 +1,12 @@
 package dvk.api.container;
 
-import dvk.api.ml.Util;
-import org.apache.log4j.Logger;
-import org.exolab.castor.mapping.FieldHandler;
-import org.exolab.castor.mapping.ValidityException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import org.exolab.castor.mapping.FieldHandler;
+import org.exolab.castor.mapping.ValidityException;
+
+import dvk.api.ml.Util;
 
 /**
  * FieldHandler for SignatureInfo signatureDate field.

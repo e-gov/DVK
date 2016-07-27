@@ -1,7 +1,9 @@
 package integration;
 
-import dvk.core.xroad.XRoadProtocolHeader;
-import dvk.core.xroad.XRoadProtocolVersion;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.activation.FileDataSource;
 
 import org.apache.axiom.attachments.ConfigurableDataHandler;
 import org.apache.axiom.om.OMAttribute;
@@ -11,9 +13,8 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.context.MessageContext;
 import org.apache.log4j.Logger;
 
-import javax.activation.FileDataSource;
-import java.util.HashMap;
-import java.util.Map;
+import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadProtocolVersion;
 
 /**
  *

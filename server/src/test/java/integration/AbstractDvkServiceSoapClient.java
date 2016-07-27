@@ -1,7 +1,7 @@
 package integration;
 
-import dvk.core.xroad.XRoadProtocolHeader;
-import dvk.core.xroad.XRoadProtocolVersion;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
@@ -14,9 +14,8 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.wsdl.WSDLConstants;
 
-
-import java.util.HashMap;
-import java.util.Map;
+import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadProtocolVersion;
 
 /**
  * Abstract representation of sending soap messages to DVK server.

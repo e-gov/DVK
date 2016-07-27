@@ -1,14 +1,15 @@
 package dvk.api.ml;
 
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
+
+import org.hibernate.Transaction;
+
 import dvk.api.DVKAPI.DvkType;
 import dvk.api.IMessageRecipient;
 import dvk.api.MessageRecipientCreateArgs;
 import dvk.api.SelectCriteria;
-import org.hibernate.Transaction;
-
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
 
 class DvkMessageRecipient extends DescendantFacade<PojoMessageRecipient> implements IMessageRecipient {
     private class CacheProxy extends CacheProxyBase<BigDecimal, DvkMessageRecipient, PojoMessageRecipient> {

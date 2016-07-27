@@ -1,13 +1,13 @@
 package dhl.iostructures;
 
-import dvk.core.CommonMethods;
-import dvk.core.CommonStructures;
-import dvk.core.Fault;
-import dhl.Recipient;
-
 import java.io.OutputStreamWriter;
 import java.sql.Connection;
 import java.util.Date;
+
+import dhl.Recipient;
+import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
+import dvk.core.Fault;
 
 public class edastus {
     private Recipient m_saaja;

@@ -5,21 +5,20 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.Hibernate;
 import dvk.api.DVKAPI;
+import dvk.api.DVKAPI.DvkType;
 import dvk.api.DVKConstants;
 import dvk.api.ICounter;
-import dvk.api.IMessageRecipient;
-import dvk.api.ISettingsFolderObserver;
-import dvk.api.ISetting;
-import dvk.api.ISettingsFolder;
 import dvk.api.IMessage;
-import dvk.api.ISessionCacheBox;
+import dvk.api.IMessageRecipient;
 import dvk.api.IOccupation;
 import dvk.api.IOrganization;
+import dvk.api.ISessionCacheBox;
+import dvk.api.ISetting;
+import dvk.api.ISettingsFolder;
+import dvk.api.ISettingsFolderObserver;
 import dvk.api.ISubdivision;
 import dvk.api.MessageRecipientCreateArgs;
-import dvk.api.DVKAPI.DvkType;
 import dvk.api.ml.Util;
 
 public class Test

@@ -1,10 +1,10 @@
 package dhl.requests;
 
-import dhl.users.Asutus;
-
 import java.util.List;
 
 import org.w3c.dom.Element;
+
+import dhl.users.Asutus;
 
 public class RequestInternalResult {
     public String dataMd5Hash;

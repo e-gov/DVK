@@ -1,10 +1,10 @@
 package dhl.iostructures;
 
-import dvk.core.CommonMethods;
-
 import java.io.OutputStreamWriter;
 import java.sql.Connection;
 import java.util.ArrayList;
+
+import dvk.core.CommonMethods;
 
 
 public class getSendStatusResponse {

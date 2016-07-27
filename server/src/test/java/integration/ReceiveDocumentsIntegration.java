@@ -1,9 +1,12 @@
 package integration;
 
-import Utills.IntegrationTestUtills;
-import dvk.core.CommonStructures;
-import dvk.core.xroad.XRoadProtocolVersion;
-import oracle.jdbc.pool.OracleDataSource;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -20,13 +23,10 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.ArrayList;
+import Utills.IntegrationTestUtills;
+import dvk.core.CommonStructures;
+import dvk.core.xroad.XRoadProtocolVersion;
+import oracle.jdbc.pool.OracleDataSource;
 
 /**
  * Integration tests for receiveDocuments.v1-v4 webservice methods.

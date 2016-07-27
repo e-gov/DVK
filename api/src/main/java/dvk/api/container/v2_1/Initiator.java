@@ -1,7 +1,5 @@
 package dvk.api.container.v2_1;
 
-import dvk.api.container.Organisation;
-
 import java.util.Date;
 
 /**

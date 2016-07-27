@@ -1,14 +1,12 @@
 package ee.ml.dev;
 
-import dvk.api.DVKAPI;
-import dvk.api.ml.PojoMessage;
 import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
-import java.util.ArrayList;
-import java.util.List;
+import dvk.api.DVKAPI;
+import dvk.api.ml.PojoMessage;
 
 /**
  * For testing API.

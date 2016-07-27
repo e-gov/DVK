@@ -1,11 +1,17 @@
 package dvk.api.container.v2_1;
 
-import dvk.api.container.Container;
-import dvk.api.ml.Util;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.exolab.castor.xml.Marshaller;
-import java.io.*;
-import java.util.List;
+
+import dvk.api.container.Container;
+import dvk.api.ml.Util;
 
 /**
  * @author Hendrik Pärna

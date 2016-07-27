@@ -1,12 +1,17 @@
 package dvk.api.ml;
 
-import dvk.api.IElementObserver;
-import dvk.api.SelectCriteria;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Transaction;
 
-import java.util.*;
+import dvk.api.IElementObserver;
+import dvk.api.SelectCriteria;
 
 public abstract class CacheProxyBase<ID, FACADE, POJO extends IElementObserver> implements ICacheProxy<FACADE> {
     protected HashMap<ID, FACADE> cache = new HashMap<ID, FACADE>();

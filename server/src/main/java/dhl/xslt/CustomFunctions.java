@@ -1,18 +1,5 @@
 package dhl.xslt;
 
-import dvk.core.Settings;
-import org.apache.axis.AxisFault;
-import org.apache.commons.codec.binary.Base64InputStream;
-import org.apache.commons.codec.binary.Base64OutputStream;
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-import org.apache.xml.dtm.ref.DTMNodeIterator;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -25,6 +12,21 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Random;
 import java.util.zip.GZIPInputStream;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+
+import org.apache.axis.AxisFault;
+import org.apache.commons.codec.binary.Base64InputStream;
+import org.apache.commons.codec.binary.Base64OutputStream;
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
+import org.apache.xml.dtm.ref.DTMNodeIterator;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import dvk.core.Settings;
 
 public class CustomFunctions {
 

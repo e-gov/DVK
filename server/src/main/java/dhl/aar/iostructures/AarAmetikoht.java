@@ -1,15 +1,16 @@
 package dhl.aar.iostructures;
 
-import dvk.core.CommonMethods;
-
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Date;
+
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.axis.AxisFault;
+
+import dvk.core.CommonMethods;
 
 public class AarAmetikoht {
     private int m_ametikohtID;

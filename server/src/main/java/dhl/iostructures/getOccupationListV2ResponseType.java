@@ -5,12 +5,14 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
+
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPBodyElement;
 import javax.xml.soap.SOAPElement;
 
 import org.apache.axis.AxisFault;
 import org.apache.log4j.Logger;
+
 import dhl.users.Ametikoht;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;

@@ -1,14 +1,14 @@
 package integration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axis2.client.Options;
 
 import dvk.core.xroad.XRoadProtocolVersion;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Hendrik Pärna

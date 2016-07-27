@@ -1,12 +1,12 @@
 package dhl.iostructures;
 
-import dvk.core.CommonMethods;
-import dhl.users.Asutus;
-
 import javax.xml.soap.SOAPBody;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import dhl.users.Asutus;
+import dvk.core.CommonMethods;
 
 public class changeOrganizationDataRequestType {
     public Asutus asutus;

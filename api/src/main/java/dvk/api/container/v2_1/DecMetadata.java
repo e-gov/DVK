@@ -1,7 +1,5 @@
 package dvk.api.container.v2_1;
 
-import org.exolab.castor.types.DateTime;
-
 import java.util.Date;
 
 /**

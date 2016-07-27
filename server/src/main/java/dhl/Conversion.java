@@ -2,7 +2,6 @@ package dhl;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-
 import java.io.FileOutputStream;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -12,7 +11,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.xml.transform.stream.StreamResult;
+
 import org.apache.log4j.Logger;
+
 import dvk.core.CommonMethods;
 
 

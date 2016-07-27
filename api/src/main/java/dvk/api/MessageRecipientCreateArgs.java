@@ -1,8 +1,8 @@
 package dvk.api;
 
-import dvk.api.ml.Util;
-
 import java.math.BigDecimal;
+
+import dvk.api.ml.Util;
 
 /**
  * @author User

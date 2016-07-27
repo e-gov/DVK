@@ -1,9 +1,5 @@
 package dhl.users;
 
-import dhl.aar.iostructures.AarAmetikohaTaitmine;
-import dvk.core.CommonMethods;
-import dvk.core.Settings;
-
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -12,6 +8,10 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+
+import dhl.aar.iostructures.AarAmetikohaTaitmine;
+import dvk.core.CommonMethods;
+import dvk.core.Settings;
 
 public class AmetikohaTaitmine {
     private int m_id;

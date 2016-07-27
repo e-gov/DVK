@@ -1,9 +1,10 @@
 package dvk.api.ml;
 
+import org.hibernate.Transaction;
+
 import dvk.api.DVKAPI.DvkType;
 import dvk.api.ISettingsFolder;
 import dvk.api.SelectCriteria;
-import org.hibernate.Transaction;
 
 // Generated 7.02.2010 22:22:31 by Hibernate Tools 3.2.4.GA
 

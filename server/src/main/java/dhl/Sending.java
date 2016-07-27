@@ -1,26 +1,26 @@
 package dhl;
 
-import dhl.users.UserProfile;
-import dvk.core.CommonMethods;
-import dvk.core.CommonStructures;
-import dvk.core.Settings;
-import dvk.core.xroad.XRoadProtocolHeader;
-
-import java.util.ArrayList;
-import java.util.Date;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.axis.AxisFault;
 import org.apache.log4j.Logger;
+
+import dhl.users.UserProfile;
+import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
+import dvk.core.Settings;
+import dvk.core.xroad.XRoadProtocolHeader;
 
 public class Sending {
     private static Logger logger = Logger.getLogger(Sending.class);

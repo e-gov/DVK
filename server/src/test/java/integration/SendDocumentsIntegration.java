@@ -1,10 +1,9 @@
 package integration;
 
-import dvk.core.xroad.XRoadProtocolHeader;
-import dvk.core.xroad.XRoadProtocolVersion;
-import junit.framework.Assert;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
@@ -16,9 +15,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadProtocolVersion;
+import junit.framework.Assert;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 
 
 /**

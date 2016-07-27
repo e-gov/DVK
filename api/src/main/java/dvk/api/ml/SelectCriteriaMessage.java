@@ -1,9 +1,9 @@
 package dvk.api.ml;
 
-import dvk.api.SelectCriteria;
-
 import java.math.BigDecimal;
 import java.util.Date;
+
+import dvk.api.SelectCriteria;
 
 public class SelectCriteriaMessage extends SelectCriteria {
     @SuppressWarnings("unused")

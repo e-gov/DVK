@@ -1,8 +1,14 @@
 package dhl.requests;
 
+import java.sql.Connection;
+import java.util.ArrayList;
+
+import org.apache.axis.AxisFault;
+import org.apache.log4j.Logger;
+
 import dhl.exceptions.RequestProcessingException;
-import dhl.iostructures.getSubdivisionListResponseType;
 import dhl.iostructures.getSubdivisionListRequestType;
+import dhl.iostructures.getSubdivisionListResponseType;
 import dhl.iostructures.getSubdivisionListV2RequestType;
 import dhl.iostructures.getSubdivisionListV2ResponseType;
 import dhl.users.Allyksus;
@@ -11,12 +17,6 @@ import dhl.users.UserProfile;
 import dvk.core.AttachmentExtractionResult;
 import dvk.core.CommonMethods;
 import dvk.core.xroad.XRoadProtocolVersion;
-
-import java.sql.Connection;
-import java.util.ArrayList;
-
-import org.apache.axis.AxisFault;
-import org.apache.log4j.Logger;
 
 public class GetSubdivisionList {
 

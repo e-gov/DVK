@@ -1,6 +1,7 @@
 package integration;
 
 import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadProtocolVersion;
 
 /**
  * {@link dvk.core.xroad.XRoadProtocolHeader} builder class for simpler testing purposes.
@@ -50,7 +51,7 @@ class XHeaderBuilder {
     }
 
     public XRoadProtocolHeader build() {
-        return new XRoadProtocolHeader(
-                asutus, andmekogu, ametnik, id, nimi, toimik, isikukood);
+        return new XRoadProtocolHeader(asutus, andmekogu, ametnik, id, nimi, toimik, isikukood, XRoadProtocolVersion.V2_0);
     }
+    
 }

@@ -1,13 +1,14 @@
 package dhl;
 
+import java.util.ArrayList;
+
+import org.apache.log4j.Logger;
+
 import dhl.exceptions.ComponentException;
 import ee.sk.digidoc.DigiDocException;
 import ee.sk.digidoc.SignedDoc;
 import ee.sk.digidoc.factory.DigiDocFactory;
 import ee.sk.utils.ConfigManager;
-import org.apache.log4j.Logger;
-
-import java.util.ArrayList;
 
 /**
  * Created with IntelliJ IDEA.

@@ -7,7 +7,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import dvk.api.container.v2_1.ContainerVer2_1;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.xml.MarshalException;
@@ -17,6 +16,7 @@ import org.exolab.castor.xml.ValidationException;
 
 import dvk.api.container.v1.ContainerVer1;
 import dvk.api.container.v2.ContainerVer2;
+import dvk.api.container.v2_1.ContainerVer2_1;
 import dvk.api.ml.Util;
 
 public abstract class Container {

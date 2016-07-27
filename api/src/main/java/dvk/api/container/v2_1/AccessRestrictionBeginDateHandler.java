@@ -1,9 +1,9 @@
 package dvk.api.container.v2_1;
 
+import java.util.Date;
+
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.ValidityException;
-
-import java.util.Date;
 
 /**
  * @author Hendrik Pärna

@@ -1,15 +1,15 @@
 package dvk.api.container;
 
+import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Properties;
+
 import org.exolab.castor.mapping.ConfigurableFieldHandler;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.ValidityException;
 
 import dvk.api.ml.Util;
-
-import java.lang.reflect.Field;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Properties;
 
 /**
  * The FieldHandler for the Date class

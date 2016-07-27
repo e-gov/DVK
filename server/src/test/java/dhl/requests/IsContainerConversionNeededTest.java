@@ -1,8 +1,8 @@
 package dhl.requests;
 
-import dhl.requests.ReceiveDocuments;
-import junit.framework.Assert;
 import org.junit.Test;
+
+import junit.framework.Assert;
 
 /**
  * @author Hendrik Pärna

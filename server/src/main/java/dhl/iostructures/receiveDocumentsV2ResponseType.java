@@ -1,12 +1,13 @@
 package dhl.iostructures;
 
-import dvk.core.CommonMethods;
-import dvk.core.xroad.XRoadProtocolVersion;
-
 import java.util.Iterator;
+
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPBodyElement;
 import javax.xml.soap.SOAPElement;
+
+import dvk.core.CommonMethods;
+import dvk.core.xroad.XRoadProtocolVersion;
 
 public class receiveDocumentsV2ResponseType implements SOAPOutputBodyRepresentation {
     public receiveDocumentsV2RequestType paring;

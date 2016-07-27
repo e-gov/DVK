@@ -1,15 +1,14 @@
 package dhl.users;
 
-import dvk.core.CommonMethods;
-
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+
+import dvk.core.CommonMethods;
 
 public class Allyksus {
     private int m_id;

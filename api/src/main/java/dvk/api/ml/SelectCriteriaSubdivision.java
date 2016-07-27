@@ -1,8 +1,8 @@
 package dvk.api.ml;
 
-import dvk.api.SelectCriteria;
-
 import java.math.BigDecimal;
+
+import dvk.api.SelectCriteria;
 
 public class SelectCriteriaSubdivision extends SelectCriteria {
     @SuppressWarnings("unused")

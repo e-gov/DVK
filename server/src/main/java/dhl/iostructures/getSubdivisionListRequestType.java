@@ -1,14 +1,14 @@
 package dhl.iostructures;
 
-import dhl.exceptions.RequestProcessingException;
-import dvk.core.CommonMethods;
-
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPException;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import dhl.exceptions.RequestProcessingException;
+import dvk.core.CommonMethods;
 
 public class getSubdivisionListRequestType {
     static Logger logger = Logger.getLogger(getSubdivisionListRequestType.class.getName());

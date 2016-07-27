@@ -3,20 +3,20 @@ package dvk.api.container.v1;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import org.exolab.castor.xml.Marshaller;
+
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.ValidationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+
 import dvk.api.container.Container;
 import dvk.api.container.Metaxml;
 import dvk.api.ml.Util;

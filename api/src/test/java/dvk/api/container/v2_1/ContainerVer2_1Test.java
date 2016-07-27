@@ -1,13 +1,12 @@
 package dvk.api.container.v2_1;
 
-import dvk.api.container.TestingFileUtils;
+import java.io.InputStream;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+
+import dvk.api.container.TestingFileUtils;
 
 /**
  * Container version 2.1 unit tests for converting from xml to objects.

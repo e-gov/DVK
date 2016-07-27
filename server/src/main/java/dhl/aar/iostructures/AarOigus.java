@@ -1,14 +1,15 @@
 package dhl.aar.iostructures;
 
-import dvk.core.CommonMethods;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+
 import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPBody;
+
+import dvk.core.CommonMethods;
 
 public class AarOigus {
     private String m_oigusNimi;

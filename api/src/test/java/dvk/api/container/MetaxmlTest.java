@@ -1,10 +1,9 @@
 package dvk.api.container;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Date;
 
 import org.exolab.castor.mapping.Mapping;

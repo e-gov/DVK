@@ -1,8 +1,9 @@
 package dhl.sys;
 
-import dvk.core.CommonMethods;
 import java.io.File;
 import java.io.FilenameFilter;
+
+import dvk.core.CommonMethods;
 
 public class TempCleaner implements Runnable {
     Thread t;

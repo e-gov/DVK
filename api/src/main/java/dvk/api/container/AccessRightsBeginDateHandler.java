@@ -1,11 +1,12 @@
 package dvk.api.container;
 
-import dvk.api.ml.Util;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.ValidityException;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import dvk.api.ml.Util;
 
 public class AccessRightsBeginDateHandler implements FieldHandler {
     private static final String FORMAT = "yyyy-MM-dd";

@@ -1,12 +1,13 @@
 package dhl.aar.iostructures;
 
-import dvk.core.CommonMethods;
-
 import java.util.Date;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.axis.AxisFault;
+
+import dvk.core.CommonMethods;
 
 public class AarTaitmineOigus {
     private String m_nimetus;

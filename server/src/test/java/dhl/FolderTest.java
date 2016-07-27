@@ -3,13 +3,10 @@
  */
 package dhl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.omg.PortableInterceptor.SUCCESSFUL;
-
-import dhl.Folder;
 
 /**
  * @author Jaak

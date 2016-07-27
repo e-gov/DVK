@@ -2,10 +2,11 @@ package dhl.iostructures;
 
 import java.util.Date;
 
-import dvk.core.CommonMethods;
-import dvk.core.Fault;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import dvk.core.CommonMethods;
+import dvk.core.Fault;
 
 public class markDocumentsReceivedV2Item {
     public int documentID;

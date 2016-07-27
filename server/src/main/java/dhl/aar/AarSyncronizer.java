@@ -1,15 +1,14 @@
 package dhl.aar;
 
-import dhl.CoreServices;
-import dhl.sys.ApplicationParams;
-import dhl.users.Asutus;
-import dvk.core.CommonMethods;
-
 import java.sql.Connection;
 import java.util.Calendar;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
+
+import dhl.sys.ApplicationParams;
+import dhl.users.Asutus;
+import dvk.core.CommonMethods;
 
 public class AarSyncronizer implements Runnable {
     static Logger logger = Logger.getLogger(AarSyncronizer.class);

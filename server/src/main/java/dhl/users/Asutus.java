@@ -1,5 +1,16 @@
 package dhl.users;
 
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+
+import org.apache.axis.AxisFault;
+
 import dhl.RemoteServer;
 import dhl.aar.AarClient;
 import dhl.aar.iostructures.AarAmetikoht;
@@ -12,17 +23,6 @@ import dvk.core.CommonMethods;
 import dvk.core.HeaderVariables;
 import dvk.core.Settings;
 import dvk.core.xroad.XRoadProtocolHeader;
-
-import java.sql.CallableStatement;
-import java.sql.Statement;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-
-import org.apache.axis.AxisFault;
 
 public class Asutus {
     private int m_id;

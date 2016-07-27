@@ -1,10 +1,15 @@
 package integration;
 
-import Utills.IntegrationTestUtills;
-import dvk.core.CommonMethods;
-import dvk.core.xroad.XRoadProtocolHeader;
-import dvk.core.xroad.XRoadProtocolVersion;
-import junit.framework.Assert;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.UUID;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
@@ -19,11 +24,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.UUID;
+import Utills.IntegrationTestUtills;
+import dvk.core.CommonMethods;
+import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadProtocolVersion;
+import junit.framework.Assert;
 
 public class GetSendStatusIntegration {
 	

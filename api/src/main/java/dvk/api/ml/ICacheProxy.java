@@ -1,11 +1,12 @@
 package dvk.api.ml;
 
-import dvk.api.SelectCriteria;
+import java.util.Iterator;
+import java.util.List;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 
-import java.util.Iterator;
-import java.util.List;
+import dvk.api.SelectCriteria;
 
 public interface ICacheProxy<E> {
     E lookup(Object id, boolean allowCreateNew, Object... extraArgs);

@@ -1,7 +1,5 @@
 package dvk.api.container;
 
-import dvk.api.container.Metaxml;
-
 public abstract class Ajalugu<MINFO, TRANS, MXML>
 {
 	private MINFO metainfo;

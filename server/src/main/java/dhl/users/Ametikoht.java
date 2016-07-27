@@ -1,20 +1,17 @@
 package dhl.users;
 
-import dhl.aar.iostructures.AarAmetikoht;
-import dhl.users.Allyksus;
-import dhl.users.AmetikohaTaitmine;
-import dhl.users.Asutus;
-import dvk.core.CommonMethods;
-import dvk.core.Settings;
-
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.Statement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+
+import dhl.aar.iostructures.AarAmetikoht;
+import dvk.core.CommonMethods;
+import dvk.core.Settings;
 
 public class Ametikoht {
     private int m_id;

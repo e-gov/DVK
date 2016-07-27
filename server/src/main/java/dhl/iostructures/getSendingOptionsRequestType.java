@@ -1,11 +1,11 @@
 package dhl.iostructures;
 
-import dvk.core.CommonMethods;
-
 import javax.xml.soap.SOAPBody;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import dvk.core.CommonMethods;
 
 public class getSendingOptionsRequestType {
     public String[] asutused;

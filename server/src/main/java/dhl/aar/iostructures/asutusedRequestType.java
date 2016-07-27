@@ -1,12 +1,12 @@
 package dhl.aar.iostructures;
 
-import dvk.core.CommonMethods;
-
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+
+import dvk.core.CommonMethods;
 
 public class asutusedRequestType {
     public String asutusedHref;

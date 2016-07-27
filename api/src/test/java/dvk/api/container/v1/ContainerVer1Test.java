@@ -1,17 +1,12 @@
 package dvk.api.container.v1;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-
-import dvk.api.container.TestingFileUtils;
-import dvk.api.container.v2_1.ContainerVer2_1;
-import junit.framework.Assert;
 
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Marshaller;
@@ -20,6 +15,8 @@ import org.junit.Test;
 
 import dvk.api.container.DhlEmailHeader;
 import dvk.api.container.SaatjaDefineeritud;
+import dvk.api.container.TestingFileUtils;
+import junit.framework.Assert;
 
 public class ContainerVer1Test {
 

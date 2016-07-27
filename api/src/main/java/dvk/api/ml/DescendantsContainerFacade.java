@@ -1,11 +1,12 @@
 package dvk.api.ml;
 
-import dvk.api.IDvkElement;
-import dvk.api.IElementObserver;
+import java.util.List;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 
-import java.util.List;
+import dvk.api.IDvkElement;
+import dvk.api.IElementObserver;
 
 public abstract class DescendantsContainerFacade<POJO extends IElementObserver> extends PojoFacade<POJO> {
     public DescendantsContainerFacade(DvkSessionCacheBox cacheBox, boolean isNew) {

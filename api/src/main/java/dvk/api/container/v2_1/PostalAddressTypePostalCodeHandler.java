@@ -1,11 +1,11 @@
 package dvk.api.container.v2_1;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang3.StringUtils;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.ValidityException;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author Hendrik Pärna

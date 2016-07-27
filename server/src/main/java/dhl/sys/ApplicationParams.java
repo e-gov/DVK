@@ -1,12 +1,12 @@
 package dhl.sys;
 
-import dvk.core.CommonMethods;
-
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Types;
 import java.util.Calendar;
 import java.util.Date;
+
+import dvk.core.CommonMethods;
 
 public class ApplicationParams {
     private Date m_lastAarSync;

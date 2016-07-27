@@ -1,9 +1,9 @@
 package dvk.api.ml;
 
-import org.hibernate.Session;
-
 import java.math.BigDecimal;
 import java.util.List;
+
+import org.hibernate.Session;
 
 public class IdRequest {
     private static final String IdRequestTemplate = "select %s as id from %s where %s = %s";

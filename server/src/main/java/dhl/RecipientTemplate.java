@@ -1,15 +1,12 @@
 package dhl;
 
-import dhl.users.Asutus;
-import dvk.core.CommonMethods;
-import dvk.core.CommonStructures;
-
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Date;
+
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -18,6 +15,10 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import dhl.users.Asutus;
+import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
 
 public class RecipientTemplate {
 

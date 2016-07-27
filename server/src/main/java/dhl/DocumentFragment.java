@@ -1,12 +1,5 @@
 package dhl;
 
-import dhl.iostructures.FragmentationResult;
-import dvk.core.CommonMethods;
-import dvk.core.CommonStructures;
-import dvk.core.xroad.XRoadProtocolHeader;
-
-import org.apache.axis.AxisFault;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -19,6 +12,13 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+
+import org.apache.axis.AxisFault;
+
+import dhl.iostructures.FragmentationResult;
+import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
+import dvk.core.xroad.XRoadProtocolHeader;
 
 public class DocumentFragment {
     private int m_id;

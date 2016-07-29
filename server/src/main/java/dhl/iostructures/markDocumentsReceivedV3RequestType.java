@@ -34,10 +34,12 @@ public class markDocumentsReceivedV3RequestType {
             org.apache.axis.Message msg = context.getRequestMessage();
             SOAPBody body = msg.getSOAPBody();
             
-            NodeList msgNodes = body.getElementsByTagName("markDocumentsReceived");
-            if (msgNodes.getLength() == 0 && xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-            	msgNodes = body.getElementsByTagName("markDocumentsReceivedV3");
+            String requestElementName = markDocumentsReceivedRequestType.DEFAULT_REQUEST_ELEMENT_NAME;
+            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
+            	requestElementName += "V3";
             }
+            
+            NodeList msgNodes = body.getElementsByTagName(requestElementName);
             
             if (msgNodes.getLength() > 0) {
                 Element msgNode = (Element) msgNodes.item(0);

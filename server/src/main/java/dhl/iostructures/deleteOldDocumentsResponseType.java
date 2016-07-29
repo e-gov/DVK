@@ -11,6 +11,7 @@ import org.w3c.dom.NodeList;
 
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
+import dvk.core.xroad.XRoadProtocolHeader;
 import dvk.core.xroad.XRoadProtocolVersion;
 
 public class deleteOldDocumentsResponseType implements SOAPOutputBodyRepresentation {
@@ -28,14 +29,14 @@ public class deleteOldDocumentsResponseType implements SOAPOutputBodyRepresentat
         m_requestElement = value;
     }
 
-    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolVersion xRoadProtocolVersion) {
+    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolHeader xRoadProtocolHeader) {
     	
         try {
             // get SOAP envelope from SOAP message
             org.apache.axis.message.SOAPEnvelope se = msg.getSOAPEnvelope();
             SOAPBody body = se.getBody();
 
-            se.addNamespaceDeclaration(xRoadProtocolVersion.getNamespacePrefix(), xRoadProtocolVersion.getNamespaceURI());
+            se.addNamespaceDeclaration(xRoadProtocolHeader.getProtocolVersion().getNamespacePrefix(), xRoadProtocolHeader.getProtocolVersion().getNamespaceURI());
             se.addNamespaceDeclaration(CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI);
 
             @SuppressWarnings("rawtypes")
@@ -45,10 +46,10 @@ public class deleteOldDocumentsResponseType implements SOAPOutputBodyRepresentat
             }
 
             SOAPBodyElement element = body.addBodyElement(se.createName("deleteOldDocumentsResponse",
-            		xRoadProtocolVersion.getNamespacePrefix(),
-            		xRoadProtocolVersion.getNamespaceURI()));
+            		xRoadProtocolHeader.getProtocolVersion().getNamespacePrefix(),
+            		xRoadProtocolHeader.getProtocolVersion().getNamespaceURI()));
 
-            if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
             	SOAPElement elParing = element.addChildElement(se.createName("paring"));
             	if (m_requestElement != null) {
             		NodeList nl = m_requestElement.getChildNodes();

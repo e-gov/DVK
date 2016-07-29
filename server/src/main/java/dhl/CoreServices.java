@@ -239,7 +239,7 @@ public class CoreServices implements Dhl {
         	}
             
         	if (body != null) {
-        		body.addToSOAPBody(response, xRoadHeader.getProtocolVersion());
+        		body.addToSOAPBody(response, xRoadHeader);
         	}
             
             response.saveChanges();
@@ -338,7 +338,7 @@ public class CoreServices implements Dhl {
             if (xRoadHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
             	body.setRequestElement(getXRoadRequestBodyElement(context, "runSystemCheck"));
             }
-            body.addToSOAPBody(response, xRoadHeader.getProtocolVersion());
+            body.addToSOAPBody(response, xRoadHeader);
             
             response.saveChanges();
         } catch (AxisFault a) {
@@ -406,7 +406,7 @@ public class CoreServices implements Dhl {
                 response.getSOAPEnvelope().removeBody();
                 
                 response.getSOAPEnvelope().addBody();
-                body.addToSOAPBody(response, xRoadHeader.getProtocolVersion());
+                body.addToSOAPBody(response, xRoadHeader);
                 
                 response.saveChanges();
             } catch (Exception ex) {
@@ -518,7 +518,7 @@ public class CoreServices implements Dhl {
                 XRoadProtocolHeader xTeePais = XRoadProtocolHeader.getFromSOAPHeaderAxis(context);
                 
                 // Tuvastame, millist päringu versiooni välja kutsuti
-                String ver = CommonMethods.getXRoadRequestVersion(xTeePais);
+                String ver = CommonMethods.getXRoadServiceVersion(xTeePais);
                 LOGGER.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele GetSendingOptions(xtee teenus: " 
                 		+ xTeePais.getService() +"). Asutusest: " + xTeePais.getConsumer() 
                 		+ " ametnik: " + xTeePais.getOfficial()
@@ -585,7 +585,7 @@ public class CoreServices implements Dhl {
                     ((getSendingOptionsV3ResponseType) result).kehaHref = a1.getContentId();
                 }
 
-                result.addToSOAPBody(response, xTeePais.getProtocolVersion());
+                result.addToSOAPBody(response, xTeePais);
                 
                 response.saveChanges();
             } else {
@@ -610,6 +610,22 @@ public class CoreServices implements Dhl {
 	public void getSendingOptionsV2(Object keha) throws AxisFault {
 		getSendingOptions(keha);
 	}
+    
+    /**
+     * @webmethod
+     */
+    @Override
+    public void getSendingOptionsV3(Object keha) throws AxisFault {
+    	getSendingOptions(keha);
+    }
+    
+    /**
+     * @webmethod
+     */
+    @Override
+    public void getSendingOptionsV4(Object keha) throws AxisFault {
+    	getSendingOptions(keha);
+    }
     
     /**
      * @webmethod
@@ -658,7 +674,7 @@ public class CoreServices implements Dhl {
 
                 // Tuvastame, millist päringu versiooni välja kutsuti
                 t.reset();
-                String ver = CommonMethods.getXRoadRequestVersion(xTeePais);
+                String ver = CommonMethods.getXRoadServiceVersion(xTeePais);
                 t.markElapsed("Getting request version");
 
                 // Laeme päises asunud andmete järgi süsteemi tööks vajalikud andmed
@@ -734,7 +750,7 @@ public class CoreServices implements Dhl {
                     responseBody.paring.dokumendid = result.dataMd5Hash;
                     responseBody.paring.kaust = result.folder;
                     responseBody.kehaHref = a1.getContentId();
-                    responseBody.addToSOAPBody(response, xTeePais.getProtocolVersion());
+                    responseBody.addToSOAPBody(response, xTeePais);
 
                     response.saveChanges();
                     t.markElapsed("Creating response message");
@@ -766,6 +782,22 @@ public class CoreServices implements Dhl {
 	public void sendDocumentsV2(Object p1, Object keha) throws AxisFault {
     	sendDocuments(p1, keha);
 	}
+    
+    /**
+     * @webmethod
+     */
+    @Override
+    public void sendDocumentsV3(Object p1, Object keha) throws AxisFault {
+    	sendDocuments(p1, keha);
+    }
+    
+    /**
+     * @webmethod
+     */
+    @Override
+    public void sendDocumentsV4(Object p1, Object keha) throws AxisFault {
+    	sendDocuments(p1, keha);
+    }
 
     /**
      * @webmethod
@@ -801,7 +833,7 @@ public class CoreServices implements Dhl {
 
                     // Tuvastame, millist päringu versiooni välja kutsuti
                     t.reset();
-                    String ver = CommonMethods.getXRoadRequestVersion(xTeePais);
+                    String ver = CommonMethods.getXRoadServiceVersion(xTeePais);
                     t.markElapsed("Getting request version");
 
                     // Laeme päises asunud andmete järgi süsteemi tööks vajalikud andmed
@@ -863,7 +895,7 @@ public class CoreServices implements Dhl {
                             responseBody.paring.arv = result.count;
                             responseBody.paring.kaust = result.folders;
                             responseBody.kehaHref = a1.getContentId();
-                            responseBody.addToSOAPBody(response, xTeePais.getProtocolVersion());
+                            responseBody.addToSOAPBody(response, xTeePais);
                         } else if (ver.equalsIgnoreCase("v2")) {
                             receiveDocumentsV2ResponseType responseBody = new receiveDocumentsV2ResponseType();
                             responseBody.paring.arv = result.count;
@@ -875,7 +907,7 @@ public class CoreServices implements Dhl {
                             responseBody.edastusID = result.deliverySessionID;
                             responseBody.fragmenteKokku = result.totalFragments;
                             responseBody.fragmentNr = result.fragmentNr;
-                            responseBody.addToSOAPBody(response, xTeePais.getProtocolVersion());
+                            responseBody.addToSOAPBody(response, xTeePais);
                         } else if (ver.equalsIgnoreCase("v3")) {
                             receiveDocumentsV3ResponseType responseBody = new receiveDocumentsV3ResponseType();
                             responseBody.paring = getXRoadRequestBodyElement(context, "receiveDocuments");
@@ -883,7 +915,7 @@ public class CoreServices implements Dhl {
                             responseBody.edastusID = result.deliverySessionID;
                             responseBody.fragmenteKokku = result.totalFragments;
                             responseBody.fragmentNr = result.fragmentNr;
-                            responseBody.addToSOAPBody(response, xTeePais.getProtocolVersion());
+                            responseBody.addToSOAPBody(response, xTeePais);
                         } else if (ver.equalsIgnoreCase("v4")) {
                             receiveDocumentsV4ResponseType responseBody = new receiveDocumentsV4ResponseType();
                             responseBody.paring = getXRoadRequestBodyElement(context, "receiveDocuments");
@@ -891,7 +923,7 @@ public class CoreServices implements Dhl {
                             responseBody.edastusID = result.deliverySessionID;
                             responseBody.fragmenteKokku = result.totalFragments;
                             responseBody.fragmentNr = result.fragmentNr;
-                            responseBody.addToSOAPBody(response, xTeePais.getProtocolVersion());
+                            responseBody.addToSOAPBody(response, xTeePais);
                         }
 
                         response.saveChanges();
@@ -929,6 +961,22 @@ public class CoreServices implements Dhl {
     /**
      * @webmethod
      */
+    @Override
+    public void receiveDocumentsV3(Object keha) throws AxisFault {
+    	receiveDocuments(keha);
+    }
+    
+    /**
+     * @webmethod
+     */
+    @Override
+    public void receiveDocumentsV4(Object keha) throws AxisFault {
+    	receiveDocuments(keha);
+    }
+    
+    /**
+     * @webmethod
+     */
     public void markDocumentsReceived(Object p1, Object keha) throws AxisFault {
         if (!Settings.Server_RunOnClientDatabase) {
             Connection conn = null;
@@ -946,7 +994,7 @@ public class CoreServices implements Dhl {
                     		+ " ametnik:" + xTeePais.getOfficial()
                     		+" isikukood:" + xTeePais.getUserId());
                     // Tuvastame, millist päringu versiooni välja kutsuti
-                    String ver = CommonMethods.getXRoadRequestVersion(xTeePais);
+                    String ver = CommonMethods.getXRoadServiceVersion(xTeePais);
 
                     // Laeme päises asunud andmete järgi süsteemi tööks vajalikud andmed
                     // autenditud kasutaja kohta.
@@ -992,14 +1040,15 @@ public class CoreServices implements Dhl {
                             markDocumentsReceivedV3ResponseType responseBody = new markDocumentsReceivedV3ResponseType();
                             responseBody.paring = result.requestElement;
                             responseBody.keha = "OK";
-                            responseBody.addToSOAPBody(response, xTeePais.getProtocolVersion());
+                            responseBody.addToSOAPBody(response, xTeePais);
                         } else {
                             markDocumentsReceivedResponseType responseBody = new markDocumentsReceivedResponseType();
                             responseBody.paring.dokumendid = result.dataMd5Hash;
                             responseBody.paring.kaust = result.folder;
                             responseBody.keha = "OK";
-                            responseBody.addToSOAPBody(response, xTeePais.getProtocolVersion());
+                            responseBody.addToSOAPBody(response, xTeePais);
                         }
+                        
                         response.saveChanges();
                     } catch (Exception ex) {
                         LOGGER.error(ex.getMessage(), ex);
@@ -1028,6 +1077,14 @@ public class CoreServices implements Dhl {
     @Override
 	public void markDocumentsReceivedV2(Object p1, Object keha) throws AxisFault {
 		markDocumentsReceived(p1, keha);
+    }
+    
+    /**
+     * @webmethod
+     */
+    @Override
+    public void markDocumentsReceivedV3(Object p1, Object keha) throws AxisFault {
+    	markDocumentsReceived(p1, keha);
     }
     
     /**
@@ -1066,7 +1123,7 @@ public class CoreServices implements Dhl {
                 		+ " ametnik: " + xTeePais.getOfficial()
                 		+" isikukood: " + xTeePais.getUserId());
                 // Tuvastame, millist päringu versiooni välja kutsuti
-                String ver = CommonMethods.getXRoadRequestVersion(xTeePais);
+                String ver = CommonMethods.getXRoadServiceVersion(xTeePais);
 
                 // Laeme päises asunud andmete järgi süsteemi tööks vajalikud andmed
                 // autenditud kasutaja kohta.
@@ -1129,13 +1186,13 @@ public class CoreServices implements Dhl {
                         getSendStatusResponseType responseBody = new getSendStatusResponseType();
                         responseBody.paringKehaHash = result.dataMd5Hash;
                         responseBody.kehaHref = a1.getContentId();
-                        responseBody.addToSOAPBody(response, xTeePais.getProtocolVersion());
+                        responseBody.addToSOAPBody(response, xTeePais);
                     } else if (ver.equalsIgnoreCase("v2")) {
                         getSendStatusV2ResponseType responseBody = new getSendStatusV2ResponseType();
                         responseBody.paring = CommonMethods.getXRoadRequestBodyElement(context, "getSendStatus");
                         responseBody.dataMd5Hash = result.dataMd5Hash;
                         responseBody.kehaHref = a1.getContentId();
-                        responseBody.addToSOAPBody(response, xTeePais.getProtocolVersion());
+                        responseBody.addToSOAPBody(response, xTeePais);
                     }
 
                     response.saveChanges();
@@ -1178,7 +1235,7 @@ public class CoreServices implements Dhl {
                     		+ " ametnik:" + xTeePais.getOfficial()
                     		+" isikukood:" + xTeePais.getUserId());
                     // Tuvastame, millist päringu versiooni välja kutsuti
-                    String ver = CommonMethods.getXRoadRequestVersion(xTeePais);
+                    String ver = CommonMethods.getXRoadServiceVersion(xTeePais);
 
                     // Tuvastame kasutaja
                     UserProfile user = UserProfile.getFromHeaders(xTeePais, conn);
@@ -1227,7 +1284,7 @@ public class CoreServices implements Dhl {
                         ((getOccupationListV2ResponseType) result).ametikohadHref = a1.getContentId();
                     }
 
-                    result.addToSOAPBody(response, xTeePais.getProtocolVersion());
+                    result.addToSOAPBody(response, xTeePais);
                     response.saveChanges();
                 } else {
                     throw new AxisFault("Süsteemi sisemine viga! Päringu konteksti laadimine ebaõnnestus!");
@@ -1264,7 +1321,7 @@ public class CoreServices implements Dhl {
                     		+ " ametnik:" + xTeePais.getOfficial()
                     		+" isikukood:" + xTeePais.getUserId());
                     // Tuvastame, millist päringu versiooni välja kutsuti
-                    String ver = CommonMethods.getXRoadRequestVersion(xTeePais);
+                    String ver = CommonMethods.getXRoadServiceVersion(xTeePais);
 
                     // Tuvastame kasutaja
                     UserProfile user = UserProfile.getFromHeaders(xTeePais, conn);
@@ -1313,7 +1370,7 @@ public class CoreServices implements Dhl {
                         ((getSubdivisionListV2ResponseType) result).allyksusedHref = a1.getContentId();
                     }
 
-                    result.addToSOAPBody(response, xTeePais.getProtocolVersion());
+                    result.addToSOAPBody(response, xTeePais);
                     response.saveChanges();
                 } else {
                     throw new AxisFault("Süsteemi sisemine viga! Päringu konteksti laadimine ebaõnnestus!");

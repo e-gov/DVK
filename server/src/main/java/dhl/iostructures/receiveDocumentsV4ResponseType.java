@@ -10,10 +10,13 @@ import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import dvk.core.xroad.XRoadProtocolHeader;
 import dvk.core.xroad.XRoadProtocolVersion;
 
 public class receiveDocumentsV4ResponseType implements SOAPOutputBodyRepresentation {
+	
 	static Logger logger = Logger.getLogger(receiveDocumentsV4ResponseType.class.getName());
+	
 	public Element paring;
     public String dokumendidHref;
     public String edastusID;
@@ -28,7 +31,7 @@ public class receiveDocumentsV4ResponseType implements SOAPOutputBodyRepresentat
         fragmenteKokku = 0;
     }
 
-    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolVersion xRoadProtocolVersion) {
+    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolHeader xRoadProtocolHeader) {
         try {
             org.apache.axis.message.SOAPEnvelope se = msg.getSOAPEnvelope();
             SOAPBody body = se.getBody();
@@ -39,9 +42,15 @@ public class receiveDocumentsV4ResponseType implements SOAPOutputBodyRepresentat
                 body.removeContents();
             }
 
-            SOAPBodyElement element = body.addBodyElement(se.createName("receiveDocumentsResponse"));
+            String responseElementName = receiveDocumentsResponseType.DEFAULT_RESPONSE_ELEMENT_NAME;
+            // FIXME Currently (29.07.2016) the WSDL has no related element definitions
+            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
+            	responseElementName = receiveDocumentsRequestType.DEFAULT_REQUEST_ELEMENT_NAME + "V4" + SOAPOutputBodyRepresentation.RESPONSE;
+            }
+            
+            SOAPBodyElement element = body.addBodyElement(se.createName(responseElementName));
 
-            if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
 	            // Sõnumi päringu osa
 	            if (paring != null) {
 	            	SOAPElement elParing = element.addChildElement(se.createName("paring"));

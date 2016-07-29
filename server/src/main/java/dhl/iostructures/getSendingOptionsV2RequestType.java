@@ -10,6 +10,7 @@ import dvk.core.xroad.XRoadProtocolHeader;
 import dvk.core.xroad.XRoadProtocolVersion;
 
 public class getSendingOptionsV2RequestType {
+	
     public String[] asutused;
     public String vahetatudDokumenteVahemaltStr;
     public String vahetatudDokumenteKuniStr;
@@ -37,10 +38,12 @@ public class getSendingOptionsV2RequestType {
             msg = context.getRequestMessage();
             body = msg.getSOAPBody();
             
-            nodes = body.getElementsByTagName("getSendingOptions");
-            if (nodes.getLength() == 0 && xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-            	nodes = body.getElementsByTagName("getSendingOptionsV2");
+            String requestElementName = getSendingOptionsRequestType.DEFAULT_REQUEST_ELEMENT_NAME;
+            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
+            	requestElementName += "V2";
             }
+            
+            nodes = body.getElementsByTagName(requestElementName);
             
             if (nodes.getLength() > 0) {
                 el = (Element) nodes.item(0);

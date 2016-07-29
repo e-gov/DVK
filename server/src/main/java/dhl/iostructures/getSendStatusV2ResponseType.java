@@ -18,6 +18,7 @@ import org.w3c.dom.NodeList;
 
 import dhl.DocumentStatusHistory;
 import dvk.core.CommonStructures;
+import dvk.core.xroad.XRoadProtocolHeader;
 import dvk.core.xroad.XRoadProtocolVersion;
 
 public class getSendStatusV2ResponseType implements SOAPOutputBodyRepresentation {
@@ -31,12 +32,12 @@ public class getSendStatusV2ResponseType implements SOAPOutputBodyRepresentation
         kehaHref = "";
     }
 
-    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolVersion xRoadProtocolVersion) throws AxisFault, SOAPException {
+    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolHeader xRoadProtocolHeader) throws AxisFault, SOAPException {
         // get SOAP envelope from SOAP message
         org.apache.axis.message.SOAPEnvelope se = msg.getSOAPEnvelope();
         SOAPBody body = se.getBody();
 
-        se.addNamespaceDeclaration(xRoadProtocolVersion.getNamespacePrefix(), xRoadProtocolVersion.getNamespaceURI());
+        se.addNamespaceDeclaration(xRoadProtocolHeader.getProtocolVersion().getNamespacePrefix(), xRoadProtocolHeader.getProtocolVersion().getNamespaceURI());
         se.addNamespaceDeclaration(CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI);
 
         @SuppressWarnings("rawtypes")
@@ -47,7 +48,7 @@ public class getSendStatusV2ResponseType implements SOAPOutputBodyRepresentation
 
         SOAPBodyElement element = body.addBodyElement(se.createName("getSendStatusResponse"));
         
-        if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+        if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
 	        SOAPElement elParing = element.addChildElement(se.createName("paring"));
 	        if (paring != null) {
 	            NodeList nl = paring.getChildNodes();

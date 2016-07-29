@@ -8,6 +8,9 @@ import org.w3c.dom.NodeList;
 import dvk.core.CommonMethods;
 
 public class sendDocumentsRequestType {
+	
+	public static final String DEFAULT_REQUEST_ELEMENT_NAME = "sendDocuments";
+	
     public String dokumendid;
     public String kaust;
 
@@ -21,7 +24,7 @@ public class sendDocumentsRequestType {
             org.apache.axis.Message msg = context.getRequestMessage();
             SOAPBody body = msg.getSOAPBody();
             
-            NodeList msgNodes = body.getElementsByTagName("sendDocuments");
+            NodeList msgNodes = body.getElementsByTagName(DEFAULT_REQUEST_ELEMENT_NAME);
             
             if (msgNodes.getLength() > 0) {
                 Element msgNode = (Element) msgNodes.item(0);

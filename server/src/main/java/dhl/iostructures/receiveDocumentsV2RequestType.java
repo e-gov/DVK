@@ -15,6 +15,7 @@ import dvk.core.xroad.XRoadProtocolHeader;
 import dvk.core.xroad.XRoadProtocolVersion;
 
 public class receiveDocumentsV2RequestType {
+	
     public int arv;
     public List<String> kaust;
     public String edastusID;
@@ -36,10 +37,12 @@ public class receiveDocumentsV2RequestType {
             org.apache.axis.Message msg = context.getRequestMessage();
             SOAPBody body = msg.getSOAPBody();
             
-            NodeList nodes = body.getElementsByTagName("receiveDocuments");
-            if (nodes.getLength() == 0 && xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-            	nodes = body.getElementsByTagName("receiveDocumentsV2");
+            String requestElementName = receiveDocumentsRequestType.DEFAULT_REQUEST_ELEMENT_NAME;
+            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
+            	requestElementName += "V2";
             }
+            
+            NodeList nodes = body.getElementsByTagName(requestElementName);
             
             if (nodes.getLength() > 0) {
                 Element el = (Element) nodes.item(0);

@@ -702,7 +702,7 @@ public class CommonMethods {
         }
     }
 
-    public static String getXRoadRequestVersion(XRoadProtocolHeader xRoadProtocolHeader) {
+    public static String getXRoadServiceVersion(XRoadProtocolHeader xRoadProtocolHeader) {
     	String requestVersion = "";
     	
     	if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {

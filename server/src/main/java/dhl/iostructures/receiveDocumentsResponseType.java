@@ -7,9 +7,13 @@ import javax.xml.soap.SOAPBodyElement;
 import javax.xml.soap.SOAPElement;
 
 import dvk.core.CommonMethods;
+import dvk.core.xroad.XRoadProtocolHeader;
 import dvk.core.xroad.XRoadProtocolVersion;
 
 public class receiveDocumentsResponseType implements SOAPOutputBodyRepresentation {
+	
+	public static final String DEFAULT_RESPONSE_ELEMENT_NAME = receiveDocumentsRequestType.DEFAULT_REQUEST_ELEMENT_NAME + SOAPOutputBodyRepresentation.RESPONSE;
+
     public receiveDocumentsRequestType paring;
     public String kehaHref;
 
@@ -18,7 +22,7 @@ public class receiveDocumentsResponseType implements SOAPOutputBodyRepresentatio
         kehaHref = "";
     }
 
-    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolVersion xRoadProtocolVersion) {
+    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolHeader xRoadProtocolHeader) {
         try {
             org.apache.axis.message.SOAPEnvelope se = msg.getSOAPEnvelope();
             SOAPBody body = se.getBody();
@@ -29,9 +33,9 @@ public class receiveDocumentsResponseType implements SOAPOutputBodyRepresentatio
                 body.removeContents();
             }
 
-            SOAPBodyElement element = body.addBodyElement(se.createName("receiveDocumentsResponse"));
+            SOAPBodyElement element = body.addBodyElement(se.createName(DEFAULT_RESPONSE_ELEMENT_NAME));
             
-            if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
 	            SOAPElement elParing = element.addChildElement(se.createName("paring"));
 	            SOAPElement elArv = elParing.addChildElement("arv");
 	            elArv.addTextNode(String.valueOf(paring.arv));

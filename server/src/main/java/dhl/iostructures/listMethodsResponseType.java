@@ -36,14 +36,14 @@ public class listMethodsResponseType implements SOAPOutputBodyRepresentation {
     	this.xRoadServices = xRoadServices;
     }
 
-    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolVersion xRoadProtocolVersion) {
+    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolHeader xRoadProtocolHeader) {
         try {
             // Get SOAP envelope from SOAP message
             org.apache.axis.message.SOAPEnvelope soapEnvelope = msg.getSOAPEnvelope();
             SOAPBody body = soapEnvelope.getBody();
 
             soapEnvelope.addNamespaceDeclaration(CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI);
-            soapEnvelope.addNamespaceDeclaration(xRoadProtocolVersion.getNamespacePrefix(), xRoadProtocolVersion.getNamespaceURI());
+            soapEnvelope.addNamespaceDeclaration(xRoadProtocolHeader.getProtocolVersion().getNamespacePrefix(), xRoadProtocolHeader.getProtocolVersion().getNamespaceURI());
 
             @SuppressWarnings("rawtypes")
 			Iterator items = body.getChildElements();
@@ -51,9 +51,10 @@ public class listMethodsResponseType implements SOAPOutputBodyRepresentation {
                 body.removeContents();
             }
 
-            SOAPBodyElement soapBody = body.addBodyElement(soapEnvelope.createName("listMethodsResponse", xRoadProtocolVersion.getNamespacePrefix(), xRoadProtocolVersion.getNamespaceURI()));
+            SOAPBodyElement soapBody = body.addBodyElement(soapEnvelope.createName("listMethodsResponse",
+            		xRoadProtocolHeader.getProtocolVersion().getNamespacePrefix(), xRoadProtocolHeader.getProtocolVersion().getNamespaceURI()));
             
-            if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
             	SOAPElement elKeha = soapBody.addChildElement("keha");
             	elKeha.addAttribute(soapEnvelope.createName("type", CommonStructures.NS_XSI_PREFIX, CommonStructures.NS_XSI_URI), "SOAP-ENC:Array");
             	elKeha.addAttribute(soapEnvelope.createName("arrayType", CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI), "xsd:string[" + String.valueOf(methodsList.length) + "]");
@@ -63,11 +64,11 @@ public class listMethodsResponseType implements SOAPOutputBodyRepresentation {
             		elItem.addAttribute(soapEnvelope.createName("type", CommonStructures.NS_XSI_PREFIX, CommonStructures.NS_XSI_URI), "xsd:string");
             		elItem.addTextNode(methodsList[i]);
             	}
-            } else if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V4_0)) {
+            } else if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
             	soapEnvelope.addNamespaceDeclaration(XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX, XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_URI);
             	
             	for (XRoadService xRoadService : xRoadServices) {
-            		SOAPElement serviceElement = soapBody.addChildElement(XRoadProtocolHeaderField.SERVICE.getValue(), xRoadProtocolVersion.getNamespacePrefix());
+            		SOAPElement serviceElement = soapBody.addChildElement(XRoadProtocolHeaderField.SERVICE.getValue(), xRoadProtocolHeader.getProtocolVersion().getNamespacePrefix());
             		serviceElement.addAttribute(
             				soapEnvelope.createName("objectType", XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX, XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_URI),
             				XRoadObjectType.SERVICE.getName());

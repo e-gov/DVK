@@ -12,6 +12,9 @@ import org.w3c.dom.NodeList;
 import dvk.core.CommonMethods;
 
 public class receiveDocumentsRequestType {
+	
+	public static final String DEFAULT_REQUEST_ELEMENT_NAME = "receiveDocuments";
+	
     public int arv;
     public List<String> kaust;
 
@@ -24,7 +27,7 @@ public class receiveDocumentsRequestType {
         try {
             org.apache.axis.Message msg = context.getRequestMessage();
             SOAPBody body = msg.getSOAPBody();
-            NodeList nodes = body.getElementsByTagName("receiveDocuments");
+            NodeList nodes = body.getElementsByTagName(DEFAULT_REQUEST_ELEMENT_NAME);
             if (nodes.getLength() > 0) {
                 Element el = (Element) nodes.item(0);
                 nodes = el.getElementsByTagName("keha");

@@ -10,10 +10,12 @@ import javax.xml.soap.SOAPElement;
 import dhl.users.Asutus;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
+import dvk.core.xroad.XRoadProtocolHeader;
 import dvk.core.xroad.XRoadProtocolVersion;
 
 public class getSendingOptionsV2ResponseType implements SOAPOutputBodyRepresentation {
-    public getSendingOptionsV2RequestType paring;
+	
+	public getSendingOptionsV2RequestType paring;
     public ArrayList<Asutus> asutused;
 
     public getSendingOptionsV2ResponseType() {
@@ -21,13 +23,13 @@ public class getSendingOptionsV2ResponseType implements SOAPOutputBodyRepresenta
         paring = null;
     }
 
-    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolVersion xRoadProtocolVersion) {
+    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolHeader xRoadProtocolHeader) {
         try {
             // get SOAP envelope from SOAP message
             org.apache.axis.message.SOAPEnvelope se = msg.getSOAPEnvelope();
             SOAPBody body = se.getBody();
 
-            se.addNamespaceDeclaration(xRoadProtocolVersion.getNamespacePrefix(), xRoadProtocolVersion.getNamespaceURI());
+            se.addNamespaceDeclaration(xRoadProtocolHeader.getProtocolVersion().getNamespacePrefix(), xRoadProtocolHeader.getProtocolVersion().getNamespaceURI());
             se.addNamespaceDeclaration(CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI);
             se.addNamespaceDeclaration(CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_URI);
 
@@ -36,28 +38,41 @@ public class getSendingOptionsV2ResponseType implements SOAPOutputBodyRepresenta
             if (items.hasNext()) {
                 body.removeContents();
             }
-
-            SOAPBodyElement element = body.addBodyElement(se.createName("getSendingOptionsResponse", CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_URI));
-
-            SOAPElement elParing = element.addChildElement("paring", "");
-            if (paring != null) {
-                SOAPElement elVvDokOotel = elParing.addChildElement("vastuvotmata_dokumente_ootel", "");
-                elVvDokOotel.addTextNode(paring.vastuvotmataDokumenteOotelStr);
-                SOAPElement elVahDokVahemalt = elParing.addChildElement("vahetatud_dokumente_vahemalt", "");
-                elVahDokVahemalt.addTextNode(paring.vahetatudDokumenteVahemaltStr);
-                SOAPElement elVahDokKuni = elParing.addChildElement("vahetatud_dokumente_kuni", "");
-                elVahDokKuni.addTextNode(paring.vahetatudDokumenteKuniStr);
-
-                SOAPElement elAsutused = elParing.addChildElement("asutused", "");
-                elAsutused.addAttribute(se.createName("type", CommonStructures.NS_XSI_PREFIX, CommonStructures.NS_XSI_URI), "SOAP-ENC:Array");
-                elAsutused.addAttribute(se.createName("arrayType", CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI), "xsd:string[" + String.valueOf(paring.asutused.length) + "]");
-                for (int i = 0; i < paring.asutused.length; ++i) {
-                    SOAPElement elReqOrg = elAsutused.addChildElement("asutus");
-                    elReqOrg.addTextNode(paring.asutused[i]);
-                }
+            
+            String responseElementName = getSendingOptionsResponseType.DEFAULT_RESPONSE_ELEMENT_NAME;
+            // FIXME Currently (29.07.2016) the WSDL has no related element definitions
+            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
+            	responseElementName = getSendingOptionsRequestType.DEFAULT_REQUEST_ELEMENT_NAME + "V2" + SOAPOutputBodyRepresentation.RESPONSE;
             }
+            
+            SOAPBodyElement element = body.addBodyElement(se.createName(responseElementName, CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_URI));
+            
+            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
+				SOAPElement elParing = element.addChildElement("paring", "");
+				if (paring != null) {
+					SOAPElement elVvDokOotel = elParing.addChildElement("vastuvotmata_dokumente_ootel", "");
+					elVvDokOotel.addTextNode(paring.vastuvotmataDokumenteOotelStr);
+					SOAPElement elVahDokVahemalt = elParing.addChildElement("vahetatud_dokumente_vahemalt", "");
+					elVahDokVahemalt.addTextNode(paring.vahetatudDokumenteVahemaltStr);
+					SOAPElement elVahDokKuni = elParing.addChildElement("vahetatud_dokumente_kuni", "");
+					elVahDokKuni.addTextNode(paring.vahetatudDokumenteKuniStr);
 
-            SOAPElement elKeha = element.addChildElement("keha", "");
+					SOAPElement elAsutused = elParing.addChildElement("asutused", "");
+					elAsutused.addAttribute(
+							se.createName("type", CommonStructures.NS_XSI_PREFIX, CommonStructures.NS_XSI_URI),
+							"SOAP-ENC:Array");
+					elAsutused.addAttribute(
+							se.createName("arrayType", CommonStructures.NS_SOAPENC_PREFIX,
+									CommonStructures.NS_SOAPENC_URI),
+							"xsd:string[" + String.valueOf(paring.asutused.length) + "]");
+					for (int i = 0; i < paring.asutused.length; ++i) {
+						SOAPElement elReqOrg = elAsutused.addChildElement("asutus");
+						elReqOrg.addTextNode(paring.asutused[i]);
+					}
+				} 
+			}
+            
+			SOAPElement elKeha = element.addChildElement("keha", "");
             elKeha.addAttribute(se.createName("type", CommonStructures.NS_XSI_PREFIX, CommonStructures.NS_XSI_URI), "SOAP-ENC:Array");
             elKeha.addAttribute(se.createName("arrayType", CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI), "dhl:asutus[" + String.valueOf(asutused.size()) + "]");
 

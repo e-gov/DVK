@@ -7,9 +7,11 @@ import javax.xml.soap.SOAPBodyElement;
 import javax.xml.soap.SOAPElement;
 
 import dvk.core.CommonMethods;
+import dvk.core.xroad.XRoadProtocolHeader;
 import dvk.core.xroad.XRoadProtocolVersion;
 
 public class receiveDocumentsV2ResponseType implements SOAPOutputBodyRepresentation {
+		
     public receiveDocumentsV2RequestType paring;
     public String dokumendidHref;
     public String edastusID;
@@ -24,7 +26,7 @@ public class receiveDocumentsV2ResponseType implements SOAPOutputBodyRepresentat
         fragmenteKokku = 0;
     }
 
-    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolVersion xRoadProtocolVersion) {
+    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolHeader xRoadProtocolHeader) {
         try {
             org.apache.axis.message.SOAPEnvelope se = msg.getSOAPEnvelope();
             SOAPBody body = se.getBody();
@@ -35,9 +37,15 @@ public class receiveDocumentsV2ResponseType implements SOAPOutputBodyRepresentat
                 body.removeContents();
             }
 
-            SOAPBodyElement element = body.addBodyElement(se.createName("receiveDocumentsResponse"));
+            String responseElementName = receiveDocumentsResponseType.DEFAULT_RESPONSE_ELEMENT_NAME;
+            // FIXME Currently (29.07.2016) the WSDL has no related element definitions
+            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
+            	responseElementName = receiveDocumentsRequestType.DEFAULT_REQUEST_ELEMENT_NAME + "V2" + SOAPOutputBodyRepresentation.RESPONSE;
+            }
+            
+            SOAPBodyElement element = body.addBodyElement(se.createName(responseElementName)); 
 
-            if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
 	            // Sõnumi päringu osa
 	            SOAPElement elParing = element.addChildElement(se.createName("paring"));
 	            SOAPElement elArv = elParing.addChildElement("arv");

@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 import dhl.users.Ametikoht;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
+import dvk.core.xroad.XRoadProtocolHeader;
 import dvk.core.xroad.XRoadProtocolVersion;
 
 public class getOccupationListV2ResponseType implements SOAPOutputBodyRepresentation {
@@ -32,7 +33,7 @@ public class getOccupationListV2ResponseType implements SOAPOutputBodyRepresenta
         dataMd5Hash = "";
     }
 
-    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolVersion xRoadProtocolVersion) {
+    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolHeader xRoadProtocolHeader) {
         try {
             // get SOAP envelope from SOAP message
             org.apache.axis.message.SOAPEnvelope se = msg.getSOAPEnvelope();
@@ -45,9 +46,12 @@ public class getOccupationListV2ResponseType implements SOAPOutputBodyRepresenta
             }
 
             SOAPBodyElement element = body.addBodyElement(se.createName("getOccupationListResponse", CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_URI));
-            SOAPElement elParing = element.addChildElement(se.createName("paring"));
-            SOAPElement elHash = elParing.addChildElement("asutused");
-            elHash.addTextNode(this.dataMd5Hash);
+            
+            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
+	            SOAPElement elParing = element.addChildElement(se.createName("paring"));
+	            SOAPElement elHash = elParing.addChildElement("asutused");
+	            elHash.addTextNode(this.dataMd5Hash);
+            }
 
             // Sõnumi keha osa
             SOAPElement elKeha = element.addChildElement(se.createName("keha"));

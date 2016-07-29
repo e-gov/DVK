@@ -7,6 +7,7 @@ import javax.xml.soap.SOAPBodyElement;
 import javax.xml.soap.SOAPElement;
 
 import dvk.core.CommonMethods;
+import dvk.core.xroad.XRoadProtocolHeader;
 import dvk.core.xroad.XRoadProtocolVersion;
 
 public class getSendStatusResponseType implements SOAPOutputBodyRepresentation {
@@ -18,7 +19,7 @@ public class getSendStatusResponseType implements SOAPOutputBodyRepresentation {
         kehaHref = "";
     }
 
-    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolVersion xRoadProtocolVersion) {
+    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolHeader xRoadProtocolHeader) {
         try {
             // get SOAP envelope from SOAP message
             org.apache.axis.message.SOAPEnvelope se = msg.getSOAPEnvelope();
@@ -32,7 +33,7 @@ public class getSendStatusResponseType implements SOAPOutputBodyRepresentation {
 
             SOAPBodyElement element = body.addBodyElement(se.createName("getSendStatusResponse"));
             
-            if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
 	            SOAPElement elParing = element.addChildElement(se.createName("paring"));
 	            elParing.addTextNode(paringKehaHash);
             }

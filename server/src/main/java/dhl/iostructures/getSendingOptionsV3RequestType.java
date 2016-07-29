@@ -17,7 +17,9 @@ import dvk.core.xroad.XRoadProtocolHeader;
 import dvk.core.xroad.XRoadProtocolVersion;
 
 public class getSendingOptionsV3RequestType {
-    static Logger logger = Logger.getLogger(getSendingOptionsV3RequestType.class.getName());
+	
+	static Logger logger = Logger.getLogger(getSendingOptionsV3RequestType.class.getName());
+    
     public String kehaHref;
     public String[] asutused;
     public List<ShortName> allyksused;
@@ -53,7 +55,12 @@ public class getSendingOptionsV3RequestType {
         org.apache.axis.Message msg = context.getRequestMessage();
         SOAPBody body = msg.getSOAPBody();
         
-        NodeList msgNodes = body.getElementsByTagName("getSendingOptions");
+        String requestElementName = getSendingOptionsRequestType.DEFAULT_REQUEST_ELEMENT_NAME;
+        if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
+        	requestElementName += "V3";
+        }
+        
+        NodeList msgNodes = body.getElementsByTagName(requestElementName);
         if (msgNodes.getLength() == 0 && xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
         	msgNodes = body.getElementsByTagName("getSendingOptionsV3");
         }

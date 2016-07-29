@@ -8,6 +8,9 @@ import org.w3c.dom.NodeList;
 import dvk.core.CommonMethods;
 
 public class getSendingOptionsRequestType {
+	
+	public static final String DEFAULT_REQUEST_ELEMENT_NAME = "getSendingOptions";
+	
     public String[] asutused;
 
     public getSendingOptionsRequestType() {
@@ -18,7 +21,7 @@ public class getSendingOptionsRequestType {
         try {
             org.apache.axis.Message msg = context.getRequestMessage();
             SOAPBody body = msg.getSOAPBody();
-            NodeList msgNodes = body.getElementsByTagName("getSendingOptions");
+            NodeList msgNodes = body.getElementsByTagName(DEFAULT_REQUEST_ELEMENT_NAME);
             if (msgNodes.getLength() > 0) {
                 Element msgNode = (Element) msgNodes.item(0);
                 NodeList bodyNodes = msgNode.getElementsByTagName("keha");

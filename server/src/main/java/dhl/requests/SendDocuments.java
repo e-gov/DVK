@@ -330,7 +330,8 @@ public class SendDocuments {
         return result;
     }
 
-    public static RequestInternalResult V2(org.apache.axis.MessageContext context, Connection conn, UserProfile user, OrgSettings hostOrgSettings, XRoadProtocolHeader xTeePais) throws Exception, ParserConfigurationException {
+    public static RequestInternalResult V2(org.apache.axis.MessageContext context, Connection conn, UserProfile user, OrgSettings hostOrgSettings, XRoadProtocolHeader xTeePais)
+    		throws Exception, ParserConfigurationException {
 
         logger.info("SendDocuments.V2 invoked.");
 

@@ -17,9 +17,13 @@ import dhl.users.Ametikoht;
 import dhl.users.Asutus;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
+import dvk.core.xroad.XRoadProtocolHeader;
 import dvk.core.xroad.XRoadProtocolVersion;
 
 public class getSendingOptionsV3ResponseType implements SOAPOutputBodyRepresentation {
+	
+	private static final String DEFAULT_RESPONSE_ELEMENT_NAME = "getSendingOptionsResponse";
+	
     public getSendingOptionsV3RequestType paring;
     public String kehaHref;
     public String responseFile;
@@ -32,7 +36,7 @@ public class getSendingOptionsV3ResponseType implements SOAPOutputBodyRepresenta
         dataMd5Hash = "";
     }
 
-    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolVersion xRoadProtocolVersion) {
+    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolHeader xRoadProtocolHeader) {
         try {
             // get SOAP envelope from SOAP message
             org.apache.axis.message.SOAPEnvelope se = msg.getSOAPEnvelope();
@@ -43,10 +47,16 @@ public class getSendingOptionsV3ResponseType implements SOAPOutputBodyRepresenta
             if (items.hasNext()) {
                 body.removeContents();
             }
-
-            SOAPBodyElement element = body.addBodyElement(se.createName("getSendingOptionsResponse", CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_URI));
             
-            if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+            String responseElementName = DEFAULT_RESPONSE_ELEMENT_NAME;
+            // FIXME Currently (29.07.2016) the WSDL has no related element definitions
+            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
+            	responseElementName = getSendingOptionsRequestType.DEFAULT_REQUEST_ELEMENT_NAME + "V3" + SOAPOutputBodyRepresentation.RESPONSE;;
+            }
+            
+            SOAPBodyElement element = body.addBodyElement(se.createName(responseElementName, CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_URI));
+            
+            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
 	            SOAPElement elParing = element.addChildElement(se.createName("paring"));
 	            elParing.addTextNode(this.dataMd5Hash);
             }

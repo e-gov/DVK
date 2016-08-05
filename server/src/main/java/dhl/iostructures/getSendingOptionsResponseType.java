@@ -61,8 +61,10 @@ public class getSendingOptionsResponseType implements SOAPOutputBodyRepresentati
             }
 	            
             SOAPElement elKeha = element.addChildElement("keha", "");
-            elKeha.addAttribute(se.createName("type", CommonStructures.NS_XSI_PREFIX, CommonStructures.NS_XSI_URI), "SOAP-ENC:Array");
-            elKeha.addAttribute(se.createName("arrayType", CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI), "dhl:asutus[" + String.valueOf(asutused.size()) + "]");
+            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
+            	elKeha.addAttribute(se.createName("type", CommonStructures.NS_XSI_PREFIX, CommonStructures.NS_XSI_URI), "SOAP-ENC:Array");
+            	elKeha.addAttribute(se.createName("arrayType", CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI), "dhl:asutus[" + String.valueOf(asutused.size()) + "]");
+            }
 
             Asutus org;
             for (int i = 0; i < asutused.size(); ++i) {

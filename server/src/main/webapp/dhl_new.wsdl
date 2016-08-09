@@ -747,7 +747,7 @@
 		
 		<operation name="getSendingOptions">
 			<xrd:version>v1</xrd:version>
-			<soap:operation soapAction="http://producers.dhl.xrd.riik.ee/producer/dhl/getSendingOptions" style="document"/>
+			<soap:operation style="document"/>
 			<input name="getSendingOptions">
 				<soap:body parts="parameters" use="literal" />
 				<soap:header message="tns:requestHeader" part="client" use="literal" />
@@ -768,7 +768,7 @@
 			</output>
 		</operation>
 		<operation name="getSendingOptionsV2">
-			<soap:operation soapAction="http://producers.dhl.xrd.riik.ee/producer/dhl/getSendingOptionsV2" style="document"/>
+			<soap:operation style="document"/>
 			<xrd:version>v2</xrd:version>
 			<input name="getSendingOptionsV2">
 				<soap:body parts="parameters" use="literal" />
@@ -790,7 +790,7 @@
 			</output>
 		</operation>
 		<operation name="sendDocuments">
-			<soap:operation soapAction="http://producers.dhl.xrd.riik.ee/producer/dhl/sendDocuments" style="document"/>
+			<soap:operation style="document"/>
 			<xrd:version>v1</xrd:version>
 			<input name="sendDocuments">
 				<mime:multipartRelated>
@@ -820,7 +820,7 @@
 			</output>
 		</operation>
 		<operation name="sendDocumentsV2">
-			<soap:operation  soapAction="http://producers.dhl.xrd.riik.ee/producer/dhl/sendDocumentsV2" style="document"/>
+			<soap:operation style="document"/>
 			<xrd:version>v2</xrd:version>
 			<input name="sendDocumentsV2">
 				<mime:multipartRelated>
@@ -850,7 +850,7 @@
 			</output>
 		</operation>
 		<operation name="receiveDocuments">
-			<soap:operation soapAction="http://producers.dhl.xrd.riik.ee/producer/dhl/receiveDocuments" style="document"/>
+			<soap:operation style="document"/>
 			<xrd:version>v1</xrd:version>
 			<input name="receiveDocuments">
 				<soap:body parts="parameters" use="literal" />
@@ -876,7 +876,7 @@
 			</output>
 		</operation>
 		<operation name="receiveDocumentsV2">
-			<soap:operation soapAction="http://producers.dhl.xrd.riik.ee/producer/dhl/receiveDocumentsV2" style="document"/>
+			<soap:operation style="document"/>
 			<xrd:version>v2</xrd:version>
 			<input name="receiveDocumentsV2">
 				<soap:body parts="parameters" use="literal" />
@@ -902,7 +902,7 @@
 			</output>
 		</operation>
 		<operation name="markDocumentsReceived">
-			<soap:operation soapAction="http://producers.dhl.xrd.riik.ee/producer/dhl/markDocumentsReceived" style="document"/>
+			<soap:operation style="document"/>
 			<xrd:version>v1</xrd:version>
 			<input name="markDocumentsReceived">
 				<mime:multipartRelated>
@@ -928,7 +928,7 @@
 			</output>
 		</operation>
 		<operation name="markDocumentsReceivedV2">
-			<soap:operation soapAction="http://producers.dhl.xrd.riik.ee/producer/dhl/markDocumentsReceivedV2" style="document"/>
+			<soap:operation style="document"/>
 			<xrd:version>v2</xrd:version>
 			<input name="markDocumentsReceivedV2">
 				<mime:multipartRelated>
@@ -954,7 +954,7 @@
 			</output>
 		</operation>
 		<operation name="getSendStatus">
-			<soap:operation soapAction="http://producers.dhl.xrd.riik.ee/producer/dhl/getSendStatus" style="document"/>
+			<soap:operation style="document"/>
 			<xrd:version>v1</xrd:version>
 			<input>
 				<mime:multipartRelated>
@@ -984,7 +984,7 @@
 			</output>
 		</operation>
 		<operation name="deleteOldDocuments">
-			<soap:operation soapAction="http://producers.dhl.xrd.riik.ee/producer/dhl/deleteOldDocuments" style="document"/>
+			<soap:operation style="document"/>
 			<xrd:version>v1</xrd:version>
 			<input>
 				<soap:body parts="parameters" use="literal" />
@@ -1006,7 +1006,7 @@
 			</output>
 		</operation>
 		<operation name="changeOrganizationData">
-			<soap:operation soapAction="http://producers.dhl.xrd.riik.ee/producer/dhl/changeOrganizationData" style="document"/>
+			<soap:operation style="document"/>
 			<xrd:version>v1</xrd:version>
 			<input>
 				<soap:body parts="parameters" use="literal" />
@@ -1028,7 +1028,7 @@
 			</output>
 		</operation>
 		<operation name="runSystemCheck">
-			<soap:operation soapAction="http://producers.dhl.xrd.riik.ee/producer/dhl/runSystemCheck" style="document"/>
+			<soap:operation style="document"/>
 			<xrd:version>v1</xrd:version>
 			<input>
 				<soap:body parts="parameters" use="literal" />
@@ -1050,7 +1050,7 @@
 			</output>
 		</operation>
 		<operation name="getOccupationList">
-			<soap:operation soapAction="http://producers.dhl.xrd.riik.ee/producer/dhl/getOccupationList" style="document"/>
+			<soap:operation style="document"/>
 			<xrd:version>v1</xrd:version>
 			<input>
 				<soap:body parts="parameters" use="literal" />
@@ -1072,7 +1072,7 @@
 			</output>
 		</operation>
 		<operation name="getSubdivisionList">
-			<soap:operation soapAction="http://producers.dhl.xrd.riik.ee/producer/dhl/getSubdivisionList" style="document"/>
+			<soap:operation style="document"/>
 			<xrd:version>v1</xrd:version>
 			<input>
 				<soap:body parts="parameters" use="literal" />

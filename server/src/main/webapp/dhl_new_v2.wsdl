@@ -22,6 +22,26 @@
 				<attribute name="href" type="ref:swaRef" />
             </complexType>
             
+            <simpleType name="GUID">
+				<annotation>
+					<documentation xml:lang="en">The representation of a GUID</documentation>
+				</annotation>
+				<restriction base="string">
+					<pattern value="\{[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}\}" />
+				</restriction>
+			</simpleType>
+			
+			<simpleType name="statusType">
+				<annotation>
+					<documentation>Info dokumendi edastuse oleku kohta</documentation>
+				</annotation>
+				<restriction base="string">
+					<enumeration value="saatmisel" />
+					<enumeration value="saadetud" />
+					<enumeration value="katkestatud" />
+				</restriction>
+			</simpleType>
+            
 			<complexType name="institutionRefsArrayType">
 				<sequence>
 					<element name="asutus" type="string" maxOccurs="unbounded">
@@ -33,29 +53,6 @@
 					</element>
 				</sequence>
 			</complexType>
-			
-			<element name="getSendingOptions">
-				<complexType>
-					<sequence>
-						<element name="keha" type="tns:institutionRefsArrayType" />
-					</sequence>
-				</complexType>
-			</element>
-			<element name="getOccupationList">
-				<complexType>
-					<sequence>
-						<element name="keha" type="tns:institutionRefsArrayType" />
-					</sequence>
-				</complexType>
-			</element>
-			<element name="getSubdivisionList">
-				<complexType>
-					<sequence>
-						<element name="keha" type="tns:institutionRefsArrayType" />
-					</sequence>
-				</complexType>
-			</element>
-
 			<complexType name="sendingOptionArrayType">
 				<sequence>
 					<element name="saatmisviis" type="string" maxOccurs="unbounded">
@@ -75,14 +72,6 @@
 					<element name="ks_asutuse_regnr" type="string" minOccurs="0" maxOccurs="1"/>
 				</sequence>
 			</complexType>
-			
-			<element name="getSendingOptionsResponse">
-				<complexType>
-					<sequence>
-						<element name="keha" type="tns:institutionArrayType" />
-					</sequence>
-				</complexType>
-			</element>
 			<complexType name="institutionArrayType">
 				<sequence>
 					<element name="asutus" type="tns:institutionType" maxOccurs="unbounded">
@@ -94,22 +83,42 @@
 					</element>
 				</sequence>
 			</complexType>
+			<complexType name="getSendingOptionsV2RequestType">
+				<sequence>
+					<element name="asutused" type="tns:institutionRefsArrayType" minOccurs="0" maxOccurs="1"/>
+					<element name="vastuvotmata_dokumente_ootel" type="boolean" minOccurs="0" maxOccurs="1"/>
+					<element name="vahetatud_dokumente_vahemalt" type="integer" minOccurs="0" maxOccurs="1"/>
+					<element name="vahetatud_dokumente_kuni" type="integer" minOccurs="0" maxOccurs="1"/>
+				</sequence>
+			</complexType>
 			
-			<element name="getOccupationListResponse">
+			<element name="getOccupationList">
 				<complexType>
 					<sequence>
-						<element name="keha" type="tns:occupationArrayType" />
+						<element name="keha" type="tns:institutionRefsType" />
 					</sequence>
 				</complexType>
 			</element>
-			<complexType name="occupationArrayType">
+			<element name="getOccupationListResponse">
+				<complexType>
+					<sequence>
+						<element name="keha" type="tns:getOccupationListV2ResponseType" />
+					</sequence>
+				</complexType>
+			</element>
+			<complexType name="getOccupationListV2ResponseType">
 				<sequence>
-					<element name="ametikoht" type="tns:occupationType" maxOccurs="unbounded">
-						<annotation>
-							<appinfo>
-								<xrd:title>Ametikoha andmed</xrd:title>
-							</appinfo>
-						</annotation>
+					<element name="asutused" type="tns:base64BinaryType" />
+				</sequence>
+			</complexType>
+			<complexType name="getOccupationListV2ResponseTypeUnencoded">
+				<sequence>
+					<element name="ametikohad">
+						<complexType>
+							<sequence>
+								<element name="ametikoht" type="tns:occupationType" maxOccurs="unbounded" />
+							</sequence>
+						</complexType>
 					</element>
 				</sequence>
 			</complexType>
@@ -123,21 +132,33 @@
 				</sequence>
 			</complexType>
 			
-			<element name="getSubdivisionListResponse">
+			<element name="getSubdivisionList">
 				<complexType>
 					<sequence>
-						<element name="keha" type="tns:subdivisionArrayType" />
+						<element name="keha" type="tns:institutionRefsType" />
 					</sequence>
 				</complexType>
 			</element>
-			<complexType name="subdivisionArrayType">
+			<element name="getSubdivisionListResponse">
+				<complexType>
+					<sequence>
+						<element name="keha" type="tns:getSubdivisionListV2ResponseType" />
+					</sequence>
+				</complexType>
+			</element>
+			<complexType name="getSubdivisionListV2ResponseType">
 				<sequence>
-					<element name="allyksus" type="tns:subdivisionType" maxOccurs="unbounded">
-						<annotation>
-							<appinfo>
-								<xrd:title>Allüksuse andmed</xrd:title>
-							</appinfo>
-						</annotation>
+					<element name="allyksused" type="tns:base64BinaryType" />
+				</sequence>
+			</complexType>
+			<complexType name="getSubdivisionListV2ResponseTypeUnencoded">
+				<sequence>
+					<element name="allyksused">
+						<complexType>
+							<sequence>
+								<element name="allyksus" type="tns:subdivisionType" maxOccurs="unbounded" />
+							</sequence>
+						</complexType>
 					</element>
 				</sequence>
 			</complexType>
@@ -150,6 +171,38 @@
 					<element name="ks_allyksuse_kood" type="string" minOccurs="0" maxOccurs="1"/>
 				</sequence>
 			</complexType>
+			
+			<complexType name="institutionRefsType">
+				<sequence>
+					<element name="asutused" type="tns:base64BinaryType" />
+				</sequence>
+			</complexType>
+			<complexType name="institutionRefsTypeUnencoded">
+				<sequence>
+					<element name="asutused">
+						<complexType>
+							<complexContent>
+								<extension base="tns:institutionRefsArrayType" />
+							</complexContent>
+						</complexType>
+					</element>
+				</sequence>
+			</complexType>
+			
+			<element name="getSendingOptions">
+				<complexType>
+					<sequence>
+						<element name="keha" type="tns:getSendingOptionsV2RequestType" />
+					</sequence>
+				</complexType>
+			</element>
+			<element name="getSendingOptionsResponse">
+				<complexType>
+					<sequence>
+						<element name="keha" type="tns:institutionArrayType" />
+					</sequence>
+				</complexType>
+			</element>
 			
 			<complexType name="documentRefsArrayType">
 				<sequence>
@@ -173,29 +226,24 @@
 					</element>
 				</sequence>
 			</complexType>
-			
-			<element name="receiveDocuments">
-				<complexType>
-					<sequence>
-						<element name="keha" type="tns:receiveDocumentsRequestType" />
-					</sequence>
-				</complexType>
-			</element>
-			<complexType name="receiveDocumentsRequestType">
+			<complexType name="tagasisideArrayType">
 				<sequence>
-					<element name="arv" type="integer" minOccurs="0">
+					<element name="item" maxOccurs="unbounded">
 						<annotation>
 							<appinfo>
-								<xrd:title>Maksimaalne tagastatav kirjete arv, vaikimisi 10</xrd:title>
+								<xrd:title>Adressaadipoolne tagasiside dokumendi vastuvõtmise kohta</xrd:title>
 							</appinfo>
 						</annotation>
-					</element>
-					<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0">
-						<annotation>
-							<appinfo>
-								<xrd:title>Kaust, kust dokumentid loetakse</xrd:title>
-							</appinfo>
-						</annotation>
+						<complexType>
+							<complexContent>
+								<extension base="dhl:tagasisideType">
+									<sequence>
+										<element ref="dhl:metaxml" minOccurs="0" maxOccurs="1" />
+										<element name="staatuse_muutmise_aeg" type="dateTime" minOccurs="0" maxOccurs="1" />
+									</sequence>
+								</extension>
+							</complexContent>
+						</complexType>
 					</element>
 				</sequence>
 			</complexType>
@@ -213,22 +261,51 @@
 				</complexContent>
 			</complexType>
 			
-			<element name="markDocumentsReceived">
+			<element name="receiveDocuments">
 				<complexType>
 					<sequence>
-						<element name="keha" type="tns:markDocumentsReceivedRequestType" />
+						<element name="keha" type="tns:receiveDocumentsV2RequestType" />
 					</sequence>
 				</complexType>
 			</element>
-			<complexType name="markDocumentsReceivedRequestType">
+			<complexType name="receiveDocumentsV2RequestType">
+				<sequence>
+					<element name="arv" type="integer" minOccurs="0">
+						<annotation>
+							<appinfo>
+								<xrd:title>Maksimaalne tagastatav kirjete arv, vaikimisi 10</xrd:title>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0">
+						<annotation>
+							<appinfo>
+								<xrd:title>Kaust, kust dokumentid loetakse</xrd:title>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="edastus_id" type="string" minOccurs="0"/>
+					<element name="fragment_nr" type="integer" minOccurs="0"/>
+					<element name="fragmendi_suurus_baitides" type="integer" minOccurs="0"/>
+				</sequence>
+			</complexType>
+			
+			<element name="markDocumentsReceived">
+				<complexType>
+					<sequence>
+						<element name="keha" type="tns:markDocumentsReceivedV2RequestType" />
+					</sequence>
+				</complexType>
+			</element>
+			<complexType name="markDocumentsReceivedV2RequestType">
 				<sequence>
 					<element name="dokumendid" type="tns:base64BinaryType"/>
 					<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0"/>
 				</sequence>
 			</complexType>
-			<complexType name="markDocumentsReceivedRequestTypeUnencoded">
+			<complexType name="markDocumentsReceivedV2RequestTypeUnencoded">
 				<sequence>
-					<element name="dokumendid" type="tns:documentRefsArrayType"/>
+					<element name="dokumendid" type="tns:tagasisideArrayType"/>
 					<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0"/>
 				</sequence>
 			</complexType>
@@ -236,31 +313,39 @@
 			<element name="markDocumentsReceivedResponse">
 				<complexType>
 					<sequence>
-						<element name="keha" type="tns:markDocumentsReceivedResponseType" />
+						<element name="keha" type="tns:markDocumentsReceivedV2ResponseType" />
 					</sequence>
 				</complexType>
 			</element>
-			<simpleType name="markDocumentsReceivedResponseType">
+			<simpleType name="markDocumentsReceivedV2ResponseType">
 				<restriction base="string"/>
 			</simpleType>
 			
 			<element name="sendDocuments">
 				<complexType>
 					<sequence>
-						<element name="keha" type="tns:sendDocumentsRequestType" />
+						<element name="keha" type="tns:sendDocumentsV2RequestType" />
 					</sequence>
 				</complexType>
 			</element>
-			<complexType name="sendDocumentsRequestType">
+			<complexType name="sendDocumentsV2RequestType">
 				<sequence>
 					<element name="dokumendid" type="tns:base64BinaryType"/>
 					<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0"/>
+					<element name="sailitustahtaeg" type="date" minOccurs="0"/>
+					<element name="edastus_id" type="string" minOccurs="0"/>
+					<element name="fragment_nr" type="integer" minOccurs="0"/>
+					<element name="fragmente_kokku" type="integer" minOccurs="0"/>
 				</sequence>
 			</complexType>
-			<complexType name="sendDocumentsRequestTypeUnencoded">
+			<complexType name="sendDocumentsV2RequestTypeUnencoded">
 				<sequence>
 					<element name="dokumendid" type="tns:documentsArrayType"/>
 					<element name="kaust" type="dhlma:dhlDokTaisnimiType" minOccurs="0"/>
+					<element name="sailitustahtaeg" type="date" minOccurs="0"/>
+					<element name="edastus_id" type="string" minOccurs="0"/>
+					<element name="fragment_nr" type="integer" minOccurs="0"/>
+					<element name="fragmente_kokku" type="integer" minOccurs="0"/>
 				</sequence>
 			</complexType>
 			
@@ -271,7 +356,7 @@
 					</sequence>
 				</complexType>
 			</element>
-			<complexType name="sendDocumentsResponseTypeUnencoded">
+			<complexType name="sendDocumentsV2ResponseTypeUnencoded">
 				<complexContent>
 					<extension base="tns:documentRefsArrayType"/>
 				</complexContent>
@@ -280,14 +365,28 @@
 			<element name="getSendStatus">
 				<complexType>
 					<sequence>
-						<element name="keha" type="tns:base64BinaryType" />
+						<element name="keha" type="tns:getSendStatusV2Request" />
 					</sequence>
 				</complexType>
 			</element>
-			<complexType name="getSendStatusRequestTypeUnencoded">
-				<complexContent>
-					<extension base="tns:documentRefsArrayType"/>
-				</complexContent>
+			<complexType name="getSendStatusV2Request">
+				<sequence>
+					<element name="dokumendid" type="tns:base64BinaryType" />
+					<element name="staatuse_ajalugu" type="boolean" />
+				</sequence>
+			</complexType>
+			<complexType name="getSendStatusV2RequestTypeUnencoded">
+				<sequence>
+					<element name="item" maxOccurs="unbounded">
+						<complexType>
+							<choice>
+								<element name="dhl_id" type="string" />
+								<element name="dokument_guid" type="tns:GUID" />
+							</choice>
+						</complexType>
+					</element>
+					<element name="staatuse_ajalugu" type="boolean" />
+				</sequence>
 			</complexType>
 			
 			<element name="getSendStatusResponse">
@@ -297,178 +396,97 @@
 					</sequence>
 				</complexType>
 			</element>
-			<complexType name="getSendStatusResponseTypeUnencoded">
+			<complexType name="getSendStatusV2ResponseTypeUnencoded">
 				<sequence>
 					<element name="item" maxOccurs="unbounded">
 						<complexType>
 							<sequence>
 								<element ref="dhlma:dhl_id"/>
 								<element ref="dhl:edastus" minOccurs="0" maxOccurs="unbounded"/>
+								<element name="staatuse_ajalugu" type="tns:statusHistoryType" />
 								<element name="olek" type="string"/>
 							</sequence>
 						</complexType>
 					</element>
 				</sequence>
 			</complexType>
-			
-			<element name="deleteOldDocuments">
-				<complexType>
-					<sequence>
-						<element name="keha">
-							<complexType />
-						</element>
-					</sequence>
-				</complexType>
-			</element>
-			<element name="deleteOldDocumentsResponse">
-				<complexType>
-					<sequence>
-						<element name="keha" type="tns:deleteOldDocumentsResponseType" />
-					</sequence>
-				</complexType>
-			</element>
-			<simpleType name="deleteOldDocumentsResponseType">
-				<restriction base="string"/>
-			</simpleType>
-			
-			<element name="changeOrganizationData">
-				<complexType>
-					<sequence>
-						<element name="keha" type="tns:changeOrganizationDataRequestType" />
-					</sequence>
-				</complexType>
-			</element>
-			<complexType name="changeOrganizationDataRequestType">
+			<complexType name="statusHistoryType">
 				<sequence>
-					<element name="registrikood" type="string" minOccurs="1"/>
-					<element name="endine_registrikood" type="string" minOccurs="0"/>
-					<element name="korgemalseisva_asutuse_registrikood" type="string" minOccurs="0"/>
-					<element name="nimi" type="string" minOccurs="0"/>
-					<element name="nime_lyhend" type="string" minOccurs="0"/>
-					<element name="liik1" type="string" minOccurs="0"/>
-					<element name="liik2" type="string" minOccurs="0"/>
-					<element name="tegevusala" type="string" minOccurs="0"/>
-					<element name="tegevuspiirkond" type="string" minOccurs="0"/>
-					<element name="maakond" type="string" minOccurs="0"/>
-					<element name="asukoht" type="string" minOccurs="0"/>
-					<element name="aadress" type="string" minOccurs="0"/>
-					<element name="postikood" type="string" minOccurs="0"/>
-					<element name="telefon" type="string" minOccurs="0"/>
-					<element name="faks" type="string" minOccurs="0"/>
-					<element name="e_post" type="string" minOccurs="0"/>
-					<element name="www" type="string" minOccurs="0"/>
-					<element name="logo" type="string" minOccurs="0"/>
-					<element name="asutamise_kuupaev" type="date" minOccurs="0"/>
-					<element name="moodustamise_akti_nimi" type="string" minOccurs="0"/>
-					<element name="moodustamise_akti_number" type="string" minOccurs="0"/>
-					<element name="moodustamise_akti_kuupaev" type="date" minOccurs="0"/>
-					<element name="pohimaaruse_akti_nimi" type="string" minOccurs="0"/>
-					<element name="pohimaaruse_akti_number" type="string" minOccurs="0"/>
-					<element name="pohimaaruse_kinnitamise_kuupaev" type="date" minOccurs="0"/>
-					<element name="pohimaaruse_kande_kuupaev" type="date" minOccurs="0"/>
-					<element name="parameetrid" type="string" minOccurs="0"/>
-					<element name="dvk_saatmine" type="boolean" minOccurs="0"/>
-					<element name="dvk_otse_saatmine" type="boolean" minOccurs="0"/>
-					<element name="toetatav_dvk_versioon" type="string" minOccurs="0"/>
-					<element name="dokumendihaldussysteemi_nimetus" type="string" minOccurs="0"/>
+					<element name="status" maxOccurs="unbounded">
+						<complexType>
+							<sequence>
+								<element name="saaja">
+									<complexType>
+										<all>
+											<element ref="dhl:regnr" minOccurs="0"/>
+      										<element ref="dhl:isikukood" minOccurs="0"/>
+      										<element name="allyksuse_lyhinimetus" type="string" minOccurs="0"/>
+      										<element name="ametikoha_lyhinimetus" type="string" minOccurs="0"/>
+										</all>
+									</complexType>
+								</element>
+								<element name="staatuse_ajalugu_id" type="integer" />
+								<element name="staatuse_muutmise_aeg" type="dateTime" />
+								<element name="staatus" type="tns:statusType" />
+								<element name="vastuvotja_staatus_id" type="integer">
+									<annotation>
+										<documentation>Info dokumendile vastuvõtja poolel määratud oleku kohta</documentation>
+									</annotation>
+								</element>
+								<element ref="dhl:metaxml" minOccurs="0" />
+								<element ref="dhl:fault" minOccurs="0" />
+							</sequence>
+						</complexType>
+					</element>
 				</sequence>
 			</complexType>
-			
-			<element name="changeOrganizationDataResponse">
-				<complexType>
-					<sequence>
-						<element name="keha" type="tns:changeOrganizationDataResponseType" />
-					</sequence>
-				</complexType>
-			</element>
-			<simpleType name="changeOrganizationDataResponseType">
-				<restriction base="string"/>
-			</simpleType>
-			
-			<element name="runSystemCheck">
-				<complexType>
-					<sequence>
-						<element name="keha">
-							<complexType />
-						</element>
-					</sequence>
-				</complexType>
-			</element>
-			
-			<element name="runSystemCheckResponse">
-				<complexType>
-					<sequence>
-						<element name="keha" type="tns:runSystemCheckResponseType" />
-					</sequence>
-				</complexType>
-			</element>
-			<simpleType name="runSystemCheckResponseType">
-				<restriction base="string"/>
-			</simpleType>
 			
 		</schema>
 	</types>
 	
-	<message name="getSendingOptions">
+	<message name="getSendingOptionsV2">
 		<part name="parameters" element="tns:getSendingOptions"/>
 	</message>
-	<message name="getSendingOptionsResponse">
+	<message name="getSendingOptionsV2Response">
 		<part name="parameters" element="tns:getSendingOptionsResponse"/>
 	</message>
-	<message name="receiveDocuments">
+	<message name="receiveDocumentsV2">
 		<part name="parameters" element="tns:receiveDocuments"/>
 	</message>
-	<message name="receiveDocumentsResponse">
+	<message name="receiveDocumentsV2Response">
 		<part name="parameters" element="tns:receiveDocumentsResponse"/>
 	</message>
-	<message name="sendDocuments">
+	<message name="sendDocumentsV2">
 		<part name="parameters" element="tns:sendDocuments"/>
 	</message>
-	<message name="sendDocumentsResponse">
+	<message name="sendDocumentsV2Response">
 		<part name="parameters" element="tns:sendDocumentsResponse"/>
 	</message>
-	<message name="markDocumentsReceived">
+	<message name="markDocumentsReceivedV2">
 		<part name="parameters" element="tns:markDocumentsReceived"/>
 	</message>
-	<message name="markDocumentsReceivedResponse">
+	<message name="markDocumentsReceivedV2Response">
 		<part name="parameters" element="tns:markDocumentsReceivedResponse"/>
 	</message>
-	<message name="getSendStatus">
+	<message name="getSendStatusV2">
 		<part name="parameters" element="tns:getSendStatus"/>
 	</message>
-	<message name="getSendStatusResponse">
+	<message name="getSendStatusV2Response">
 		<part name="parameters" element="tns:getSendStatusResponse"/>
 	</message>
-	<message name="deleteOldDocuments">
-		<part name="parameters" element="tns:deleteOldDocuments"/>
-	</message>
-	<message name="deleteOldDocumentsResponse">
-		<part name="parameters" element="tns:deleteOldDocumentsResponse"/>
-	</message>
-	<message name="changeOrganizationData">
-		<part name="parameters" element="tns:changeOrganizationData"/>
-	</message>
-	<message name="changeOrganizationDataResponse">
-		<part name="parameters" element="tns:changeOrganizationDataResponse"/>
-	</message>
-	<message name="runSystemCheck">
-		<part name="parameters" element="tns:runSystemCheck"/>
-	</message>
-	<message name="runSystemCheckResponse">
-		<part name="parameters" element="tns:runSystemCheckResponse"/>
-	</message>
-	<message name="getOccupationList">
+	<message name="getOccupationListV2">
 		<part name="parameters" element="tns:getOccupationList"/>
 	</message>
-	<message name="getOccupationListResponse">
+	<message name="getOccupationListV2Response">
 		<part name="parameters" element="tns:getOccupationListResponse"/>
 	</message>
-	<message name="getSubdivisionList">
+	<message name="getSubdivisionListV2">
 		<part name="parameters" element="tns:getSubdivisionList"/>
 	</message>
-	<message name="getSubdivisionListResponse">
+	<message name="getSubdivisionListV2Response">
 		<part name="parameters" element="tns:getSubdivisionListResponse"/>
 	</message>
+	
 	<message name="requestHeader">
 		<part name="client" element="xrd:client" />
 		<part name="service" element="xrd:service" />
@@ -484,80 +502,56 @@
 				<xrd:title>Asutuste saatmisviisid</xrd:title>
 				<xrd:notes>Asutste toetatavate saatmisviiside loetelu</xrd:notes>
 			</documentation>
-			<input message="tns:getSendingOptions" name="getSendingOptions"/>
-			<output message="tns:getSendingOptionsResponse" name="getSendingOptionsResponse"/>
+			<input message="tns:getSendingOptionsV2" name="getSendingOptionsV2"/>
+			<output message="tns:getSendingOptionsV2Response" name="getSendingOptionsV2Response"/>
 		</operation>
 		<operation name="sendDocuments">
 			<documentation>
 				<xrd:title>Dokumentide edastamine</xrd:title>
 				<xrd:notes>Dokumentide edastamine dokumendihoidlasse</xrd:notes>
 			</documentation>
-			<input message="tns:sendDocuments" name="sendDocuments"/>
-			<output message="tns:sendDocumentsResponse"  name="sendDocumentsResponse"/>
+			<input message="tns:sendDocumentsV2" name="sendDocumentsV2"/>
+			<output message="tns:sendDocumentsV2Response"  name="sendDocumentsV2Response"/>
 		</operation>
 		<operation name="receiveDocuments">
 			<documentation>
 				<xrd:title>Uute dokumentide lugemine</xrd:title>
 				<xrd:notes>Uute veel lugemata saabunud dokumentide allalaadimine dokumendihoidlast</xrd:notes>
 			</documentation>
-			<input message="tns:receiveDocuments" name="receiveDocuments"/>
-			<output message="tns:receiveDocumentsResponse" name="receiveDocumentsResponse"/>
+			<input message="tns:receiveDocumentsV2" name="receiveDocumentsV2"/>
+			<output message="tns:receiveDocumentsV2Response" name="receiveDocumentsV2Response"/>
 		</operation>
 		<operation name="markDocumentsReceived">
 			<documentation>
 				<xrd:title>Uute dokumentide loetuks märkimine</xrd:title>
 				<xrd:notes>Uute saabunud dokumentide loetuks märkimine</xrd:notes>
 			</documentation>
-			<input message="tns:markDocumentsReceived" name="markDocumentsReceived"/>
-			<output message="tns:markDocumentsReceivedResponse" name="markDocumentsReceivedResponse"/>
+			<input message="tns:markDocumentsReceivedV2" name="markDocumentsReceivedV2"/>
+			<output message="tns:markDocumentsReceivedV2Response" name="markDocumentsReceivedV2Response"/>
 		</operation>
 		<operation name="getSendStatus">
 			<documentation>
 				<xrd:title>Saadetud dokumentide oleku kontrollimine</xrd:title>
 				<xrd:notes>Kontrollib, kas saadetud dokumendid on kõigile adressaatidele edukalt edastatud</xrd:notes>
 			</documentation>
-			<input message="tns:getSendStatus"/>
-			<output message="tns:getSendStatusResponse"/>
-		</operation>
-		<operation name="deleteOldDocuments">
-			<documentation>
-				<xrd:title>Aegunud dokumentide kustutamine</xrd:title>
-				<xrd:notes>Kustutab dokumendid, mille säilitustähtaeg on möödas</xrd:notes>
-			</documentation>
-			<input message="tns:deleteOldDocuments"/>
-			<output message="tns:deleteOldDocumentsResponse"/>
-		</operation>
-		<operation name="changeOrganizationData">
-			<documentation>
-				<xrd:title>Asutuse andmete muutmine</xrd:title>
-				<xrd:notes>Asutuse andmete muutmine</xrd:notes>
-			</documentation>
-			<input message="tns:changeOrganizationData"/>
-			<output message="tns:changeOrganizationDataResponse"/>
-		</operation>
-		<operation name="runSystemCheck">
-			<documentation>
-				<xrd:title>Serveri toimimise kontroll</xrd:title>
-				<xrd:notes>Kontrollib, kas DVK serveri põhifunktsionaalsus toimib</xrd:notes>
-			</documentation>
-			<input message="tns:runSystemCheck"/>
-			<output message="tns:runSystemCheckResponse"/>
+			<input message="tns:getSendStatusV2" name="getSendStatusV2"/>
+			<output message="tns:getSendStatusV2Response" name="getSendStatusV2Response" />
 		</operation>
 		<operation name="getOccupationList">
 			<documentation>
 				<xrd:title>Ametikohtade nimekiri</xrd:title>
 				<xrd:notes>Ametikohtade nimekirja laadimine</xrd:notes>
 			</documentation>
-			<input message="tns:getOccupationList"/>
-			<output message="tns:getOccupationListResponse"/>
+			<input message="tns:getOccupationListV2"/>
+			<output message="tns:getOccupationListV2Response"/>
 		</operation>
 		<operation name="getSubdivisionList">
 			<documentation>
 				<xrd:title>Allüksuste nimekiri</xrd:title>
 				<xrd:notes>Allüksuste nimekirja laadimine</xrd:notes>
 			</documentation>
-			<input message="tns:getSubdivisionList"/>
-			<output message="tns:getSubdivisionListResponse"/>
+			<input message="tns:getSubdivisionListV2"/>
+			<output message="tns:getSubdivisionListV2Response"/>
 		</operation>
 	</portType>
 	
@@ -565,9 +559,9 @@
 		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
 		
 		<operation name="getSendingOptions">
-			<xrd:version>v1</xrd:version>
 			<soap:operation style="document"/>
-			<input name="getSendingOptions">
+			<xrd:version>v2</xrd:version>
+			<input name="getSendingOptionsV2">
 				<soap:body parts="parameters" use="literal" />
 				<soap:header message="tns:requestHeader" part="client" use="literal" />
 				<soap:header message="tns:requestHeader" part="service" use="literal" />
@@ -576,7 +570,7 @@
 				<soap:header message="tns:requestHeader" part="issue" use="literal" />
 				<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
 			</input>
-			<output name="getSendingOptionsResponse">
+			<output name="getSendingOptionsV2Response">
 				<soap:body parts="parameters" use="literal" />
 				<soap:header message="tns:requestHeader" part="client" use="literal" />
 				<soap:header message="tns:requestHeader" part="service" use="literal" />
@@ -588,11 +582,11 @@
 		</operation>
 		<operation name="sendDocuments">
 			<soap:operation style="document"/>
-			<xrd:version>v1</xrd:version>
-			<input name="sendDocuments">
+			<xrd:version>v2</xrd:version>
+			<input name="sendDocumentsV2">
 				<mime:multipartRelated>
 					<mime:part>
-						<soap:body parts="parameters" use="literal" />
+						<soap:body  use="literal" />
 						<soap:header message="tns:requestHeader" part="client" use="literal" />
 						<soap:header message="tns:requestHeader" part="service" use="literal" />
 						<soap:header message="tns:requestHeader" part="id" use="literal" />
@@ -602,7 +596,7 @@
 					</mime:part>
 				</mime:multipartRelated>
 			</input>
-			<output name="sendDocumentsResponse">
+			<output name="sendDocumentsV2Response">
 				<mime:multipartRelated>
 					<mime:part>
 						<soap:body parts="parameters" use="literal" />
@@ -618,8 +612,8 @@
 		</operation>
 		<operation name="receiveDocuments">
 			<soap:operation style="document"/>
-			<xrd:version>v1</xrd:version>
-			<input name="receiveDocuments">
+			<xrd:version>v2</xrd:version>
+			<input name="receiveDocumentsV2">
 				<soap:body parts="parameters" use="literal" />
 				<soap:header message="tns:requestHeader" part="client" use="literal" />
 				<soap:header message="tns:requestHeader" part="service" use="literal" />
@@ -628,7 +622,7 @@
 				<soap:header message="tns:requestHeader" part="issue" use="literal" />
 				<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
 			</input>
-			<output name="receiveDocumentsResponse">
+			<output name="receiveDocumentsV2Response">
 				<mime:multipartRelated>
 					<mime:part>
 						<soap:body parts="parameters" use="literal" />
@@ -644,8 +638,8 @@
 		</operation>
 		<operation name="markDocumentsReceived">
 			<soap:operation style="document"/>
-			<xrd:version>v1</xrd:version>
-			<input name="markDocumentsReceived">
+			<xrd:version>v2</xrd:version>
+			<input name="markDocumentsReceivedV2">
 				<mime:multipartRelated>
 					<mime:part>
 						<soap:body parts="parameters" use="literal" />
@@ -658,7 +652,7 @@
 					</mime:part>
 				</mime:multipartRelated>
 			</input>
-			<output name="markDocumentsReceivedResponse">
+			<output name="markDocumentsReceivedV2Response">
 				<soap:body parts="parameters" use="literal" />
 				<soap:header message="tns:requestHeader" part="client" use="literal" />
 				<soap:header message="tns:requestHeader" part="service" use="literal" />
@@ -670,8 +664,8 @@
 		</operation>
 		<operation name="getSendStatus">
 			<soap:operation style="document"/>
-			<xrd:version>v1</xrd:version>
-			<input>
+			<xrd:version>v2</xrd:version>
+			<input name="getSendStatusV2">
 				<mime:multipartRelated>
 					<mime:part>
 						<soap:body parts="parameters" use="literal" />
@@ -684,7 +678,7 @@
 					</mime:part>
 				</mime:multipartRelated>
 			</input>
-			<output>
+			<output name="getSendStatusV2Response">
 				<mime:multipartRelated>
 					<mime:part>
 						<soap:body parts="parameters" use="literal" />
@@ -696,77 +690,11 @@
 						<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
 					</mime:part>
 				</mime:multipartRelated>
-			</output>
-		</operation>
-		<operation name="deleteOldDocuments">
-			<soap:operation style="document"/>
-			<xrd:version>v1</xrd:version>
-			<input>
-				<soap:body parts="parameters" use="literal" />
-				<soap:header message="tns:requestHeader" part="client" use="literal" />
-				<soap:header message="tns:requestHeader" part="service" use="literal" />
-				<soap:header message="tns:requestHeader" part="id" use="literal" />
-				<soap:header message="tns:requestHeader" part="userId" use="literal" />
-				<soap:header message="tns:requestHeader" part="issue" use="literal" />
-				<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
-			</input>
-			<output>
-				<soap:body parts="parameters" use="literal" />
-				<soap:header message="tns:requestHeader" part="client" use="literal" />
-				<soap:header message="tns:requestHeader" part="service" use="literal" />
-				<soap:header message="tns:requestHeader" part="id" use="literal" />
-				<soap:header message="tns:requestHeader" part="userId" use="literal" />
-				<soap:header message="tns:requestHeader" part="issue" use="literal" />
-				<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
-			</output>
-		</operation>
-		<operation name="changeOrganizationData">
-			<soap:operation style="document"/>
-			<xrd:version>v1</xrd:version>
-			<input>
-				<soap:body parts="parameters" use="literal" />
-				<soap:header message="tns:requestHeader" part="client" use="literal" />
-				<soap:header message="tns:requestHeader" part="service" use="literal" />
-				<soap:header message="tns:requestHeader" part="id" use="literal" />
-				<soap:header message="tns:requestHeader" part="userId" use="literal" />
-				<soap:header message="tns:requestHeader" part="issue" use="literal" />
-				<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
-			</input>
-			<output>
-				<soap:body parts="parameters" use="literal" />
-				<soap:header message="tns:requestHeader" part="client" use="literal" />
-				<soap:header message="tns:requestHeader" part="service" use="literal" />
-				<soap:header message="tns:requestHeader" part="id" use="literal" />
-				<soap:header message="tns:requestHeader" part="userId" use="literal" />
-				<soap:header message="tns:requestHeader" part="issue" use="literal" />
-				<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
-			</output>
-		</operation>
-		<operation name="runSystemCheck">
-			<soap:operation style="document"/>
-			<xrd:version>v1</xrd:version>
-			<input>
-				<soap:body parts="parameters" use="literal" />
-				<soap:header message="tns:requestHeader" part="client" use="literal" />
-				<soap:header message="tns:requestHeader" part="service" use="literal" />
-				<soap:header message="tns:requestHeader" part="id" use="literal" />
-				<soap:header message="tns:requestHeader" part="userId" use="literal" />
-				<soap:header message="tns:requestHeader" part="issue" use="literal" />
-				<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
-			</input>
-			<output>
-				<soap:body parts="parameters" use="literal" />
-				<soap:header message="tns:requestHeader" part="client" use="literal" />
-				<soap:header message="tns:requestHeader" part="service" use="literal" />
-				<soap:header message="tns:requestHeader" part="id" use="literal" />
-				<soap:header message="tns:requestHeader" part="userId" use="literal" />
-				<soap:header message="tns:requestHeader" part="issue" use="literal" />
-				<soap:header message="tns:requestHeader" part="protocolVersion" use="literal" />
 			</output>
 		</operation>
 		<operation name="getOccupationList">
 			<soap:operation style="document"/>
-			<xrd:version>v1</xrd:version>
+			<xrd:version>v2</xrd:version>
 			<input>
 				<soap:body parts="parameters" use="literal" />
 				<soap:header message="tns:requestHeader" part="client" use="literal" />
@@ -788,7 +716,7 @@
 		</operation>
 		<operation name="getSubdivisionList">
 			<soap:operation style="document"/>
-			<xrd:version>v1</xrd:version>
+			<xrd:version>v2</xrd:version>
 			<input>
 				<soap:body parts="parameters" use="literal" />
 				<soap:header message="tns:requestHeader" part="client" use="literal" />

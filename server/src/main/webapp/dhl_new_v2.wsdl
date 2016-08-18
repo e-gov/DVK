@@ -17,10 +17,6 @@
 			<import namespace="http://www.riik.ee/schemas/dhl" schemaLocation="http://www.riik.ee/schemas/dhl/dhl.xsd"/>
 			<import namespace="http://www.riik.ee/schemas/dhl-meta-automatic" schemaLocation="http://www.riik.ee/schemas/dhl/dhl-meta-automatic.xsd"/>
 			<import namespace="http://x-road.eu/xsd/xroad.xsd" schemaLocation="http://x-road.eu/xsd/xroad.xsd" />
-			
-			<complexType name="base64BinaryType">
-				<attribute name="href" type="ref:swaRef" />
-            </complexType>
             
             <simpleType name="GUID">
 				<annotation>
@@ -30,7 +26,6 @@
 					<pattern value="\{[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}\}" />
 				</restriction>
 			</simpleType>
-			
 			<simpleType name="statusType">
 				<annotation>
 					<documentation>Info dokumendi edastuse oleku kohta</documentation>
@@ -42,6 +37,9 @@
 				</restriction>
 			</simpleType>
             
+            <complexType name="base64BinaryType">
+				<attribute name="href" type="ref:swaRef" />
+            </complexType>
 			<complexType name="institutionRefsArrayType">
 				<sequence>
 					<element name="asutus" type="string" maxOccurs="unbounded">
@@ -83,95 +81,6 @@
 					</element>
 				</sequence>
 			</complexType>
-			<complexType name="getSendingOptionsV2RequestType">
-				<sequence>
-					<element name="asutused" type="tns:institutionRefsArrayType" minOccurs="0" maxOccurs="1"/>
-					<element name="vastuvotmata_dokumente_ootel" type="boolean" minOccurs="0" maxOccurs="1"/>
-					<element name="vahetatud_dokumente_vahemalt" type="integer" minOccurs="0" maxOccurs="1"/>
-					<element name="vahetatud_dokumente_kuni" type="integer" minOccurs="0" maxOccurs="1"/>
-				</sequence>
-			</complexType>
-			
-			<element name="getOccupationList">
-				<complexType>
-					<sequence>
-						<element name="keha" type="tns:institutionRefsType" />
-					</sequence>
-				</complexType>
-			</element>
-			<element name="getOccupationListResponse">
-				<complexType>
-					<sequence>
-						<element name="keha" type="tns:getOccupationListV2ResponseType" />
-					</sequence>
-				</complexType>
-			</element>
-			<complexType name="getOccupationListV2ResponseType">
-				<sequence>
-					<element name="asutused" type="tns:base64BinaryType" />
-				</sequence>
-			</complexType>
-			<complexType name="getOccupationListV2ResponseTypeUnencoded">
-				<sequence>
-					<element name="ametikohad">
-						<complexType>
-							<sequence>
-								<element name="ametikoht" type="tns:occupationType" maxOccurs="unbounded" />
-							</sequence>
-						</complexType>
-					</element>
-				</sequence>
-			</complexType>
-			<complexType name="occupationType">
-				<sequence>
-					<element name="kood" type="string"/>
-					<element name="nimetus" type="string"/>
-					<element name="asutuse_kood" type="string"/>
-					<element name="lyhinimetus" type="string"/>
-					<element name="ks_allyksuse_kood" type="string" minOccurs="0" maxOccurs="1"/>
-				</sequence>
-			</complexType>
-			
-			<element name="getSubdivisionList">
-				<complexType>
-					<sequence>
-						<element name="keha" type="tns:institutionRefsType" />
-					</sequence>
-				</complexType>
-			</element>
-			<element name="getSubdivisionListResponse">
-				<complexType>
-					<sequence>
-						<element name="keha" type="tns:getSubdivisionListV2ResponseType" />
-					</sequence>
-				</complexType>
-			</element>
-			<complexType name="getSubdivisionListV2ResponseType">
-				<sequence>
-					<element name="allyksused" type="tns:base64BinaryType" />
-				</sequence>
-			</complexType>
-			<complexType name="getSubdivisionListV2ResponseTypeUnencoded">
-				<sequence>
-					<element name="allyksused">
-						<complexType>
-							<sequence>
-								<element name="allyksus" type="tns:subdivisionType" maxOccurs="unbounded" />
-							</sequence>
-						</complexType>
-					</element>
-				</sequence>
-			</complexType>
-			<complexType name="subdivisionType">
-				<sequence>
-					<element name="kood" type="string"/>
-					<element name="nimetus" type="string"/>
-					<element name="asutuse_kood" type="string"/>
-					<element name="lyhinimetus" type="string"/>
-					<element name="ks_allyksuse_kood" type="string" minOccurs="0" maxOccurs="1"/>
-				</sequence>
-			</complexType>
-			
 			<complexType name="institutionRefsType">
 				<sequence>
 					<element name="asutused" type="tns:base64BinaryType" />
@@ -188,22 +97,6 @@
 					</element>
 				</sequence>
 			</complexType>
-			
-			<element name="getSendingOptions">
-				<complexType>
-					<sequence>
-						<element name="keha" type="tns:getSendingOptionsV2RequestType" />
-					</sequence>
-				</complexType>
-			</element>
-			<element name="getSendingOptionsResponse">
-				<complexType>
-					<sequence>
-						<element name="keha" type="tns:institutionArrayType" />
-					</sequence>
-				</complexType>
-			</element>
-			
 			<complexType name="documentRefsArrayType">
 				<sequence>
 					<element name="dhl_id" type="dhlma:dhlDokIDType" maxOccurs="unbounded">
@@ -248,17 +141,107 @@
 				</sequence>
 			</complexType>
 			
-			<element name="receiveDocumentsResponse">
+			<element name="getOccupationList" type="tns:getOccupationListV2RequestType" />
+			<complexType name="getOccupationListV2RequestType">
+				<sequence>
+					<element name="keha" type="tns:institutionRefsType" />
+				</sequence>
+			</complexType>
+			
+			<element name="getOccupationListResponse">
 				<complexType>
 					<sequence>
-						<element name="keha" type="tns:base64BinaryType" />
+						<element name="keha" type="tns:getOccupationListV2ResponseType" />
 					</sequence>
 				</complexType>
 			</element>
-			<complexType name="receiveDocumentsResponseTypeUnencoded">
-				<complexContent>
-					<extension base="tns:documentsArrayType"/>
-				</complexContent>
+			<complexType name="getOccupationListV2ResponseType">
+				<sequence>
+					<element name="asutused" type="tns:base64BinaryType" />
+				</sequence>
+			</complexType>
+			<complexType name="getOccupationListV2ResponseTypeUnencoded">
+				<sequence>
+					<element name="ametikohad">
+						<complexType>
+							<sequence>
+								<element name="ametikoht" type="tns:occupationType" maxOccurs="unbounded" />
+							</sequence>
+						</complexType>
+					</element>
+				</sequence>
+			</complexType>
+			<complexType name="occupationType">
+				<sequence>
+					<element name="kood" type="string"/>
+					<element name="nimetus" type="string"/>
+					<element name="asutuse_kood" type="string"/>
+					<element name="lyhinimetus" type="string"/>
+					<element name="ks_allyksuse_kood" type="string" minOccurs="0" maxOccurs="1"/>
+				</sequence>
+			</complexType>
+			
+			<element name="getSubdivisionList" type="tns:getSubdivisionListV2RequestType" />
+			<complexType name="getSubdivisionListV2RequestType">
+				<sequence>
+					<element name="keha" type="tns:institutionRefsType" />
+				</sequence>
+			</complexType>
+			
+			<element name="getSubdivisionListResponse">
+				<complexType>
+					<sequence>
+						<element name="keha" type="tns:getSubdivisionListV2ResponseType" />
+					</sequence>
+				</complexType>
+			</element>
+			<complexType name="getSubdivisionListV2ResponseType">
+				<sequence>
+					<element name="allyksused" type="tns:base64BinaryType" />
+				</sequence>
+			</complexType>
+			<complexType name="getSubdivisionListV2ResponseTypeUnencoded">
+				<sequence>
+					<element name="allyksused">
+						<complexType>
+							<sequence>
+								<element name="allyksus" type="tns:subdivisionType" maxOccurs="unbounded" />
+							</sequence>
+						</complexType>
+					</element>
+				</sequence>
+			</complexType>
+			<complexType name="subdivisionType">
+				<sequence>
+					<element name="kood" type="string"/>
+					<element name="nimetus" type="string"/>
+					<element name="asutuse_kood" type="string"/>
+					<element name="lyhinimetus" type="string"/>
+					<element name="ks_allyksuse_kood" type="string" minOccurs="0" maxOccurs="1"/>
+				</sequence>
+			</complexType>
+			
+			<element name="getSendingOptions">
+				<complexType>
+					<sequence>
+						<element name="keha" type="tns:getSendingOptionsV2RequestType" />
+					</sequence>
+				</complexType>
+			</element>
+			<complexType name="getSendingOptionsV2RequestType">
+				<sequence>
+					<element name="asutused" type="tns:institutionRefsArrayType" minOccurs="0" maxOccurs="1"/>
+					<element name="vastuvotmata_dokumente_ootel" type="boolean" minOccurs="0" maxOccurs="1"/>
+					<element name="vahetatud_dokumente_vahemalt" type="integer" minOccurs="0" maxOccurs="1"/>
+					<element name="vahetatud_dokumente_kuni" type="integer" minOccurs="0" maxOccurs="1"/>
+				</sequence>
+			</complexType>
+			
+			<element name="getSendingOptionsResponse" type="tns:getSendingOptionsV2ResponseType" />
+			<complexType name="getSendingOptionsV2ResponseType">
+				<sequence>
+					<element name="keha" type="tns:institutionArrayType" />
+				</sequence>
 			</complexType>
 			
 			<element name="receiveDocuments">
@@ -286,8 +269,20 @@
 					</element>
 					<element name="edastus_id" type="string" minOccurs="0"/>
 					<element name="fragment_nr" type="integer" minOccurs="0"/>
-					<element name="fragmendi_suurus_baitides" type="integer" minOccurs="0"/>
+					<element name="fragmendi_suurus_baitides" type="long" minOccurs="0"/>
 				</sequence>
+			</complexType>
+			
+			<element name="receiveDocumentsResponse" type="tns:receiveDocumentsV2ResponseType" />
+			<complexType name="receiveDocumentsV2ResponseType">
+				<sequence>
+					<element name="keha" type="tns:base64BinaryType" />
+				</sequence>
+			</complexType>
+			<complexType name="receiveDocumentsV2ResponseTypeUnencoded">
+				<complexContent>
+					<extension base="tns:documentsArrayType"/>
+				</complexContent>
 			</complexType>
 			
 			<element name="markDocumentsReceived">
@@ -318,7 +313,7 @@
 				</complexType>
 			</element>
 			<simpleType name="markDocumentsReceivedV2ResponseType">
-				<restriction base="string"/>
+				<restriction base="string" />
 			</simpleType>
 			
 			<element name="sendDocuments">
@@ -349,27 +344,32 @@
 				</sequence>
 			</complexType>
 			
-			<element name="sendDocumentsResponse">
-				<complexType>
-					<sequence>
-						<element name="keha" type="tns:base64BinaryType" />
-					</sequence>
-				</complexType>
-			</element>
+			<element name="sendDocumentsResponse" type="tns:sendDocumentsV2ResponseType" />
+			<complexType name="sendDocumentsV2ResponseType">
+				<sequence>
+					<element name="keha" type="tns:base64BinaryType" />
+				</sequence>
+			</complexType>
 			<complexType name="sendDocumentsV2ResponseTypeUnencoded">
-				<complexContent>
-					<extension base="tns:documentRefsArrayType"/>
-				</complexContent>
+				<sequence>
+					<element name="keha">
+						<complexType>
+							<complexContent>
+								<extension base="tns:documentRefsArrayType"/>
+							</complexContent>
+						</complexType>
+					</element>
+				</sequence>
 			</complexType>
 			
 			<element name="getSendStatus">
 				<complexType>
 					<sequence>
-						<element name="keha" type="tns:getSendStatusV2Request" />
+						<element name="keha" type="tns:getSendStatusV2RequestType" />
 					</sequence>
 				</complexType>
 			</element>
-			<complexType name="getSendStatusV2Request">
+			<complexType name="getSendStatusV2RequestType">
 				<sequence>
 					<element name="dokumendid" type="tns:base64BinaryType" />
 					<element name="staatuse_ajalugu" type="boolean" />
@@ -389,13 +389,12 @@
 				</sequence>
 			</complexType>
 			
-			<element name="getSendStatusResponse">
-				<complexType>
-					<sequence>
-						<element name="keha" type="tns:base64BinaryType" />
-					</sequence>
-				</complexType>
-			</element>
+			<element name="getSendStatusResponse" type="tns:getSendStatusV2ResponseType" />
+			<complexType name="getSendStatusV2ResponseType">
+				<sequence>
+					<element name="keha" type="tns:base64BinaryType" />
+				</sequence>
+			</complexType>
 			<complexType name="getSendStatusV2ResponseTypeUnencoded">
 				<sequence>
 					<element name="item" maxOccurs="unbounded">

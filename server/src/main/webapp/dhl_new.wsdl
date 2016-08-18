@@ -272,9 +272,15 @@
 				</complexType>
 			</element>
 			<complexType name="sendDocumentsResponseTypeUnencoded">
-				<complexContent>
-					<extension base="tns:documentRefsArrayType"/>
-				</complexContent>
+				<sequence>
+					<element name="keha">
+						<complexType>
+							<complexContent>
+								<extension base="tns:documentRefsArrayType"/>
+							</complexContent>
+						</complexType>
+					</element>
+				</sequence>
 			</complexType>
 			
 			<element name="getSendStatus">

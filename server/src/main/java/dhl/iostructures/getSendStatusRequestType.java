@@ -7,6 +7,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public class getSendStatusRequestType {
+	
+	public static final String DEFAULT_REQUEST_ELEMENT_NAME = "getSendStatus";
+	
     public String kehaHref;
 
     public getSendStatusRequestType() {
@@ -16,7 +19,9 @@ public class getSendStatusRequestType {
     public static getSendStatusRequestType getFromSOAPBody(org.apache.axis.MessageContext context) throws SOAPException {
         org.apache.axis.Message msg = context.getRequestMessage();
         SOAPBody body = msg.getSOAPBody();
-        NodeList msgNodes = body.getElementsByTagName("getSendStatus");
+        
+        NodeList msgNodes = body.getElementsByTagName(DEFAULT_REQUEST_ELEMENT_NAME);
+        
         if (msgNodes.getLength() > 0) {
             Element msgNode = (Element) msgNodes.item(0);
             NodeList bodyNodes = msgNode.getElementsByTagName("keha");

@@ -37,7 +37,6 @@ public class runSystemCheckResponseType implements SOAPOutputBodyRepresentation 
 
             se.addNamespaceDeclaration(xRoadProtocolHeader.getProtocolVersion().getNamespacePrefix(), xRoadProtocolHeader.getProtocolVersion().getNamespaceURI());
             se.addNamespaceDeclaration(CommonStructures.NS_XSI_PREFIX, CommonStructures.NS_XSI_URI);
-            se.addNamespaceDeclaration(CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI);
 
             @SuppressWarnings("rawtypes")
 			Iterator items = body.getChildElements();
@@ -49,6 +48,8 @@ public class runSystemCheckResponseType implements SOAPOutputBodyRepresentation 
             		se.createName("runSystemCheckResponse", xRoadProtocolHeader.getProtocolVersion().getNamespacePrefix(), xRoadProtocolHeader.getProtocolVersion().getNamespaceURI()));
 
             if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
+            	se.addNamespaceDeclaration(CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI);
+            	
             	SOAPElement elParing = element.addChildElement(se.createName("paring"));
             	if (m_requestElement != null) {
             		NodeList nl = m_requestElement.getChildNodes();

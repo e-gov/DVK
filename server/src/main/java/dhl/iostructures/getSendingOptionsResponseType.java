@@ -37,7 +37,6 @@ public class getSendingOptionsResponseType implements SOAPOutputBodyRepresentati
             SOAPBody body = se.getBody();
 
             se.addNamespaceDeclaration(xRoadProtocolHeader.getProtocolVersion().getNamespacePrefix(), xRoadProtocolHeader.getProtocolVersion().getNamespaceURI());
-            se.addNamespaceDeclaration(CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI);
             se.addNamespaceDeclaration(CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_URI);
 
             @SuppressWarnings("rawtypes")
@@ -49,6 +48,8 @@ public class getSendingOptionsResponseType implements SOAPOutputBodyRepresentati
             SOAPBodyElement element = body.addBodyElement(se.createName(DEFAULT_RESPONSE_ELEMENT_NAME, CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_URI));
 
             if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
+            	se.addNamespaceDeclaration(CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI);
+            	
 	            SOAPElement elParing = element.addChildElement("paring", "");
 	            if (paring != null) {
 	                elParing.addAttribute(se.createName("type", CommonStructures.NS_XSI_PREFIX, CommonStructures.NS_XSI_URI), "SOAP-ENC:Array");

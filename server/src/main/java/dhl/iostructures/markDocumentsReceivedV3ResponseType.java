@@ -33,7 +33,6 @@ public class markDocumentsReceivedV3ResponseType implements SOAPOutputBodyRepres
             SOAPBody body = se.getBody();
 
             se.addNamespaceDeclaration(xRoadProtocolHeader.getProtocolVersion().getNamespacePrefix(), xRoadProtocolHeader.getProtocolVersion().getNamespaceURI());
-            se.addNamespaceDeclaration(CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI);
 
             @SuppressWarnings("rawtypes")
 			Iterator items = body.getChildElements();
@@ -41,15 +40,11 @@ public class markDocumentsReceivedV3ResponseType implements SOAPOutputBodyRepres
                 body.removeContents();
             }
             
-            String responseElementName = markDocumentsReceivedResponseType.DEFAULT_RESPONSE_ELEMENT_NAME;
-            // FIXME Currently (29.07.2016) the WSDL has no related element definitions
-            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-            	responseElementName = markDocumentsReceivedRequestType.DEFAULT_REQUEST_ELEMENT_NAME + "V3" + SOAPOutputBodyRepresentation.RESPONSE;
-            }
-            
-            SOAPBodyElement element = body.addBodyElement(se.createName(responseElementName));
+            SOAPBodyElement element = body.addBodyElement(se.createName(markDocumentsReceivedResponseType.DEFAULT_RESPONSE_ELEMENT_NAME));
             
             if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
+            	se.addNamespaceDeclaration(CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI);
+            	
 	            SOAPElement elParing = element.addChildElement(se.createName("paring"));
 	            if (paring != null) {
 	                NodeList nl = paring.getChildNodes();

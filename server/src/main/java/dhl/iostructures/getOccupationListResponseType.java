@@ -15,6 +15,9 @@ import dvk.core.xroad.XRoadProtocolHeader;
 import dvk.core.xroad.XRoadProtocolVersion;
 
 public class getOccupationListResponseType implements SOAPOutputBodyRepresentation {
+	
+	public static final String DEFAULT_RESPONSE_ELEMENT_NAME = getOccupationListRequestType.DEFAULT_REQUEST_ELEMENT_NAME + SOAPOutputBodyRepresentation.RESPONSE;
+	
     static Logger logger = Logger.getLogger(getOccupationListResponseType.class.getName());
     public getOccupationListRequestType paring;
     public ArrayList<Ametikoht> ametikohad;
@@ -36,7 +39,6 @@ public class getOccupationListResponseType implements SOAPOutputBodyRepresentati
             SOAPBody body = se.getBody();
 
             se.addNamespaceDeclaration(xRoadProtocolHeader.getProtocolVersion().getNamespacePrefix(), xRoadProtocolHeader.getProtocolVersion().getNamespaceURI());
-            se.addNamespaceDeclaration(CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI);
             se.addNamespaceDeclaration(CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_URI);
 
             @SuppressWarnings("rawtypes")
@@ -45,9 +47,11 @@ public class getOccupationListResponseType implements SOAPOutputBodyRepresentati
                 body.removeContents();
             }
 
-            SOAPBodyElement element = body.addBodyElement(se.createName("getOccupationListResponse", CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_URI));
+            SOAPBodyElement element = body.addBodyElement(se.createName(DEFAULT_RESPONSE_ELEMENT_NAME, CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_URI));
 
             if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
+            	se.addNamespaceDeclaration(CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI);
+            	
 	            SOAPElement elParing = element.addChildElement("paring", "");
 	            if (paring != null) {
 	                elParing.addAttribute(se.createName("type", CommonStructures.NS_XSI_PREFIX, CommonStructures.NS_XSI_URI), "SOAP-ENC:Array");

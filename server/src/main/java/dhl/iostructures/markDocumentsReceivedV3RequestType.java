@@ -11,7 +11,6 @@ import org.w3c.dom.NodeList;
 
 import dvk.core.CommonMethods;
 import dvk.core.xroad.XRoadProtocolHeader;
-import dvk.core.xroad.XRoadProtocolVersion;
 
 public class markDocumentsReceivedV3RequestType {
     static Logger logger = Logger.getLogger(markDocumentsReceivedV3RequestType.class.getName());
@@ -34,12 +33,7 @@ public class markDocumentsReceivedV3RequestType {
             org.apache.axis.Message msg = context.getRequestMessage();
             SOAPBody body = msg.getSOAPBody();
             
-            String requestElementName = markDocumentsReceivedRequestType.DEFAULT_REQUEST_ELEMENT_NAME;
-            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-            	requestElementName += "V3";
-            }
-            
-            NodeList msgNodes = body.getElementsByTagName(requestElementName);
+            NodeList msgNodes = body.getElementsByTagName(markDocumentsReceivedRequestType.DEFAULT_REQUEST_ELEMENT_NAME);
             
             if (msgNodes.getLength() > 0) {
                 Element msgNode = (Element) msgNodes.item(0);

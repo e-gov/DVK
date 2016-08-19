@@ -12,7 +12,6 @@ import org.w3c.dom.NodeList;
 import dvk.core.CommonMethods;
 import dvk.core.Settings;
 import dvk.core.xroad.XRoadProtocolHeader;
-import dvk.core.xroad.XRoadProtocolVersion;
 
 public class receiveDocumentsV2RequestType {
 	
@@ -37,12 +36,7 @@ public class receiveDocumentsV2RequestType {
             org.apache.axis.Message msg = context.getRequestMessage();
             SOAPBody body = msg.getSOAPBody();
             
-            String requestElementName = receiveDocumentsRequestType.DEFAULT_REQUEST_ELEMENT_NAME;
-            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-            	requestElementName += "V2";
-            }
-            
-            NodeList nodes = body.getElementsByTagName(requestElementName);
+            NodeList nodes = body.getElementsByTagName(receiveDocumentsRequestType.DEFAULT_REQUEST_ELEMENT_NAME);
             
             if (nodes.getLength() > 0) {
                 Element el = (Element) nodes.item(0);

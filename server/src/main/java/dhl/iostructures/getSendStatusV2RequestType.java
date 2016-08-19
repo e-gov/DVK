@@ -20,7 +20,9 @@ public class getSendStatusV2RequestType {
     public static getSendStatusV2RequestType getFromSOAPBody(org.apache.axis.MessageContext context) throws SOAPException {
         org.apache.axis.Message msg = context.getRequestMessage();
         SOAPBody body = msg.getSOAPBody();
-        NodeList msgNodes = body.getElementsByTagName("getSendStatus");
+        
+        NodeList msgNodes = body.getElementsByTagName(getSendStatusRequestType.DEFAULT_REQUEST_ELEMENT_NAME);
+        
         if (msgNodes.getLength() > 0) {
             Element msgNode = (Element) msgNodes.item(0);
             NodeList bodyNodes = msgNode.getElementsByTagName("keha");

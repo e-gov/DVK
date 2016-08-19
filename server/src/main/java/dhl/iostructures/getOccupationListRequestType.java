@@ -11,6 +11,9 @@ import dhl.exceptions.RequestProcessingException;
 import dvk.core.CommonMethods;
 
 public class getOccupationListRequestType {
+	
+	public static final String DEFAULT_REQUEST_ELEMENT_NAME = "getOccupationList";
+	
     static Logger logger = Logger.getLogger(getOccupationListRequestType.class.getName());
     public String[] asutused;
 
@@ -23,7 +26,9 @@ public class getOccupationListRequestType {
         try {
             org.apache.axis.Message msg = context.getRequestMessage();
             SOAPBody body = msg.getSOAPBody();
-            NodeList msgNodes = body.getElementsByTagName("getOccupationList");
+            
+            NodeList msgNodes = body.getElementsByTagName(DEFAULT_REQUEST_ELEMENT_NAME);
+            
             if (msgNodes.getLength() > 0) {
                 Element msgNode = (Element) msgNodes.item(0);
                 NodeList bodyNodes = msgNode.getElementsByTagName("keha");

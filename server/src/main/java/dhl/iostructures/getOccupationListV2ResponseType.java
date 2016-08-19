@@ -45,7 +45,7 @@ public class getOccupationListV2ResponseType implements SOAPOutputBodyRepresenta
                 body.removeContents();
             }
 
-            SOAPBodyElement element = body.addBodyElement(se.createName("getOccupationListResponse", CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_URI));
+            SOAPBodyElement element = body.addBodyElement(se.createName(getOccupationListResponseType.DEFAULT_RESPONSE_ELEMENT_NAME, CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_URI));
             
             if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
 	            SOAPElement elParing = element.addChildElement(se.createName("paring"));

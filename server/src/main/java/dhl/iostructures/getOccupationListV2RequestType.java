@@ -29,7 +29,9 @@ public class getOccupationListV2RequestType {
         try {
             org.apache.axis.Message msg = context.getRequestMessage();
             SOAPBody body = msg.getSOAPBody();
-            NodeList msgNodes = body.getElementsByTagName("getOccupationList");
+            
+            NodeList msgNodes = body.getElementsByTagName(getOccupationListRequestType.DEFAULT_REQUEST_ELEMENT_NAME);
+            
             if (msgNodes.getLength() > 0) {
                 Element msgNode = (Element) msgNodes.item(0);
                 NodeList bodyNodes = msgNode.getElementsByTagName("keha");

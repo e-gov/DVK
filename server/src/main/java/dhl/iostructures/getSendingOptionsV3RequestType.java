@@ -14,7 +14,6 @@ import org.w3c.dom.NodeList;
 import dvk.core.CommonMethods;
 import dvk.core.ShortName;
 import dvk.core.xroad.XRoadProtocolHeader;
-import dvk.core.xroad.XRoadProtocolVersion;
 
 public class getSendingOptionsV3RequestType {
 	
@@ -55,26 +54,21 @@ public class getSendingOptionsV3RequestType {
         org.apache.axis.Message msg = context.getRequestMessage();
         SOAPBody body = msg.getSOAPBody();
         
-        String requestElementName = getSendingOptionsRequestType.DEFAULT_REQUEST_ELEMENT_NAME;
-        if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-        	requestElementName += "V3";
-        }
-        
-        NodeList msgNodes = body.getElementsByTagName(requestElementName);
-        if (msgNodes.getLength() == 0 && xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-        	msgNodes = body.getElementsByTagName("getSendingOptionsV3");
-        }
+        NodeList msgNodes = body.getElementsByTagName(getSendingOptionsRequestType.DEFAULT_REQUEST_ELEMENT_NAME);
         
         if (msgNodes.getLength() > 0) {
             Element msgNode = (Element) msgNodes.item(0);
+            
             NodeList bodyNodes = msgNode.getElementsByTagName("keha");
             if (bodyNodes.getLength() > 0) {
+            	getSendingOptionsV3RequestType result = new getSendingOptionsV3RequestType();
+            	
                 Element bodyNode = (Element) bodyNodes.item(0);
-                getSendingOptionsV3RequestType result = new getSendingOptionsV3RequestType();
                 result.kehaHref = bodyNode.getAttribute("href");
                 if (result.kehaHref.startsWith("cid:")) {
                     result.kehaHref = result.kehaHref.replaceFirst("cid:", "");
                 }
+                
                 return result;
             } else {
                 throw new Exception("Vigane päringu getSendingOptions.V3 keha - puudub element \"keha\".");

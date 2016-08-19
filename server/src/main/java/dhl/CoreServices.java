@@ -606,30 +606,6 @@ public class CoreServices implements Dhl {
     /**
      * @webmethod
      */
-    @Override
-	public void getSendingOptionsV2(Object keha) throws AxisFault {
-		getSendingOptions(keha);
-	}
-    
-    /**
-     * @webmethod
-     */
-    @Override
-    public void getSendingOptionsV3(Object keha) throws AxisFault {
-    	getSendingOptions(keha);
-    }
-    
-    /**
-     * @webmethod
-     */
-    @Override
-    public void getSendingOptionsV4(Object keha) throws AxisFault {
-    	getSendingOptions(keha);
-    }
-    
-    /**
-     * @webmethod
-     */
     public void sendDocuments(Object p1, Object keha) throws AxisFault {
         Timer t1 = new Timer();
         t1.reset();
@@ -773,30 +749,6 @@ public class CoreServices implements Dhl {
             conn = null;
         }
         t1.markElapsed("Entire request duration");
-    }
-
-    /**
-     * @webmethod
-     */
-    @Override
-	public void sendDocumentsV2(Object p1, Object keha) throws AxisFault {
-    	sendDocuments(p1, keha);
-	}
-    
-    /**
-     * @webmethod
-     */
-    @Override
-    public void sendDocumentsV3(Object p1, Object keha) throws AxisFault {
-    	sendDocuments(p1, keha);
-    }
-    
-    /**
-     * @webmethod
-     */
-    @Override
-    public void sendDocumentsV4(Object p1, Object keha) throws AxisFault {
-    	sendDocuments(p1, keha);
     }
 
     /**
@@ -953,30 +905,6 @@ public class CoreServices implements Dhl {
     /**
      * @webmethod
      */
-    @Override
-	public void receiveDocumentsV2(Object keha) throws AxisFault {
-		receiveDocuments(keha);
-	}
-    
-    /**
-     * @webmethod
-     */
-    @Override
-    public void receiveDocumentsV3(Object keha) throws AxisFault {
-    	receiveDocuments(keha);
-    }
-    
-    /**
-     * @webmethod
-     */
-    @Override
-    public void receiveDocumentsV4(Object keha) throws AxisFault {
-    	receiveDocuments(keha);
-    }
-    
-    /**
-     * @webmethod
-     */
     public void markDocumentsReceived(Object p1, Object keha) throws AxisFault {
         if (!Settings.Server_RunOnClientDatabase) {
             Connection conn = null;
@@ -1069,22 +997,6 @@ public class CoreServices implements Dhl {
                 conn = null;
             }
         }
-    }
-
-    /**
-     * @webmethod
-     */
-    @Override
-	public void markDocumentsReceivedV2(Object p1, Object keha) throws AxisFault {
-		markDocumentsReceived(p1, keha);
-    }
-    
-    /**
-     * @webmethod
-     */
-    @Override
-    public void markDocumentsReceivedV3(Object p1, Object keha) throws AxisFault {
-    	markDocumentsReceived(p1, keha);
     }
     
     /**

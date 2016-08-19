@@ -2,14 +2,12 @@ package dhl.iostructures;
 
 import javax.xml.soap.SOAPBody;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import dvk.core.CommonMethods;
 import dvk.core.xroad.XRoadProtocolHeader;
-import dvk.core.xroad.XRoadProtocolVersion;
 
 public class markDocumentsReceivedRequestType {
 	
@@ -36,26 +34,7 @@ public class markDocumentsReceivedRequestType {
             org.apache.axis.Message msg = context.getRequestMessage();
             SOAPBody body = msg.getSOAPBody();
             
-            String requestElementName = DEFAULT_REQUEST_ELEMENT_NAME;
-            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-            	// NOTE For some unknown historical reason version 2 of markDocumentsReceived request is also handled by this method
-            	String serviceVersion = xRoadProtocolHeader.getXRoadService().getServiceVersion();
-            	
-            	if (StringUtils.isNotBlank(serviceVersion)) {
-            		if (serviceVersion.equalsIgnoreCase("v2")) {
-            			requestElementName += "V2";
-            		}
-            	}
-            }
-            
-            NodeList msgNodes = body.getElementsByTagName(requestElementName);
-            
-            if (msgNodes.getLength() == 0 && xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-            	if (xRoadProtocolHeader.getXRoadService().getServiceVersion().equals("v2")) {
-            		// NB! For some reason version 2 is defined identically to v1 in the related WSDL
-            		msgNodes = body.getElementsByTagName("markDocumentsReceivedV2");
-            	}
-            }
+            NodeList msgNodes = body.getElementsByTagName(DEFAULT_REQUEST_ELEMENT_NAME);
             
             if (msgNodes.getLength() > 0) {
                 Element msgNode = (Element) msgNodes.item(0);

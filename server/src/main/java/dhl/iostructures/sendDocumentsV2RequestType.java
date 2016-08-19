@@ -5,13 +5,11 @@ import java.util.Date;
 import javax.xml.soap.SOAPBody;
 
 import org.apache.axis.AxisFault;
-import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import dvk.core.CommonMethods;
 import dvk.core.xroad.XRoadProtocolHeader;
-import dvk.core.xroad.XRoadProtocolVersion;
 
 public class sendDocumentsV2RequestType {
 	
@@ -37,24 +35,8 @@ public class sendDocumentsV2RequestType {
             SOAPBody body = msg.getSOAPBody();
             NodeList tmpNodes = null;
             Element el = null;
-            
-            String requestElementName = sendDocumentsRequestType.DEFAULT_REQUEST_ELEMENT_NAME;
-            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-            	// NOTE For some unknown historical reason versions 3 and 4 of sendDocuments request are also handled by this method
-            	String serviceVersion = xRoadProtocolHeader.getXRoadService().getServiceVersion();
-            	
-            	if (StringUtils.isNotBlank(serviceVersion)) {
-            		if (serviceVersion.equalsIgnoreCase("v2")) {
-            			requestElementName += "V2";
-            		} else if (serviceVersion.equalsIgnoreCase("v3")) {
-            			requestElementName += "V3";
-            		} else if (serviceVersion.equalsIgnoreCase("v4")) {
-            			requestElementName += "V4";
-            		}
-            	}
-            }
-            
-            NodeList msgNodes = body.getElementsByTagName(requestElementName);
+
+            NodeList msgNodes = body.getElementsByTagName(sendDocumentsRequestType.DEFAULT_REQUEST_ELEMENT_NAME);
             
             if (msgNodes.getLength() > 0) {
                 Element msgNode = (Element) msgNodes.item(0);

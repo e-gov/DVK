@@ -42,7 +42,6 @@ public class listMethodsResponseType implements SOAPOutputBodyRepresentation {
             org.apache.axis.message.SOAPEnvelope soapEnvelope = msg.getSOAPEnvelope();
             SOAPBody body = soapEnvelope.getBody();
 
-            soapEnvelope.addNamespaceDeclaration(CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI);
             soapEnvelope.addNamespaceDeclaration(xRoadProtocolHeader.getProtocolVersion().getNamespacePrefix(), xRoadProtocolHeader.getProtocolVersion().getNamespaceURI());
 
             @SuppressWarnings("rawtypes")
@@ -57,6 +56,8 @@ public class listMethodsResponseType implements SOAPOutputBodyRepresentation {
             SOAPElement elKeha = soapBody.addChildElement("keha");
             
             if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
+            	soapEnvelope.addNamespaceDeclaration(CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI);
+            	
             	elKeha.addAttribute(soapEnvelope.createName("type", CommonStructures.NS_XSI_PREFIX, CommonStructures.NS_XSI_URI), "SOAP-ENC:Array");
             	elKeha.addAttribute(soapEnvelope.createName("arrayType", CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI), "xsd:string[" + String.valueOf(methodsList.length) + "]");
             	

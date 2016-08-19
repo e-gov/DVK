@@ -30,7 +30,6 @@ public class getSendingOptionsV2ResponseType implements SOAPOutputBodyRepresenta
             SOAPBody body = se.getBody();
 
             se.addNamespaceDeclaration(xRoadProtocolHeader.getProtocolVersion().getNamespacePrefix(), xRoadProtocolHeader.getProtocolVersion().getNamespaceURI());
-            se.addNamespaceDeclaration(CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI);
             se.addNamespaceDeclaration(CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_URI);
 
             @SuppressWarnings("rawtypes")
@@ -39,15 +38,11 @@ public class getSendingOptionsV2ResponseType implements SOAPOutputBodyRepresenta
                 body.removeContents();
             }
             
-            String responseElementName = getSendingOptionsResponseType.DEFAULT_RESPONSE_ELEMENT_NAME;
-            // FIXME Currently (29.07.2016) the WSDL has no related element definitions
-            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-            	responseElementName = getSendingOptionsRequestType.DEFAULT_REQUEST_ELEMENT_NAME + "V2" + SOAPOutputBodyRepresentation.RESPONSE;
-            }
-            
-            SOAPBodyElement element = body.addBodyElement(se.createName(responseElementName, CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_URI));
+            SOAPBodyElement element = body.addBodyElement(se.createName(getSendingOptionsResponseType.DEFAULT_RESPONSE_ELEMENT_NAME, CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_URI));
             
             if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
+            	se.addNamespaceDeclaration(CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI);
+            	
 				SOAPElement elParing = element.addChildElement("paring", "");
 				if (paring != null) {
 					SOAPElement elVvDokOotel = elParing.addChildElement("vastuvotmata_dokumente_ootel", "");

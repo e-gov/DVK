@@ -11,6 +11,9 @@ import dvk.core.xroad.XRoadProtocolHeader;
 import dvk.core.xroad.XRoadProtocolVersion;
 
 public class getSendStatusResponseType implements SOAPOutputBodyRepresentation {
+	
+	public static final String DEFAULT_RESPONSE_ELEMENT_NAME = getSendStatusRequestType.DEFAULT_REQUEST_ELEMENT_NAME + SOAPOutputBodyRepresentation.RESPONSE;
+	
     public String paringKehaHash;
     public String kehaHref;
 
@@ -31,7 +34,7 @@ public class getSendStatusResponseType implements SOAPOutputBodyRepresentation {
                 body.removeContents();
             }
 
-            SOAPBodyElement element = body.addBodyElement(se.createName("getSendStatusResponse"));
+            SOAPBodyElement element = body.addBodyElement(se.createName(DEFAULT_RESPONSE_ELEMENT_NAME));
             
             if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
 	            SOAPElement elParing = element.addChildElement(se.createName("paring"));

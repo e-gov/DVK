@@ -11,6 +11,9 @@ import dhl.exceptions.RequestProcessingException;
 import dvk.core.CommonMethods;
 
 public class getSubdivisionListRequestType {
+	
+	public static final String DEFAULT_REQUEST_ELEMENT_NAME = "getSubdivisionList";
+	
     static Logger logger = Logger.getLogger(getSubdivisionListRequestType.class.getName());
     public String[] asutused;
 
@@ -22,7 +25,9 @@ public class getSubdivisionListRequestType {
         try {
             org.apache.axis.Message msg = context.getRequestMessage();
             SOAPBody body = msg.getSOAPBody();
-            NodeList msgNodes = body.getElementsByTagName("getSubdivisionList");
+            
+            NodeList msgNodes = body.getElementsByTagName(DEFAULT_REQUEST_ELEMENT_NAME);
+            
             if (msgNodes.getLength() > 0) {
                 Element msgNode = (Element) msgNodes.item(0);
                 NodeList bodyNodes = msgNode.getElementsByTagName("keha");

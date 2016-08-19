@@ -22,8 +22,6 @@ import dvk.core.xroad.XRoadProtocolVersion;
 
 public class getSendingOptionsV3ResponseType implements SOAPOutputBodyRepresentation {
 	
-	private static final String DEFAULT_RESPONSE_ELEMENT_NAME = "getSendingOptionsResponse";
-	
     public getSendingOptionsV3RequestType paring;
     public String kehaHref;
     public String responseFile;
@@ -48,13 +46,7 @@ public class getSendingOptionsV3ResponseType implements SOAPOutputBodyRepresenta
                 body.removeContents();
             }
             
-            String responseElementName = DEFAULT_RESPONSE_ELEMENT_NAME;
-            // FIXME Currently (29.07.2016) the WSDL has no related element definitions
-            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-            	responseElementName = getSendingOptionsRequestType.DEFAULT_REQUEST_ELEMENT_NAME + "V3" + SOAPOutputBodyRepresentation.RESPONSE;;
-            }
-            
-            SOAPBodyElement element = body.addBodyElement(se.createName(responseElementName, CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_URI));
+            SOAPBodyElement element = body.addBodyElement(se.createName(getSendingOptionsResponseType.DEFAULT_RESPONSE_ELEMENT_NAME, CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_URI));
             
             if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
 	            SOAPElement elParing = element.addChildElement(se.createName("paring"));

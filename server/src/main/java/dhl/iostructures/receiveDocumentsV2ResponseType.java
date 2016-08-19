@@ -36,14 +36,8 @@ public class receiveDocumentsV2ResponseType implements SOAPOutputBodyRepresentat
             if (items.hasNext()) {
                 body.removeContents();
             }
-
-            String responseElementName = receiveDocumentsResponseType.DEFAULT_RESPONSE_ELEMENT_NAME;
-            // FIXME Currently (29.07.2016) the WSDL has no related element definitions
-            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-            	responseElementName = receiveDocumentsRequestType.DEFAULT_REQUEST_ELEMENT_NAME + "V2" + SOAPOutputBodyRepresentation.RESPONSE;
-            }
             
-            SOAPBodyElement element = body.addBodyElement(se.createName(responseElementName)); 
+            SOAPBodyElement element = body.addBodyElement(se.createName(receiveDocumentsResponseType.DEFAULT_RESPONSE_ELEMENT_NAME)); 
 
             if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
 	            // Sõnumi päringu osa

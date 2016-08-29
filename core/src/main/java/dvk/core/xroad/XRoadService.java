@@ -1,7 +1,5 @@
 package dvk.core.xroad;
 
-import dvk.core.Settings;
-
 /**
  * This class models XRoadServiceIdentifierType as defined in the related
  * <a href="http://x-road.eu/xsd/identifiers.xsd">XML schema</a>.
@@ -13,6 +11,19 @@ public class XRoadService extends XRoadIdentifier {
 	
 	public XRoadService() {}
 	
+	/**
+	 * A constructor for XRoad service instance.
+	 * 
+	 * <p>
+	 * NOTE:<br>
+	 * According to the XRoadServiceIdentifierType XSD definition subsystemCode and serviceVersion can be omitted.
+	 * </p>
+	 * 
+	 * @param xRoadInstance
+	 * @param memberClass
+	 * @param memberCode
+	 * @param serviceCode
+	 */
 	public XRoadService(String xRoadInstance, String memberClass, String memberCode, String serviceCode) {
 		this.xRoadInstance = xRoadInstance;
 		this.memberClass = memberClass;
@@ -20,25 +31,21 @@ public class XRoadService extends XRoadIdentifier {
 		this.serviceCode = serviceCode;
 	}
 	
-	public XRoadService(String xRoadInstance, String memberClass, String memberCode, String subsystemCode, String serviceCode, String serviceVersion) {
-		this(xRoadInstance, memberClass, memberCode, serviceCode);
-		this.subsystemCode = subsystemCode;
-		this.serviceVersion = serviceVersion;
-	}
-	
 	/**
-	 * This constructor builds an X-Road service using predefined settings for
-	 * <em>xRoadInstance</em>, <em>memberClass</em>, <em>memberCode</em> and <em>subsystemCode</em>.
+	 * A constructor for XRoad service instance.
 	 * 
-	 * @param serviceCode name of the <em>serviceCode</em> as defined in the X-Road protocol v.4.0 specification
-	 * @param serviceVersion name of the <em>serviceVersion</em> as defined in the X-Road protocol v.4.0 specification
+	 * @param xRoadInstance
+	 * @param memberClass
+	 * @param memberCode
+	 * @param subsystemCode
+	 * @param serviceCode
+	 * @param serviceVersion
 	 */
-	public XRoadService(String serviceCode, String serviceVersion) {
-		this.xRoadInstance = Settings.getXRoadInstance();
-		this.memberClass = Settings.getXRoadMemberClass();
-		this.memberCode = Settings.getxRoadMemberCode();
-		this.subsystemCode = Settings.getXRoadSubsystemCode();
-		
+	public XRoadService(String xRoadInstance, String memberClass, String memberCode, String subsystemCode, String serviceCode, String serviceVersion) {
+		this.xRoadInstance = xRoadInstance;
+		this.memberClass = memberClass;
+		this.memberCode = memberCode;
+		this.subsystemCode = subsystemCode;
 		this.serviceCode = serviceCode;
 		this.serviceVersion = serviceVersion;
 	}

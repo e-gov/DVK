@@ -17,6 +17,7 @@ import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
 import org.apache.axis.message.MessageElement;
+import org.apache.axis.utils.StringUtils;
 
 import dvk.core.CommonMethods;
 
@@ -498,7 +499,19 @@ public final class XRoadProtocolHeader {
 	public String getService() {
 		// This is for backward compatibility
 		if (protocolVersion.equals(XRoadProtocolVersion.V4_0)) {
-			return xRoadService.getServiceCode() + " " + (xRoadService.getServiceVersion() != null ? xRoadService.getServiceVersion() : "");
+			StringBuilder sb = new StringBuilder();
+			
+			if (!StringUtils.isEmpty(xRoadService.getSubsystemCode())) {
+				sb.append(xRoadService.getSubsystemCode()).append(".");
+			}
+			
+			sb.append(xRoadService.getServiceCode());
+			
+			if (!StringUtils.isEmpty(xRoadService.getServiceVersion())) {
+				sb.append(".").append(xRoadService.getServiceVersion());
+			}
+			
+			return sb.toString();
 		}
 		
 		return service;

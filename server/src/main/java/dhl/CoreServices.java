@@ -69,6 +69,7 @@ import dvk.client.db.UnitCredential;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import dvk.core.Settings;
+import dvk.core.util.DvkUtil;
 import dvk.core.xroad.XRoadProtocolHeader;
 import dvk.core.xroad.XRoadProtocolVersion;
 import dvk.core.xroad.XRoadService;
@@ -159,31 +160,31 @@ public class CoreServices implements Dhl {
 		});
 		
 		// Initializing service methods list for use with X-Road protocol version 4.0
-		serviceMethodsWhenRunOnClientDatabase.add(new XRoadService("sendDocuments", "v1"));
-		serviceMethodsWhenRunOnClientDatabase.add(new XRoadService("sendDocuments", "v2"));
-		serviceMethodsWhenRunOnClientDatabase.add(new XRoadService("sendDocuments", "v3"));
-		serviceMethodsWhenRunOnClientDatabase.add(new XRoadService("sendDocuments", "v4"));
-		serviceMethodsWhenRunOnClientDatabase.add(new XRoadService("getSendStatus", "v1"));
-		serviceMethodsWhenRunOnClientDatabase.add(new XRoadService("getSendStatus", "v2"));
-		serviceMethodsWhenRunOnClientDatabase.add(new XRoadService("getSendingOptions", "v1"));
-		serviceMethodsWhenRunOnClientDatabase.add(new XRoadService("getSendingOptions", "v2"));
-		serviceMethodsWhenRunOnClientDatabase.add(new XRoadService("getSendingOptions", "v3"));
+		serviceMethodsWhenRunOnClientDatabase.add(DvkUtil.createDvkXRoadService("sendDocuments", "v1"));
+		serviceMethodsWhenRunOnClientDatabase.add(DvkUtil.createDvkXRoadService("sendDocuments", "v2"));
+		serviceMethodsWhenRunOnClientDatabase.add(DvkUtil.createDvkXRoadService("sendDocuments", "v3"));
+		serviceMethodsWhenRunOnClientDatabase.add(DvkUtil.createDvkXRoadService("sendDocuments", "v4"));
+		serviceMethodsWhenRunOnClientDatabase.add(DvkUtil.createDvkXRoadService("getSendStatus", "v1"));
+		serviceMethodsWhenRunOnClientDatabase.add(DvkUtil.createDvkXRoadService("getSendStatus", "v2"));
+		serviceMethodsWhenRunOnClientDatabase.add(DvkUtil.createDvkXRoadService("getSendingOptions", "v1"));
+		serviceMethodsWhenRunOnClientDatabase.add(DvkUtil.createDvkXRoadService("getSendingOptions", "v2"));
+		serviceMethodsWhenRunOnClientDatabase.add(DvkUtil.createDvkXRoadService("getSendingOptions", "v3"));
 		
 		serviceMethodsFull.addAll(serviceMethodsWhenRunOnClientDatabase);
-		serviceMethodsFull.add(new XRoadService("receiveDocuments", "v1"));
-		serviceMethodsFull.add(new XRoadService("receiveDocuments", "v2"));
-		serviceMethodsFull.add(new XRoadService("receiveDocuments", "v3"));
-		serviceMethodsFull.add(new XRoadService("receiveDocuments", "v4"));
-		serviceMethodsFull.add(new XRoadService("markDocumentsReceived", "v1"));
-		serviceMethodsFull.add(new XRoadService("markDocumentsReceived", "v2"));
-		serviceMethodsFull.add(new XRoadService("markDocumentsReceived", "v3"));
-		serviceMethodsFull.add(new XRoadService("deleteOldDocuments", "v1"));
-		serviceMethodsFull.add(new XRoadService("changeOrganizationData", "v1"));
-		serviceMethodsFull.add(new XRoadService("runSystemCheck", "v1"));
-		serviceMethodsFull.add(new XRoadService("getOccupationList", "v1"));
-		serviceMethodsFull.add(new XRoadService("getOccupationList", "v2"));
-		serviceMethodsFull.add(new XRoadService("getSubdivisionList", "v1"));
-		serviceMethodsFull.add(new XRoadService("getSubdivisionList", "v2"));
+		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("receiveDocuments", "v1"));
+		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("receiveDocuments", "v2"));
+		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("receiveDocuments", "v3"));
+		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("receiveDocuments", "v4"));
+		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("markDocumentsReceived", "v1"));
+		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("markDocumentsReceived", "v2"));
+		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("markDocumentsReceived", "v3"));
+		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("deleteOldDocuments", "v1"));
+		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("changeOrganizationData", "v1"));
+		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("runSystemCheck", "v1"));
+		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("getOccupationList", "v1"));
+		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("getOccupationList", "v2"));
+		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("getSubdivisionList", "v1"));
+		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("getSubdivisionList", "v2"));
     }
 
     protected void finalize() {

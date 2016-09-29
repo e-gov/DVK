@@ -22,7 +22,12 @@ import org.apache.axis.utils.StringUtils;
 import dvk.core.CommonMethods;
 
 /**
- * This class representation the X-Road protocol specific header section.
+ * <p>This class representation the X-Road protocol specific header section.</p>
+ * 
+ * NOTE:<br>
+ * this class was made by merging the old existing functionality (which was left as is)
+ * meant for handling X-Road message protocol version 2.0
+ * and the new specific functionality required by X-Road message protocol version 4.0
  * 
  */
 public final class XRoadProtocolHeader {

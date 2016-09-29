@@ -6,7 +6,7 @@
 	
 	<groupId>dvk</groupId>
 	<artifactId>server</artifactId>
-	<version>1.7.16</version>
+	<version>1.8.0</version>
 	<packaging>war</packaging>
 	
 	<name>dvk-server</name>
@@ -14,7 +14,7 @@
 	<parent>
 		<groupId>dvk</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.7.1</version>
+		<version>1.8.0</version>
 	</parent>
 
 	<properties>

@@ -22,6 +22,8 @@
         - [Edastatud dokumentide staatuse kontroll](#edastatud-dokumentide-staatuse-kontroll)
         - [Dokumentide vastuvõtt](#dokumentide-vastuvõtt)
 - [X-Tee päringute kirjeldused](#x-tee-päringute-kirjeldused)
+    - [Üldinfo](#xroad-general-info)
+    - [X-tee sõnumiprotokoll versioon 4.0](#xroad-message-protocol-v4)
     - [sendDocuments](#senddocuments)
         - [sendDocuments.v1](#senddocumentsv1)
         - [sendDocuments.v2](#senddocumentsv2)
@@ -155,7 +157,7 @@ DVK-le saadetavad ja sealt loetavad dokumendid on järgmisel kujul XML-tekstid (
 
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?><dhl:dokument xmlns:dhl="http://www.riik.ee/schemas/dhl">
- 
+
  <!-- Konkreetse struktuuri/semantikaga metainfo blokk,
       Sisaldab nii DVK tarkvara kui kasutaja poolt sisestatut.
       Siia blokki pannakse metainfo, millest teised süsteemid
@@ -163,13 +165,13 @@ DVK-le saadetavad ja sealt loetavad dokumendid on järgmisel kujul XML-tekstid (
       Võib saatja poolt jääda tühjaks/puududa.            
  -->
  <dhl:metainfo/>
- 
+
  <!-- Konkreetse semantikaga transpordiblokk, sisaldab konkreetset kust/kuhu
       infot, mille kaudu DVK tarkvara dokumendi edasi saadab.
       Edasisaatmiseks mõeldud dokumentide juures kohustuslik osa.
  -->
  <dhl:transport/>
- 
+
  <!-- Informatsioon dokumendi senise liikumistee ja muutumiste kohta.
       Blokk sisaldab lihtsalt varasemaid metainfo, transport ja metaxml
       blokke, järjestikuselt. Dokumendi edasisaatmisel kopeeritakse viimased
@@ -178,7 +180,7 @@ DVK-le saadetavad ja sealt loetavad dokumendid on järgmisel kujul XML-tekstid (
       Esialgse saatja poolt jäetakse üldjuhul tühjaks.
  -->
  <dhl:ajalugu/>
- 
+
  <!—- Järgnevad dokumendi liigist sõltuva struktuuriga metaandmed.
       Soovituslik oleks igal konkreetsel juhul viidata metaandmete struktuuri
       kirjeldavale XML skeemile (schema), kasutada selleks xmlns ja schemaLocation
@@ -189,7 +191,7 @@ DVK-le saadetavad ja sealt loetavad dokumendid on järgmisel kujul XML-tekstid (
  <dhl:metaxml xmlns="http://www.riik.ee/schemas/dhl/rkel_letter"
    schemaLocation="http://www.riik.ee/schemas/dhl/rkel_letter
    http://www.riik.ee/schemas/dhl/rkel_letter.xsd"/>
- 
+
  <!-- Järgneb üks SignedDoc struktuur, kas siis signatuuridega või ei.
       SignedDoc blokk sisaldab konkreetseid dokumente.
       Kirjeldus vastab täpselt AS Sertifitseerimiskeskuse antud
@@ -287,14 +289,14 @@ Metainfo väljad jaotuvad järgmiselt:
      teine blokk on kasutusel xteega saadud/saadetud
      dokumentide, kolmas aga epostiga saadud/saadetud
      dokumentide jaoks -->
-     
+
  <ma:dhl_id>DVK sisene unikaalne id</ma:dhl_id>
  <ma:dhl_kaust>Kausta, kus antud dokumenti DVK-s hoitakse, nimi</ma:dhl_kaust>
  <ma:dhl_saabumisviis>esialgu string email või string xtee</ma:dhl_saabumisviis>
  <ma:dhl_saabumisaeg>DVK -sse saabumise aeg CCYY-MM-DDThh:mm:ss</ma:dhl_saabumisaeg>  
  <ma:dhl_saatmisviis>esialgu string email või string xtee</ma:dhl_saatmisviis>
  <ma:dhl_saatmisaeg>DVKst saatmise aeg CCYY-MM-DDThh:mm:ss</ma:dhl_saatmisaeg>
- 
+
  <ma:dhl_saatja_asutuse_nr>
    registrinr turvaserverist (ainult xteest tulnud)
  </ma:dhl_saatja_asutuse_nr>
@@ -313,7 +315,7 @@ Metainfo väljad jaotuvad järgmiselt:
  <ma:dhl_saaja_isikukood>
   saaja kood turvaserverile (xteega saadetud)
  </ma:dhl_saaja_isikukood>
- 
+
  <ma:dhl_saatja_epost>
   saatja eposti aadress (tulnud epostiga)
  </ma:dhl_saatja_epost>
@@ -338,16 +340,16 @@ Metainfo väljad jaotuvad järgmiselt:
     Siin on toodud eraldi info koostaja kohta ja info
     saatja kohta: viimast tuleb kasutada, kui saatja (asutus)
     on erinev koostajast (asutusest)
-  
+
  -->
- 
+
  <mm:koostaja_asutuse_nr>
     algse koostaja (autori) asutuse number
  </mm:koostaja_asutuse_nr>
  <mm:saaja_asutuse_nr>
    asutuse nr, kellele saata (kui tühi, ei saadeta)
  </mm:saaja_asutuse_nr>
- 
+
  <mm:koostaja_dokumendinimi>
    dokumendi nimi koostajal
  </mm:koostaja_doknimi>
@@ -378,7 +380,7 @@ Metainfo väljad jaotuvad järgmiselt:
  <mm:koostaja_asutuse_kontakt>
   algse koostaja asutuse kontaktinfo
  </mm:koostaja_asutuse_kontakt>
-  
+
  <mm:autori_osakond>
    osakond, kus autor ehk ametlik saatja peaks töötama
  </mm:autori_osakond>
@@ -391,7 +393,7 @@ Metainfo väljad jaotuvad järgmiselt:
  <mm:autori_kontakt>
   autori ehk ametliku saatja kontaktinfo
  </mm:autori_kontakt>
- 
+
  <mm:seotud_dokumendinr_koostajal>
   Koostaja dokument, mis on praegusega seotud
  </mm:seotud_dokumendinr_koostajal>
@@ -408,7 +410,7 @@ Metainfo väljad jaotuvad järgmiselt:
  <mm:saatja_asutuse_kontakt>
   saatja asutuse kontakt
  </mm:saatja_asutuse_kontakt>
-  
+
  <mm:saaja_isikukood>
   isikukood, kellele dokument saadetakse
  </mm:saaja_isikukood>
@@ -452,14 +454,14 @@ DVK konteineri versioon 2 metainfo blokk näeb välja järgmine:
      teine blokk on kasutusel xteega saadud/saadetud
      dokumentide, kolmas aga epostiga saadud/saadetud
      dokumentide jaoks -->
-     
+
  <ma:dhl_id>DVK sisene unikaalne id</ma:dhl_id>
  <ma:dhl_kaust>Kausta, kus antud dokumenti DVK-s hoitakse, nimi</ma:dhl_kaust>
  <ma:dhl_saabumisviis>esialgu string email või string xtee</ma:dhl_saabumisviis>
  <ma:dhl_saabumisaeg>DVK -sse saabumise aeg CCYY-MM-DDThh:mm:ss</ma:dhl_saabumisaeg>  
  <ma:dhl_saatmisviis>esialgu string email või string xtee</ma:dhl_saatmisviis>
  <ma:dhl_saatmisaeg>DVKst saatmise aeg CCYY-MM-DDThh:mm:ss</ma:dhl_saatmisaeg>
- 
+
  <ma:dhl_saatja_asutuse_nr>
    registrinr turvaserverist (ainult xteest tulnud)
  </ma:dhl_saatja_asutuse_nr>
@@ -478,7 +480,7 @@ DVK konteineri versioon 2 metainfo blokk näeb välja järgmine:
  <ma:dhl_saaja_isikukood>
   saaja kood turvaserverile (xteega saadetud)
  </ma:dhl_saaja_isikukood>
- 
+
  <ma:dhl_saatja_epost>
   saatja eposti aadress (tulnud epostiga)
  </ma:dhl_saatja_epost>
@@ -503,16 +505,16 @@ DVK konteineri versioon 2 metainfo blokk näeb välja järgmine:
     Siin on toodud eraldi info koostaja kohta ja info
     saatja kohta: viimast tuleb kasutada, kui saatja (asutus)
     on erinev koostajast (asutusest)
-  
+
  -->
- 
+
  <mm:koostaja_asutuse_nr>
     algse koostaja (autori) asutuse number
  </mm:koostaja_asutuse_nr>
  <mm:saaja_asutuse_nr>
    asutuse nr, kellele saata (kui tühi, ei saadeta)
  </mm:saaja_asutuse_nr>
- 
+
  <mm:koostaja_dokumendinimi>
    dokumendi nimi koostajal
  </mm:koostaja_doknimi>
@@ -543,7 +545,7 @@ DVK konteineri versioon 2 metainfo blokk näeb välja järgmine:
  <mm:koostaja_asutuse_kontakt>
   algse koostaja asutuse kontaktinfo
  </mm:koostaja_asutuse_kontakt>
-  
+
  <mm:autori_osakond>
    osakond, kus autor ehk ametlik saatja peaks töötama
  </mm:autori_osakond>
@@ -556,7 +558,7 @@ DVK konteineri versioon 2 metainfo blokk näeb välja järgmine:
  <mm:autori_kontakt>
   autori ehk ametliku saatja kontaktinfo
  </mm:autori_kontakt>
- 
+
  <mm:seotud_dokumendinr_koostajal>
   Koostaja dokument, mis on praegusega seotud
  </mm:seotud_dokumendinr_koostajal>
@@ -573,7 +575,7 @@ DVK konteineri versioon 2 metainfo blokk näeb välja järgmine:
  <mm:saatja_asutuse_kontakt>
   saatja asutuse kontakt
  </mm:saatja_asutuse_kontakt>
-  
+
  <mm:saaja_isikukood>
   isikukood, kellele dokument saadetakse
  </mm:saaja_isikukood>
@@ -716,7 +718,7 @@ Transport blokk sisaldab dokumendi edasisaatmiseks kriitilist vajalikku infot. B
    <dhl:osakonna_kood>Saatja struktuuriüksuse asutusesisene kood<dhl:osakonna_kood>
    <dhl:osakonna_nimi> Saatja struktuuriüksuse nimi<dhl:osakonna_nimi>
  </dhl:saatja>
-    
+
  <!-- piiramatu arv saaja info blokke -->
  <dhl:saaja>
    <dhl:regnr>Saaja asutuse registreerimisnumber<dhl:regnr>
@@ -769,7 +771,7 @@ Näitab, kas antud dokument on adressaadile teadmiseks või täitmiseks
    <dhl:allyksuse_lyhinimetus>Saatja allüksuse lühinimetus<dhl:allyksuse_kood>
    <dhl:allyksuse_nimetus>Saatja allüksuse nimetus<dhl:allyksuse_nimetus>
 </dhl:saatja>
-    
+
  <!-- piiramatu arv saaja info blokke -->
  <dhl:saaja>
    <dhl:teadmiseks>
@@ -1006,7 +1008,7 @@ Saatmisinfo kirje sisaldab ka elemendi „olek“, **mille väärtus määrab do
 
 ####Dokumentide vastuvõtt
 
-![Dokumentide vastuvõtt](/docs/img/image2.png "Dokumentide vastuvõtt") 
+![Dokumentide vastuvõtt](/docs/img/image2.png "Dokumentide vastuvõtt")
 
 DHS-i poolne teiste asutuste poolt antud asutusele saadetud dokumentide vastuvõtt toimub päringu *dhl.receiveDocuments* abil. Päring tagastab kõik DVK-s antud asutusele teiste asutuste poolt edastatud dokumendid. Päringule saab elemendi „arv“ abil määrata piirangu, mitu dokumenti maksimaalselt tohib vastuses tagastada. Lisaks saab elemendi „kaust“ abil määrata kausta(d), kust dokumente loetakse.
 Päring tagastab loetud dokumentide massiivi.
@@ -1024,6 +1026,85 @@ Peale edukat dokumentide vastuvõttu peab DHS käivitama päringu *dhl.markDocum
 Päring tagastab oma kehas väärtuse „OK“.
 
 ##X-Tee päringute kirjeldused
+
+<a name="xroad-general-info"></a>
+### Üldinfo
+DVK veebiteenused kasutatakse üle X-Tee (DVK eeldab, et päringus on defineeritud X-Tee päised). Päringute kirjelduse juures on toodud välja päringu parameetrid ning päringu vastuse kuju X-Tee sõnumiprotokolli versioon 2.0 jaoks (veebiteenused stiilis „RPC/encoded”).
+
+<a name="xroad-message-protocol-v4"></a>
+### X-tee sõnumiprotokoll versioon 4.0
+Vana sõnumiprotokolli (versioon 2.0) asemel võib kasutada X-tee sõnumiprotokolli versioon 4.0 (veebiteenused stiilis „Document/Literal wrapped”). Selleks on vaja teha järgmist:<br>
+ 1) vahetada vana protokolli nimeruumi defineerimist (`xmlns:xtee="http://x-tee.riik.ee/xsd/xtee.xsd"`) järgmise kahe defineerimistega:
+- `xmlns:xrd="http://x-road.eu/xsd/xroad.xsd"`
+- `xmlns:id="http://x-road.eu/xsd/identifiers"`
+
+2) panna SOAP päringu *header* elemendi sisse X-tee sõnumiprotikolli versioonile 4 vastavad elemendid. **Päringu keha (SOAP body) sisu jääb samaks.**
+
+Päringu parameetritena on eeldatud alati järgmiste päiste olemasolu:
+
+```xml
+<xrd:client id:objectType="SUBSYSTEM">
+    <id:xRoadInstance>tavaliselt riigi ISO kood</id:xRoadInstance>
+    <id:memberClass>kliendi tüüp (kas riik,  asutus, ettevõtte, eraisik jne)</id:memberClass>
+    <id:memberCode>päringut tegeva asutuse kood</id:memberCode>
+    
+    <!-- Optional (mittekohustuslik) -->
+    <id:subsystemCode>allasutus, kelle nimel kasutaja päringut teostab</id:subsystemCode>
+</xrd:client>
+<xrd:service id:objectType="SERVICE">
+    <id:xRoadInstance>tavaliselt riigi ISO kood</id:xRoadInstance>
+    <id:memberClass>teenuse pakkuja tüüp (kas riik,  asutus, ettevõtte vms)</id:memberClass>
+    <id:memberCode>teenuse pakkuja kood</id:memberCode>
+    
+    <id:subsystemCode>andmekogu nimi – „dhl“</id:subsystemCode>
+    <id:serviceCode>päringu nimi (Nt. „sendDocuments”)</id:serviceCode>
+    <id:serviceVersion>päringu versioon (Nt. „v1”)</id:serviceVersion>
+</xrd:service>
+<xrd:userId>päringu teinud isiku kood</xrd:userId>
+<xrd:id>päringu ID</xrd:id>
+<xrd:protocolVersion>sõnumiprotokolli versioon (peab olema 4.0)</xrd:protocolVersion>
+```
+<br>
+Siin on standadse SOAP **päringu näide** *sendDocuments* teenuse jaoks, mis annab ettekujutuse X-tee sõnumiprotokolli v4.0 kasutamisest:
+```xml
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+        xmlns:dhl="http://producers.dhl.xtee.riik.ee/producer/dhl"
+
+        xmlns:xrd="http://x-road.eu/xsd/xroad.xsd"
+        xmlns:id="http://x-road.eu/xsd/identifiers">
+    <soapenv:Header>
+        <xrd:client id:objectType="SUBSYSTEM">
+            <id:xRoadInstance>EE</id:xRoadInstance>
+            <id:memberClass>GOV</id:memberClass>
+            <id:memberCode>70000562</id:memberCode>
+        </xrd:client>
+        <xrd:service id:objectType="SERVICE">
+            <id:xRoadInstance>EE</id:xRoadInstance>
+            <id:memberClass>GOV</id:memberClass>
+            <id:memberCode>70006317</id:memberCode>
+
+            <id:subsystemCode>dhl</id:subsystemCode>
+            <id:serviceCode>sendDocuments</id:serviceCode>
+            <id:serviceVersion>v4</id:serviceVersion>
+        </xrd:service>
+        <xrd:userId>EE38806190294</xrd:userId>
+        <xrd:id>6cae248568b3db7e97ff784673a4d38c5906bee0</xrd:id>
+        <xrd:protocolVersion>4.0</xrd:protocolVersion>
+    </soapenv:Header>
+    <soapenv:Body>
+        <dhl:sendDocuments>
+            <keha>
+                <dokumendid href="cid:uus_kapsel_1.xml.gz.b64"/>
+            </keha>
+        </dhl:sendDocuments>
+    </soapenv:Body>
+</soapenv:Envelope>
+```
+
+Rohkem infot X-tee sõnumiprotokolli v4.0 kasutamise kohta saab vastavast [*tehnilisest spetsifikatsioonist*](http://x-road.eu/docs/x-road_message_protocol_v4.0.pdf).
+
+##DVK teenused
+Järgmisena on näidatud kõik DVK poolt pakutavad teenused koos kirjelduste ja näidetega.
 
 ###sendDocuments
 
@@ -1618,9 +1699,9 @@ SOAPAction: ""
 MIME-Version: 1.0
 Content-Length: 19154
 
-<soapenv:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" 
+<soapenv:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
 xmlns:dhl="http://localhost:8080/services/dhlHttpSoapPort"
 xmlns:xtee="http://x-tee.riik.ee/xsd/xtee.xsd">
    <soapenv:Header>
@@ -4779,7 +4860,7 @@ Content-Encoding: gzip
 H4sIAAAAAAAAALNJzE0tyczOz0hMsbOBsUvsbLLz81PsDG30wbRNXiZQprTYLvjwnpyUTIWy/KLczKxEG32...
 Y4VR/JCwDpUv8hzwAAAA==
 ------=_Part_22_9158501.1265809289375--
-``` 
+```
 
 ##### Päringu „keha“ elemendi sisu
 
@@ -4790,7 +4871,7 @@ Elemendi „keha“ sisu kodeerimata kujul on:
     <asutus>87654321</asutus>
     <asutus>12345678</asutus>
 </asutused>
-``` 
+```
 
 ##### Vastuse „keha“ elemendi sisu
 
@@ -4827,7 +4908,7 @@ Elemendi „keha“ sisu kodeerimata kujul on:
         <ks_allyksuse_lyhinimetus>RMTP</ks_allyksuse_lyhinimetus>
     </ametikoht>
 </ametikohad>
-``` 
+```
 
 ##Kasutusõiguste süsteem DVK rakenduses
 ------
@@ -4901,7 +4982,7 @@ server_validate_xml_files = no
 # Määrab, kas DVK server üritab valideerida digiallkirja
 # konteinerite küljes olevaid allkirju.
 server_validate_signatures = no
-``` 
+```
 
 
 ##Adressaatide automaatne lisamine DVK serveris
@@ -4915,7 +4996,7 @@ Automaatse adressaatide lisamise korral muudab DVK server saadetava dokumendikon
 
 DVK serveri poolt automaatselt lisatavaid aadressaate saab seadistada DVK serveri andmetabelis VASTUVOTJA\_MALL. Nimetatud andmetabeli struktuur näeb välja järgmine:
 
-| Andmevälja nimi | Kirjeldus | 
+| Andmevälja nimi | Kirjeldus |
 |-------|----------------------|
 | vastuvotja_mall_id | Kirje unikaalne ID. Selle määrab andmebaas automaatselt. |
 | asutus_id | Lisatava adressaadi asutuse ID. Viitab tabelisse ASUTUS. Vähemalt see lahter peaks adressaadi puhul alati täidetud olema. |
@@ -5060,7 +5141,7 @@ Selleks tuleb DVK serveri konfiguratsioonifaili dhl.properties lisada järgmised
 ```
 client_default_org_code = 12345678
 client_default_person_code = 11111111111
-``` 
+```
 
 **Väliste serverite aadresside lisamine DVK serverisse**
 
@@ -5139,7 +5220,7 @@ User-Agent: Axis/1.3
 
 DVK päringud ei tööta aga korrektselt näiteks järgmise päise korral:
 
-<pre> 
+<pre>
 POST /cgi-bin/consumer_proxy HTTP/1.0
 Content-Type: multipart/related; <b>type=text/xml;</b> start="<FC392E97EB481BFCEB435125AA3B5B51>";     boundary="----=_Part_0_20230270.1171971312715"
 User-Agent: Axis/1.3
@@ -5205,7 +5286,7 @@ https://svn.eesti.ee/projektid/dvk/server/trunk/src/main/webapp/
 <dhl:dokument xmlns:dhl="http://www.riik.ee/schemas/dhl" dhl:schemaLocation=““>
   <dhl:metainfo xmlns:ma="http://www.riik.ee/schemas/dhl-meta-automatic" ma:schemaLocation=“ http://www.riik.ee/schemas/dhl/dhl-meta-automatic.xsd“
  xmlns:mm="http://www.riik.ee/schemas/dhl-meta-manual" mm:schemaLocation=“ http://www.riik.ee/schemas/dhl/dhl-meta-manual.xsd“>
-        
+
     <!— Seda osa pole ise vaja täita, selle täidab DVK väljuval sõnumil ise -->
     <ma:dhl_id>100</ma:dhl_id>
     <ma:dhl_saabumisviis>xtee</ma:dhl_saabumisviis>
@@ -5220,7 +5301,7 @@ https://svn.eesti.ee/projektid/dvk/server/trunk/src/main/webapp/
     <ma:dhl_saaja_epost>karupoeg.puhh@vallavalitsus.ee</ma:dhl_saaja_epost>
     <ma:dhl_kaust>/KIRJAD</ma:dhl_kaust>
     <!— Automaatselt täidetava osa lõpp -->
-    
+
     <mm:koostaja_asutuse_nr>12345678</mm:koostaja_asutuse_nr>
     <mm:saaja_asutuse_nr>87654321</mm:saaja_asutuse_nr>
     <mm:koostaja_dokumendinimi>Kaeveloa taotlus, H. Kriimsilm</mm:koostaja_dokumendinimi>
@@ -5370,7 +5451,7 @@ https://svn.eesti.ee/projektid/dvk/server/trunk/src/main/webapp/
     </dhl:metaxml>
     <SignedDoc/>
 </dhl:dokument>
-``` 
+```
 
 ##LISA 3: &lt;dokument&gt; XML struktuuri kasutusnäide (DVK konteineri versioon 2)
 
@@ -5481,4 +5562,4 @@ https://svn.eesti.ee/projektid/dvk/server/trunk/src/main/webapp/
     </dhl:failid>
     <dhl:konteineri_versioon>2</dhl:konteineri_versioon>
 </dhl:dokument>
-``` 
+```

@@ -102,12 +102,14 @@ public class UserProfile {
         // Laeme asutuste registrist esitatud asutuse koodile vastava
         // asutuse andmed.
         Asutus org = new Asutus();
-		int organizationId = 0;		
+		int organizationId = 0;
 		if (header.getXRoadClient() != null && StringUtils.isNotEmpty(header.getXRoadClient().getSubsystemCode())) {
 			org.loadByRegNr(header.getProducer(), conn);
 			
 			if (org.getRegistrikood2().equals(header.getConsumer())) {
 				organizationId = org.getId();
+			} else {
+				org.clear();
 			}
 		}
 		

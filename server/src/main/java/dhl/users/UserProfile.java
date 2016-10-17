@@ -104,9 +104,9 @@ public class UserProfile {
         Asutus org = new Asutus();
 		int organizationId = 0;
 		if (header.getXRoadClient() != null && StringUtils.isNotEmpty(header.getXRoadClient().getSubsystemCode())) {
-			org.loadByRegNr(header.getProducer(), conn);
+			org.loadByRegNr(header.getXRoadClient().getSubsystemCode(), conn);
 			
-			if (org.getRegistrikood2().equals(header.getConsumer())) {
+			if (org.getRegistrikood2().equals(header.getXRoadClient().getMemberCode())) {
 				organizationId = org.getId();
 			} else {
 				org.clear();

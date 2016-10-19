@@ -102,20 +102,21 @@ public class UserProfile {
         // Laeme asutuste registrist esitatud asutuse koodile vastava
         // asutuse andmed.
         Asutus org = new Asutus();
-		int organizationId = 0;
-		if (header.getXRoadClient() != null && StringUtils.isNotEmpty(header.getXRoadClient().getSubsystemCode())) {
-			org.loadByRegNr(header.getXRoadClient().getSubsystemCode(), conn);
-			
-			if (org.getRegistrikood2().equals(header.getXRoadClient().getMemberCode())) {
-				organizationId = org.getId();
-			} else {
-				org.clear();
-			}
-		}
 		
-		if (organizationId == 0) {
-			org.loadByRegNr(header.getConsumer(), conn);
-			organizationId = org.getId();
+		org.loadByRegNr(header.getConsumer(), conn);
+		int organizationId = org.getId();
+		
+		if (organizationId == 0 && header.getXRoadClient() != null
+				&& StringUtils.isNotEmpty(header.getXRoadClient().getSubsystemCode())) {
+			org.clear();
+			org.loadByRegNr(header.getXRoadClient().getSubsystemCode(), conn);
+
+			if (StringUtils.isEmpty(org.getRegistrikood2())) {
+				throw new AxisFault(CommonStructures.VIGA_ALAMSYS_REG_TAITMATA
+						.replaceFirst("#1", header.getXRoadClient().getSubsystemCode()));
+			} else if (org.getRegistrikood2().equals(header.getXRoadClient().getMemberCode())) {
+				organizationId = org.getId();
+			}
 		}
 		
 		if (organizationId == 0) {

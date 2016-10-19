@@ -28,6 +28,7 @@ public class CommonStructures {
     public static final String VIGA_XTEE_PAISED_PUUDU = "Esitatud sõnumil puuduvad vajalikud X-Tee päised!";
     public static final String VIGA_XTEE_ASUTUSE_PAIS_PUUDU = "Esitatud sõnumi X-Tee päised ei sisalda informatsiooni sõnumi saatnud asutuse kohta!";
     public static final String VIGA_XTEE_ISIKU_PAIS_PUUDU = "Esitatud sõnumi X-Tee päised ei sisalda informatsiooni sõnumi saatnud isiku kohta!";
+    public static final String VIGA_ALAMSYS_REG_TAITMATA = "Alamsüsteemi (#1) registrikood ei ole DVK keskserveris väärtustatud!";
     public static final String VIGA_TUNDMATU_ASUTUS = "Esitatud sõnumi saatjaks märgitud asutus (#1) ei kuulu DVK-d kasutavate asutuste hulka!";
     public static final String VIGA_TUNDMATU_ISIK = "Esitatud sõnumi saatjaks märgitud isik ei kuulu DVK-s registreeritud isikute hulka!";
     public static final String VIGA_PUUDUV_MIME_LISA = "Viga MIME lisade töötlemisel! Sõnumi kehas märgitud ID-le vastavat MIME lisa ei õnnestunud leida!";

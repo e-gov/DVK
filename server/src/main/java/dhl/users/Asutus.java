@@ -625,7 +625,7 @@ public class Asutus {
 	                    Asutus item = new Asutus();
 	                    item.setId(rs.getInt("asutus_id"));
 	                    item.setRegistrikood(rs.getString("registrikood"));
-	                    item.setRegistrikood(rs.getString("registrikood2"));
+	                    item.setRegistrikood2(rs.getString("registrikood2"));
 	                    item.setRegistrikoodVana(rs.getString("e_registrikood"));
 	                    item.setKsAsutuseID(rs.getInt("ks_asutus_id"));
 	                    item.setKsAsutuseKood(rs.getString("ks_asutus_kood"));

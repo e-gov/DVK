@@ -1,6 +1,6 @@
-#Dokumendivahetuskeskuse (DVK) Liideste spetsifikatsioon
+# Dokumendivahetuskeskuse (DVK) Liideste spetsifikatsioon
 
-##Sisukord
+## Sisukord
 - [Muudatuste ajalugu](#muudatuste-ajalugu)
 - [Sissejuhatus](#sissejuhatus)
 - [Üldskeem: dokumendid, metainfo, dokumendivahetus](#Üldskeem-dokumendid-metainfo-dokumendivahetus)
@@ -78,7 +78,7 @@
 
 
 
-##Muudatuste ajalugu
+## Muudatuste ajalugu
 
 | Kuupäev | Versioon | Kirjeldus | Autor |
 |-------|----------|----------------|----------------------|
@@ -98,10 +98,12 @@
 | 08.04.2010 | 1.6.00 | Eemaldatud vananenud tekst | Hannes Kiivet |
 | 14.04.2014 | 1.7 | Lisatud sendDocuments.v4 päringu kirjeldus. Täiendatud receiveDocuments päringu kirjeldust. | Hendrik Pärna |
 | 26.09.2016 | 1.8 | Dokumendi sisu üle viidud MarkDown formaati (sisulisi muudatusi tegemata) | Kertu Hiire |
+| 29.09.2016 | 1.9 | Lisatud X-tee v4.0 sõnumiprotokolli kirjeldused DVK kontekstis | Levan Kekelidze |
+| 01.10.2016 | 1.10 | Lisatud teave X-tee alamsüsteemide (subsystem) kasutamisest DVKs  | Kertu Hiire |
 
 
 
-##Sissejuhatus
+## Sissejuhatus
 ------
 
 Dokumendivahetuskeskus (DVK) on erinevatele dokumendihaldussüsteemidele ja muudele dokumente käsitlevatele infosüsteemidele ühine keskset dokumendivahetuse teenust pakkuv infosüsteem. DVK ülesanne on hajutatult paiknevate infosüsteemide liidestamine X-tee vahendusel, dokumentide lühiajaline säilitamine ja lähimas tulevikus ka dokumentide menetlemist toetavate teenuste pakkumine.
@@ -109,9 +111,9 @@ Dokumendivahetuskeskus (DVK) on erinevatele dokumendihaldussüsteemidele ja muud
 Spetsifikatsioonile on eraldi lisatud kolm lisa:
 - [Lisa 1. Viited kasutatavatele nimeruumidele ja XML skeemikirjeldustele](#lisa-1-kasutatavate-andmete-xml-schema-kirjeldused)
 - [Lisa 2. DVK dokumendi näide (DVK konteineri versioon 1)](#lisa-2-dokument-xml-struktuuri-kasutusnäide-dvk-konteineri-versioon-1)
-- [Lisa 3. DVK dokumendi näide (DVK konteineri versioon 2)](#lisa-2-dokument-xml-struktuuri-kasutusnäide-dvk-konteineri-versioon-2)
+- [Lisa 3. DVK dokumendi näide (DVK konteineri versioon 2)](#lisa-3-dokument-xml-struktuuri-kasutusnäide-dvk-konteineri-versioon-2)
 
-##Üldskeem: dokumendid, metainfo, dokumendivahetus
+## Üldskeem: dokumendid, metainfo, dokumendivahetus
 
 Dokumendivahetus DHS ja DVK vahel toimub järgmiste põhikonteinerite kaudu:
 - Väline XTEE SOAP-ümbrik sisaldab gzip-ga kokkupakitud, seejärel base64 kodeeritud XML  konteinerit "dokument"
@@ -120,12 +122,12 @@ Dokumendivahetus DHS ja DVK vahel toimub järgmiste põhikonteinerite kaudu:
         - DigiDoc formaadis dokumenti (DVK konteiner versioon 1), mis omakorda:
             - sisaldab suvalise hulga base64 kodeeringus ja minimaalse formaadi-metainfoga varustatud faile
             - sisaldab suvalise hulga allkirja-blokke nimetatud failide jaoks. Allkirja-blokkidesse ei tule kopeerida konteineris olevate eraldi allkirjastatud dokumentide allkirja-blokke. NB! DVK kontekstis on lubatud allkirja-blokkide puudumine!
-        - <failid> formaadis konteinerit (DVK konteiner versioon 2), mis omakorda:
+        - `<failid>` formaadis konteinerit (DVK konteiner versioon 2), mis omakorda:
             - Sisaldab suvalise hulga faile zip-itud ja seejärel Base64 kodeeringusse panduna. Lisaks failide metaandmed.
 
 Dokumendi ("dokument" konteiner) struktuuri kirjeldame järgmises peatükis, SOAP-konteinerit ja X-Tee päringut aga edasises "Dokumentide logistika" peatükis.
 
-##Vahetatava dokumendi üldine XML kirjeldus
+## Vahetatava dokumendi üldine XML kirjeldus
 
 Dokumendi formaat põhineb kas DigiDoc formaadil (DVK konteineri versioon 1) või `<failid>` konteineril. Dokumendi kohta on olemas erinevat tüüpi metainfo pluss suvaline hulk DigiDoc/failid konteinereid. Muud kaalutlused:
 
@@ -151,7 +153,7 @@ Juhime veel tähelepanu, et DVK konteineri versiooni 1 (kasutab failide kirjelda
 Alates DVK versioonist 1.6.0 on toetatud ka DVK konteineri versioon 2, milles faile hoitakse `<failid>` konteineris. `<failid>` konteiner sisaldab omakorda suvalise arvu faile ja nende metaandmeid. DVK konteineri versioon 2 ei toeta otse failide konteineri küljes olevat digiallkirja. Digiallkirjastatud dokumentide edastamiseks tuleb `<failid>` konteinerisse lisada allkirjastatud DigiDoc fail.
 
 
-###Dokumendi üldine ümbrik
+### Dokumendi üldine ümbrik
 
 DVK-le saadetavad ja sealt loetavad dokumendid on järgmisel kujul XML-tekstid (detailsemalt kirjeldatakse infoblokke järgmistes peatükkides):
 
@@ -223,27 +225,11 @@ Järgnev on DigiDoc formaadi ümbriku ülemise taseme kirjeldus AS Sertifitseeri
     ....
     <Signature/>
 </SignedDoc>
-
-Kui kasutatakse DVK konteineri versiooni 2, siis hoitakse faile <failid> konteineris, mille struktuur on järgmine:
-
-<dhl:failid xmlns="http://www.riik.ee/schemas/dhl/2010/2">       
-<fail>
-        <jrknr/>
-      <fail_pealkiri/>
-      <fail_suurus/>
-      <fail_tyyp/>
-      <fail_nimi/>
-      <zip_base64_sisu/>
-      <krypteering/>
-      <pohi_dokument/>
-      <pohi_dokument_konteineris/>
-    </fail>
-</dhl:failid>
 ```
 
 Kui kasutatakse DVK konteineri versiooni 2, siis hoitakse faile `<failid>` konteineris, mille struktuur on järgmine:
 
-```
+```xml
 <dhl:failid xmlns="http://www.riik.ee/schemas/dhl/2010/2">       
 <fail>
         <jrknr/>
@@ -259,7 +245,7 @@ Kui kasutatakse DVK konteineri versiooni 2, siis hoitakse faile `<failid>` konte
 </dhl:failid>
 ```
 
-###Metainfo blokk dokumendis
+### Metainfo blokk dokumendis
 
 MetaInfo bloki struktuur on lame: ta sisaldab hulgaliselt rdf-ideoloogia järgi väli-väärtus paare, kus iga paar annab kogu dokumendi ümbriku jaoks mingi väärtuse.
 
@@ -698,7 +684,7 @@ Dokumendi koostaja kontakttelefon
 ```
 
 
-###Transport blokk dokumendis
+### Transport blokk dokumendis
 
 Transport blokk sisaldab dokumendi edasisaatmiseks kriitilist vajalikku infot. Blokk on kohustuslik, kui dokument on mõeldud edasisaatmiseks. Täpsemalt vaata dokumentide logistika peatükist ja dhl.xsd schemast edasises. Ka siin sõltub bloki struktuur kasutatavast DVK konteineri versioonist. **Versioon 1** puhul on kasutusel järgmine struktuur:
 
@@ -752,7 +738,7 @@ Transport blokk sisaldab dokumendi edasisaatmiseks kriitilist vajalikku infot. B
  </dhl:vahendaja>
 </dhl:transport>
 ```
-###DVK konteineri versioon 2 puhul on kasutusel järgmine struktuur:
+### DVK konteineri versioon 2 puhul on kasutusel järgmine struktuur:
 
 ```xml
 <dhl:transport xmlns:dhl="http://www.riik.ee/schemas/dhl/2010/2">
@@ -826,8 +812,8 @@ Ajalugu blokk sisaldab kas täielikke või osalisi koopiaid dokumendi varasemate
    <dhl:metaxml/>
 <dhl:ajalugu/>
 ```
-###Metaxml blokk dokumendis
-Metaxml bloki sisuks on dokumendi liigist sõltuva struktuuriga metaandmed. Soovituslik oleks igal konkreetsel juhul viidata metaandmete struktuuri kirjeldavale XML skeemile (schema), kasutades selleks xmlns ja schemaLocation atribuute. Vaikimisi eeldatakse, et metaxml blokis sisalduvad andmed vastavad Riigikantselei poolt fikseeritud kirja metaandmete vormingule: (http://www.riik.ee/schemas/dhl/rkel\_letter.xsd)
+### Metaxml blokk dokumendis
+Metaxml bloki sisuks on dokumendi liigist sõltuva struktuuriga metaandmed. Soovituslik oleks igal konkreetsel juhul viidata metaandmete struktuuri kirjeldavale XML skeemile (schema), kasutades selleks xmlns ja schemaLocation atribuute. Vaikimisi eeldatakse, et metaxml blokis sisalduvad andmed vastavad Riigikantselei poolt fikseeritud kirja metaandmete vormingule: (http://www.riik.ee/schemas/dhl/rkel_letter.xsd)
 
 ```xml
 <dhl:metaxml xmlns="http://www.riik.ee/schemas/dhl/rkel_letter"
@@ -844,7 +830,7 @@ Metaxml bloki sisuks on dokumendi liigist sõltuva struktuuriga metaandmed. Soov
 
 <dhl:metaxml/>
 ```
-###Taustinfoks:DigiDoci konteiner
+### Taustinfoks:DigiDoci konteiner
 Selline on DigiDoc konteineri üldstruktuur:
 
 ```xml
@@ -867,12 +853,11 @@ Iga faili kohta tehakse kirje `<DataFile>`, mis omab järgmisi atribuute:
 
     Filename - faili tegelik (väline) nimi ilma teekonnata.
 
-    ContentType - dokumendi salvestamise meetod (DETATCHED, EMBEDDED\_BASE64 või EMBEDDED)
+    ContentType - dokumendi salvestamise meetod (DETATCHED, EMBEDDED_BASE64 või EMBEDDED)
 
-    EMBEDDED - faili andmed on sisestatud algkujul antud kirjes.
-Kasutatav vaid XML kujul algandmete jaoks. Tähelepanu tuleb osutada sellel, et algandmete XML fail ei sisaldaks XML päist (`<?xml ... ?>`) ega DTD-d. Siin kirjeldatud XML elemendid ei ole keelatud. Võmalik on ühe faili sisse salvestada algkujul teist DigiDoc faili.
+    EMBEDDED - faili andmed on sisestatud algkujul antud kirjes. Kasutatav vaid XML kujul algandmete jaoks. Tähelepanu tuleb osutada sellel, et algandmete XML fail ei sisaldaks XML päist (`<?xml ... ?>`) ega DTD-d. Siin kirjeldatud XML elemendid ei ole keelatud. Võmalik on ühe faili sisse salvestada algkujul teist DigiDoc faili.
 
-    EMBEDDED\_BASE64 - faili andmed on sisestatud Base64 kujul antud kirjes.
+    EMBEDDED_BASE64 - faili andmed on sisestatud Base64 kujul antud kirjes.
 
     DETATCHED - algandmed sisalduvad failis, mille nimi on salvestatud atribuudis Filename.
 
@@ -889,7 +874,7 @@ Kasutatav vaid XML kujul algandmete jaoks. Tähelepanu tuleb osutada sellel, et 
     xmlns - peab kasutama SignedDoc namespacet: http://www.sk.ee/DigiDoc/v1.3.0\#.
 
 
-###Taustinfoks:`<failid>` konteiner
+### Taustinfoks:`<failid>` konteiner
 DVK konteineri versioon 2 kasutab failide edastamiseks <SignedDoc> (DigiDoc) konteineri asemel `<failid>` konteinerit, mille struktuur on järgmine:
 
 ```xml
@@ -913,15 +898,15 @@ Kui tegemist on konteinerfailiga (BDOC, DDOC, ZIP), siis annab põhifaili nime
 </dhl:failid>
 ```
 
-##Dokumentide logistika
+## Dokumentide logistika
 ------
 
-###Üldist
+### Üldist
 Kahe erineva asutuse dokumendihaldussüsteemide (DHS) vaheline automaatne elektrooniline dokumendivahetus realiseeritakse üle X-tee dokumendivahetuskeskuse (DVK) kaasabil. DHS-ile paistab DVK kätte kui X-tee infrastruktuuris asuv andmekogu ning ka sellega suhtlus realiseeritakse standardsel viisil – DHS-i juurde realiseeritakse X-tee adapterserver, mis suhtleb läbi asutuse turvaserveri DVK-ga.
 
-###Tööskeem
+### Tööskeem
 
-####DVK loogiline ülesehitus
+#### DVK loogiline ülesehitus
 Dokumentide logistika teenuste seisukohast omab DVK järgmist loogilist ülesehitust:
 
 -   Kõik DVK-d üle X-Tee kasutavad asutused on ära kirjeldatud suhtluspartneritena. Iga suhtluspartner omab DVK-s kontot, mille kaudu saab teistele asutustele dokumente saata ja endale saadetud dokumente vastu võtta.
@@ -929,7 +914,7 @@ Dokumentide logistika teenuste seisukohast omab DVK järgmist loogilist ülesehi
 -   Iga DVK-sse saadetava dokumendi puhul määratakse ära dokumendi saatja ning ühe või mitme adressaadi andmed. Adressaatide andmete alusel otsustatakse, millistele asutustele antud dokumenti üleslaadimiseks pakutakse.
 -   DVK-sse saabumisel fikseeritakse iga adressaadi kohta dokumendi olekuks „saatmisel”. Kui adressaat on dokumendi DVK-st vastu võtnud ja dokumendi kättesaamist kinnitanud, saab dokument antud adressaadi seisukohast olekuks „saadetud”. Iga dokumendi kohta hoitakse DVK-s ka koondolekut. Kui dokument ootab saatmist vähemalt ühele adressaadile, on dokumendi koondolek „saatmisel”. Kui dokument on kõigi adressaatide poolt vastu võetud, saab dokumendi koondolekuks „saadetud”.
 
-####Kaustade kasutamine
+#### Kaustade kasutamine
 Juhul, kui tekib vajadus vahetada asutuste vahel mitut erinevat liiki dokumente või kui samas asutuses vahetavad DVK kaudu dokumente mitu erinevat rakendust, on otstarbekas kasutada dokumentide organiseerimiseks DVK poolel kaustade funktsionaalsust. S.t. näiteks e-arveid vahetavad asutused kausta /FINANTS kaudu ja kirju kausta /KIRJAD kaudu.
 
 Vaikimisi võiks DVK rakendus sisaldada järgmisi kaustu:
@@ -963,9 +948,9 @@ Kui asutusel töötleb vorme ja muid DVK dokumente erinev IS, peaks e-vorme tö�
 
 Vormile vastuse saatmisel peaks vastus olema adresseeritud samasse kausta, kuhu oli paigutatud algne EV rakenduse kasutaja poolt saadetud dokument. DVK-st allalaaditava dokumendi kaust on määratud elemendiga "ma:dhl\_kaust".
 
-####Dokumentide edastamine
+#### Dokumentide edastamine
 
-![Dokumentide edastamine](/docs/img/image1.png "Dokumentide edastamine")
+![Dokumentide edastamine](/doc/img/image1.png "Dokumentide edastamine")
 
 Dokumentide edastamiseks teis(t)ele asutus(t)ele käivitab DHS päringu *dhl.sendDocuments*. Päringu kehasse paigutatakse massiivina kõik edastamist nõudvad dokumendid. Dokumendid peavad olema esitatud „dhlDokumentType“ XML tüübile vastavas formaadis (vt punkti „Dokumentide formaat“) ning omama elemendi „Transport“ all järgmisi kohustuslikke elemente:
 
@@ -984,7 +969,7 @@ Päringuga on võimalik edastada ka dokumente, mis asuvad DVK dokumendikontol. S
 
 Päring tagastab resultaadina massiivi, mille vastavatel positsioonidel on edastatud dokumentide DVK seesmised ID-id.
 
-####Edastatud dokumentide staatuse kontroll
+#### Edastatud dokumentide staatuse kontroll
 Päringuga *dhl.getSendStatus* küsitakse päringu *dhl.sendDocuments* abil edastatud dokumentide olekuinfot. Päringu kehas esitatakse massiiv dokumentide ID-idest(DVK konteineri versioonis 2 on võimalik leida dokumendi staatus ka dokumendi GUID abil), mille olekut soovitakse teada saada. Päring tagastab massiivi, mille elementideks on dokumentide saatmisinfo. Saatmisinfo sisaldab iga saaja kohta elementi „edastus“, mille alamelementide tähendused on:
 
 - „saaja“ element on samasuguse sisuga, nagu dokumendi saaja element oli algselt määratud.
@@ -1006,9 +991,9 @@ Saatmisinfo kirje sisaldab ka elemendi „olek“, **mille väärtus määrab do
 - „saadetud“ – dokument õnnestus kõigile saajatele edastada.
 - „katkestatud“ – vähemalt ühele saajale ei õnnestunud dokumenti edastada.
 
-####Dokumentide vastuvõtt
+#### Dokumentide vastuvõtt
 
-![Dokumentide vastuvõtt](/docs/img/image2.png "Dokumentide vastuvõtt")
+![Dokumentide vastuvõtt](/doc/img/image2.png "Dokumentide vastuvõtt")
 
 DHS-i poolne teiste asutuste poolt antud asutusele saadetud dokumentide vastuvõtt toimub päringu *dhl.receiveDocuments* abil. Päring tagastab kõik DVK-s antud asutusele teiste asutuste poolt edastatud dokumendid. Päringule saab elemendi „arv“ abil määrata piirangu, mitu dokumenti maksimaalselt tohib vastuses tagastada. Lisaks saab elemendi „kaust“ abil määrata kausta(d), kust dokumente loetakse.
 Päring tagastab loetud dokumentide massiivi.
@@ -1025,7 +1010,7 @@ Peale edukat dokumentide vastuvõttu peab DHS käivitama päringu *dhl.markDocum
 
 Päring tagastab oma kehas väärtuse „OK“.
 
-##X-Tee päringute kirjeldused
+## X-Tee päringute kirjeldused
 
 <a name="xroad-general-info"></a>
 ### Üldinfo
@@ -1103,12 +1088,12 @@ Siin on standadse SOAP **päringu näide** *sendDocuments* teenuse jaoks, mis an
 
 Rohkem infot X-tee sõnumiprotokolli v4.0 kasutamise kohta saab vastavast [*tehnilisest spetsifikatsioonist*](http://x-road.eu/docs/x-road_message_protocol_v4.0.pdf).
 
-##DVK teenused
+## DVK teenused
 Järgmisena on näidatud kõik DVK poolt pakutavad teenused koos kirjelduste ja näidetega.
 
-###sendDocuments
+### sendDocuments
 
-###sendDocuments.v1
+### sendDocuments.v1
 ------
 
 <pre>
@@ -1125,9 +1110,9 @@ Element „kaust“ määrab ära kataloogitee, kuhu tuleb dokumendid paigutada.
 Väljundi kehaks on base64 kodeeringus documentRefsArrayType tüüpi massiiv, mis sisaldab DVK poolt dokumentidele omistatud unikaalseid ID-e.  
 Dokumentide saatmisel sendDocuments päringuga teostatakse DVK konteineri ning saadetavate XML, DDOC ja BDOC failide valideerimine. Täpsem info failide valideerimise kohta asub käesoleva dokumendi peatükis „[Edastatavate dokumentide valideerimine DVK serveris](#edastatavate-dokumentide-valideerimine-dvk-serveris)“.
 
-####Näide
+#### Näide
 
-#####Päring
+##### Päring
 
 ```xml
 POST /cgi-bin/consumer_proxy HTTP/1.0
@@ -1285,7 +1270,7 @@ Kui saadeti korraga mitu dokumenti, siis on elemendi „keha“ sisu kodeerimata
 <dhl_id>54365437</dhl_id>
 ```
 
-###sendDocuments.v2
+### sendDocuments.v2
 ------
 
 Päringu sendDocuments versioon v2 erineb eelmisest versioonist selle poolest, et võimaldab dokumente DVK serverisse saata fragmenteeritud kujul.
@@ -1492,7 +1477,7 @@ Kui saadeti korraga mitu dokumenti, siis on elemendi „keha“ sisu kodeerimata
 <dhl_id>54365437</dhl_id>
 ```
 
-###sendDocuments.v3
+### sendDocuments.v3
 ------
 
 Päring erineb versioonist 2 selle poolest, et kasutusele on võetud asutuse ja allüksuse lühinimetused.
@@ -1683,14 +1668,14 @@ Kui saadeti korraga mitu dokumenti, siis on elemendi „keha“ sisu kodeerimata
 ```
 
 
-###sendDocuments.v4
+### sendDocuments.v4
 ------
 
 Päring erineb versioonist 3 selle poolest, et teenus võtab vastu kapsli versiooni 2.1.
 
-####Näide:
+#### Näide:
 
-#####Päring
+##### Päring
 ```xml
 POST dhl/services/dhlHttpSoapPort HTTP/1.1
 Accept-Encoding: gzip,deflate
@@ -1724,7 +1709,7 @@ xmlns:xtee="http://x-tee.riik.ee/xsd/xtee.xsd">
 </soapenv:Envelope>
 ```
 
-#####Päringu keha sisu, mis on base64 dekodeeritud ning seejärel Gzip'ist lahti pakitud:
+##### Päringu keha sisu, mis on base64 dekodeeritud ning seejärel Gzip'ist lahti pakitud:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -1903,7 +1888,7 @@ xmlns:xtee="http://x-tee.riik.ee/xsd/xtee.xsd">
 </DecContainer>
 ```
 
-#####Päringu vastus:
+##### Päringu vastus:
 
 ```xml
 HTTP/1.1 200 OK
@@ -1959,9 +1944,9 @@ pakkimist:
 <keha><dhl_id>6423</dhl_id></keha>
 ```
 
-###getSendStatus
+### getSendStatus
 
-###getSendStatus.v1
+### getSendStatus.v1
 ------
 
 <pre>
@@ -2378,11 +2363,11 @@ Elemendi „keha“ sisu kodeerimata kujul on:
 </item>
 ```
 
-###receiveDocuments
+### receiveDocuments
 Kui vastuvõtjale on saadetud 2.1 versioon kapslist ja asutuse toetatav kapsli versioon on 1.0, siis kapsel konverteeritakse kapsli versioonist
 2.1 versiooni 1.0. **NB! Teistpidi konverteerimist ei eksisteeri.**
 
-###receiveDocuments.v1
+### receiveDocuments.v1
 ------
 
 <pre>
@@ -2399,9 +2384,9 @@ Element „kaust“ määrab ära, millisest DVK kaustast dokumendid loetakse. E
 
 Väljund on base64 kodeeringus documentsArrayType tüüpi massiiv, mille iga element on tagastatud dokument.
 
-####Näide
+#### Näide
 
-#####Päring
+##### Päring
 
 ```xml
 POST /cgi-bin/consumer_proxy HTTP/1.0
@@ -2570,7 +2555,7 @@ Elemendi „keha“ sisu kodeerimata kujul on:
 </dokument>
 ```
 
-###receiveDocuments.v2
+### receiveDocuments.v2
 ------
 
 Päringu receiveDocuments versioon v2 erineb eelmisest versioonist selle poolest, et võimaldab dokumente DVK serverist alla laadida fragmenteeritud kujul.
@@ -2735,7 +2720,7 @@ Elemendi „keha“ sisu kodeerimata kujul on:
 </dokument>
 ```
 
-###receiveDocuments.v3
+### receiveDocuments.v3
 ------
 
 Päringu receiveDocuments versioon v3 erineb eelmisest versioonist selle poolest, et võimaldab parameetritena ette anda allüksuse koodi ja ametikoha koodi. See võimaldab vastu võtta ainult konkreetsele allüksusele ja/või ametikohale adresseeritud dokumendid.
@@ -2903,7 +2888,7 @@ Elemendi „keha“ sisu kodeerimata kujul on:
 </dokument>
 ```
 
-###receiveDocuments.v4
+### receiveDocuments.v4
 ------
 
 Päringu receiveDocuments versioon v4 erineb versioonist V3 selle poolest, et võimaldab allüskuse ja ametikoha parameetritena kasutada lühinimetusi (versioon V3 kasutas numbrilisi ID koode). See võimaldab vastu võtta ainult konkreetsele allüksusele ja/või ametikohale adresseeritud dokumente. Vastussõnumis olevad dokumendid kasutavad DVK konteineri versioon 2.
@@ -3091,9 +3076,9 @@ Elemendi „keha“ sisu kodeerimata kujul on:
 </dokument>
 ```
 
-###markDocumentsReceived
+### markDocumentsReceived
 
-###markDocumentsReceived.v1
+### markDocumentsReceived.v1
 ------
 
 <pre>
@@ -3209,7 +3194,7 @@ Elemendi „keha“ sisu kodeerimata kujul on:
 <dhl_id>54365435</dhl_id>
 ```
 
-###markDocumentsReceived.v2
+### markDocumentsReceived.v2
 ------
 
 Element „dokumendid“ on base64 kodeeringus massiiv, mille iga element „item” on alljärgneva struktuuriga:
@@ -3355,7 +3340,7 @@ Elemendi „keha“ sisu kodeerimata kujul on:
 </item>
 ```
 
-###markDocumentsReceived.v3
+### markDocumentsReceived.v3
 ------
 
 Päringu markDogumentsReceived versioon v3 eelneb varasematest versioonidest selle poolest, et elemendi „dokumendid“ sisu asub nüüd SOAP sõnumi kehas (varasemates versioonides asus base64 kodeeritud kujul SOAP sõnumi manuses). Samuti on lisatud võimalus märkida dokumendid vastuvõetuks kasutades dokumendi GUID tüüpi identifikaatorit (sellisel juhul asendab element &lt;dokument\_guid&gt; elemendi &lt;dhl\_id&gt;).
@@ -3509,9 +3494,9 @@ Content-Type: text/xml
 </SOAP-ENV:Envelope>
 ```
 
-###getSendingOptions
+### getSendingOptions
 
-###getSendingOptions.v1
+### getSendingOptions.v1
 ------
 
 <pre>
@@ -3625,7 +3610,7 @@ Content-Type: text/xml
 </soapenv:Envelope>
 ```
 
-###getSendingOptions.v2  
+### getSendingOptions.v2  
 ------
 
 <pre>
@@ -3761,7 +3746,7 @@ Content-Type: text/xml
 </soapenv:Envelope>
 ```
 
-###getSendingOptions.v3
+### getSendingOptions.v3
 ------
 
 <pre>
@@ -4012,7 +3997,7 @@ Elemendi „keha“ sisu kodeerimata kujul on:
 </keha>
 ```
 
-###changeOrganizationData
+### changeOrganizationData
 ------
 
 <pre>
@@ -4061,7 +4046,7 @@ Kui andmete uuendamine õnnestub, siis tagastab päring vastussõnumi kehas vä�
 
 Antud päringu puhul esitatakse nii sisend- kui väljundandmed pakkimata ja kodeerimata kujul.
 
-####Näide
+#### Näide
 
 ##### Päring
 
@@ -4188,7 +4173,7 @@ Content-Type: text/xml
 </soapenv:Envelope>
 ```
 
-###deleteOldDocuments
+### deleteOldDocuments
 ------
 <pre>
 Päringu nimi: dhl.deleteOldDocuments.v1
@@ -4200,7 +4185,7 @@ Päring kustutab DVK andmebaasist säilitustähtaja ületanud dokumendid. Kui s�
 
 Kui säilitustähtaja ületanud dokumentide kustutamine õnnestub, siis tagastab päring vastussõnumi kehas väärtuse „OK“.
 
-####Näide
+#### Näide
 
 ##### Päring
 
@@ -4263,7 +4248,7 @@ Content-Type: text/xml
 </soapenv:Envelope>
 ```
 
-###runSystemCheck
+### runSystemCheck
 ------
 
 <pre>
@@ -4274,7 +4259,7 @@ Väljundi keha: string
 
 Päring kontrollib DVK serveri kriitiliste funktsioonide toimimist (andmebaasi ligipääs, kettale kirjutamine, jne.). Kui kõik kontrollitavad funktsioonid toimivad, siis tagastab päring väärtuse „OK“. Avastatud vea korral tagastab päring veateate SOAP veateate kujul.
 
-####Näide
+#### Näide
 
 ##### Päring
 
@@ -4337,9 +4322,9 @@ Content-Type: text/xml
 </soapenv:Envelope>
 ```
 
-###getSubdivisionList
+### getSubdivisionList
 
-###getSubdivisionList.v1
+### getSubdivisionList.v1
 ------
 
 <pre>
@@ -4461,7 +4446,7 @@ Content-Type: text/xml
 </soapenv:Envelope>
 ```
 
-###getSubdivisionList.v2
+### getSubdivisionList.v2
 ------
 
 Päringu getSubdivisionList versioon v2 eelneb varasematest versioonidest selle poolest, et päringu ja vastuse andmed asuvad nüüd SOAP sõnumi manustes (varasemates versioonides asusid andmed SOAP sõnumi kehas).
@@ -4623,9 +4608,9 @@ Elemendi „keha“ sisu kodeerimata kujul on:
 </allyksused>
 ```
 
-###getOccupationList
+### getOccupationList
 
-###getOccupationList.v1
+### getOccupationList.v1
 ------
 
 <pre>
@@ -4749,7 +4734,7 @@ Content-Type: text/xml
 </soapenv:Envelope>
 ```
 
-###getOccupationList.v2
+### getOccupationList.v2
 ------
 
 Päringu getOccupationList versioon v2 eelneb varasematest versioonidest selle poolest, et päringu ja vastuse andmed asuvad nüüd SOAP sõnumi manustes (varasemates versioonides asusid andmed SOAP sõnumi kehas).
@@ -4910,7 +4895,7 @@ Elemendi „keha“ sisu kodeerimata kujul on:
 </ametikohad>
 ```
 
-##Kasutusõiguste süsteem DVK rakenduses
+## Kasutusõiguste süsteem DVK rakenduses
 ------
 
 Dokumendivahetuskeskuses kasutatakse kahetasemelist kasutusõiguste süsteemi:
@@ -4985,14 +4970,14 @@ server_validate_signatures = no
 ```
 
 
-##Adressaatide automaatne lisamine DVK serveris
+## Adressaatide automaatne lisamine DVK serveris
 ------
 
 DVK serverit on võimalik seadistada nii, et kui saadetav dokumendikonteiner vastab etteantud tingimustele, siis lisatakse dokumendi adressaatide hulka üks või mitu täiendavat adressaati. Nimetatud lahendus on vajalik näiteks selleks, et garanteerida mingi projektiga seotud dokumentide jõudmine kõigile asjassepuutuvatele osapooltele.
 
 Automaatse adressaatide lisamise korral muudab DVK server saadetava dokumendikonteineri XML andmeid, s.t. lisatud adressaadid on nähtavad ka kõigile teistele adressaatidele ja dokumendi esialgsele saatjale.
 
-###Adressaatide automaatse lisamise seadistamine
+### Adressaatide automaatse lisamise seadistamine
 
 DVK serveri poolt automaatselt lisatavaid aadressaate saab seadistada DVK serveri andmetabelis VASTUVOTJA\_MALL. Nimetatud andmetabeli struktuur näeb välja järgmine:
 
@@ -5041,39 +5026,42 @@ Sellisel juhul näeks andmeväli TINGIMUS\_XPATH väärtus välja järgmine:<pre
 
 
 
-##Dokumentide edastamine DVK serverite vahel (DVK lüüsid)
+## Dokumentide edastamine DVK serverite vahel (DVK lüüsid)
 ------
 
-###Sissejuhatus
+### Sissejuhatus
 DVK lüüsid kujutavad endast võimalust edastada DVK serverisse saadetud dokumente mõnda teise DVK serverisse või mõnda teise dokumendivahetussüsteemi. Esmases tehnilises lahenduses toetab DVK dokumentide edastamist DVK andmevahetusspetsifikatsioonile vastavatesse dokumendivahetussüsteemidesse.
 
 Sellise dokumentide edastamise peamiseks eesmärgiks on, et saaks eksisteerida eraldi dokumendivahetuskeskkonnad näiteks riigisektori ja erasektori jaoks. Dokumentide vahetamine kirjeldatud juhul toimiks siis joonisel 1 toodud skeemi alusel:
 
-![Joonis 1](/docs/img/image3.PNG "Joonis 1")
+![Joonis 1](/doc/img/image3.PNG "Joonis 1")
 
 DVK serverisse saadetud dokumendi (päring *sendDocuments*) edastamise
 protsess on esitatud joonisel 2.
 
-![Joonis 2](/docs/img/image4.PNG "Joonis 2")
+![Joonis 2](/doc/img/image4.PNG "Joonis 2")
 
 Analoogilist protsessi rakendatakse ka olukorras, kus dokumendi saatja
 pärib andmeid dokumendi staatuse kohta (päring *getSendStatus*).
 
-###Tehnilised piirangud DVK lüüside kasutamisele
+### Tehnilised piirangud DVK lüüside kasutamisele
 
 DVK arhitektuurist tingitult on DVK lüüsidele seatud järgmised
 tehnilised piirangud:
 
-  1.  Dokumendivahetussüsteem, kuhu DVK server dokumente edastab, peab toetama DVK andmevahetusspetsifikatsioonile sarnast transaktsiooniloogikat. S.t. DVK-ga liidestatav dokumendivahetussüsteem peab suutma anda ja vastu võtta andmeid dokumendi kohaletoimetamise kohta.\ Vastasel juhul puudub DVK kaudu dokumendi välja saatnud asutusel või isikul võimalus teada saada, kas tema poolt saadetud dokument on edukalt kohale toimetatud.
+  1.  Dokumendivahetussüsteem, kuhu DVK server dokumente edastab, peab toetama DVK andmevahetusspetsifikatsioonile sarnast transaktsiooniloogikat. S.t. DVK-ga liidestatav dokumendivahetussüsteem peab suutma anda ja vastu võtta andmeid dokumendi kohaletoimetamise kohta.
+  Vastasel juhul puudub DVK kaudu dokumendi välja saatnud asutusel või isikul võimalus teada saada, kas tema poolt saadetud dokument on edukalt kohale toimetatud.
   2.  Dokumendivahetussüsteem, kuhu DVK server dokumente edastab, peab toetama DVK dokumendikonteineri spetsifikatsioonile vastavate XML andmevahetuskonteinerite kasutamist. Alternatiivina võib liidestatav dokumendivahetussüsteem kasutada andmevahetuskonteinerit, mis on andmevahetuse toimimise seisukohast kriitiliste andmete osas teisendatav DVK andmevahetuskonteineriks (ja vastupidi).
-  3.  Iga DVK server peab omama kõigi teiste liidestatud dokumendivahetusserverite nimekirja ning omama ligipääsu nendes serverites seadistatud asutuste nimekirjale.\ Kui eeldada, et iga DVK server ei ole teadlik kõigist teistest DVK serveritest, siis tuleks dokumendi edastamisel arvestada vajadusega edastada dokument adressaadile läbi mitme serveri. Iga serveritevaheline edastus tähendaks aga saatmisele kuluva aja täiendavat kasvu (dokumendi edastamine läbi 10 serveri oleks kõigi serverite vahel sama andmesidekiirust eeldades ca. 11 korda aeglasem kui otse saatmine).\ Kui eeldada, et iga DVK server ei oma ligipääsu võimalike adressaatide nimekirjale, siis ei ole võimalik dokumente edastada.
-  4.  Iga DVK server, mis on võimeline dokumente edastama, peab omama asutuse registrikoodi ja isikukoodi, mida kasutades dokumente edasi saadetakse.\ Vastasel juhul ei ole võimalik DVK serverist andmeid üle X-Tee
+  3.  Iga DVK server peab omama kõigi teiste liidestatud dokumendivahetusserverite nimekirja ning omama ligipääsu nendes serverites seadistatud asutuste nimekirjale.
+  Kui eeldada, et iga DVK server ei ole teadlik kõigist teistest DVK serveritest, siis tuleks dokumendi edastamisel arvestada vajadusega edastada dokument adressaadile läbi mitme serveri. Iga serveritevaheline edastus tähendaks aga saatmisele kuluva aja täiendavat kasvu (dokumendi edastamine läbi 10 serveri oleks kõigi serverite vahel sama andmesidekiirust eeldades ca. 11 korda aeglasem kui otse saatmine).
+  Kui eeldada, et iga DVK server ei oma ligipääsu võimalike adressaatide nimekirjale, siis ei ole võimalik dokumente edastada.
+  4.  Iga DVK server, mis on võimeline dokumente edastama, peab omama asutuse registrikoodi ja isikukoodi, mida kasutades dokumente edasi saadetakse. Vastasel juhul ei ole võimalik DVK serverist andmeid üle X-Tee
 
-###DVK lüüside lahendusest tingitud muudatused DVK spetsifikatsioonis
+### DVK lüüside lahendusest tingitud muudatused DVK spetsifikatsioonis
 
 Tehniline lahendus jääb dokumendi saatja seisukohast täpselt samasuguseks nagu varem. S.t. saatja koostab saadetavatest dokumentidest DVK konteineri, lisab enda andmed ja adressaatide andmed ning saadab konteineri oma DVK serverisse. Dokumendi kohaletoimetamine on sellest hetkest alates DVK serverite omavaheline asi.
 
-####Vahendaja kirje DVK konteineri transport andmestruktuuris
+#### Vahendaja kirje DVK konteineri transport andmestruktuuris
 
 Vastuvõtja seisukohast lisandub käesoleva lahendusega täiendav kirje „vahendaja“ DVK konteineri transport plokis. Antud kirje näol on tegemist automaatselt täidetavate andmetega, mille lisab DVK dokumendikonteinerisse dokumendi edastanud DVK server.
 
@@ -5125,7 +5113,7 @@ Vahendaja kirje on ennekõike vajalik selleks, et DVK server lubaks dokumendieda
 
 Teine oluline põhjus vahendaja kirje lisamiseks on asjaolu, et vastasel juhul peaks DVK server olema valmis vastu võtma dokumente, mille saatja andmed ei klapi X-tee päringu teinud asutuse andmetega. See aga annaks võimaluse tahtmatuteks (või ka tahtlikeks) identiteedivargusteks, mille lahendamine oleks võimalik üksnes X-Tee logide abil.
 
-####DVK serveri täiendavad seadistused
+#### DVK serveri täiendavad seadistused
 Et DVK server saaks teistesse serveritesse dokumente edastada, peavad olema täidetud järgmised tingimused:
 
 1.  Server peab saama teostada X-Tee päringuid
@@ -5149,10 +5137,10 @@ Et DVK server teaks, millised teised DVK serverid olemas on ja kus need asuvad, 
 
 Selleks tuleks iga teadaoleva teise DVK serveri kohta lisada andmetabelisse „Server“ järgmised andmed:
 
--   andmekogu nimetusnäiteks „dhl“. Ei pea olema täidetud, kui server ei kasuta andmevahetuseks X-Teed.
--   aadressX-Tee andmevahetuse puhul reeglina:\ http://\[TURVASERVER\]/cgi-bin/consumer\_proxy\ Ilma X-Tee vahenduseta andmevahetuse puhul oleks siin serveri reaalne URL.
+-   andmekogu nimetus  -  näiteks „dhl“. Ei pea olema täidetud, kui server ei kasuta andmevahetuseks X-Teed.
+-   aadress  -   X-Tee andmevahetuse puhul reeglina: http://[TURVASERVER]/cgi-bin/consumer_proxy Ilma X-Tee vahenduseta andmevahetuse puhul oleks siin serveri reaalne URL.
 
-##Dokumentide edastamine fragmentidena
+## Dokumentide edastamine fragmentidena
 ------
 
 DVK päringuid sendDocuments.v2 ja receiveDocuments.v2 saab kasutada nii, et dokumendid edastataks kliendilt serverile või serverilt kliendile tükkhaaval.
@@ -5178,10 +5166,10 @@ Dokumentide tükkhaaval vastuvõtmiseks tuleks kasutada järgmisi päringu recei
 -   edastus\_idEdastussessiooni ID. Vastuvõtja poolt vabalt valitav võimalikult unikaalne string, mis on ühiseks nimetajaks kõigile edastatavatele tükkidele (ja mille alusel saab hiljem kõik tükid tuvastada ja kokku panna).
 
 
-##Teadaolevad vead DVK rakenduses
+## Teadaolevad vead DVK rakenduses
 ------
 
-###Content-Transfer-Encoding päise vigane esitus
+### Content-Transfer-Encoding päise vigane esitus
 
 DVK rakendus sisaldab kasutatavatest tarkvarakomponentidest (Axis 1.3 teegist) tingituna järgmist viga MIME sõnumimanuste
 Content-Transfer-Encoding päises:
@@ -5206,7 +5194,7 @@ Content-ID: ...
 
 Antud juhul tuleks arvestada, et hoolimata päises märgitud *binary* kodeeringust saadab DVK MIME manuseid ikkagi Base64 kodeeritult. Samuti ignoreerib DVK rakendus antud päist saabuvate sõnumite puhul ning eeldab, et manus on saadetud Base64 kodeeritud kujul.
 
-###Tundlikkus Content-Type päise kirjapildi suhtes
+### Tundlikkus Content-Type päise kirjapildi suhtes
 DVK rakendus ei suuda päringut korrektselt vastu võtta, kui saadetava sõnumi HTTP päises puuduvad jutumärgid *Content-Type* päises parameetri *type* väärtuse ümber. Puuduvate jutumärkide korral ei suuda DVK rakendus sõnumit töödelda ning tagastab veateate.
 
 DVK päringud töötavad korrektselt näiteks järgmise päise korral:
@@ -5233,13 +5221,13 @@ Antud viga põhjustab Apache Axis 1.3 koosseisus kasutatav JavaMail teek, mis ee
 
 
 
-##LISA 1: Kasutatavate andmete XML Schema kirjeldused
+## LISA 1: Kasutatavate andmete XML Schema kirjeldused
 
 Alates versioonist 1.6.0 on kasutusel uus versioon DVK konteinerist. Seoses uue versiooni kasutuselevõtuga tekkisid ka uued nimeruumid
 manuaalsete metaandmete ja dokumenti kirjeldavate elementide jaoks. DVK konteineri uus versioon (2) töötab paralleelselt vanema versiooniga (1).
 Olenevalt päringu versioonist on kasutusel kas DVK konteineri versioon 1 või 2.
 
-###Automaatsed metaandmed
+### Automaatsed metaandmed
 Automaatsete metaandmete koosseis ei muutunud seoses DVK konteineri versiooni 2 kasutuselevõtuga.
 
 Nimeruumi väärtuseks on: *http://www.riik.ee/schemas/dhl-meta-automatic*
@@ -5247,7 +5235,7 @@ Nimeruumi väärtuseks on: *http://www.riik.ee/schemas/dhl-meta-automatic*
 XML skeemifaili asukoht on:
 *http://www.riik.ee/schemas/dhl/dhl-meta-automatic.xsd*
 
-###Manuaalsed metaandmed
+### Manuaalsed metaandmed
 Manuaalsete metaandmete koosseis muutus seoses DVK konteineri versiooni 2 kasutuselevõtuga:
 
 DVK konteineri versioon 1 puhul:
@@ -5275,12 +5263,12 @@ DVK konteineri versioon 2 puhul:
 
 -   XML skeemifaili asukoht on:  *http://www.riik.ee/schemas/dhl/dhl.2010.r1.xsd*
 
-###Päringute WSDL kirjeldus
+### Päringute WSDL kirjeldus
 
 Päringute WSDL kirjeldus asub failis dhl.wsdl. See fail asub DVK serveri paketis juurkaustas. SVN-is:
 https://svn.eesti.ee/projektid/dvk/server/trunk/src/main/webapp/
 
-##LISA 2: &lt;dokument&gt; XML struktuuri kasutusnäide (DVK konteineri versioon 1)
+## LISA 2: &lt;dokument&gt; XML struktuuri kasutusnäide (DVK konteineri versioon 1)
 
 ```xml
 <dhl:dokument xmlns:dhl="http://www.riik.ee/schemas/dhl" dhl:schemaLocation=““>

@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	
 	<artifactId>server</artifactId>
-	<version>1.8.0</version>
+	<version>1.8.1</version>
 	<packaging>war</packaging>
 	
 	<name>dvk-server</name>
@@ -13,7 +13,7 @@
 	<parent>
 		<groupId>dvk</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.8.0</version>
+		<version>1.8.1</version>
 	</parent>
 
 	<properties>

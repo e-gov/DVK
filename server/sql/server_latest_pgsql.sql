@@ -380,6 +380,7 @@ CREATE INDEX ametikoht_taitmine_i_id_idx ON ametikoht_taitmine (i_id);
 CREATE TABLE asutus (
 	asutus_id integer default nextval('sq_asutus_id') NOT NULL,
 	registrikood varchar(30) NOT NULL,
+	registrikood2 varchar(12) NOT NULL,
 	e_registrikood varchar(8) NULL,
 	ks_asutus_id integer NULL,
 	ks_asutus_kood varchar(20) NULL,
@@ -420,7 +421,8 @@ CREATE TABLE asutus (
 ) ;
 COMMENT ON COLUMN asutus.kapsel_versioon IS 'Asutuse poolt toetatud kapsli versioon.';
 COMMENT ON COLUMN asutus.asutus_id IS 'asutuste tabeli primary key';
-COMMENT ON COLUMN asutus.registrikood IS 'asutuse registrikood';
+COMMENT ON COLUMN asutus.registrikood IS 'asutuse registrikood või infosüsteemi nimetus';
+COMMENT ON COLUMN asutus.registrikood2 IS 'asutuse registrikood';
 COMMENT ON COLUMN asutus.e_registrikood IS 'asutuse varasem registrikood';
 COMMENT ON COLUMN asutus.ks_asutus_id IS 'kõrgemalseisva asutuse asutus_id';
 COMMENT ON COLUMN asutus.ks_asutus_kood IS 'selle alusel on tekitatud ks_asutus_id. Viitab kõrgemalseisva asutuse väljale registrikood';
@@ -895,6 +897,7 @@ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION "Add_Asutus"(
     p_registrikood character varying,
+    p_registrikood2 character varying,
     p_registrikood_vana character varying,
     p_ks_asutus_id integer,
     p_ks_asutus_kood character varying,
@@ -961,6 +964,7 @@ BEGIN
         into    asutus(
                 asutus_id,
                 registrikood,
+                registrikood2,
                 e_registrikood,
                 ks_asutus_id,
                 ks_asutus_kood,
@@ -1000,6 +1004,7 @@ BEGIN
 				kapsel_versioon)
         values  (p_id,
                 p_registrikood,
+                p_registrikood2,
                 p_registrikood_vana,
                 p_ks_asutus_id,
                 p_ks_asutus_kood,
@@ -1036,7 +1041,7 @@ BEGIN
                 p_toetatav_dvk_versioon,
                 p_server_id,
                 p_aar_id,
-				p_kapsel_versioon);
+                p_kapsel_versioon);
 
     end if;
     return  p_id;
@@ -1936,6 +1941,7 @@ LANGUAGE PLPGSQL;
 create type get_asutus_by_id as (
 
     registrikood character varying,
+    registrikood2 character varying,
     registrikood_vana character varying,
     ks_asutus_id integer,
     ks_asutus_kood character varying,
@@ -1983,6 +1989,7 @@ BEGIN
 RETURN QUERY
 
         select  a.registrikood,
+                a.registrikood2,
                 a.e_registrikood,
                 a.ks_asutus_id,
                 a.ks_asutus_kood,
@@ -2019,7 +2026,7 @@ RETURN QUERY
                 a.toetatav_dvk_versioon,
                 a.server_id,
                 a.aar_id,
-				a.kapsel_versioon
+                a.kapsel_versioon
         from    asutus a
         where   a.asutus_id = p_id
                 LIMIT 1;
@@ -2029,6 +2036,7 @@ LANGUAGE PLPGSQL;
 
 create type get_asutus_by_regnr as (
 	id integer,
+	registrikood2 character varying,
 	e_registrikood character varying,
 	ks_asutus_id integer,
 	ks_asutus_kood character varying,
@@ -2059,13 +2067,13 @@ create type get_asutus_by_regnr as (
 	last_modified timestamp,
 	username character varying,
 	params character varying,
-	dhl_otse_saatmine smallint,
 	dhl_saatmine smallint,
+	dhl_otse_saatmine smallint,
 	dhs_nimetus character varying,
 	toetatav_dvk_versioon character varying,
 	server_id integer,
 	aar_id integer,
-	kapsel_versioon character varying
+    kapsel_versioon character varying
 );
 
 
@@ -2077,6 +2085,7 @@ BEGIN
 RETURN QUERY
 
         select  asutus_id,
+                registrikood2,
                 e_registrikood,
                 ks_asutus_id,
                 ks_asutus_kood,
@@ -2113,7 +2122,7 @@ RETURN QUERY
                 toetatav_dvk_versioon,
                 server_id,
                 aar_id,
-				kapsel_versioon				
+                kapsel_versioon				
         from    asutus
         where   registrikood = p_registrikood
                 LIMIT 1;
@@ -3150,6 +3159,7 @@ LANGUAGE PLPGSQL;
 CREATE OR REPLACE FUNCTION "Update_Asutus" (
     p_id integer,
     p_registrikood character varying,
+    p_registrikood2 character varying,
     p_registrikood_vana character varying,
     p_ks_asutus_id integer,
     p_ks_asutus_kood character varying,
@@ -3198,6 +3208,7 @@ BEGIN
 
     update  asutus
     set     registrikood = p_registrikood,
+            registrikood2 = p_registrikood2,
             e_registrikood = p_registrikood_vana,
             ks_asutus_id = p_ks_asutus_id,
             ks_asutus_kood = p_ks_asutus_kood,
@@ -7673,6 +7684,7 @@ BEGIN
 		  tr_operation := 'INSERT';		  		
 		  asutus_new.ASUTUS_ID := NEW.ASUTUS_ID;
 		  asutus_new.REGISTRIKOOD := NEW.REGISTRIKOOD;
+		  asutus_new.REGISTRIKOOD2 := NEW.REGISTRIKOOD2;
 		  asutus_new.E_REGISTRIKOOD := NEW.E_REGISTRIKOOD;
 		  asutus_new.KS_ASUTUS_ID := NEW.KS_ASUTUS_ID;
 		  asutus_new.KS_ASUTUS_KOOD := NEW.KS_ASUTUS_KOOD;
@@ -7714,6 +7726,7 @@ BEGIN
 		  tr_operation := 'UPDATE';		  		  
 		  asutus_old.ASUTUS_ID := OLD.ASUTUS_ID;
 		  asutus_old.REGISTRIKOOD := OLD.REGISTRIKOOD;
+		  asutus_old.REGISTRIKOOD2 := OLD.REGISTRIKOOD2;
 		  asutus_old.E_REGISTRIKOOD := OLD.E_REGISTRIKOOD;
 		  asutus_old.KS_ASUTUS_ID := OLD.KS_ASUTUS_ID;
 		  asutus_old.KS_ASUTUS_KOOD := OLD.KS_ASUTUS_KOOD;
@@ -7755,6 +7768,7 @@ BEGIN
 		  tr_operation := 'DELETE'; 		  		  
 		  asutus_old.ASUTUS_ID := OLD.ASUTUS_ID;
 		  asutus_old.REGISTRIKOOD := OLD.REGISTRIKOOD;
+		  asutus_old.REGISTRIKOOD2 := OLD.REGISTRIKOOD2;
 		  asutus_old.E_REGISTRIKOOD := OLD.E_REGISTRIKOOD;
 		  asutus_old.KS_ASUTUS_ID := OLD.KS_ASUTUS_ID;
 		  asutus_old.KS_ASUTUS_KOOD := OLD.KS_ASUTUS_KOOD;
@@ -7928,6 +7942,55 @@ BEGIN
         clmn.data_type,
         asutus_old.registrikood,
         asutus_new.registrikood,
+        LOCALTIMESTAMP,
+        usr,
+        '''',
+        '''',
+        '''',
+        LOCALTIMESTAMP,
+        LOCALTIMESTAMP,
+        '''',
+        0,
+        current_setting('dvkxtee.xtee_isikukood'),
+        current_setting('dvkxtee.xtee_asutus')
+      );
+    END IF;
+
+    -- registrikood2 changed
+    IF(coalesce(asutus_new.registrikood2, ' ') != coalesce(asutus_old.registrikood2, ' ')) THEN
+      SELECT * INTO clmn FROM information_schema.columns WHERE upper(table_name) = tablename AND upper(column_name) = upper('registrikood2');
+      p_id := nextval('sq_logi_id');
+      INSERT INTO logi(
+        log_id,
+        tabel,
+        op,
+        uidcol,
+        tabel_uid,
+        veerg,
+        ctype,
+        vana_vaartus,
+        uus_vaartus,
+        muutmise_aeg,
+        ab_kasutaja,
+        ef_kasutaja,
+        kasutaja_kood,
+        comm,
+        created,
+        last_modified,
+        username,
+        ametikoht,
+        xtee_isikukood,
+        xtee_asutus
+      ) VALUES (
+        p_id,
+        tablename,
+        tr_operation,
+        pkey_col, -- primary key column name
+        primary_key_value, -- primary key value
+        clmn.column_name, -- column name
+        clmn.data_type,
+        asutus_old.registrikood2,
+        asutus_new.registrikood2,
         LOCALTIMESTAMP,
         usr,
         '''',

@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.util.ArrayList;
 
 import org.apache.axis.AxisFault;
+import org.apache.commons.lang3.StringUtils;
 
 import dvk.core.CommonStructures;
 import dvk.core.xroad.XRoadProtocolHeader;
@@ -100,16 +101,36 @@ public class UserProfile {
 
         // Laeme asutuste registrist esitatud asutuse koodile vastava
         // asutuse andmed.
+        Asutus org = new Asutus();
+		int organizationId = 0;
+		if (header.getXRoadClient() != null && StringUtils.isNotEmpty(header.getXRoadClient().getSubsystemCode())) {
+			org.loadByRegNr(header.getXRoadClient().getSubsystemCode(), conn);
+			
+			if (org.getId() > 0 && StringUtils.isEmpty(org.getRegistrikood2())) {
+				throw new AxisFault(CommonStructures.VIGA_ALAMSYS_REG_TAITMATA
+						.replaceFirst("#1", header.getXRoadClient().getSubsystemCode()));
+			} else if (org.getRegistrikood2().equals(header.getXRoadClient().getMemberCode())) {
+				organizationId = org.getId();
+			} else {
+				org.clear();
+			}
+
+		}
+		
+		if (organizationId == 0) {
+			org.loadByRegNr(header.getConsumer(), conn);
+			organizationId = org.getId();
+		}
+		
+		if (organizationId == 0) {
+			throw new AxisFault(CommonStructures.VIGA_TUNDMATU_ASUTUS
+					.replaceFirst("#1", header.getConsumer()));
+		}
         result.setOrganizationCode(header.getConsumer());
-        result.setOrganizationID(Asutus.getIDByRegNr(header.getConsumer(), false, conn));
-        if (result.getOrganizationID() <= 0) {
-            throw new AxisFault(CommonStructures.VIGA_TUNDMATU_ASUTUS
-                    .replaceFirst("#1", header.getConsumer()));
-        }
+        result.setOrganizationID(organizationId);
 
         // Make sure that current users organization has not been disabled.
-        Asutus org = new Asutus(result.getOrganizationID(), conn);
-        if ((org == null) || !org.getDvkSaatmine()) {
+        if ( ! org.getDvkSaatmine()) {
             throw new AxisFault(CommonStructures.VIGA_ASUTUS_BLOKEERITUD
                     .replaceFirst("#1", result.getOrganizationCode()));
         }

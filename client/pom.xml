@@ -4,7 +4,6 @@
 		
 	<modelVersion>4.0.0</modelVersion>
 	
-	<groupId>dvk</groupId>
 	<artifactId>client</artifactId>
 	<version>1.7.8</version>
 	<packaging>jar</packaging>
@@ -14,7 +13,7 @@
 	<parent>
 		<groupId>dvk</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.8.0</version>
+		<version>1.8.1</version>
 	</parent>
 	
 	<properties>
@@ -48,15 +47,6 @@
 			</resource>
 		</resources>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>

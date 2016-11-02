@@ -27,6 +27,7 @@ import dvk.core.xroad.XRoadProtocolHeader;
 public class Asutus {
     private int m_id;
     private String m_registrikood;
+    private String m_registrikood2;
     private String m_registrikoodVana;
     private int m_ksAsutuseID;
     private String m_ksAsutuseKood;
@@ -87,6 +88,14 @@ public class Asutus {
 
     public String getRegistrikood() {
         return m_registrikood;
+    }
+    
+    public void setRegistrikood2(String registrikood2) {
+        this.m_registrikood2 = registrikood2;
+    }
+    
+    public String getRegistrikood2() {
+    	return m_registrikood2;
     }
 
     public void setRegistrikoodVana(String registrikoodVana) {
@@ -388,6 +397,7 @@ public class Asutus {
     public void clear() {
         m_id = 0;
         m_registrikood = "";
+        m_registrikood2 = "";
         m_registrikoodVana = "";
         m_ksAsutuseID = 0;
         m_ksAsutuseKood = "";
@@ -447,6 +457,7 @@ public class Asutus {
 
 	                m_id = rs.getInt("id");
 	                m_registrikood = registrikood;
+	                m_registrikood2 = rs.getString("registrikood2");
 	                m_registrikoodVana = rs.getString("e_registrikood");
 	                m_ksAsutuseID = rs.getInt("ks_asutus_id");
 	                m_ksAsutuseKood = rs.getString("ks_asutus_kood");
@@ -504,6 +515,7 @@ public class Asutus {
                 ResultSet rs = cs.executeQuery("SELECT * FROM \"Get_AsutusByID\"(" + id + ")");
                 while (rs.next()) {
                     m_registrikood = rs.getString("registrikood");
+                    m_registrikood2 = rs.getString("registrikood2");
                     m_registrikoodVana = rs.getString("registrikood_vana");
                     m_ksAsutuseID = rs.getInt("ks_asutus_id");
                     m_ksAsutuseKood = rs.getString("ks_asutus_kood");
@@ -552,7 +564,7 @@ public class Asutus {
             CommonMethods.logError(e, this.getClass().getName(), "loadByID");
             clear();
         }
-    }
+    }	
 
     public static int getIDByRegNr(String registrikood, boolean ainultDvkVoimelised, Connection conn) throws AxisFault {
         try {        	
@@ -613,6 +625,7 @@ public class Asutus {
 	                    Asutus item = new Asutus();
 	                    item.setId(rs.getInt("asutus_id"));
 	                    item.setRegistrikood(rs.getString("registrikood"));
+	                    item.setRegistrikood2(rs.getString("registrikood2"));
 	                    item.setRegistrikoodVana(rs.getString("e_registrikood"));
 	                    item.setKsAsutuseID(rs.getInt("ks_asutus_id"));
 	                    item.setKsAsutuseKood(rs.getString("ks_asutus_kood"));
@@ -675,57 +688,58 @@ public class Asutus {
                 Calendar cal = Calendar.getInstance();
                 
 
-                CallableStatement cs = conn.prepareCall("{? = call \"Add_Asutus\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                CallableStatement cs = conn.prepareCall("{? = call \"Add_Asutus\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 cs.registerOutParameter(1, Types.INTEGER);
 
                 cs.setString(2, m_registrikood);
-                cs.setString(3, m_registrikoodVana);
-                CommonMethods.setNullableIntParam(cs, 4, m_ksAsutuseID);
-                cs.setString(5, m_ksAsutuseKood);
-                cs.setString(6, m_nimetus);
-                cs.setString(7, m_nimeLyhend);
-                cs.setString(8, m_liik1);
-                cs.setString(9, m_liik2);
-                cs.setString(10, m_tegevusala);
-                cs.setString(11, m_tegevuspiirkond);
-                cs.setString(12, m_maakond);
-                cs.setString(13, m_asukoht);
-                cs.setString(14, m_aadress);
-                cs.setString(15, m_postikood);
-                cs.setString(16, m_telefon);
-                cs.setString(17, m_faks);
-                cs.setString(18, m_epost);
-                cs.setString(19, m_www);
-                cs.setString(20, m_logo);
-                cs.setTimestamp(21, CommonMethods.sqlDateFromDate(m_asutamiseKuupaev), cal);
-                cs.setString(22, m_moodustamiseAktiNimi);
-                cs.setString(23, m_moodustamiseAktiNumber);
-                cs.setTimestamp(24, CommonMethods.sqlDateFromDate(m_moodustamiseAktiKuupaev), cal);
-                cs.setString(25, m_pohimaaruseAktiNimi);
-                cs.setString(26, m_pohimaaruseAktiNumber);
-                cs.setTimestamp(27, CommonMethods.sqlDateFromDate(m_pohimaaruseKinnitamiseKuupaev), cal);
-                cs.setTimestamp(28, CommonMethods.sqlDateFromDate(m_pohimaaruseKandeKuupaev), cal);
-                cs.setTimestamp(29, CommonMethods.sqlDateFromDate(m_loodud), cal);
-                cs.setTimestamp(30, CommonMethods.sqlDateFromDate(m_muudetud), cal);
-                cs.setString(31, m_muutja);
-                cs.setString(32, m_parameetrid);
-                cs.setInt(33, m_dvkSaatmine ? 1 : 0);
-                cs.setInt(34, m_dvkOtseSaatmine ? 1 : 0);
-                cs.setString(35, m_dhsNimetus);
-                cs.setString(36, m_toetatavDVKVersioon);
+                cs.setString(3, m_registrikood2);
+                cs.setString(4, m_registrikoodVana);
+                CommonMethods.setNullableIntParam(cs, 5, m_ksAsutuseID);
+                cs.setString(6, m_ksAsutuseKood);
+                cs.setString(7, m_nimetus);
+                cs.setString(8, m_nimeLyhend);
+                cs.setString(9, m_liik1);
+                cs.setString(10, m_liik2);
+                cs.setString(11, m_tegevusala);
+                cs.setString(12, m_tegevuspiirkond);
+                cs.setString(13, m_maakond);
+                cs.setString(14, m_asukoht);
+                cs.setString(15, m_aadress);
+                cs.setString(16, m_postikood);
+                cs.setString(17, m_telefon);
+                cs.setString(18, m_faks);
+                cs.setString(19, m_epost);
+                cs.setString(20, m_www);
+                cs.setString(21, m_logo);
+                cs.setTimestamp(22, CommonMethods.sqlDateFromDate(m_asutamiseKuupaev), cal);
+                cs.setString(23, m_moodustamiseAktiNimi);
+                cs.setString(24, m_moodustamiseAktiNumber);
+                cs.setTimestamp(25, CommonMethods.sqlDateFromDate(m_moodustamiseAktiKuupaev), cal);
+                cs.setString(26, m_pohimaaruseAktiNimi);
+                cs.setString(27, m_pohimaaruseAktiNumber);
+                cs.setTimestamp(28, CommonMethods.sqlDateFromDate(m_pohimaaruseKinnitamiseKuupaev), cal);
+                cs.setTimestamp(29, CommonMethods.sqlDateFromDate(m_pohimaaruseKandeKuupaev), cal);
+                cs.setTimestamp(30, CommonMethods.sqlDateFromDate(m_loodud), cal);
+                cs.setTimestamp(31, CommonMethods.sqlDateFromDate(m_muudetud), cal);
+                cs.setString(32, m_muutja);
+                cs.setString(33, m_parameetrid);
+                cs.setInt(34, m_dvkSaatmine ? 1 : 0);
+                cs.setInt(35, m_dvkOtseSaatmine ? 1 : 0);
+                cs.setString(36, m_dhsNimetus);
+                cs.setString(37, m_toetatavDVKVersioon);
 
-                CommonMethods.setNullableIntParam(cs, 37, m_serverID);
-                CommonMethods.setNullableIntParam(cs, 38, m_aarID);
+                CommonMethods.setNullableIntParam(cs, 38, m_serverID);
+                CommonMethods.setNullableIntParam(cs, 39, m_aarID);
 
                 if (xTeePais != null) {
-                    cs.setString(39, xTeePais.getUserId());
-                    cs.setString(40, xTeePais.getConsumer());
+                    cs.setString(40, xTeePais.getUserId());
+                    cs.setString(41, xTeePais.getConsumer());
                 } else {
-                    cs.setString(39, null);
                     cs.setString(40, null);
+                    cs.setString(41, null);
                 }
                 
-                cs.setString(41, m_kapsel_versioon);
+                cs.setString(42, m_kapsel_versioon);
                 cs.execute();
                 m_id = cs.getInt(1);
                 cs.close();
@@ -741,56 +755,57 @@ public class Asutus {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
                 CallableStatement cs = conn.prepareCall(
-                		"{call \"Update_Asutus\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                		"{call \"Update_Asutus\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 
                 cs.setInt(1, m_id);
                 cs.setString(2, m_registrikood);
-                cs.setString(3, m_registrikoodVana);
-                CommonMethods.setNullableIntParam(cs, 4, m_ksAsutuseID);
-                cs.setString(5, m_ksAsutuseKood);
-                cs.setString(6, m_nimetus);
-                cs.setString(7, m_nimeLyhend);
-                cs.setString(8, m_liik1);
-                cs.setString(9, m_liik2);
-                cs.setString(10, m_tegevusala);
-                cs.setString(11, m_tegevuspiirkond);
-                cs.setString(12, m_maakond);
-                cs.setString(13, m_asukoht);
-                cs.setString(14, m_aadress);
-                cs.setString(15, m_postikood);
-                cs.setString(16, m_telefon);
-                cs.setString(17, m_faks);
-                cs.setString(18, m_epost);
-                cs.setString(19, m_www);
-                cs.setString(20, m_logo);
-                cs.setTimestamp(21, CommonMethods.sqlDateFromDate(m_asutamiseKuupaev), cal);
-                cs.setString(22, m_moodustamiseAktiNimi);
-                cs.setString(23, m_moodustamiseAktiNumber);
-                cs.setTimestamp(24, CommonMethods.sqlDateFromDate(m_moodustamiseAktiKuupaev), cal);
-                cs.setString(25, m_pohimaaruseAktiNimi);
-                cs.setString(26, m_pohimaaruseAktiNumber);
-                cs.setTimestamp(27, CommonMethods.sqlDateFromDate(m_pohimaaruseKinnitamiseKuupaev), cal);
-                cs.setTimestamp(28, CommonMethods.sqlDateFromDate(m_pohimaaruseKandeKuupaev), cal);
-                cs.setTimestamp(29, CommonMethods.sqlDateFromDate(m_loodud), cal);
-                cs.setTimestamp(30, CommonMethods.sqlDateFromDate(m_muudetud), cal);
-                cs.setString(31, m_muutja);
-                cs.setString(32, m_parameetrid);
-                cs.setInt(33, m_dvkSaatmine ? 1 : 0);
-                cs.setInt(34, m_dvkOtseSaatmine ? 1 : 0);
-                cs.setString(35, m_dhsNimetus);
-                cs.setString(36, m_toetatavDVKVersioon);
+                cs.setString(3, m_registrikood2);
+                cs.setString(4, m_registrikoodVana);
+                CommonMethods.setNullableIntParam(cs, 5, m_ksAsutuseID);
+                cs.setString(6, m_ksAsutuseKood);
+                cs.setString(7, m_nimetus);
+                cs.setString(8, m_nimeLyhend);
+                cs.setString(9, m_liik1);
+                cs.setString(10, m_liik2);
+                cs.setString(11, m_tegevusala);
+                cs.setString(12, m_tegevuspiirkond);
+                cs.setString(13, m_maakond);
+                cs.setString(14, m_asukoht);
+                cs.setString(15, m_aadress);
+                cs.setString(16, m_postikood);
+                cs.setString(17, m_telefon);
+                cs.setString(18, m_faks);
+                cs.setString(19, m_epost);
+                cs.setString(20, m_www);
+                cs.setString(21, m_logo);
+                cs.setTimestamp(22, CommonMethods.sqlDateFromDate(m_asutamiseKuupaev), cal);
+                cs.setString(23, m_moodustamiseAktiNimi);
+                cs.setString(24, m_moodustamiseAktiNumber);
+                cs.setTimestamp(25, CommonMethods.sqlDateFromDate(m_moodustamiseAktiKuupaev), cal);
+                cs.setString(26, m_pohimaaruseAktiNimi);
+                cs.setString(27, m_pohimaaruseAktiNumber);
+                cs.setTimestamp(28, CommonMethods.sqlDateFromDate(m_pohimaaruseKinnitamiseKuupaev), cal);
+                cs.setTimestamp(29, CommonMethods.sqlDateFromDate(m_pohimaaruseKandeKuupaev), cal);
+                cs.setTimestamp(30, CommonMethods.sqlDateFromDate(m_loodud), cal);
+                cs.setTimestamp(31, CommonMethods.sqlDateFromDate(m_muudetud), cal);
+                cs.setString(32, m_muutja);
+                cs.setString(33, m_parameetrid);
+                cs.setInt(34, m_dvkSaatmine ? 1 : 0);
+                cs.setInt(35, m_dvkOtseSaatmine ? 1 : 0);
+                cs.setString(36, m_dhsNimetus);
+                cs.setString(37, m_toetatavDVKVersioon);
 
-                CommonMethods.setNullableIntParam(cs, 37, m_serverID);
-                CommonMethods.setNullableIntParam(cs, 38, m_aarID);
+                CommonMethods.setNullableIntParam(cs, 38, m_serverID);
+                CommonMethods.setNullableIntParam(cs, 39, m_aarID);
                 
                 if (xTeePais != null) {
-                    cs.setString(39, xTeePais.getUserId());
-                    cs.setString(40, xTeePais.getConsumer());
+                    cs.setString(40, xTeePais.getUserId());
+                    cs.setString(41, xTeePais.getConsumer());
                 } else {
-                    cs.setString(39, null);
                     cs.setString(40, null);
+                    cs.setString(41, null);
                 }
-                cs.setString(41, m_kapsel_versioon);
+                cs.setString(42, m_kapsel_versioon);
                 cs.execute();
                 cs.close();
             }

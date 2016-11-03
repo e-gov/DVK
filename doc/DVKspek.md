@@ -1,5 +1,26 @@
 # Dokumendivahetuskeskuse (DVK) Liideste spetsifikatsioon
 
+
+------
+
+## Teadmiseks
+
+DVK on üle minemas uuele protokollile DHX (https://github.com/e-gov/DHX). Allolevat DVK dokumentatsiooni võib käsitleda suures osas vananenuna, mis sisaldab ajaloolistel põhjustel mitmeid ebatäpsuseid ning viiteid funktsionaalsustele, mida ei ole kunagi kasutusele võetud. Mittelõplik loetelu nimetatutest:
++ "Konteiner" ja "kapsel" terminite läbisegi kasutamine - tegemist on ühe ja sama asjaga.
++ Konteineri/kapsli versiooni 2.0 ei ole DVK-s kunagi kasutusele võetud; kapsli versioon 1.0 asendus kapsli versiooni 2.1-ga.
++ Kapsli versioonis 2.1 tuleb soovitatavalt kasutada kõikide teenuste viimaseid versioone.
+
+**Kapsel 1.0 -> 2.1 üleminejatele**
+
+Kapsel 2.1 üleminejatele on kõige olulisem info leitav siit: https://riha.eesti.ee/riha/main/xml/elektroonilise_andmevahetuse_metaandmete_loend/1
+
+**X-tee v6 sõnumiprotokoll 4.0**
+
+DVK universaalklient toetab uut sõnumiprotokolli järgmise aasta algul. Juhul kui DVK teenuseid kasutav tarkvara ei kasuta DVK UK liidest, tuleb sõnumiprotokolli 4.0 tugi juurde arendada. Infot uue sõnumiprotokollile ülemineku kohta leiab siit: [X-tee sõnumiprotokoll versioon 4.0](#xroad-message-protocol-v4)
+
+
+------
+
 ## Sisukord
 - [Muudatuste ajalugu](#muudatuste-ajalugu)
 - [Sissejuhatus](#sissejuhatus)
@@ -1962,7 +1983,7 @@ Väljundi kehaks on base64 kodeeringus massiiv, mille elemendid „item“ on st
 - edastus – null kuni mitu elementi, millest igaüks kirjeldab konkreetse edastuse infot (vt punkt „Edastatud dokumentide staatuse kontroll“)
 - olek – dokumendi edastamise koondolek
 
-Olekute täpsema kirjelduse leiad käesoleva dokumendi peatüki „Dokumentide logistika” alampeatükist „[Edastatud dokumentide staatuse kontroll](#Edastatud-dokumentide-staatuse-kontroll)”.
+Olekute täpsema kirjelduse leiad käesoleva dokumendi peatüki „Dokumentide logistika” alampeatükist „[Edastatud dokumentide staatuse kontroll](#edastatud-dokumentide-staatuse-kontroll)”.
 
 #### Näide
 
@@ -2125,7 +2146,7 @@ Elemendi „keha“ sisu kodeerimata kujul on:
 </item>
 ```
 
-###getSendStatus.v2
+### getSendStatus.v2
 ------
 
 <pre>

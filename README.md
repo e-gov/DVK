@@ -13,13 +13,24 @@ Repositooriumis on DVK tarkvaral viis erinevat alamprojekti:
 
 DVK teenused ning päringute näited leiab [DVK spetsifikatsioonist](doc/DVKspek.md)
 
-## X-tee versioon 6-le üleminek DVK kontekstis
+##Teadmiseks
+
+DVK on tsentraalse dokumentide edastamise lahendusena saadaval veel 2 aastat, mille järel edastatakse dokumente hajusalt üle DHX protokolli.
+Üleminek hajusale dokumentide edastamisele algab 2017. aasta aprillist. DHX protokolli väljatöötamise vahetulemused ja taustamaterjalid asuvad aadressil https://github.com/e-gov/DHX.
+
+
+**Kapsel 1.0 -> 2.1 üleminejatele**
+
+Kapsel 2.1 üleminejatele on kõige olulisem info leitav siit: https://riha.eesti.ee/riha/main/xml/elektroonilise_andmevahetuse_metaandmete_loend/1
+
+
+### X-tee versioon 6-le üleminek DVK kontekstis
 
 DVK kasutaja jaoks kõige olulisem muudatuse seoses X-tee versioon 6-le üleminekul on muudatused X-tee sõnumiprotokollis (versioon 4.0). See tähendab, et DVK teenuste poole pöördumisel on vajalik seda teha senisest erinevate X-tee sõnumipäistega.
-Täpsemad kirjeldused uutest päistest leiab [vastavast peatükist DVK spetsifikatsioonist](doc/DVKspek.md#x-tee-sõnumiprotokoll-versioon-40)
 
+DVK universaalklient saab uue versiooni ja hakkab toetama uut sõnumiprotokolli 2017 aasta algul. Juhul kui DVK teenuseid kasutav tarkvara ei kasuta DVK UK liidest, tuleb sõnumiprotokolli 4.0 tugi juurde arendada. Infot uue sõnumiprotokollile ülemineku kohta leiab [vastavast peatükist DVK spetsifikatsioonist](doc/DVKspek.md#x-tee-sõnumiprotokoll-versioon-40)
 
-### Alamsüsteemide kasutamise loogika DVK-s
+#### Alamsüsteemide kasutamise loogika DVK-s
 
 Kui asutus on DVK-ga liitunud mitme süsteemiga (näiteks eraldi struktuuriüksused, millele oleks võimalik otse dokumente adresseerida), siis on vaja v4.0 sõnumiprotokolli kasutades DVK keskserveris täpsustada alamsüsteemi (subsystemCode) ning registrikoodi (memberCode) väärtused. 
 

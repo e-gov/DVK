@@ -1,0 +1,11 @@
+Status: FAILED
+Time Taken: 42
+Size: 0
+Timestamp: Fri Nov 11 16:40:50 EET 2016
+TestStep: Send capsule
+
+----------------- Messages ------------------------------
+Attach file from filesystem - OK - 10
+sendDocument - FAILED - 19
+- [Valid HTTP Status Codes] Response status code:503 is not in acceptable list of status codes
+- [Contains receiptId] Missing token [receiptId] in Response

@@ -351,8 +351,91 @@ public class Document {
             return false;
         }
     }
-
     
+    
+    /**
+     * Function finds not sent DHX documents and updates them in order for other JOB instances not to take them for sending
+     * @param resendDate - documents with earlier last_send_date will be resent again
+     * @param conn
+     * @return
+     */
+    public static ArrayList<Document> getNotSentDhxDocumentsForSending (Date resendDate, Connection conn) {
+        try {
+          if (conn != null) {
+              Calendar cal = Calendar.getInstance();
+              boolean defaultAutoCommit = conn.getAutoCommit();
+              conn.setAutoCommit(false);
+              String sql = "{? = call \"Get_NotSentDhxDocuments\"(?)}";
+              CallableStatement cs = conn.prepareCall(sql);
+              cs.registerOutParameter(1, Types.OTHER);
+              cs.setTimestamp(2, CommonMethods.sqlDateFromDate(resendDate), cal);
+            //  cs.setInt(1, this.getVersion());
+            //  cs.setInt(2, this.getTargetVersion());
+              cs.execute();
+              ResultSet rs = (ResultSet) cs.getObject(1);
+              ArrayList<Document> result = new ArrayList<Document>();
+              int docCounter = 0;
+              while (rs.next()) {
+                  ++docCounter;                    
+                  Document item = new Document();
+                  item.setId(rs.getInt("dokument_id"));
+                  item.setOrganizationID(rs.getInt("asutus_id"));
+                  item.setFolderID(rs.getInt("kaust_id"));
+                  item.setConservationDeadline(rs.getTimestamp("sailitustahtaeg", cal));
+                  item.setDvkContainerVersion(rs.getInt("versioon"));
+                  item.setContainerVersion(rs.getString("kapsli_versioon"));                    
+                                                         
+                  String itemDataFile = CommonMethods.createPipelineFile(docCounter);
+                  item.setFilePath(itemDataFile);
+                  
+                  
+                  String sisu =  rs.getString("sisu");
+                  if (sisu != null && sisu.length() > 0) { 
+                      byte[] containerData = rs.getString("sisu").getBytes("UTF-8");
+                      logger.debug("Container data was read from database. Container size: " + containerData.length + " bytes.");
+                      CommonMethods.writeToFile(itemDataFile, containerData);
+                  }else{
+                      item.setFilePath(null); 
+                  }
+                  
+                  result.add(item);
+              }
+              rs.close();
+              cs.close();
+              
+              if (!setAllDhxNotSentDocumentsToSend(conn)) {
+            	  throw new RuntimeException("Unable to send documents to sending");
+              }
+              conn.commit();
+              conn.setAutoCommit(defaultAutoCommit);
+              rs.close();
+              cs.close();
+              return result;
+          } else {
+              throw new RuntimeException("Connection == null");
+          }
+      } catch (Exception e) {
+          logger.error("Error retreiving conversion data from database: ", e);
+          return null;
+      }
+        
+      }
+
+    private static Boolean setAllDhxNotSentDocumentsToSend (Connection conn){
+    	 try {
+             if (conn != null) {
+                 CallableStatement cs = conn.prepareCall("{call \"Set_AllDhxNotSentDocumentsInternalConsignment\"()}");
+                 boolean result = cs.execute();
+                 cs.close();
+                 return result;
+             } else {
+                 return false;
+             }
+         } catch (Exception ex) {
+             logger.error(ex.getMessage(), ex);
+             return false;
+         }
+    }
 
     /**
      * Tagastab nimekirja etteantud dokumentidest, mille allalaadimiseks

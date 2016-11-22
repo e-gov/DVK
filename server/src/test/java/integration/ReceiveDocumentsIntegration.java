@@ -43,8 +43,8 @@ public class ReceiveDocumentsIntegration {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        //String serviceUrl = "http://0.0.0.0:9099/services/dhlHttpSoapPort";
-    	String serviceUrl = "http://0.0.0.0:8070/dvk/services/dhlHttpSoapPort";
+        String serviceUrl = "http://localhost:8070/services/dhlHttpSoapPort";
+    	//String serviceUrl = "http://0.0.0.0:8070/dvk/services/dhlHttpSoapPort";
         
         EndpointReference endpointReference = new EndpointReference(serviceUrl);
         

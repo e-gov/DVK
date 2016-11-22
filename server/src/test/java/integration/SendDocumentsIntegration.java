@@ -43,8 +43,8 @@ public class SendDocumentsIntegration {
                 .setAmetnik("EE12345678901").setId("6cae248568b3db7e97ff784673a4d38c5906bee0")
                 .setNimi("dhl.sendDocuments.v1").setToimik("").setIsikukood("");
 
-        //String serviceUrl = "http://0.0.0.0:9099/services/dhlHttpSoapPort";
-        String serviceUrl = "http://0.0.0.0:8070/dvk/services/dhlHttpSoapPort";
+        String serviceUrl = "http://localhost:8070/services/dhlHttpSoapPort";
+        //String serviceUrl = "http://0.0.0.0:8070/dvk/services/dhlHttpSoapPort";
         
         EndpointReference endpointReference = new EndpointReference(serviceUrl);
         

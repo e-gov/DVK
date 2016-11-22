@@ -1,0 +1,13 @@
+Status: FAILED
+Time Taken: 124
+Size: 0
+Timestamp: Tue Oct 25 19:36:34 EEST 2016
+TestStep: Õige kapsli saatmine
+
+----------------- Messages ------------------------------
+Attach file and base64Gzip - OK - 7
+sendDocuments - FAILED - 33
+- [SOAP Response] error: </body> does not close tag <hr>.
+- [SOAP Response] </body> does not close tag <hr>.
+- [Valid HTTP Status Codes] Response status code:404 is not in acceptable list of status codes
+- [Contains href] Missing token [href="cid:] in Response

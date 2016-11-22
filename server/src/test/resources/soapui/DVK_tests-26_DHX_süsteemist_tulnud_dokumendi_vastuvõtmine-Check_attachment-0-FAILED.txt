@@ -1,0 +1,22 @@
+Status: FAILED
+Time Taken: 55
+Size: 0
+Timestamp: Thu Nov 10 17:00:59 EET 2016
+TestStep: Check attachment
+Error:Assertion failed: 
+
+assert xml.contains('DecId>'+ dhlId  +'</')
+       |   |                | |      |
+       ""  false            | 1044   DecId>1044</
+                            DecId>1044
+
+
+----------------- Messages ------------------------------
+Assertion failed: 
+
+assert xml.contains('DecId>'+ dhlId  +'</')
+       |   |                | |      |
+       ""  false            | 1044   DecId>1044</
+                            DecId>1044
+
+error at line: 11

@@ -1,0 +1,13 @@
+Status: FAILED
+Time Taken: 71
+Size: 0
+Timestamp: Fri Nov 11 16:40:49 EET 2016
+TestStep: Õige kapsli saatmine
+
+----------------- Messages ------------------------------
+Attach file from filesystem - OK - 5
+sendDocument - FAILED - 27
+- [Valid HTTP Status Codes] Response status code:503 is not in acceptable list of status codes
+- [Contains receiptId] Missing token [receiptId] in Response
+- [Schema Compliance] error: The document is not a Envelope@http://schemas.xmlsoap.org/soap/envelope/: document element mismatch got html
+- [Schema Compliance] The document is not a Envelope@http://schemas.xmlsoap.org/soap/envelope/: document element mismatch got html

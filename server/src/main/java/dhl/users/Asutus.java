@@ -3,6 +3,7 @@ package dhl.users;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -65,6 +66,8 @@ public class Asutus {
     private int m_serverID;
     private int m_aarID;
     private String m_kapsel_versioon;
+    
+    private Boolean m_dhx_asutus;
 
     public Asutus() {
         clear();
@@ -393,6 +396,14 @@ public class Asutus {
     public void setKapselVersioon(String m_kapsel_versioon) {
         this.m_kapsel_versioon = m_kapsel_versioon;
     }
+    
+    public Boolean getDhxAsutus() {
+        return m_dhx_asutus;
+      }
+
+      public void setDhxAsutus(Boolean m_dhx_asutus) {
+        this.m_dhx_asutus = m_dhx_asutus;
+      }
 
     public void clear() {
         m_id = 0;
@@ -435,6 +446,7 @@ public class Asutus {
         m_serverID = 0;
         m_aarID = 0;
         m_kapsel_versioon = "";
+        m_dhx_asutus = false;
     }
     
     
@@ -494,7 +506,8 @@ public class Asutus {
 	                m_toetatavDVKVersioon = rs.getString("toetatav_dvk_versioon");
 	                m_serverID = rs.getInt("server_id");
 	                m_aarID = rs.getInt("aar_id");
-	                m_kapsel_versioon = rs.getString("kapsel_versioon");	                
+	                m_kapsel_versioon = rs.getString("kapsel_versioon");	
+	                m_dhx_asutus = rs.getInt("dhx_asutus") != 0;
                 }
                 rs.close();
                 cs.close();
@@ -552,7 +565,8 @@ public class Asutus {
                     m_toetatavDVKVersioon = rs.getString("toetatav_dvk_versioon");
                     m_serverID = rs.getInt("server_id");
                     m_aarID = rs.getInt("aar_id");
-                    m_kapsel_versioon = rs.getString("kapsel_versioon");                    
+                    m_kapsel_versioon = rs.getString("kapsel_versioon");  
+                    m_dhx_asutus = rs.getInt("dhx_asutus") != 0;
                 }
                 rs.close();
                 cs.close();
@@ -606,17 +620,24 @@ public class Asutus {
         }
     }
 
+    public static ArrayList<Asutus> getList(Connection conn) {
+        return getList(conn, null);
+      }
     
-    
-    public static ArrayList<Asutus> getList(Connection conn) {    	
+    public static ArrayList<Asutus> getList(Connection conn, Boolean dhxAsutus) {    	
         try {
             if (conn != null) {
             	Calendar cal = Calendar.getInstance();
             	boolean defaultAutoCommit = conn.getAutoCommit();
             	try{
 	            	conn.setAutoCommit(false);            	
-	            	CallableStatement cs = conn.prepareCall("{? = call \"Get_AsutusList\"()}");
-	            	cs.registerOutParameter(1, Types.OTHER);            	
+	            	CallableStatement cs = conn.prepareCall("{? = call \"Get_AsutusList\"(?)}");
+	            	cs.registerOutParameter(1, Types.OTHER);  
+	            	if (dhxAsutus != null) {
+	                    cs.setInt(2, (dhxAsutus?1:0));
+	                } else {
+	                    cs.setNull(2, Types.INTEGER);
+	                }
 	                cs.execute();
             	
 	                ResultSet rs = (ResultSet) cs.getObject(1);	                
@@ -688,7 +709,7 @@ public class Asutus {
                 Calendar cal = Calendar.getInstance();
                 
 
-                CallableStatement cs = conn.prepareCall("{? = call \"Add_Asutus\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                CallableStatement cs = conn.prepareCall("{? = call \"Add_Asutus\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 cs.registerOutParameter(1, Types.INTEGER);
 
                 cs.setString(2, m_registrikood);
@@ -738,8 +759,9 @@ public class Asutus {
                     cs.setString(40, null);
                     cs.setString(41, null);
                 }
-                
+
                 cs.setString(42, m_kapsel_versioon);
+                cs.setInt(43, (m_dhx_asutus?1:0));
                 cs.execute();
                 m_id = cs.getInt(1);
                 cs.close();
@@ -755,7 +777,7 @@ public class Asutus {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
                 CallableStatement cs = conn.prepareCall(
-                		"{call \"Update_Asutus\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                		"{call \"Update_Asutus\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 
                 cs.setInt(1, m_id);
                 cs.setString(2, m_registrikood);
@@ -806,6 +828,7 @@ public class Asutus {
                     cs.setString(41, null);
                 }
                 cs.setString(42, m_kapsel_versioon);
+                cs.setInt(43, (m_dhx_asutus?1:0));
                 cs.execute();
                 cs.close();
             }
@@ -814,6 +837,24 @@ public class Asutus {
             clear();
         }
     }
+    
+    public static Boolean isDhxAsutus (Connection conn, Integer id) throws SQLException{
+        try {  
+          Boolean result = false;
+          CallableStatement cs = conn.prepareCall("SELECT dhx_asutus FROM asutus where asutus_id=?");
+          cs.setInt(1, id);
+          ResultSet rs = cs.executeQuery();
+          while (rs.next()) {
+            result = rs.getInt("dhx_asutus") == 1;
+          }
+          rs.close();
+          cs.close();
+          return result;
+      } catch (SQLException e) {
+          CommonMethods.logError(e, "Asutus", "loadByRegNr");
+          throw e;
+      }
+      }
 
     public void saveToDB(Connection conn, XRoadProtocolHeader xTeePais) {
         if (m_id > 0) {

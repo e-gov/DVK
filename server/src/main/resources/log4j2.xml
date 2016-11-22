@@ -10,35 +10,40 @@
     <Console name="console" target="SYSTEM_OUT">
       <PatternLayout pattern="%-5p %d %c{1} - %m%n"/>
     </Console>
-    <File name="file" fileName="${server.log.file}">
+    <File name="file" fileName="c://logs/dvk.log">
       <PatternLayout pattern="%d{ABSOLUTE} %5p %d %C.%M:%L - %m%n"/>
     </File>
+    
      <!-- <Syslog name="syslog" host="192.168.1.117" port="514" protocol="TCP" newLine="true" facility="LOCAL7"/> -->
   </Appenders> 
-  <Loggers>
-    <Logger name="dhl" level="debug">
-    	<AppenderRef ref="STDOUT"/>
-    	<AppenderRef ref="file"/>
-    	<AppenderRef ref="syslog"/>
+  <Loggers> 
+	<Logger name="org.apache.axis.transport.http.HTTPSender" level="ALL">
+	   <level value="ALL"/>
+	   <AppenderRef ref="STDOUT"/>
+	</Logger>  
+	 <Logger name="org.springframework.ws.client.MessageTracing" level="trace" additivity="false">
+      <AppenderRef ref="STDOUT"/>
+      <AppenderRef ref="file"/>
+    </Logger> 
+    <Logger name="org.springframework.ws.server.MessageTracing" level="trace" additivity="false">
+      <AppenderRef ref="STDOUT"/>
+      <AppenderRef ref="file"/>
     </Logger>
-    <Logger name="dvk" level="debug">
-    	<AppenderRef ref="STDOUT"/>
-    	<AppenderRef ref="file"/>
+    <Logger name="ee" level="trace" additivity="false">
+      <AppenderRef ref="STDOUT"/>
+      <AppenderRef ref="file"/>
     </Logger>
-     <Logger name="ee.sk" level="debug">
-    	<AppenderRef ref="file"/>
+    <Logger name="dhl" level="trace" additivity="false">
+      <AppenderRef ref="STDOUT"/>
+      <AppenderRef ref="file"/>
     </Logger>
-     <Logger name="org.apache.axis" level="error">
-    	<AppenderRef ref="file"/>
-    	<AppenderRef ref="STDOUT"/>
+    <Logger name="org" level="info" additivity="false">
+      <AppenderRef ref="STDOUT"/>
+      <AppenderRef ref="file"/>
     </Logger>
-     <Logger name="org.mortbay.jetty" level="error">
-    	<AppenderRef ref="file"/>
-    	<AppenderRef ref="STDOUT"/>
-    </Logger>
-    
-    <Root level="debug">
-      <AppenderRef ref="console"/>
+    <Root value="INFO">
+      <AppenderRef ref="STDOUT"/>
+      <AppenderRef ref="file"/>
     </Root>
   </Loggers>
 </Configuration>

@@ -1,0 +1,77 @@
+Status: FAILED
+Time Taken: 33
+Size: 345
+Timestamp: Tue Oct 25 19:36:34 EEST 2016
+TestStep: sendDocuments
+
+----------------- Messages ------------------------------
+[SOAP Response] error: </body> does not close tag <hr>.
+[SOAP Response] </body> does not close tag <hr>.
+[Valid HTTP Status Codes] Response status code:404 is not in acceptable list of status codes
+[Contains href] Missing token [href="cid:] in Response
+
+----------------- Properties ------------------------------
+Endpoint: http://localhost:8070/dvk2/services/dhlHttpSoapPort
+Encoding: UTF-8
+
+---------------- Request ---------------------------
+Request Headers: SOAPAction : ""
+Connection : Keep-Alive
+User-Agent : Apache-HttpClient/4.1.1 (java 1.5)
+Host : localhost:8070
+Accept-Encoding : gzip,deflate
+Content-Length : 3878
+MIME-Version : 1.0
+Content-Type : multipart/related; type="text/xml"; start="<rootpart@soapui.org>"; boundary="----=_Part_11_131192910.1477413394840"
+
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xtee="http://x-tee.riik.ee/xsd/xtee.xsd" xmlns:dhl="http://producers.dhl.xtee.riik.ee/producer/dhl">
+   <soapenv:Header>
+      <ns4:protocolVersion xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">4.0</ns4:protocolVersion>
+      <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f</ns4:id>
+      <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
+         <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
+         <ns3:memberClass>GOV</ns3:memberClass>
+         <ns3:memberCode>99954321</ns3:memberCode>
+         <ns3:subsystemCode/>
+      </ns4:client>
+      <ns4:service ns3:objectType="SERVICE" xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
+         <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
+         <ns3:memberClass>GOV</ns3:memberClass>
+         <ns3:memberCode/>
+         <ns3:subsystemCode>DHX</ns3:subsystemCode>
+         <ns3:serviceCode>sendDocument</ns3:serviceCode>
+         <ns3:serviceVersion>v4</ns3:serviceVersion>
+      </ns4:service>
+   </soapenv:Header>
+   <soapenv:Body>
+      <dhl:sendDocuments>
+         <keha>
+            <dokumendid href="cid:doc"/>
+            <kaust>/</kaust>
+         </keha>
+      </dhl:sendDocuments>
+   </soapenv:Body>
+</soapenv:Envelope>
+
+---------------- Response --------------------------
+Response Headers: Cache-Control : must-revalidate,no-cache,no-store
+Server : Jetty(9.3.9.v20160517)
+#status# : HTTP/1.1 404 Not Found
+Content-Length : 345
+Date : Tue, 25 Oct 2016 16:36:34 GMT
+Content-Type : text/html;charset=iso-8859-1
+
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<title>Error 404 Not Found</title>
+</head>
+<body><h2>HTTP ERROR 404</h2>
+<p>Problem accessing /dvk2/services/dhlHttpSoapPort. Reason:
+<pre>    Not Found</pre></p><hr><a href="http://eclipse.org/jetty">Powered by Jetty:// 9.3.9.v20160517</a><hr/>
+
+</body>
+</html>
+

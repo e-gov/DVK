@@ -8,7 +8,6 @@ Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 	<display-name>Dokumendivahetuskeskus</display-name>
 
 	<distributable />
-	
 	<filter>
 		<filter-name>HttpServletRequestFilter</filter-name>
 		<description>This filter is used to replace HTTP requests with the custom ones</description>
@@ -30,7 +29,9 @@ Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 	<listener>
 		<listener-class>org.apache.axis.transport.http.AxisHTTPSessionListener</listener-class>
 	</listener>
-	
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
 	<servlet>
 		<servlet-name>AxisServlet</servlet-name>
 		<display-name>Apache-Axis Servlet</display-name>
@@ -40,42 +41,64 @@ Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 			<param-value>${dhl.properties}</param-value>
 		</init-param>
 	</servlet>
-	
+	<servlet>
+		<servlet-name>spring-ws</servlet-name>
+		<servlet-class>org.springframework.ws.transport.http.MessageDispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>transformWsdlLocations</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>contextClass</param-name>
+			<param-value>
+				org.springframework.web.context.support.AnnotationConfigWebApplicationContext
+			</param-value>
+		</init-param>
+		<!-- Again, config locations must consist of one or more comma- or space-delimited 
+			and fully-qualified @Configuration classes -->
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>ee.ria.dhx.ws.beanconfig.DhxEndpointConfig</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
 	<servlet-mapping>
-		<servlet-name>AxisServlet</servlet-name>
-		<url-pattern>/servlet/AxisServlet</url-pattern>
+		<servlet-name>spring-ws</servlet-name>
+		<url-pattern>/ws/*</url-pattern>
 	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>AxisServlet</servlet-name>
-		<url-pattern>*.jws</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>AxisServlet</servlet-name>
-		<url-pattern>/services/*</url-pattern>
-	</servlet-mapping>
-	
-	<session-config>
-		<!-- Default to 5 minute session timeouts -->
-		<session-timeout>5</session-timeout>
-	</session-config>
-	
-	<!-- 
-		 Currently the W3C haven't settled on a media type for WSDL;
-		 http://www.w3.org/TR/2003/WD-wsdl12-20030303/#ietf-draft for now we go with the basic 'it's XML' response
-	-->
-	<mime-mapping>
-		<extension>wsdl</extension>
-		<mime-type>text/xml</mime-type>
-	</mime-mapping>
-	<mime-mapping>
-		<extension>xsd</extension>
-		<mime-type>text/xml</mime-type>
-	</mime-mapping>
-	
-	<welcome-file-list id="WelcomeFileList">
-		<welcome-file>index.jsp</welcome-file>
-		<welcome-file>index.html</welcome-file>
-		<welcome-file>index.jws</welcome-file>
-	</welcome-file-list>
-	
+		<servlet-mapping>
+			<servlet-name>AxisServlet</servlet-name>
+			<url-pattern>/servlet/AxisServlet</url-pattern>
+		</servlet-mapping>
+		<servlet-mapping>
+			<servlet-name>AxisServlet</servlet-name>
+			<url-pattern>*.jws</url-pattern>
+		</servlet-mapping>
+		<servlet-mapping>
+			<servlet-name>AxisServlet</servlet-name>
+			<url-pattern>/services/*</url-pattern>
+		</servlet-mapping>
+
+		<session-config>
+			<!-- Default to 5 minute session timeouts -->
+			<session-timeout>5</session-timeout>
+		</session-config>
+
+		<!-- Currently the W3C haven't settled on a media type for WSDL; http://www.w3.org/TR/2003/WD-wsdl12-20030303/#ietf-draft 
+			for now we go with the basic 'it's XML' response -->
+		<mime-mapping>
+			<extension>wsdl</extension>
+			<mime-type>text/xml</mime-type>
+		</mime-mapping>
+		<mime-mapping>
+			<extension>xsd</extension>
+			<mime-type>text/xml</mime-type>
+		</mime-mapping>
+
+		<welcome-file-list id="WelcomeFileList">
+			<welcome-file>index.jsp</welcome-file>
+			<welcome-file>index.html</welcome-file>
+			<welcome-file>index.jws</welcome-file>
+		</welcome-file-list>
+
 </web-app>

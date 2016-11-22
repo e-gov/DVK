@@ -1035,8 +1035,12 @@ public class CommonMethods {
 
         return result;
     }
-
+    
     public static void joinSplitXML(String xmlFileName, BufferedWriter mainOutWriter) {
+    	joinSplitXML(xmlFileName, mainOutWriter, true);
+    }
+
+    public static void joinSplitXML(String xmlFileName, BufferedWriter mainOutWriter, Boolean deleteOriginalFile) {
         FileInputStream mainInStream = null;
         InputStreamReader mainInReader = null;
         BufferedReader mainReader = null;
@@ -1099,9 +1103,10 @@ public class CommonMethods {
             safeCloseReader(mainReader);
             safeCloseReader(mainInReader);
             safeCloseStream(mainInStream);
-
-            // Kustutame ajutise faili
-            (new File(xmlFileName)).delete();
+            if ( deleteOriginalFile) {
+	            // Kustutame ajutise faili
+	            (new File(xmlFileName)).delete();
+            }
         } catch (Exception ex) {
         	logger.error(ex.getMessage(), ex);
         } finally {

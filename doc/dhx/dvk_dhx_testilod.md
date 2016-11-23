@@ -76,9 +76,9 @@ Iga SOAP sõnumi X-tee headeri, service elemendi tuleb täita DVK andmetega, ehk
 ### 1.1. Õige kapsli saatmine
 <pre>
 
-   **Saatev süsteem** : DHS 1
-   **Kapsli adressaat** : DHS 3
-   **Saadetis** : korrektselt kapseldatud fail
+   Saatev süsteem : DHS 1
+   Kapsli adressaat : DHS 3
+   Saadetis : korrektselt kapseldatud fail
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline)**:
@@ -235,9 +235,9 @@ Place>
 ### 1.2. Õige kapsli saatmine alamsüsteemile
 <pre>
 
-   **Saatev süsteem** : DHS 1
-   **Kapsli adressaat** : DHS 3-e DVK-s asutusena registreeritud alamsüsteemi nimi
-   **Saadetis** : korrektselt kapseldatud fail
+   Saatev süsteem : DHS 1
+   Kapsli adressaat : DHS 3-e DVK-s asutusena registreeritud alamsüsteemi nimi
+   Saadetis : korrektselt kapseldatud fail
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -391,9 +391,9 @@ Märkus: Vajadusel (juhul kui testi tehakse mitte selle adressaadiga, kelle andm
 ### 1.3. Vale kapsli saatmine
 <pre>
 
-   **Saatev süsteem** : DHS 1
-   **Kapsli adressaat** : DHS 3
-   **Saadetis** : kapsli fail, mis ei vasta Elektroonilise andmevahetuse metaandmete loendile 2.1 (nt puudu kohustuslik väli), aga on XML formaadis fail õige XML vorminguga.
+   Saatev süsteem : DHS 1
+   Kapsli adressaat : DHS 3
+   Saadetis : kapsli fail, mis ei vasta Elektroonilise andmevahetuse metaandmete loendile 2.1 (nt puudu kohustuslik väli), aga on XML formaadis fail õige XML vorminguga.
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -538,9 +538,9 @@ Märkus: Vajadusel (juhul kui testi tehakse mitte selle adressaadiga, kelle andm
 ### 1.4. Faili saatmine (fail ei ole kapsel)
 <pre>
 
-   **Saatev süsteem** : DHS 1
-   **Kapsli adressaat** : DHS 3
-   **Saadetis** : fail, mis ei ole XML või XML vale vorminguga.
+   Saatev süsteem : DHS 1
+   Kapsli adressaat : DHS 3
+   Saadetis : fail, mis ei ole XML või XML vale vorminguga.
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -596,9 +596,9 @@ Test fail.
 ### 1.5. Duplikaadi kontroll
 <pre>
 
-   **Saatev süsteem** : DHS 1
-   **Kapsli adressaat** : DHS 3
-   **Saadetis** : korrektselt kapseldatud fail
+   Saatev süsteem : DHS 1
+   Kapsli adressaat : DHS 3
+   Saadetis : korrektselt kapseldatud fail
 </pre>
 
 #### **  Verifitseerija toimimine (samm-sammuline):**
@@ -750,9 +750,9 @@ Test fail.
 ### 1.6. Valele adressaadile saatmine
 <pre>
 
-   **Saatev süsteem** : DHS 1
-   **Kapsli adressaat** : puudu olev adressaat
-   **Saadetis** : korrektselt kapseldatud fail
+   Saatev süsteem : DHS 1
+   Kapsli adressaat : puudu olev adressaat
+   Saadetis : korrektselt kapseldatud fail
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -903,9 +903,9 @@ Test fail.
 ### 1.7. Vahendatavate nimekirja küsimine DVK-st.
 <pre>
 
-   **Saatev süsteem** : DHS 1
-   **Kapsli adressaat** : 
-   **Saadetis** :
+   Saatev süsteem : DHS 1
+   Kapsli adressaat : 
+   Saadetis :
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -958,9 +958,9 @@ Test fail.
 ### 1.8. DVK süsteemist tulnud dokumentide vastuvõtmine
 <pre>
 
-   **Saatev süsteem** : 
-   **Kapsli adressaat** : DHS 2
-   **Saadetis** : korrektselt kapseldatud fail
+   Saatev süsteem : 
+   Kapsli adressaat : DHS 2
+   Saadetis : korrektselt kapseldatud fail
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -977,9 +977,9 @@ Märkus: kui testimisel kasutatakse DHX etalonteostuses tehtud DHS maketti, siis
 ### 1.9. Õige kapsli saatmine. Adressat toetab ainult 1.0 kapsli versiooni
 <pre>
 
-   **Saatev süsteem** : DHS 1
-   **Kapsli adressaat** : DHS 4
-   **Saadetis** : korrektselt kapseldatud fail 1.0
+   Saatev süsteem : DHS 1
+   Kapsli adressaat : DHS 4
+   Saadetis : korrektselt kapseldatud fail 1.0
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -1135,9 +1135,9 @@ Place>
 ### 1.10. Õige kapsli saatmine. Kapslis on määratud ’ARVED’ kaust.
 <pre>
 
-   **Saatev süsteem** : DHS 1
-   **Kapsli adressaat** : DHS 3
-   **Saadetis** : korrektselt kapseldatud fail
+   Saatev süsteem : DHS 1
+   Kapsli adressaat : DHS 3
+   Saadetis : korrektselt kapseldatud fail
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -1296,9 +1296,9 @@ Place>
 ### 2.1. Õige kapsli saatmine
 <pre>
 
-   **Saatev süsteem** : DHS 3
-   **Kapsli adressaat** : DHS 2
-   **Saadetis** : korrektselt kapseldatud fail
+   Saatev süsteem : DHS 3
+   Kapsli adressaat : DHS 2
+   Saadetis : korrektselt kapseldatud fail
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -1457,9 +1457,9 @@ Place>
 ### 2.2. Vale kapsli saatmine
 <pre>
 
-   **Saatev süsteem** : DHS 3
-   **Kapsli adressaat** : DHS 2
-   **Saadetis** : kapsli fail, mis ei vasta Elektroonilise andmevahetuse metaandmete loendile 2.1 (nt puudu kohustuslik väli), aga on XML fail õige XML vorminguga
+   Saatev süsteem : DHS 3
+   Kapsli adressaat : DHS 2
+   Saadetis : kapsli fail, mis ei vasta Elektroonilise andmevahetuse metaandmete loendile 2.1 (nt puudu kohustuslik väli), aga on XML fail õige XML vorminguga
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -1609,9 +1609,9 @@ Place>
 ### 2.3. Faili saatmine (fail ei ole kapsel)
 <pre>
 
-   **Saatev süsteem** : DHS 3
-   **Kapsli adressaat** : DHS 2
-   **Saadetis** : fail mis ei ole XML või XML vale vorminguga.
+   Saatev süsteem : DHS 3
+   Kapsli adressaat : DHS 2
+   Saadetis : fail mis ei ole XML või XML vale vorminguga.
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -1673,9 +1673,9 @@ Test fail.
 ### 2.4. Vahendatavale saatmine
 <pre>
 
-   **Saatev süsteem** : DHS 3
-   **Kapsli adressaat** : Üks DHS 2 vahendatavatest
-   **Saadetis** : korrektselt kapseldatud fail
+   Saatev süsteem : DHS 3
+   Kapsli adressaat : Üks DHS 2 vahendatavatest
+   Saadetis : korrektselt kapseldatud fail
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -1832,9 +1832,9 @@ Test fail.
 ### 2.5. Valele adressaadile saatmine
 <pre>
 
-   **Saatev süsteem** : DHS 3
-   **Kapsli adressaat** : Puudu olev asutus
-   **Saadetis** : korrektselt kapseldatud fail
+   Saatev süsteem : DHS 3
+   Kapsli adressaat : Puudu olev asutus
+   Saadetis : korrektselt kapseldatud fail
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -1993,9 +1993,9 @@ Test fail.
 ### 2.6. DHX süsteemist tulnud dokumendi vastuvõtmine
 <pre>
 
-   **Saatev süsteem** : DHS 3
-   **Kapsli adressaat** :
-   **Saadetis** :
+   Saatev süsteem : DHS 3
+   Kapsli adressaat :
+   Saadetis :
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -2053,9 +2053,9 @@ Test fail.
 ### 2.7. DHX süsteemist tulnud dokumendi vastuvõetuks märkimine
 <pre>
 
-   **Saatev süsteem** : DHS 3
-   **Kapsli adressaat** : 
-   **Saadetis** : 
+   Saatev süsteem : DHS 3
+   Kapsli adressaat : 
+   Saadetis : 
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -2107,9 +2107,9 @@ Test fail.
 ### 2.8. DHX süsteemist tulnud dokumendi vastuvõtmine. Dokument on suunatud alamsüsteemile.
 <pre>
 
-   **Saatev süsteem** : DHS 3 alamsüsteem
-   **Kapsli adressaat** : 
-   **Saadetis** : 
+   Saatev süsteem : DHS 3 alamsüsteem
+   Kapsli adressaat : 
+   Saadetis : 
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -2168,9 +2168,9 @@ Test fail.
 ### 2.9. DHX süsteemist tulnud dokumendi vastuvõetuks märkimine.  Dokument on suunatud alamsüsteemile.
 <pre>
 
-   **Saatev süsteem** : DHS 3 alamsüsteem
-   **Kapsli adressaat** : 
-   **Saadetis** : 
+   Saatev süsteem : DHS 3 alamsüsteem
+   Kapsli adressaat : 
+   Saadetis : 
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -2222,9 +2222,9 @@ Test fail.
 ### 2.10. DVK adressaatide nimekirja pärimine.
 <pre>
 
-   **Saatev süsteem** : DHS 3
-   **Kapsli adressaat** :
-   **Saadetis** :
+   Saatev süsteem : DHS 3
+   Kapsli adressaat :
+   Saadetis :
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -2277,9 +2277,9 @@ Test fail.
 ### 2.11. DHX-i saadetud dokumendi staatuse pärimine(saatmine õnnestus)
 <pre>
 
-   **Saatev süsteem** : DHS 3
-   **Kapsli adressaat** :
-   **Saadetis** :
+   Saatev süsteem : DHS 3
+   Kapsli adressaat :
+   Saadetis :
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -2334,9 +2334,9 @@ Test fail.
 ### 2.12. DHX-i saadetud dokumendi staatuse pärimine(saatmine ebaõnnestus, adressaat ei ole üleval)
 <pre>
 
-   **Saatev süsteem** : DHS 3
-   **Kapsli adressaat** : DHS 1
-   **Saadetis** : korrektselt kapseldatud fail
+   Saatev süsteem : DHS 3
+   Kapsli adressaat : DHS 1
+   Saadetis : korrektselt kapseldatud fail
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -2392,9 +2392,9 @@ Test fail.
 ### 2.13. Õige kapsli saatmine DHX alamsüsteemile(DHX. prefiksiga X-tee alamsüsteemile)
 <pre>
 
-   **Saatev süsteem** : DHS 3
-   **Kapsli adressaat** : DHS 2-e DVK-s asutusena registreeritud alamsüsteem
-   **Saadetis** : korrektselt kapseldatud fail
+   Saatev süsteem : DHS 3
+   Kapsli adressaat : DHS 2-e DVK-s asutusena registreeritud alamsüsteem
+   Saadetis : korrektselt kapseldatud fail
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -2553,9 +2553,9 @@ Test fail.
 ### 2.14. Vana kapsli(korrektselt kapseldatud fail 1.0) saatmine DHX adressaadile
 <pre>
 
-   **Saatev süsteem** : DHS 3
-   **Kapsli adressaat** : DHS 2
-   **Saadetis** : korrektselt kapseldatud fail 1.0
+   Saatev süsteem : DHS 3
+   Kapsli adressaat : DHS 2
+   Saadetis : korrektselt kapseldatud fail 1.0
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -2648,9 +2648,9 @@ Test fail.
 ### 2.15. DHX süsteemist tulnud dokumendi vastuvõtmine. Adressat toetab ainult 1.0 kapsli versiooni
 <pre>
 
-   **Saatev süsteem** : DHS 4
-   **Kapsli adressaat** :
-   **Saadetis** :
+   Saatev süsteem : DHS 4
+   Kapsli adressaat :
+   Saadetis :
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -2709,9 +2709,9 @@ Märkus: manuses olev fail on kodeeritud kujul(base64 ja gZip).
 ### 2.16. DHX süsteemist tulnud dokumendi  vastuvõetuks märkimine. Adressat toetab ainult 1.0 kapsli versiooni
 <pre>
 
-   **Saatev süsteem** : DHS 4
-   **Kapsli adressaat** :
-   **Saadetis** :
+   Saatev süsteem : DHS 4
+   Kapsli adressaat :
+   Saadetis :
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -2765,9 +2765,9 @@ Märkus: manuses olev fail on kodeeritud kujul(base64 ja gZip).
 ### 2.17. DHX süsteemist tulnud dokumendi vastuvõtmine ’ARVED’ kaustast.
 <pre>
 
-   **Saatev süsteem** : DHS 3
-   **Kapsli adressaat** :
-   **Saadetis** :
+   Saatev süsteem : DHS 3
+   Kapsli adressaat :
+   Saadetis :
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -2827,9 +2827,9 @@ Märkus: manuses olev fail on kodeeritud kujul(base64 ja gZip).
 ### 2.18. DHX süsteemist tulnud dokumendi vastuvõetuks märkimine. Dokument on ’ARVED’ kaustas. 
 <pre>
 
-   **Saatev süsteem** : DHS 3
-   **Kapsli adressaat** :
-   **Saadetis** :
+   Saatev süsteem : DHS 3
+   Kapsli adressaat :
+   Saadetis :
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -2883,9 +2883,9 @@ Märkus: manuses olev fail on kodeeritud kujul(base64 ja gZip).
 ### 3.1. Õige kapsli saatmine
 <pre>
 
-   **Saatev süsteem** : DHS makett
-   **Kapsli adressaat** : DHS 3
-   **Saadetis** : korrektselt kapseldatud fail
+   Saatev süsteem : DHS makett
+   Kapsli adressaat : DHS 3
+   Saadetis : korrektselt kapseldatud fail
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -2905,9 +2905,9 @@ Märkus: manuses olev fail on kodeeritud kujul(base64 ja gZip).
 ### 3.2. Vale kapsli saatmine
 <pre>
 
-   **Saatev süsteem** : DHS makett
-   **Kapsli adressaat** : DHS 3
-   **Saadetis** : kapsli fail, mis ei vasta Elektroonilise andmevahetuse metaandmete loendile 2.1 (nt puudu kohustuslik väli), aga on XML fail õige XML vorminguga
+   Saatev süsteem : DHS makett
+   Kapsli adressaat : DHS 3
+   Saadetis : kapsli fail, mis ei vasta Elektroonilise andmevahetuse metaandmete loendile 2.1 (nt puudu kohustuslik väli), aga on XML fail õige XML vorminguga
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -2927,9 +2927,9 @@ Märkus: manuses olev fail on kodeeritud kujul(base64 ja gZip).
 ### 3.3. Faili saatmine (fail ei ole kapsel)
 <pre>
 
-   **Saatev süsteem** : DHS makett
-   **Kapsli adressaat** : DHS 3
-   **Saadetis** : fail mis ei ole XML või XML vale vorminguga.
+   Saatev süsteem : DHS makett
+   Kapsli adressaat : DHS 3
+   Saadetis : fail mis ei ole XML või XML vale vorminguga.
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -2949,9 +2949,9 @@ Märkus: manuses olev fail on kodeeritud kujul(base64 ja gZip).
 ### 3.4. Duplikaadi kontroll
 <pre>
 
-   **Saatev süsteem** : DHS makett
-   **Kapsli adressaat** : DHS 3
-   **Saadetis** : korrektselt kapseldatud fail
+   Saatev süsteem : DHS makett
+   Kapsli adressaat : DHS 3
+   Saadetis : korrektselt kapseldatud fail
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**
@@ -2974,9 +2974,9 @@ DHS 2 tunneb ära, et on sama saadetise juba edukalt vastu võtnud ja tagastab v
 ### 3.5. DVK süsteemist tulnud dokumendi vastuvõtmine
 <pre>
 
-   **Saatev süsteem** : DHS makett
-   **Kapsli adressaat** : DHS 3
-   **Saadetis** : korrektselt kapseldatud fail
+   Saatev süsteem : DHS makett
+   Kapsli adressaat : DHS 3
+   Saadetis : korrektselt kapseldatud fail
 </pre>
 
 #### **Verifitseerija toimimine (samm-sammuline):**

@@ -312,6 +312,25 @@ public class CommonMethods {
             throw new RuntimeException(e);
         }
     }
+    
+    /**
+     * Recursively renames the namespace of a node.
+     * 
+     * @param node the starting node.
+     * @param namespace the new namespace. Supplying <tt>null</tt> removes the namespace.
+     */
+    public static void removeNamespaceRecursive(Node node) {
+     // Document document = node.getOwnerDocument();
+      if (node.getNodeType() == Node.ELEMENT_NODE) {
+        node.setPrefix(null);
+       // document.renameNode(node, namespace, node.getNodeName());
+      }
+      NodeList list = node.getChildNodes();
+      for (int i = 0; i < list.getLength(); ++i) {
+        removeNamespaceRecursive(list.item(i));
+      }
+    }
+
 
     public static byte[] xmlElementToBinary(Element xmlElement) {
         try {
@@ -326,6 +345,7 @@ public class CommonMethods {
         boolean result = true;
         FileOutputStream out = null;
         OutputStreamWriter ow = null;
+        xmlElement.setPrefix(null);
         try {
             out = new FileOutputStream(filePath, false);
             ow = new OutputStreamWriter(out, "UTF-8");

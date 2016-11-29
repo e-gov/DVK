@@ -927,7 +927,6 @@ public class ReceiveDocuments {
                     "Failed to process XML contents of document "
                             + documentData.getId() + "! Document XML is empty or invalid.");
         }
-
         Element decMetadata = null;
 
         NodeList foundNodes = currentXmlContent.getDocumentElement().getElementsByTagNameNS("*", "DecMetadata");
@@ -961,7 +960,9 @@ public class ReceiveDocuments {
                     CommonMethods.getDateISO8601(sendingData.getStartDate()),
                     firstMetadataNode);
         }
-
+        if( currentXmlContent.getDocumentElement().getPrefix() != null) {
+          CommonMethods.removeNamespaceRecursive(currentXmlContent.getDocumentElement());
+        }
         // Salvestame muudetud XML andmed faili
         CommonMethods.xmlElementToFile(currentXmlContent.getDocumentElement(), filePath);
     }

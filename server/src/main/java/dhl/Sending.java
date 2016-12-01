@@ -274,6 +274,32 @@ public class Sending {
         }
     }
 
+    public static boolean updateStatus (int sendingId, int sendStatus, Date endDate, Connection conn) {
+      
+      logger.debug("Updating sending. Parameters: ");
+      logger.debug("sending_id: " + sendingId);
+      logger.debug("sending_end_date: " + endDate);
+      logger.debug("send_status_id: " + sendStatus);
+
+      try {
+          if (conn != null) {
+              Calendar cal = Calendar.getInstance();
+              CallableStatement cs = conn.prepareCall("UPDATE transport set staatus_id=?, saatmise_lopp=? where transport_id = ?");
+              cs.setInt(1, sendStatus);
+              cs.setTimestamp(2, CommonMethods.sqlDateFromDate(endDate), cal);
+              cs.setInt(3, sendingId);
+              cs.executeUpdate();
+              cs.close();
+              conn.commit();
+              return true;
+          } else {
+              return false;
+          }
+      } catch (Exception ex) {
+          logger.error(ex.getMessage(), ex);
+          return false;
+      }
+    }
     
     public boolean update(boolean updateChildObjects, Connection conn, XRoadProtocolHeader xTeePais) {
         logger.debug("Updating sending. Parameters: ");

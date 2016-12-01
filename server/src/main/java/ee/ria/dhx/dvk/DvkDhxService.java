@@ -19,6 +19,7 @@ import dvk.core.FileSplitResult;
 import dvk.core.Settings;
 import dvk.core.xroad.XRoadClient;
 import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadProtocolVersion;
 
 import ee.ria.dhx.exception.DhxException;
 import ee.ria.dhx.exception.DhxExceptionEnum;
@@ -580,9 +581,10 @@ public class DvkDhxService implements DhxImplementationSpecificService {
     String pipelineDataFile = null;
     Sending tmpSending = new Sending();
     tmpSending.loadByDocumentID(doc.getId(), conn);
+    Boolean allSent = true;
     Asutus senderOrg = new Asutus(tmpSending.getSender().getOrganizationID(), conn);
     for (Recipient recipient : tmpSending.getRecipients()) {
-      if (recipient.getSendStatusID() == 101
+      if (recipient.getSendStatusID() == CommonStructures.SendStatus_Sending
           && Asutus.isDhxAsutus(conn,
               recipient.getOrganizationID())) {
         log.debug("found document and recipient to send to DHX. recipient: " + recipient.getId());
@@ -665,28 +667,6 @@ public class DvkDhxService implements DhxImplementationSpecificService {
             pkg.setDocumentFile(new DataHandler(source));
           }
           asyncDhxPackageService.sendPackage(pkg);
-          /*
-           * OutgoingDhxPackage pkg = packageProvider.getOutgoingPackage(new File(pipelineDataFile),
-           * consignmentId, getDhxRegCode(asutus), getDhxSubsystem(asutus )); DhxSendDocumentResult
-           * response = documentService .sendPackage(pkg); SendDocumentResponse docResponse =
-           * response.getResponse(); if (docResponse.getFault() != null) { dvk.core.Fault fault =
-           * new Fault(); fault.setFaultCode(docResponse.getFault() .getFaultCode());
-           * fault.setFaultString(docResponse.getFault() .getFaultString());
-           * recipient.setFault(fault); } recipient.setSendingEndDate(new Date()); if
-           * (docResponse.getFault() == null) { log.debug("Document was succesfulyy sent to DHX");
-           * recipient.setDhxExternalReceiptId(docResponse .getReceiptId());
-           * recipient.setRecipientStatusId(11); recipient.setSendStatusID(102);
-           * recipient.setSendingEndDate(new Date()); } else {
-           * log.debug("Fault occured while sending document to DHX"); if (recipient.getSendCount()
-           * >= maxResendCount) {
-           * log.debug("Max attempts to send documents was done. Saving document as failed.");
-           * recipient.setRecipientStatusId(5); recipient.setSendStatusID(103);
-           * recipient.setSendingEndDate(new Date()); } dvk.core.Fault fault = new Fault();
-           * fault.setFaultCode(docResponse.getFault() .getFaultCode());
-           * fault.setFaultString(docResponse.getFault() .getFaultString());
-           * recipient.setFault(fault); }
-           */
-          // }
 
         } catch (DhxException ex) {
           log.debug("Error occured while sending document to DHX");
@@ -776,15 +756,13 @@ public class DvkDhxService implements DhxImplementationSpecificService {
       List<AsyncDhxSendDocumentResult> retryResults) {
     log.info("sendDvkToDhx invoked.");
     Connection conn = null;
+    Boolean allSent = true;
     try {
       conn = getConnection();
       String recipientIdStr = finalResult.getSentPackage().getInternalConsignmentId();
       Integer recipientId = Integer.parseInt(recipientIdStr);
       Recipient recipient = Recipient.getById(recipientId, conn);
       SendDocumentResponse docResponse = finalResult.getResponse();
-      if (docResponse.getFault() != null) {
-
-      }
       recipient.setSendingEndDate(new Date());
       if (docResponse.getFault() == null) {
         log.debug("Document was succesfuly sent to DHX");
@@ -827,6 +805,15 @@ public class DvkDhxService implements DhxImplementationSpecificService {
         recipient.setFault(fault);
       }
       recipient.update(conn, null);
+      List<Recipient> recipients = Recipient.getList(recipient.getSendingID(), conn);
+      for( Recipient docRecipient : recipients) {
+        if (docRecipient.getSendStatusID() != CommonStructures.SendStatus_Sent) {
+          allSent = false;
+        }
+      }
+      if (allSent) {
+        Sending.updateStatus(recipient.getSendingID(), CommonStructures.SendStatus_Sent, new Date(), conn);
+      }
     } catch (Exception ex) {
       log.error("Error occured while saving send results. " + ex.getMessage(), ex);
     } finally {

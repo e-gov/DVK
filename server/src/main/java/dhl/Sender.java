@@ -20,7 +20,7 @@ import dhl.users.Asutus;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import dvk.core.Settings;
-import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadHeader;
 
 public class Sender {
     static Logger logger = Logger.getLogger(Sender.class.getName());
@@ -230,7 +230,7 @@ public class Sender {
         }
     }
 
-    public int addToDB(Connection conn, XRoadProtocolHeader xTeePais) throws IllegalArgumentException, SQLException {
+    public int addToDB(Connection conn, XRoadHeader xTeePais) throws IllegalArgumentException, SQLException {
     	if (conn != null) {
             CallableStatement cs = conn.prepareCall("{? = call \"Add_Sender\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
             cs.registerOutParameter(1, Types.INTEGER);
@@ -268,7 +268,7 @@ public class Sender {
     }
     
     
-    public static Sender fromXML(XMLStreamReader xmlReader, Connection conn, XRoadProtocolHeader xTeePais) throws AxisFault {
+    public static Sender fromXML(XMLStreamReader xmlReader, Connection conn, XRoadHeader xTeePais) throws AxisFault {
         try {
             Sender result = new Sender();
 

@@ -1,17 +1,12 @@
 package dvk.client;
 
-import dvk.client.businesslayer.ErrorLog;
-import dvk.client.dhl.service.LoggingService;
-import dvk.client.iostructures.*;
-import dvk.core.CommonMethods;
-import dvk.core.Settings;
-
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
@@ -27,6 +22,17 @@ import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import dvk.client.businesslayer.ErrorLog;
+import dvk.client.dhl.service.LoggingService;
+import dvk.client.iostructures.DvkXHeader;
+import dvk.client.iostructures.GetSendStatusBody;
+import dvk.client.iostructures.MarkDocumentsReceivedBody;
+import dvk.client.iostructures.ReceiveDocumentsBody;
+import dvk.client.iostructures.SendDocumentsBody;
+import dvk.client.iostructures.SoapMessageBuilder;
+import dvk.core.CommonMethods;
+import dvk.core.Settings;
 
 public class TestClient {
     static Logger logger = Logger.getLogger(TestClient.class.getName());

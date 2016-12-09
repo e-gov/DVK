@@ -8,7 +8,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axis2.client.Options;
 
-import dvk.core.xroad.XRoadProtocolVersion;
+import dvk.core.xroad.XRoadMessageProtocolVersion;
 
 /**
  * @author Hendrik Pärna
@@ -16,7 +16,7 @@ import dvk.core.xroad.XRoadProtocolVersion;
  */
 public class ReceiveDocumentsDvkSoapClient extends AbstractDvkServiceSoapClient {
 
-    public ReceiveDocumentsDvkSoapClient(Options options, XRoadProtocolVersion xRoadProtocol) {
+    public ReceiveDocumentsDvkSoapClient(Options options, XRoadMessageProtocolVersion xRoadProtocol) {
        super(options, xRoadProtocol);
     }
 

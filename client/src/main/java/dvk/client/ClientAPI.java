@@ -1,23 +1,5 @@
 package dvk.client;
 
-import dvk.client.businesslayer.*;
-
-import dvk.client.conf.OrgDvkSettings;
-import dvk.client.conf.OrgSettings;
-import dvk.client.db.DBConnection;
-import dvk.client.db.UnitCredential;
-import dvk.client.dhl.service.DatabaseSessionService;
-import dvk.client.dhl.service.LoggingService;
-import dvk.client.iostructures.*;
-import dvk.core.AttachmentExtractionResult;
-import dvk.core.CommonMethods;
-import dvk.core.CommonStructures;
-import dvk.core.FileSplitResult;
-import dvk.core.HeaderVariables;
-import dvk.core.Fault;
-import dvk.core.Settings;
-import dvk.core.ShortName;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -27,7 +9,11 @@ import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.security.Security;
 import java.sql.Connection;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -43,13 +29,59 @@ import org.apache.axis.attachments.AttachmentPart;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.transport.http.HTTPConstants;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import dvk.client.businesslayer.Classifier;
+import dvk.client.businesslayer.DhlCapability;
+import dvk.client.businesslayer.DhlMessage;
+import dvk.client.businesslayer.ErrorLog;
+import dvk.client.businesslayer.MessageRecipient;
+import dvk.client.businesslayer.Occupation;
+import dvk.client.businesslayer.RequestLog;
+import dvk.client.businesslayer.ResponseStatus;
+import dvk.client.businesslayer.Subdivision;
+import dvk.client.conf.OrgDvkSettings;
+import dvk.client.conf.OrgSettings;
+import dvk.client.db.DBConnection;
+import dvk.client.db.UnitCredential;
+import dvk.client.dhl.service.DatabaseSessionService;
+import dvk.client.dhl.service.LoggingService;
+import dvk.client.iostructures.DvkXHeader;
+import dvk.client.iostructures.GetOccupationListBody;
+import dvk.client.iostructures.GetOccupationListV2Body;
+import dvk.client.iostructures.GetSendStatusBody;
+import dvk.client.iostructures.GetSendStatusResponseItem;
+import dvk.client.iostructures.GetSendStatusV2Body;
+import dvk.client.iostructures.GetSendingOptionsBody;
+import dvk.client.iostructures.GetSendingOptionsV2Body;
+import dvk.client.iostructures.GetSendingOptionsV3Body;
+import dvk.client.iostructures.GetSendingOptionsV3ResponseType;
+import dvk.client.iostructures.GetSubdivisionListBody;
+import dvk.client.iostructures.GetSubdivisionListV2Body;
+import dvk.client.iostructures.MarkDocumentsReceivedBody;
+import dvk.client.iostructures.MarkDocumentsReceivedV3Body;
+import dvk.client.iostructures.ReceiveDocumentsBody;
+import dvk.client.iostructures.ReceiveDocumentsResult;
+import dvk.client.iostructures.ReceiveDocumentsV2Body;
+import dvk.client.iostructures.ReceiveDocumentsV3Body;
+import dvk.client.iostructures.ReceiveDocumentsV4Body;
+import dvk.client.iostructures.SendDocumentsBody;
+import dvk.client.iostructures.SendDocumentsV2Body;
+import dvk.client.iostructures.SoapMessageBuilder;
+import dvk.core.AttachmentExtractionResult;
+import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
+import dvk.core.Fault;
+import dvk.core.FileSplitResult;
+import dvk.core.HeaderVariables;
+import dvk.core.Settings;
+import dvk.core.ShortName;
 
 public class ClientAPI {
 	//static Logger logger = Logger.getLogger(ClientAPI.class.getName());
@@ -226,7 +258,7 @@ public class ClientAPI {
                 }
                 
                 Message msg = new Message(messageData);
-                call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "getSendStatus"));
+                call.setOperationName(new QName(CommonStructures.NS_DHL_URI, "getSendStatus"));
 
                 // Lisame sänumile manuse
                 String tmpFile = CommonMethods.gzipPackXML(attachmentFile, headerVar.getOrganizationCode(), "getSendStatus");
@@ -486,7 +518,7 @@ public class ClientAPI {
 		
 		try {
 	    	Message msg = new Message(messageData);
-	        call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "sendDocuments"));
+	        call.setOperationName(new QName(CommonStructures.NS_DHL_URI, "sendDocuments"));
 	        
 	        // Lisame sänumile manuse
 	        FileDataSource ds = new FileDataSource(attachmentFile);
@@ -633,7 +665,7 @@ public class ClientAPI {
                         b4.fragmentNr++;
                         messageData = (new SoapMessageBuilder(header, b4.getBodyContentsAsText())).getMessageAsText();
                         Message msg = new Message(messageData);
-                        call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "receiveDocuments"));
+                        call.setOperationName(new QName(CommonStructures.NS_DHL_URI, "receiveDocuments"));
 
                         // Teostame päringu
                         call.invoke(msg);
@@ -754,7 +786,7 @@ public class ClientAPI {
                         b3.fragmentNr++;
                         messageData = (new SoapMessageBuilder(header, b3.getBodyContentsAsText())).getMessageAsText();
                         Message msg = new Message(messageData);
-                        call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "receiveDocuments"));
+                        call.setOperationName(new QName(CommonStructures.NS_DHL_URI, "receiveDocuments"));
 
                         // Teostame päringu
                         call.invoke(msg);
@@ -867,7 +899,7 @@ public class ClientAPI {
                         b2.fragmentNr++;
                         messageData = (new SoapMessageBuilder(header, b2.getBodyContentsAsText())).getMessageAsText();
                         Message msg = new Message(messageData);
-                        call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "receiveDocuments"));
+                        call.setOperationName(new QName(CommonStructures.NS_DHL_URI, "receiveDocuments"));
 
                         // Teostame päringu
                         call.invoke(msg);
@@ -972,7 +1004,7 @@ public class ClientAPI {
         }
 
         Message msg = new Message(messageData);
-        call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "receiveDocuments"));
+        call.setOperationName(new QName(CommonStructures.NS_DHL_URI, "receiveDocuments"));
 
         Message response = null;
 
@@ -1137,7 +1169,7 @@ public class ClientAPI {
             }
 
             Message msg = new Message(messageBody);
-            call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "markDocumentsReceived"));
+            call.setOperationName(new QName(CommonStructures.NS_DHL_URI, "markDocumentsReceived"));
 
             // Lisame sänumile manuse
             if (requestVersion < 3) {
@@ -1275,7 +1307,7 @@ public class ClientAPI {
             }
 
             Message msg = new Message(messageBody);
-            call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "markDocumentsReceived"));
+            call.setOperationName(new QName(CommonStructures.NS_DHL_URI, "markDocumentsReceived"));
 
             // Lisame sänumile manuse
             if (requestVersion < 3) {
@@ -1536,7 +1568,7 @@ public class ClientAPI {
             }
 
             Message msg = new Message(messageData);
-            call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "getSendingOptions"));
+            call.setOperationName(new QName(CommonStructures.NS_DHL_URI, "getSendingOptions"));
 
             // Lisame sänumile manuse
             if (requestVersion == 3) {
@@ -1646,7 +1678,7 @@ public class ClientAPI {
             }
 
             Message msg = new Message(messageData);
-            call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "getSubdivisionList"));
+            call.setOperationName(new QName(CommonStructures.NS_DHL_URI, "getSubdivisionList"));
 
             // Lisame sänumile manuse
             if (requestVersion == 2) {
@@ -1770,7 +1802,7 @@ public class ClientAPI {
                     throw new Exception("Request getOccupationList does not have version v" + String.valueOf(requestVersion) + "!");
             }
             Message msg = new Message(messageData);
-            call.setOperationName(new QName(CommonStructures.NS_DVK_MAIN, "getOccupationList"));
+            call.setOperationName(new QName(CommonStructures.NS_DHL_URI, "getOccupationList"));
 
             // Lisame sänumile manuse
             if (requestVersion == 2) {

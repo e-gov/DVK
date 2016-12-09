@@ -7,8 +7,8 @@ import javax.xml.soap.SOAPBodyElement;
 import javax.xml.soap.SOAPElement;
 
 import dvk.core.CommonMethods;
-import dvk.core.xroad.XRoadProtocolHeader;
-import dvk.core.xroad.XRoadProtocolVersion;
+import dvk.core.xroad.XRoadHeader;
+import dvk.core.xroad.XRoadMessageProtocolVersion;
 
 public class sendDocumentsResponseType implements SOAPOutputBodyRepresentation {
 	
@@ -22,7 +22,7 @@ public class sendDocumentsResponseType implements SOAPOutputBodyRepresentation {
         kehaHref = "";
     }
 
-    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolHeader xRoadProtocolHeader) {
+    public void addToSOAPBody(org.apache.axis.Message msg, XRoadHeader xRoadHeader) {
         try {
             org.apache.axis.message.SOAPEnvelope se = msg.getSOAPEnvelope();
             SOAPBody body = se.getBody();
@@ -35,7 +35,7 @@ public class sendDocumentsResponseType implements SOAPOutputBodyRepresentation {
             
             SOAPBodyElement element = body.addBodyElement(se.createName(DEFAULT_RESPONSE_ELEMENT_NAME));
             
-            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
+            if (xRoadHeader.getMessageProtocolVersion().equals(XRoadMessageProtocolVersion.V2_0)) {
             	SOAPElement elParing = element.addChildElement(se.createName("paring"));
             	
             	SOAPElement elDok = elParing.addChildElement("dokumendid");

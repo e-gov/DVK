@@ -1,5 +1,12 @@
 package integration;
 
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.junit.Test;
+
 import dvk.client.ClientAPI;
 import dvk.client.businesslayer.Occupation;
 import dvk.client.businesslayer.Subdivision;
@@ -13,12 +20,6 @@ import dvk.core.HeaderVariables;
 import dvk.core.Settings;
 import ee.ria.dvk.client.testutil.IntegrationTestsConfigUtil;
 import junit.framework.Assert;
-import org.apache.log4j.Logger;
-import org.junit.Test;
-
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
 
 public class OrgCapabilityCheckerRequestsIntegration {
 

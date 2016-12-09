@@ -1,10 +1,5 @@
 package dvk.client.businesslayer;
 
-import dvk.client.conf.OrgSettings;
-import dvk.client.db.DBConnection;
-import dvk.client.dhl.service.LoggingService;
-import dvk.core.CommonMethods;
-import dvk.core.CommonStructures;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -16,6 +11,12 @@ import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import dvk.client.conf.OrgSettings;
+import dvk.client.db.DBConnection;
+import dvk.client.dhl.service.LoggingService;
+import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
 
 public class Occupation {
 	static Logger logger = Logger.getLogger(Occupation.class.getName());

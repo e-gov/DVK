@@ -53,14 +53,14 @@ import dvk.core.FileSplitResult;
 import dvk.core.HeaderVariables;
 import dvk.core.Settings;
 import dvk.core.XmlValidator;
-import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadHeader;
 
 public class SendDocuments {
     private static Logger logger = Logger.getLogger(SendDocuments.class);
 
     public static RequestInternalResult V1(
             org.apache.axis.MessageContext context, Connection conn, UserProfile user,
-            OrgSettings hostOrgSettings, XRoadProtocolHeader xTeePais) throws Exception {
+            OrgSettings hostOrgSettings, XRoadHeader xTeePais) throws Exception {
         logger.info("SendDocuments.V1 invoked.");
 
         Timer t = new Timer();
@@ -330,7 +330,7 @@ public class SendDocuments {
         return result;
     }
 
-    public static RequestInternalResult V2(org.apache.axis.MessageContext context, Connection conn, UserProfile user, OrgSettings hostOrgSettings, XRoadProtocolHeader xTeePais)
+    public static RequestInternalResult V2(org.apache.axis.MessageContext context, Connection conn, UserProfile user, OrgSettings hostOrgSettings, XRoadHeader xTeePais)
     		throws Exception, ParserConfigurationException {
 
         logger.info("SendDocuments.V2 invoked.");
@@ -708,7 +708,7 @@ public class SendDocuments {
      * @throws AxisFault
      * @throws ParserConfigurationException
      */
-    public static RequestInternalResult V3(org.apache.axis.MessageContext context, Connection conn, UserProfile user, OrgSettings hostOrgSettings, XRoadProtocolHeader xTeePais) throws Exception, ParserConfigurationException {
+    public static RequestInternalResult V3(org.apache.axis.MessageContext context, Connection conn, UserProfile user, OrgSettings hostOrgSettings, XRoadHeader xTeePais) throws Exception, ParserConfigurationException {
 
         logger.info("SendDocuments.V3 invoked.");
 
@@ -1115,7 +1115,7 @@ public class SendDocuments {
 
 
     // Edastab dokumendi teise DVK serverisse
-    private static ArrayList<Sending> ForwardDocument(dhl.Document doc, String kaust, Connection conn, int requestVersion, XRoadProtocolHeader xTeePais) throws Exception {
+    private static ArrayList<Sending> ForwardDocument(dhl.Document doc, String kaust, Connection conn, int requestVersion, XRoadHeader xTeePais) throws Exception {
         ArrayList<Sending> sendingList = doc.getSendingList();
         int lastSendingIndex = -1;
         if ((sendingList != null) && !sendingList.isEmpty()) {
@@ -1315,7 +1315,7 @@ public class SendDocuments {
      */
     public static RequestInternalResult v4(
             MessageContext context, Connection connection, UserProfile user,
-            OrgSettings hostOrgSettings, XRoadProtocolHeader xTeePais) throws Exception {
+            OrgSettings hostOrgSettings, XRoadHeader xTeePais) throws Exception {
         logger.info("SendDocuments.v4 invoked.");
 
         return generalSendDocuments(context, connection, user, hostOrgSettings, xTeePais);
@@ -1324,7 +1324,7 @@ public class SendDocuments {
 
     private static RequestInternalResult generalSendDocuments(
             MessageContext context, Connection conn, UserProfile user,
-            OrgSettings hostOrgSettings, XRoadProtocolHeader xTeePais) throws Exception {
+            OrgSettings hostOrgSettings, XRoadHeader xTeePais) throws Exception {
         Timer t = new Timer();
         RequestInternalResult result = new RequestInternalResult();
         String pipelineDataFile = CommonMethods.createPipelineFile(0);

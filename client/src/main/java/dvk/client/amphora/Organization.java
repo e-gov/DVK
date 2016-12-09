@@ -1,13 +1,14 @@
 package dvk.client.amphora;
 
-import dvk.client.businesslayer.ErrorLog;
-import dvk.client.conf.OrgSettings;
-import dvk.client.db.UnitCredential;
-import dvk.client.dhl.service.LoggingService;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Types;
+
+import dvk.client.businesslayer.ErrorLog;
+import dvk.client.conf.OrgSettings;
+import dvk.client.db.UnitCredential;
+import dvk.client.dhl.service.LoggingService;
 
 public class Organization {
     private int m_partyID;
@@ -39,10 +40,10 @@ public class Organization {
     }
 
     public Organization() {
-        Clear();
+        clear();
     }
 
-    public void Clear() {
+    public void clear() {
         m_partyID = 0;
         m_name = "";
         m_code = "";

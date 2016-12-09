@@ -1,21 +1,19 @@
 package dvk.client;
 
-import dvk.client.AditGetSendStatusService;
-import dvk.client.ClientAPI;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.junit.Ignore;
+import org.junit.Test;
+
 import dvk.client.conf.OrgSettings;
 import dvk.client.iostructures.AditDocument;
 import dvk.client.iostructures.AditGetSendStatusResponse;
 import dvk.client.iostructures.AditReciever;
 import dvk.core.Settings;
 import ee.ria.dvk.client.testutil.IntegrationTestsConfigUtil;
-import junit.framework.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 /**
  * @author Hendrik Pärna

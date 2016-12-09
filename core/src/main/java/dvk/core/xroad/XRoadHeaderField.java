@@ -1,6 +1,13 @@
 package dvk.core.xroad;
 
-public enum XRoadProtocolHeaderField {
+/**
+ * This enumeration class models SOAP headers that are used by the X-Road system.
+ * These SOAP headers are defined in the related
+ * <a href="http://x-road.eu/docs/x-road_message_protocol_v4.0.pdf">technical specification</a>.
+ * 
+ * @author Levan Kekelidze
+ */
+public enum XRoadHeaderField {
 
 	CLIENT("client"),
 	SERVICE("service"),
@@ -14,7 +21,7 @@ public enum XRoadProtocolHeaderField {
 	
 	private final String value;
 	
-	private XRoadProtocolHeaderField(String value) {
+	private XRoadHeaderField(String value) {
 		this.value = value;
 	}
 	

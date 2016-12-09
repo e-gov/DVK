@@ -14,8 +14,8 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.wsdl.WSDLConstants;
 
-import dvk.core.xroad.XRoadProtocolHeader;
-import dvk.core.xroad.XRoadProtocolVersion;
+import dvk.core.xroad.XRoadHeader;
+import dvk.core.xroad.XRoadMessageProtocolVersion;
 
 /**
  * Abstract representation of sending soap messages to DVK server.
@@ -28,19 +28,19 @@ public abstract class AbstractDvkServiceSoapClient {
 	
     private Options options;
     protected String attachmentName;
-    protected dvk.core.xroad.XRoadProtocolHeader xHeader;
+    protected dvk.core.xroad.XRoadHeader xHeader;
     protected SOAPFactory fac = OMAbstractFactory.getSOAP11Factory();
     protected SOAPEnvelope env = fac.getDefaultEnvelope();
     protected Map<String, OMNamespace> namespaces;
     
-    protected XRoadProtocolVersion xRoadProtocolVersion;
+    protected XRoadMessageProtocolVersion xRoadMessageProtocolVersion;
 
-    public AbstractDvkServiceSoapClient(Options options, XRoadProtocolVersion xRoadProtocol) {
+    public AbstractDvkServiceSoapClient(Options options, XRoadMessageProtocolVersion xRoadProtocol) {
          this.options = options;
-         this.xRoadProtocolVersion = xRoadProtocol;
+         this.xRoadMessageProtocolVersion = xRoadProtocol;
     }
 
-    protected MessageContext sendMessage(XRoadProtocolHeader xHeader) throws Exception {
+    protected MessageContext sendMessage(XRoadHeader xHeader) throws Exception {
         this.xHeader = xHeader;
 
         ServiceClient sender = new ServiceClient(null,null);
@@ -92,7 +92,7 @@ public abstract class AbstractDvkServiceSoapClient {
         env.getBody().addChild(createMessageBody());
 
         //message header
-        env = xHeader.appendToSOAPHeader(env, fac);
+        env = xHeader.prepareSOAPHeader(env, fac);
         messageContext.setEnvelope(env);
 
         addAttachmentTo(messageContext);

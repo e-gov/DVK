@@ -1,6 +1,11 @@
 package dvk.core.xroad;
 
-public enum XRoadProtocolVersion {
+/**
+ * This enumeration class contains data related to X-Road message protocol versions.
+ * 
+ * @author Levan Kekelidze
+ */
+public enum XRoadMessageProtocolVersion {
 
 	/**
 	 * Supported by X-Road security server v1 - v4
@@ -33,7 +38,7 @@ public enum XRoadProtocolVersion {
 	
 	private final String namespacePrefix;
 	
-	private XRoadProtocolVersion(String value, String namespaceURI, String namespacePrefix) {
+	private XRoadMessageProtocolVersion(String value, String namespaceURI, String namespacePrefix) {
 		this.value = value;
 		this.namespaceURI = namespaceURI;
 		this.namespacePrefix = namespacePrefix;

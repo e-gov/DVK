@@ -1,14 +1,15 @@
 package dvk.client.amphora;
 
-import dvk.client.businesslayer.ErrorLog;
-import dvk.client.dhl.service.LoggingService;
-import dvk.core.CommonMethods;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Calendar;
 import java.util.Date;
+
+import dvk.client.businesslayer.ErrorLog;
+import dvk.client.dhl.service.LoggingService;
+import dvk.core.CommonMethods;
 
 public class Item {
     private int m_id;
@@ -40,10 +41,10 @@ public class Item {
     }
 
     public Item() {
-        Clear();
+        clear();
     }
 
-    public void Clear() {
+    public void clear() {
         m_id = 0;
         m_ownerID = 0;
         m_name = "";

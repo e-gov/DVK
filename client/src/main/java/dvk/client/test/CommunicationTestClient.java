@@ -1,5 +1,9 @@
 package dvk.client.test;
 
+import java.util.ArrayList;
+
+import org.apache.log4j.Logger;
+
 import dvk.client.ClientAPI;
 import dvk.client.businesslayer.DhlMessage;
 import dvk.client.conf.OrgDvkSettings;
@@ -8,9 +12,6 @@ import dvk.client.iostructures.ReceiveDocumentsResult;
 import dvk.core.CommonMethods;
 import dvk.core.HeaderVariables;
 import dvk.core.Settings;
-import java.util.ArrayList;
-
-import org.apache.log4j.Logger;
 
 public class CommunicationTestClient {
 	private static Logger logger = Logger.getLogger(CommunicationTestClient.class.getName());
@@ -61,25 +62,25 @@ public class CommunicationTestClient {
             
             // Running tests
             logger.debug("\nRunning tests:");
-            logger.debug("1) Send correct document to organization (v1):\t");
+            logger.debug("1) SEND correct document to organization (v1):\t");
             ok = runTest1(dvkClient, header);
             logger.debug(ok ? "OK" : "Failed!");
             okCount += ok ? 1 : 0;
             failedCount += ok ? 0 : 1;
 
-            logger.debug("2) Send correct document to division (v1):\t");
+            logger.debug("2) SEND correct document to division (v1):\t");
             ok = runTest2(dvkClient, header);
             logger.debug(ok ? "OK" : "Failed!");
             okCount += ok ? 1 : 0;
             failedCount += ok ? 0 : 1;
 
-            logger.debug("3) Send correct document to occupation (v1):\t");
+            logger.debug("3) SEND correct document to occupation (v1):\t");
             ok = runTest3(dvkClient, header);
             logger.debug(ok ? "OK" : "Failed!");
             okCount += ok ? 1 : 0;
             failedCount += ok ? 0 : 1;
 
-            logger.debug("4) Send correct document to division and occupation (v1):\t");
+            logger.debug("4) SEND correct document to division and occupation (v1):\t");
             ok = runTest4(dvkClient, header);
             logger.debug(ok ? "OK" : "Failed!");
             okCount += ok ? 1 : 0;

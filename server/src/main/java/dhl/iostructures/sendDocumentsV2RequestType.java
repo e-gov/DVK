@@ -9,7 +9,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import dvk.core.CommonMethods;
-import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadHeader;
 
 public class sendDocumentsV2RequestType {
 	
@@ -29,7 +29,7 @@ public class sendDocumentsV2RequestType {
         fragmenteKokku = 0;
     }
 
-    public static sendDocumentsV2RequestType getFromSOAPBody(org.apache.axis.MessageContext context, XRoadProtocolHeader xRoadProtocolHeader) throws AxisFault {
+    public static sendDocumentsV2RequestType getFromSOAPBody(org.apache.axis.MessageContext context, XRoadHeader xRoadHeader) throws AxisFault {
         try {
             org.apache.axis.Message msg = context.getRequestMessage();
             SOAPBody body = msg.getSOAPBody();

@@ -17,7 +17,7 @@ import dhl.users.Ametikoht;
 import dhl.users.Asutus;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
-import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadHeader;
 
 public class Proxy {
     private int m_id;
@@ -218,7 +218,7 @@ public class Proxy {
         }
     }
 
-    public int addToDB(Connection conn, XRoadProtocolHeader xTeePais) throws IllegalArgumentException, SQLException {
+    public int addToDB(Connection conn, XRoadHeader xTeePais) throws IllegalArgumentException, SQLException {
         if (conn != null) {
             CallableStatement cs = conn.prepareCall("{? = call \"Add_Proxy\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
             cs.registerOutParameter(1, Types.INTEGER);

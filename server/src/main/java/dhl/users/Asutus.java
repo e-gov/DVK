@@ -22,7 +22,7 @@ import dvk.client.iostructures.GetSendingOptionsV3ResponseType;
 import dvk.core.CommonMethods;
 import dvk.core.HeaderVariables;
 import dvk.core.Settings;
-import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadHeader;
 
 public class Asutus {
     private int m_id;
@@ -682,7 +682,7 @@ public class Asutus {
     
 
     
-    public void addToDB(Connection conn, XRoadProtocolHeader xTeePais) {    	
+    public void addToDB(Connection conn, XRoadHeader xTeePais) {    	
         try {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
@@ -750,7 +750,7 @@ public class Asutus {
         }
     }
     
-    public void updateInDB(Connection conn, XRoadProtocolHeader xTeePais) {
+    public void updateInDB(Connection conn, XRoadHeader xTeePais) {
         try {
             if (conn != null) {
                 Calendar cal = Calendar.getInstance();
@@ -815,7 +815,7 @@ public class Asutus {
         }
     }
 
-    public void saveToDB(Connection conn, XRoadProtocolHeader xTeePais) {
+    public void saveToDB(Connection conn, XRoadHeader xTeePais) {
         if (m_id > 0) {
             updateInDB(conn, xTeePais);
         } else {
@@ -827,7 +827,7 @@ public class Asutus {
      * Laeb kõigist teistest teadaolevatest serveritest asutuste nimekirjad
      * ja sünkroniseerib kohaliku asutuste registri saadud andmetega.
      */
-    public static void getOrgsFromAllKnownServers(String orgCodeToFind, Connection conn, XRoadProtocolHeader xTeePais) throws Exception {
+    public static void getOrgsFromAllKnownServers(String orgCodeToFind, Connection conn, XRoadHeader xTeePais) throws Exception {
         boolean foundMissingOrg = false;
         ArrayList<RemoteServer> servers = RemoteServer.getList(conn);
         if (!servers.isEmpty()) {

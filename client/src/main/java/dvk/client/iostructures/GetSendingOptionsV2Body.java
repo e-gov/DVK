@@ -1,6 +1,5 @@
 package dvk.client.iostructures;
 
-import dvk.client.iostructures.SOAPBodyOverride;
 import java.util.ArrayList;
 
 public class GetSendingOptionsV2Body implements SOAPBodyOverride {

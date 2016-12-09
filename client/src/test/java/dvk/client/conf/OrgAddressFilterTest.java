@@ -1,14 +1,9 @@
 package dvk.client.conf;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import dvk.client.businesslayer.MessageRecipient;
-import dvk.client.conf.OrgAddressFilter;
 
 public class OrgAddressFilterTest {
 

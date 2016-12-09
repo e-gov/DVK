@@ -26,8 +26,8 @@ import org.xml.sax.InputSource;
 
 import Utills.IntegrationTestUtills;
 import dvk.core.CommonMethods;
-import dvk.core.xroad.XRoadProtocolHeader;
-import dvk.core.xroad.XRoadProtocolVersion;
+import dvk.core.xroad.XRoadHeader;
+import dvk.core.xroad.XRoadMessageProtocolVersion;
 import junit.framework.Assert;
 
 public class GetSendStatusIntegration {
@@ -37,12 +37,12 @@ public class GetSendStatusIntegration {
 	
     private static Options options;
     private static XHeaderBuilder xHeaderBuilder;
-    private static XRoadProtocolVersion xRoadProtocolVersion;
+    private static XRoadMessageProtocolVersion xRoadMessageProtocolVersion;
 
     @BeforeClass
     public static void setUp() throws Exception {
         xHeaderBuilder = new XHeaderBuilder();
-        xRoadProtocolVersion = XRoadProtocolVersion.V2_0;
+        xRoadMessageProtocolVersion = XRoadMessageProtocolVersion.V2_0;
         xHeaderBuilder.setAsutus("87654321").setAndmekogu("dhl")
         //xHeaderBuilder.setAsutus("70006317").setAndmekogu("dhl")
                 .setAmetnik("EE37001010001").setId("6cae248568b3db7e97ff784673a4d38c5906bee0")
@@ -102,13 +102,13 @@ public class GetSendStatusIntegration {
         return getDhlIdOfMessage(sendMessageWithAttachment(path, xHeaderBuilderForSending.build(), optionsForSending));
     }
 
-    private MessageContext sendMessageWithAttachment(String attachmentName, XRoadProtocolHeader xHeader,  Options options) throws Exception {
-        SendDocumentsDvkSoapClient sendDocumentsDvkSoapClient = new SendDocumentsDvkSoapClient(options, xRoadProtocolVersion);
+    private MessageContext sendMessageWithAttachment(String attachmentName, XRoadHeader xHeader,  Options options) throws Exception {
+        SendDocumentsDvkSoapClient sendDocumentsDvkSoapClient = new SendDocumentsDvkSoapClient(options, xRoadMessageProtocolVersion);
         return sendDocumentsDvkSoapClient.sendMessage(attachmentName, xHeader);
     }
 
-    private MessageContext doGetSendStatusRequest(String attachmentName, XRoadProtocolHeader xHeader) throws Exception {
-        GetSendStatusDvkSoapClient getSendStatusDvkSoapClient = new GetSendStatusDvkSoapClient(options, xRoadProtocolVersion);
+    private MessageContext doGetSendStatusRequest(String attachmentName, XRoadHeader xHeader) throws Exception {
+        GetSendStatusDvkSoapClient getSendStatusDvkSoapClient = new GetSendStatusDvkSoapClient(options, xRoadMessageProtocolVersion);
         return getSendStatusDvkSoapClient.sendRequest(attachmentName, xHeader);
     }
 

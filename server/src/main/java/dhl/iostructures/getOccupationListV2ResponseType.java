@@ -16,8 +16,8 @@ import org.apache.log4j.Logger;
 import dhl.users.Ametikoht;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
-import dvk.core.xroad.XRoadProtocolHeader;
-import dvk.core.xroad.XRoadProtocolVersion;
+import dvk.core.xroad.XRoadHeader;
+import dvk.core.xroad.XRoadMessageProtocolVersion;
 
 public class getOccupationListV2ResponseType implements SOAPOutputBodyRepresentation {
     static Logger logger = Logger.getLogger(getOccupationListV2ResponseType.class.getName());
@@ -33,7 +33,7 @@ public class getOccupationListV2ResponseType implements SOAPOutputBodyRepresenta
         dataMd5Hash = "";
     }
 
-    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolHeader xRoadProtocolHeader) {
+    public void addToSOAPBody(org.apache.axis.Message msg, XRoadHeader xRoadHeader) {
         try {
             // get SOAP envelope from SOAP message
             org.apache.axis.message.SOAPEnvelope se = msg.getSOAPEnvelope();
@@ -45,9 +45,9 @@ public class getOccupationListV2ResponseType implements SOAPOutputBodyRepresenta
                 body.removeContents();
             }
 
-            SOAPBodyElement element = body.addBodyElement(se.createName(getOccupationListResponseType.DEFAULT_RESPONSE_ELEMENT_NAME, CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_URI));
+            SOAPBodyElement element = body.addBodyElement(se.createName(getOccupationListResponseType.DEFAULT_RESPONSE_ELEMENT_NAME, CommonStructures.NS_DHL_PREFIX, CommonStructures.NS_DHL_SCHEMA_URI));
             
-            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
+            if (xRoadHeader.getMessageProtocolVersion().equals(XRoadMessageProtocolVersion.V2_0)) {
 	            SOAPElement elParing = element.addChildElement(se.createName("paring"));
 	            SOAPElement elHash = elParing.addChildElement("asutused");
 	            elHash.addTextNode(this.dataMd5Hash);

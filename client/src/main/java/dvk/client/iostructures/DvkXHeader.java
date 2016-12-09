@@ -1,14 +1,15 @@
 package dvk.client.iostructures;
 
-import dvk.client.businesslayer.ErrorLog;
-import dvk.client.dhl.service.LoggingService;
-import dvk.core.CommonStructures;
 import javax.xml.rpc.handler.MessageContext;
 import javax.xml.rpc.handler.soap.SOAPMessageContext;
 import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPFactory;
 import javax.xml.soap.SOAPHeader;
+
+import dvk.client.businesslayer.ErrorLog;
+import dvk.client.dhl.service.LoggingService;
+import dvk.core.CommonStructures;
 
 public class DvkXHeader implements XHeader {
     private String m_asutus;

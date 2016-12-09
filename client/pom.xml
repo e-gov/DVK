@@ -106,12 +106,6 @@
 			<groupId>dvk</groupId>
 			<artifactId>core</artifactId>
 			<version>1.7.3</version>
-			<exclusions>
-				<exclusion>
-					<groupId>*</groupId>
-					<artifactId>*</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		
 		<dependency>

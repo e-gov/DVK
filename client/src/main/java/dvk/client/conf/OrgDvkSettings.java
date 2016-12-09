@@ -1,9 +1,10 @@
 package dvk.client.conf;
 
-import dvk.core.CommonMethods;
-import dvk.core.Settings;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import dvk.core.CommonMethods;
+import dvk.core.Settings;
 
 public class OrgDvkSettings {
     private String m_serviceUrl;

@@ -25,7 +25,7 @@ import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import dvk.core.Fault;
 import dvk.core.Settings;
-import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadHeader;
 
 public class Recipient {
     private static Logger logger = Logger.getLogger(Recipient.class);
@@ -343,7 +343,7 @@ public class Recipient {
     }
     
     
-    public int addToDB(Connection conn, XRoadProtocolHeader xTeePais) throws SQLException, IllegalArgumentException {
+    public int addToDB(Connection conn, XRoadHeader xTeePais) throws SQLException, IllegalArgumentException {
         if (conn != null) {
             Calendar cal = Calendar.getInstance();
             boolean defaultAutoCommit = conn.getAutoCommit();
@@ -416,7 +416,7 @@ public class Recipient {
     }
     
 
-    public boolean updateProc(Connection conn, XRoadProtocolHeader xTeePais) throws SQLException, IllegalArgumentException {
+    public boolean updateProc(Connection conn, XRoadHeader xTeePais) throws SQLException, IllegalArgumentException {
         if (conn != null) {
             Calendar cal = Calendar.getInstance();
             boolean defaultAutoCommit = conn.getAutoCommit();
@@ -489,7 +489,7 @@ public class Recipient {
     }
     
     
-    public boolean update(Connection conn, XRoadProtocolHeader xTeePais) throws SQLException, IllegalArgumentException {
+    public boolean update(Connection conn, XRoadHeader xTeePais) throws SQLException, IllegalArgumentException {
         if (conn != null) {
             Calendar cal = Calendar.getInstance();
             boolean defaultAutoCommit = conn.getAutoCommit();
@@ -639,7 +639,7 @@ public class Recipient {
         }
     }
 
-    public static Recipient fromXML(XMLStreamReader xmlReader, Connection conn, XRoadProtocolHeader xTeePais) throws AxisFault {
+    public static Recipient fromXML(XMLStreamReader xmlReader, Connection conn, XRoadHeader xTeePais) throws AxisFault {
         try {
             Recipient result = new Recipient();
 

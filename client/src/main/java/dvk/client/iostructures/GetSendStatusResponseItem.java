@@ -1,14 +1,15 @@
 package dvk.client.iostructures;
 
-import dvk.client.businesslayer.DocumentStatusHistory;
-import dvk.client.businesslayer.MessageRecipient;
-import dvk.client.conf.OrgSettings;
-import dvk.core.Settings;
-import dvk.core.CommonMethods;
 import java.util.ArrayList;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import dvk.client.businesslayer.DocumentStatusHistory;
+import dvk.client.businesslayer.MessageRecipient;
+import dvk.core.CommonMethods;
+import dvk.core.Settings;
 
 public class GetSendStatusResponseItem {
     private int m_dhlID;

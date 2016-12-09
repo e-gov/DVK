@@ -1,9 +1,11 @@
 package dvk.client.iostructures;
 
 import java.util.ArrayList;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 import dvk.client.businesslayer.DhlCapability;
 import dvk.client.businesslayer.Occupation;
 import dvk.client.businesslayer.Subdivision;

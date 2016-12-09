@@ -10,8 +10,8 @@ import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import dvk.core.xroad.XRoadProtocolHeader;
-import dvk.core.xroad.XRoadProtocolVersion;
+import dvk.core.xroad.XRoadHeader;
+import dvk.core.xroad.XRoadMessageProtocolVersion;
 
 public class receiveDocumentsV3ResponseType implements SOAPOutputBodyRepresentation {
 	
@@ -31,7 +31,7 @@ public class receiveDocumentsV3ResponseType implements SOAPOutputBodyRepresentat
         fragmenteKokku = 0;
     }
 
-    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolHeader xRoadProtocolHeader) {
+    public void addToSOAPBody(org.apache.axis.Message msg, XRoadHeader xRoadHeader) {
         try {
             org.apache.axis.message.SOAPEnvelope se = msg.getSOAPEnvelope();
             SOAPBody body = se.getBody();
@@ -44,7 +44,7 @@ public class receiveDocumentsV3ResponseType implements SOAPOutputBodyRepresentat
             
             SOAPBodyElement element = body.addBodyElement(se.createName(receiveDocumentsResponseType.DEFAULT_RESPONSE_ELEMENT_NAME));
 
-            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
+            if (xRoadHeader.getMessageProtocolVersion().equals(XRoadMessageProtocolVersion.V2_0)) {
             	// Sõnumi päringu osa
             	if (paring != null) {
 	            	SOAPElement elParing = element.addChildElement(se.createName("paring"));

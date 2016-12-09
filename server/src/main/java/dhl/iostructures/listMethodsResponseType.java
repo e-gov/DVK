@@ -9,11 +9,12 @@ import javax.xml.soap.SOAPElement;
 
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
+import dvk.core.xroad.XRoadIdentifier;
 import dvk.core.xroad.XRoadIdentifierType;
 import dvk.core.xroad.XRoadObjectType;
-import dvk.core.xroad.XRoadProtocolHeader;
-import dvk.core.xroad.XRoadProtocolHeaderField;
-import dvk.core.xroad.XRoadProtocolVersion;
+import dvk.core.xroad.XRoadHeader;
+import dvk.core.xroad.XRoadHeaderField;
+import dvk.core.xroad.XRoadMessageProtocolVersion;
 import dvk.core.xroad.XRoadService;
 
 public class listMethodsResponseType implements SOAPOutputBodyRepresentation {
@@ -36,13 +37,13 @@ public class listMethodsResponseType implements SOAPOutputBodyRepresentation {
     	this.xRoadServices = xRoadServices;
     }
 
-    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolHeader xRoadProtocolHeader) {
+    public void addToSOAPBody(org.apache.axis.Message msg, XRoadHeader xRoadHeader) {
         try {
             // Get SOAP envelope from SOAP message
             org.apache.axis.message.SOAPEnvelope soapEnvelope = msg.getSOAPEnvelope();
             SOAPBody body = soapEnvelope.getBody();
 
-            soapEnvelope.addNamespaceDeclaration(xRoadProtocolHeader.getProtocolVersion().getNamespacePrefix(), xRoadProtocolHeader.getProtocolVersion().getNamespaceURI());
+            soapEnvelope.addNamespaceDeclaration(xRoadHeader.getMessageProtocolVersion().getNamespacePrefix(), xRoadHeader.getMessageProtocolVersion().getNamespaceURI());
 
             @SuppressWarnings("rawtypes")
 			Iterator items = body.getChildElements();
@@ -51,9 +52,9 @@ public class listMethodsResponseType implements SOAPOutputBodyRepresentation {
             }
 
             SOAPBodyElement soapBody = body.addBodyElement(soapEnvelope.createName("listMethodsResponse",
-            		xRoadProtocolHeader.getProtocolVersion().getNamespacePrefix(), xRoadProtocolHeader.getProtocolVersion().getNamespaceURI()));
+            		xRoadHeader.getMessageProtocolVersion().getNamespacePrefix(), xRoadHeader.getMessageProtocolVersion().getNamespaceURI()));
             
-            if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
+            if (xRoadHeader.getMessageProtocolVersion().equals(XRoadMessageProtocolVersion.V2_0)) {
             	soapEnvelope.addNamespaceDeclaration(CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI);
             	
             	SOAPElement elKeha = soapBody.addChildElement("keha");
@@ -65,31 +66,31 @@ public class listMethodsResponseType implements SOAPOutputBodyRepresentation {
             		elItem.addAttribute(soapEnvelope.createName("type", CommonStructures.NS_XSI_PREFIX, CommonStructures.NS_XSI_URI), "xsd:string");
             		elItem.addTextNode(methodsList[i]);
             	}
-            } else if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-            	soapEnvelope.addNamespaceDeclaration(XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX, XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_URI);
+            } else if (xRoadHeader.getMessageProtocolVersion().equals(XRoadMessageProtocolVersion.V4_0)) {
+            	soapEnvelope.addNamespaceDeclaration(XRoadIdentifier.NAMESPACE_PREFIX, XRoadIdentifier.NAMESPACE_URI);
             	
             	for (XRoadService xRoadService : xRoadServices) {
-            		SOAPElement serviceElement = soapBody.addChildElement(XRoadProtocolHeaderField.SERVICE.getValue(), xRoadProtocolHeader.getProtocolVersion().getNamespacePrefix());
+            		SOAPElement serviceElement = soapBody.addChildElement(XRoadHeaderField.SERVICE.getValue(), xRoadHeader.getMessageProtocolVersion().getNamespacePrefix());
             		serviceElement.addAttribute(
-            				soapEnvelope.createName("objectType", XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX, XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_URI),
+            				soapEnvelope.createName("objectType", XRoadIdentifier.NAMESPACE_PREFIX, XRoadIdentifier.NAMESPACE_URI),
             				XRoadObjectType.SERVICE.getName());
             		
-            		SOAPElement xRoadInstance = serviceElement.addChildElement(XRoadIdentifierType.XROAD_INSTANCE.getName(), XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX);
-            		xRoadInstance.addTextNode(xRoadService.getxRoadInstance());
+            		SOAPElement xRoadInstance = serviceElement.addChildElement(XRoadIdentifierType.XROAD_INSTANCE.getName(), XRoadIdentifier.NAMESPACE_PREFIX);
+            		xRoadInstance.addTextNode(xRoadService.getXRoadInstance());
             		
-            		SOAPElement memberClass = serviceElement.addChildElement(XRoadIdentifierType.MEMBER_CLASS.getName(), XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX);
+            		SOAPElement memberClass = serviceElement.addChildElement(XRoadIdentifierType.MEMBER_CLASS.getName(), XRoadIdentifier.NAMESPACE_PREFIX);
             		memberClass.addTextNode(xRoadService.getMemberClass());
             		
-            		SOAPElement memberCode = serviceElement.addChildElement(XRoadIdentifierType.MEMBER_CODE.getName(), XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX);
+            		SOAPElement memberCode = serviceElement.addChildElement(XRoadIdentifierType.MEMBER_CODE.getName(), XRoadIdentifier.NAMESPACE_PREFIX);
             		memberCode.addTextNode(xRoadService.getMemberCode());
             		
-            		SOAPElement subsystemCode = serviceElement.addChildElement(XRoadIdentifierType.SUBSYSTEM_CODE.getName(), XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX);
+            		SOAPElement subsystemCode = serviceElement.addChildElement(XRoadIdentifierType.SUBSYSTEM_CODE.getName(), XRoadIdentifier.NAMESPACE_PREFIX);
             		subsystemCode.addTextNode(xRoadService.getSubsystemCode());
             		
-            		SOAPElement serviceCode = serviceElement.addChildElement(XRoadIdentifierType.SERVICE_CODE.getName(), XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX);
+            		SOAPElement serviceCode = serviceElement.addChildElement(XRoadIdentifierType.SERVICE_CODE.getName(), XRoadIdentifier.NAMESPACE_PREFIX);
             		serviceCode.addTextNode(xRoadService.getServiceCode());
             		
-            		SOAPElement serviceVersion = serviceElement.addChildElement(XRoadIdentifierType.SERVICE_VERSION.getName(), XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX);
+            		SOAPElement serviceVersion = serviceElement.addChildElement(XRoadIdentifierType.SERVICE_VERSION.getName(), XRoadIdentifier.NAMESPACE_PREFIX);
             		serviceVersion.addTextNode(xRoadService.getServiceVersion());
             	}
             }

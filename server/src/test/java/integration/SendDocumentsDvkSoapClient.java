@@ -13,8 +13,8 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.context.MessageContext;
 import org.apache.log4j.Logger;
 
-import dvk.core.xroad.XRoadProtocolHeader;
-import dvk.core.xroad.XRoadProtocolVersion;
+import dvk.core.xroad.XRoadHeader;
+import dvk.core.xroad.XRoadMessageProtocolVersion;
 
 /**
  *
@@ -24,11 +24,11 @@ import dvk.core.xroad.XRoadProtocolVersion;
 public class SendDocumentsDvkSoapClient extends AbstractDvkServiceSoapClient {
     private static Logger logger = Logger.getLogger(SendDocumentsDvkSoapClient.class);
 
-    public SendDocumentsDvkSoapClient(Options options, XRoadProtocolVersion xRoadProtocol) {
+    public SendDocumentsDvkSoapClient(Options options, XRoadMessageProtocolVersion xRoadProtocol) {
         super(options, xRoadProtocol);
     }
 
-    public MessageContext sendMessage(String attachmentName, XRoadProtocolHeader xHeader) throws Exception {
+    public MessageContext sendMessage(String attachmentName, XRoadHeader xHeader) throws Exception {
         super.attachmentName = attachmentName;
         super.xHeader = xHeader;
         return sendMessage(xHeader);
@@ -46,7 +46,7 @@ public class SendDocumentsDvkSoapClient extends AbstractDvkServiceSoapClient {
         elKeha.addChild(fac.createOMElement("kaust", null));
 
         /*       
-		// Send document in fragments
+		// SEND document in fragments
         // start
         OMElement elEdastusId = fac.createOMElement("edastus_id", null);
         //b.edastusID = headerVar.getOrganizationCode() + String.valueOf(message.getId());

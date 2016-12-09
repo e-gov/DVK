@@ -1,10 +1,5 @@
 package dvk.client.db;
 
-import dvk.client.businesslayer.ErrorLog;
-import dvk.client.conf.OrgSettings;
-import dvk.client.dhl.service.LoggingService;
-import dvk.core.CommonMethods;
-import dvk.core.CommonStructures;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -13,6 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+
+import dvk.client.businesslayer.ErrorLog;
+import dvk.client.conf.OrgSettings;
+import dvk.client.dhl.service.LoggingService;
+import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
 
 public class UnitCredential {
 	private static Logger logger = Logger.getLogger(UnitCredential.class.getName());

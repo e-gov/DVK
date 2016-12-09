@@ -1,37 +1,48 @@
 package dvk.client;
 
-import dvk.client.businesslayer.ErrorLog;
-import dvk.client.businesslayer.MessageRecipient;
-import dvk.client.businesslayer.RequestLog;
-import dvk.client.businesslayer.ResponseStatus;
-import dvk.client.conf.OrgSettings;
-import dvk.client.db.DBConnection;
-import dvk.client.dhl.service.DatabaseSessionService;
-import dvk.client.dhl.service.LoggingService;
-import dvk.client.iostructures.*;
-import dvk.core.*;
-import org.apache.axis.Message;
-import org.apache.axis.attachments.AttachmentPart;
-import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-
-import javax.activation.DataHandler;
-import javax.activation.FileDataSource;
-import javax.xml.namespace.QName;
 import java.io.File;
 import java.sql.Connection;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
+import javax.xml.namespace.QName;
+
+import org.apache.axis.Message;
+import org.apache.axis.attachments.AttachmentPart;
+import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
+
+import dvk.client.businesslayer.ErrorLog;
+import dvk.client.businesslayer.MessageRecipient;
+import dvk.client.businesslayer.RequestLog;
+import dvk.client.businesslayer.ResponseStatus;
+import dvk.client.conf.OrgSettings;
+import dvk.client.dhl.service.DatabaseSessionService;
+import dvk.client.dhl.service.LoggingService;
+import dvk.client.iostructures.AditDocument;
+import dvk.client.iostructures.AditGetSendStatusRequest;
+import dvk.client.iostructures.AditGetSendStatusResponse;
+import dvk.client.iostructures.AditGetSendStatusV1Body;
+import dvk.client.iostructures.AditReciever;
+import dvk.client.iostructures.AditXHeader;
+import dvk.client.iostructures.SoapMessageBuilder;
+import dvk.client.iostructures.XHeader;
+import dvk.core.AttachmentExtractionResult;
+import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
+import dvk.core.HeaderVariables;
+import dvk.core.Settings;
+
 /**
  * @author Hendrik Pärna
  * @since 2.04.14
  */
 public class AditGetSendStatusService {
-    static Logger logger = Logger.getLogger(AditGetSendStatusService.class);
+	
+    private static final Logger logger = Logger.getLogger(AditGetSendStatusService.class);
 
     private String producerName;
     private ClientAPI client;
@@ -176,7 +187,7 @@ public class AditGetSendStatusService {
 
         try {
             Message msg = new Message(messageData);
-            client.getCall().setOperationName(new QName(CommonStructures.NS_ADIT_MAIN, "getSendStatus"));
+            client.getCall().setOperationName(new QName(CommonStructures.NS_ADIT_URI, "getSendStatus"));
 
             FileDataSource ds = new FileDataSource(attachmentFile);
             DataHandler d1 = new DataHandler(ds);

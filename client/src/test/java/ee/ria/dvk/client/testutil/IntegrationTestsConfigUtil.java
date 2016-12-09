@@ -1,16 +1,17 @@
 package ee.ria.dvk.client.testutil;
 
-import dvk.client.conf.OrgSettings;
-import dvk.client.db.DBConnection;
-import dvk.client.dhl.service.DatabaseSessionService;
-import dvk.core.Settings;
-import org.apache.log4j.Logger;
-
 import java.io.IOException;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import org.apache.log4j.Logger;
+
+import dvk.client.conf.OrgSettings;
+import dvk.client.db.DBConnection;
+import dvk.client.dhl.service.DatabaseSessionService;
+import dvk.core.Settings;
 
 /**
  * Meant for only parsing the integrationTestConfigs.properties file to get all the

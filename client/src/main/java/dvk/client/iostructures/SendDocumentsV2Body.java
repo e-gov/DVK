@@ -1,7 +1,8 @@
 package dvk.client.iostructures;
 
-import dvk.core.CommonMethods;
 import java.util.Date;
+
+import dvk.core.CommonMethods;
 
 public class SendDocumentsV2Body {
     public String dokumendid;

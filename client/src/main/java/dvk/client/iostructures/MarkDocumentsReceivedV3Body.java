@@ -2,7 +2,9 @@ package dvk.client.iostructures;
 
 import java.util.ArrayList;
 import java.util.Date;
+
 import org.apache.log4j.Logger;
+
 import dvk.client.businesslayer.DhlMessage;
 import dvk.core.CommonMethods;
 import dvk.core.Fault;

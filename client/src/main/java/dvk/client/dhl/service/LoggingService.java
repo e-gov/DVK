@@ -1,19 +1,20 @@
 package dvk.client.dhl.service;
 
-import dvk.client.businesslayer.ErrorLog;
-import dvk.client.businesslayer.RequestLog;
-import dvk.client.conf.OrgSettings;
-import dvk.client.db.DBConnection;
-import dvk.core.CommonMethods;
-import dvk.core.CommonStructures;
-import org.apache.log4j.Logger;
-
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Calendar;
+
+import org.apache.log4j.Logger;
+
+import dvk.client.businesslayer.ErrorLog;
+import dvk.client.businesslayer.RequestLog;
+import dvk.client.conf.OrgSettings;
+import dvk.client.db.DBConnection;
+import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
 
 public class LoggingService {
     static Logger logger = Logger.getLogger(LoggingService.class.getName());

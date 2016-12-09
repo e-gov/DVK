@@ -1,6 +1,7 @@
 package dvk.client.conf;
 
 import java.util.ArrayList;
+
 import dvk.client.businesslayer.MessageRecipient;
 import dvk.core.CommonMethods;
 

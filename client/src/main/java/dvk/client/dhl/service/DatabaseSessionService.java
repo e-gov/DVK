@@ -1,8 +1,8 @@
 package dvk.client.dhl.service;
 
-import dvk.client.conf.OrgSettings;
-
 import java.sql.Connection;
+
+import dvk.client.conf.OrgSettings;
 
 public class DatabaseSessionService {
 

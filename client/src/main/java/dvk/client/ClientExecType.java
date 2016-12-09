@@ -1,10 +1,10 @@
 package dvk.client;
 
 public enum ClientExecType {
-    Send,
-    Receive,
-    SendReceive,
-    UpdateStatus,
-    DeleteOldDocuments,
-    ADITGetSendStatus
+    SEND,
+    RECEIVE,
+    SEND_RECEIVE,
+    UPDATE_STATUS,
+    DELETE_OLDDOCUMENTS,
+    ADIT_GET_SEND_STATUS
 }

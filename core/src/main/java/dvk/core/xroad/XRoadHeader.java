@@ -22,7 +22,7 @@ import org.apache.axis.utils.StringUtils;
 import dvk.core.CommonMethods;
 
 /**
- * <p>This class representation the X-Road protocol specific header section.</p>
+ * <p>This class representation the X-Road message protocol specific header section.</p>
  * 
  * NOTE:<br>
  * this class was made by merging the old existing functionality (which was left as is)
@@ -30,23 +30,20 @@ import dvk.core.CommonMethods;
  * and the new specific functionality required by X-Road message protocol version 4.0
  * 
  */
-public final class XRoadProtocolHeader {
-	
-	public static final String NAMESPACE_IDENTIFIERS_PREFIX = "id";
-    public static final String NAMESPACE_IDENTIFIERS_URI = "http://x-road.eu/xsd/identifiers";
+public final class XRoadHeader {
 
-    // Fields specific to X-Road protocol version 2.0, 3.0 and 3.1
-    private String consumer;	// "asutus" in the X-Road protocol version 2.0
-    private String producer;	// "andmekogu" in the X-Road protocol version 2.0
-    private String service;		// "nimi" in the X-Road protocol version 2.0
+    // Fields specific to X-Road message protocol version 2.0, 3.0 and 3.1
+    private String consumer;	// "asutus" in the X-Road message protocol version 2.0
+    private String producer;	// "andmekogu" in the X-Road message protocol version 2.0
+    private String service;		// "nimi" in the X-Road message protocol version 2.0
     
     @Deprecated
-    public String official;		// "ametnik" in the X-Road protocol version 2.0
+    public String official;		// "ametnik" in the X-Road message protocol version 2.0
     
-    // Fields specific to X-Road protocol version 4.0
+    // Fields specific to X-Road message protocol version 4.0
     private XRoadClient xRoadClient;
 	private XRoadService xRoadService;
-	private XRoadProtocolVersion protocolVersion;
+	private XRoadMessageProtocolVersion messageProtocolVersion;
 	
 	// Common fields
     private String id;
@@ -54,7 +51,7 @@ public final class XRoadProtocolHeader {
     private String issue;
 
     /**
-     * A constructor for X-Road protocol versions 2.0, 3.0, 3.1
+     * A constructor for X-Road message protocol versions 2.0, 3.0, 3.1
      * 
      * @param asutus
      * @param andmekogu
@@ -64,7 +61,7 @@ public final class XRoadProtocolHeader {
      * @param toimik
      * @param isikukood
      */
-    public XRoadProtocolHeader(String asutus, String andmekogu, String ametnik, String id, String nimi, String toimik, String isikukood, XRoadProtocolVersion xRoadProtocolVersion) {
+    public XRoadHeader(String asutus, String andmekogu, String ametnik, String id, String nimi, String toimik, String isikukood, XRoadMessageProtocolVersion xRoadMessageProtocolVersion) {
         this.consumer = asutus;
         this.producer = andmekogu;
         this.official = ametnik;
@@ -72,11 +69,11 @@ public final class XRoadProtocolHeader {
         this.service = nimi;
         this.issue = toimik;
         this.userId = isikukood;
-        this.protocolVersion = xRoadProtocolVersion;
+        this.messageProtocolVersion = xRoadMessageProtocolVersion;
     }
     
     /**
-     * A constructor for X-Road protocol version 4.0
+     * A constructor for X-Road message protocol version 4.0
      * 
      * @param xRoadClient
      * @param xRoadService
@@ -84,33 +81,38 @@ public final class XRoadProtocolHeader {
      * @param userId
      * @param issue
      */
-    public XRoadProtocolHeader(XRoadClient xRoadClient, XRoadService xRoadService, String id, String userId, String issue) {
+    public XRoadHeader(XRoadClient xRoadClient, XRoadService xRoadService, String id, String userId, String issue) {
     	this.xRoadClient = xRoadClient;
     	this.xRoadService = xRoadService;
     	this.id = id;
     	this.userId = userId;
     	this.issue = issue;
     	
-    	this.protocolVersion = XRoadProtocolVersion.V4_0;
+    	this.messageProtocolVersion = XRoadMessageProtocolVersion.V4_0;
     }
     
-    // Lisab käesoleva objekti andmed SOAP päisesse
-    public SOAPEnvelope appendToSOAPHeader(SOAPEnvelope envelope, SOAPFactory factory) {
-        try {
-            if (protocolVersion.equals(XRoadProtocolVersion.V4_0)) {
-            	prepareXRoadProtocol_4_0_Header(envelope, factory);
-            } else {
-            	prepareXRoadProtocol_2_0_Header(envelope, factory);
-            }
-        } catch (Exception ex) {
-            CommonMethods.logError(ex, this.getClass().getName(), "appendToSOAPHeader");
+    /**
+     * Populates a SOAP header block with the related X-Road message protocol specific data.
+     * 
+     * @param envelope SOAPEnvelope for which to prepare X-Road message protocol related data
+     * @param factory SOAP factory object to use for SOAP elements creation
+     * @return SOAP envelope with filled SOAP header block
+     * @throws Exception if unsupported X-Road message protocol version is used
+     */
+    public SOAPEnvelope prepareSOAPHeader(SOAPEnvelope envelope, SOAPFactory factory) throws Exception {
+        if (messageProtocolVersion.equals(XRoadMessageProtocolVersion.V4_0)) {
+        	prepareXRoadMessageProtocol_4_0_Header(envelope, factory);
+        } else if (messageProtocolVersion.equals(XRoadMessageProtocolVersion.V2_0)) {
+        	prepareXRoadMessageProtocol_2_0_Header(envelope, factory);
+        } else {
+        	throw new Exception("Unsupported X-Road message protocol version " + messageProtocolVersion.getValue());
         }
         
         return envelope;
     }
 
     /**
-     * @deprecated Use {@link #appendToSOAPHeader(SOAPEnvelope, SOAPFactory)} instead
+     * @deprecated Use {@link #prepareSOAPHeader(SOAPEnvelope, SOAPFactory)} instead
      * 
      * @param msg SOAP message
      * @return {@code true} if successfully appended the required elements or {@code false} if an error occurred
@@ -119,7 +121,7 @@ public final class XRoadProtocolHeader {
         try {
             // get SOAP envelope from SOAP message
             javax.xml.soap.SOAPEnvelope se = msg.getSOAPEnvelope();
-            se.addNamespaceDeclaration(XRoadProtocolVersion.V2_0.getNamespacePrefix(), XRoadProtocolVersion.V2_0.getNamespaceURI());
+            se.addNamespaceDeclaration(XRoadMessageProtocolVersion.V2_0.getNamespacePrefix(), XRoadMessageProtocolVersion.V2_0.getNamespaceURI());
 
             SOAPHeader sh = se.getHeader();
             if (sh == null) {
@@ -129,19 +131,19 @@ public final class XRoadProtocolHeader {
             }
 
             // create SOAP elements specifying prefix and URI
-            SOAPElement sHelem1 = sh.addChildElement("asutus", XRoadProtocolVersion.V2_0.getNamespacePrefix(), XRoadProtocolVersion.V2_0.getNamespaceURI());
+            SOAPElement sHelem1 = sh.addChildElement("asutus", XRoadMessageProtocolVersion.V2_0.getNamespacePrefix(), XRoadMessageProtocolVersion.V2_0.getNamespaceURI());
             sHelem1.addTextNode(consumer);
-            SOAPElement sHelem2 = sh.addChildElement("andmekogu",XRoadProtocolVersion.V2_0.getNamespacePrefix(), XRoadProtocolVersion.V2_0.getNamespaceURI());
+            SOAPElement sHelem2 = sh.addChildElement("andmekogu",XRoadMessageProtocolVersion.V2_0.getNamespacePrefix(), XRoadMessageProtocolVersion.V2_0.getNamespaceURI());
             sHelem2.addTextNode(producer);
-            SOAPElement sHelem3 = sh.addChildElement("ametnik", XRoadProtocolVersion.V2_0.getNamespacePrefix(), XRoadProtocolVersion.V2_0.getNamespaceURI());
+            SOAPElement sHelem3 = sh.addChildElement("ametnik", XRoadMessageProtocolVersion.V2_0.getNamespacePrefix(), XRoadMessageProtocolVersion.V2_0.getNamespaceURI());
             sHelem3.addTextNode(official);
-            SOAPElement sHelem4 = sh.addChildElement("id", XRoadProtocolVersion.V2_0.getNamespacePrefix(), XRoadProtocolVersion.V2_0.getNamespaceURI());
+            SOAPElement sHelem4 = sh.addChildElement("id", XRoadMessageProtocolVersion.V2_0.getNamespacePrefix(), XRoadMessageProtocolVersion.V2_0.getNamespaceURI());
             sHelem4.addTextNode(id);
-            SOAPElement sHelem5 = sh.addChildElement("nimi", XRoadProtocolVersion.V2_0.getNamespacePrefix(), XRoadProtocolVersion.V2_0.getNamespaceURI());
+            SOAPElement sHelem5 = sh.addChildElement("nimi", XRoadMessageProtocolVersion.V2_0.getNamespacePrefix(), XRoadMessageProtocolVersion.V2_0.getNamespaceURI());
             sHelem5.addTextNode(service);
-            SOAPElement sHelem6 = sh.addChildElement("toimik", XRoadProtocolVersion.V2_0.getNamespacePrefix(), XRoadProtocolVersion.V2_0.getNamespaceURI());
+            SOAPElement sHelem6 = sh.addChildElement("toimik", XRoadMessageProtocolVersion.V2_0.getNamespacePrefix(), XRoadMessageProtocolVersion.V2_0.getNamespaceURI());
             sHelem6.addTextNode(issue);
-            SOAPElement sHelem7 = sh.addChildElement("isikukood", XRoadProtocolVersion.V2_0.getNamespacePrefix(), XRoadProtocolVersion.V2_0.getNamespaceURI());
+            SOAPElement sHelem7 = sh.addChildElement("isikukood", XRoadMessageProtocolVersion.V2_0.getNamespacePrefix(), XRoadMessageProtocolVersion.V2_0.getNamespaceURI());
             sHelem7.addTextNode(userId);
 
             return true;
@@ -156,10 +158,10 @@ public final class XRoadProtocolHeader {
      * @deprecated Use {@link #getFromSOAPHeaderAxis(org.apache.axis.MessageContext)} instead.
      * 
      * @param context message context
-     * @return {@link XRoadProtocolHeader} object filled with data from the context or {@code null} if some error occurred 
+     * @return {@link XRoadHeader} object filled with data from the context or {@code null} if some error occurred 
      */
     @Deprecated
-    public static XRoadProtocolHeader getFromSOAPHeader(MessageContext context) {
+    public static XRoadHeader getFromSOAPHeader(MessageContext context) {
         try {
             String asutus = "";
             String andmekogu = "";
@@ -196,37 +198,53 @@ public final class XRoadProtocolHeader {
                 }
             }
 
-            return new XRoadProtocolHeader(asutus, andmekogu, ametnik, id, nimi, toimik, isikukood, XRoadProtocolVersion.V2_0);
+            return new XRoadHeader(asutus, andmekogu, ametnik, id, nimi, toimik, isikukood, XRoadMessageProtocolVersion.V2_0);
         } catch (Exception ex) {
-            CommonMethods.logError(ex, XRoadProtocolHeader.class.getCanonicalName(), "getFromSOAPHeader");
+            CommonMethods.logError(ex, XRoadHeader.class.getCanonicalName(), "getFromSOAPHeader");
             
             return null;
         }
     }
 
-    public static XRoadProtocolHeader getFromSOAPHeaderAxis(org.apache.axis.MessageContext context) {
-    	XRoadProtocolHeader xRoadProtocolHeader = null;
+    public static XRoadHeader getFromSOAPHeaderAxis(org.apache.axis.MessageContext context, String requiredMessageProtocolVersion) throws Exception {
+    	XRoadHeader xRoadHeader = null;
     	
         try {
             Message message = context.getRequestMessage();
             org.apache.axis.message.SOAPEnvelope soapEnvelope = message.getSOAPEnvelope();
              
-            org.apache.axis.message.SOAPHeaderElement xRoadProtocolVersion = soapEnvelope.getHeaderByName(XRoadProtocolVersion.V4_0.getNamespaceURI(), "protocolVersion");
-            if (xRoadProtocolVersion != null) {
-            	xRoadProtocolHeader = buildXRoadProtocol_v4_0_HeaderFromSoap(soapEnvelope);
+            org.apache.axis.message.SOAPHeaderElement xRoadProtocolVersion = soapEnvelope.getHeaderByName(XRoadMessageProtocolVersion.V4_0.getNamespaceURI(), XRoadHeaderField.PROTOCOL_VERSION.getValue());
+	        if (requiredMessageProtocolVersion != null && (xRoadProtocolVersion == null || !xRoadProtocolVersion.getValue().equals(requiredMessageProtocolVersion))) {
+	        	throw new Exception("X-Road message protocol version MUST be " + requiredMessageProtocolVersion);
+	        }
+	        
+	        /*
+	         *  IMPLEMENTATION NOTE
+	         *  
+	         *  Currently DVK supports two X-Road message protocol versions:
+	         *  # version 2.0 (legacy)
+	         *  # version 4.0 (latest version as of now)
+	         *  
+	         *  When new X-Road message protocol versions come add the required build logic.
+	         *  
+	         */
+	        if (xRoadProtocolVersion != null) {
+            	xRoadHeader = buildXRoadProtocol_v4_0_HeaderFromSoap(soapEnvelope);
             } else {
-            	xRoadProtocolHeader = buildXRoadProtocol_v2_0_HeaderFromSoap(soapEnvelope);
+            	xRoadHeader = buildXRoadProtocol_v2_0_HeaderFromSoap(soapEnvelope);
             }
         } catch (Exception ex) {
-            CommonMethods.logError(ex, XRoadProtocolHeader.class.getCanonicalName(), "getFromSOAPHeaderAxis");
+            CommonMethods.logError(ex, XRoadHeader.class.getCanonicalName(), "getFromSOAPHeaderAxis");
+            
+            throw ex;
         }
         
-        return xRoadProtocolHeader;
+        return xRoadHeader;
     }
     
-    private SOAPEnvelope prepareXRoadProtocol_2_0_Header(SOAPEnvelope envelope, SOAPFactory factory) {
+    private SOAPEnvelope prepareXRoadMessageProtocol_2_0_Header(SOAPEnvelope envelope, SOAPFactory factory) {
     	// Deklareerime x-tee nimeruumi
-    	OMNamespace nsXtee = factory.createOMNamespace(XRoadProtocolVersion.V2_0.getNamespaceURI(), XRoadProtocolVersion.V2_0.getNamespacePrefix());
+    	OMNamespace nsXtee = factory.createOMNamespace(XRoadMessageProtocolVersion.V2_0.getNamespaceURI(), XRoadMessageProtocolVersion.V2_0.getNamespacePrefix());
     	envelope.declareNamespace(nsXtee);
     	
     	// Lisame päise väljad
@@ -256,74 +274,95 @@ public final class XRoadProtocolHeader {
     	return envelope;
     }
 
-	private SOAPEnvelope prepareXRoadProtocol_4_0_Header(SOAPEnvelope envelope, SOAPFactory factory) {
-		OMNamespace nsXRoad = factory.createOMNamespace(XRoadProtocolVersion.V4_0.getNamespaceURI(), XRoadProtocolVersion.V4_0.getNamespacePrefix());
-		OMNamespace nsId = factory.createOMNamespace(NAMESPACE_IDENTIFIERS_URI, NAMESPACE_IDENTIFIERS_PREFIX);
+	private SOAPEnvelope prepareXRoadMessageProtocol_4_0_Header(SOAPEnvelope soapEnvelope, SOAPFactory factory) {
+		OMNamespace nsXRoad = factory.createOMNamespace(XRoadMessageProtocolVersion.V4_0.getNamespaceURI(), XRoadMessageProtocolVersion.V4_0.getNamespacePrefix());
+		OMNamespace nsId = factory.createOMNamespace(XRoadIdentifier.NAMESPACE_URI, XRoadIdentifier.NAMESPACE_PREFIX);
 
-		envelope.declareNamespace(nsXRoad);
-		envelope.declareNamespace(nsId);
+		soapEnvelope.declareNamespace(nsXRoad);
+		soapEnvelope.declareNamespace(nsId);
 
+		org.apache.axiom.soap.SOAPHeader soapHeader = soapEnvelope.getHeader();
+		
 		// Populating client block
-		SOAPHeaderBlock clientHeaderBlock = factory.createSOAPHeaderBlock(XRoadProtocolHeaderField.CLIENT.getValue(), nsXRoad);
-		clientHeaderBlock.addAttribute("objectType", XRoadObjectType.MEMBER.getName(), nsId);
+		SOAPHeaderBlock clientHeaderBlock = factory.createSOAPHeaderBlock(XRoadHeaderField.CLIENT.getValue(), nsXRoad);
+		clientHeaderBlock.addAttribute(XRoadIdentifier.OBJECT_TYPE_ATTRIBUTE, XRoadObjectType.MEMBER.getName(), nsId);
 
 		OMElement clientXRoadInstance = factory.createOMElement(XRoadIdentifierType.XROAD_INSTANCE.getName(), nsId);
 		clientXRoadInstance.setText(xRoadClient.getxRoadInstance());
+		clientHeaderBlock.addChild(clientXRoadInstance);
+		
 		OMElement clientMemberClass = factory.createOMElement(XRoadIdentifierType.MEMBER_CLASS.getName(), nsId);
 		clientMemberClass.setText(xRoadClient.getMemberClass());
+		clientHeaderBlock.addChild(clientMemberClass);
+		
 		OMElement clientMemberCode = factory.createOMElement(XRoadIdentifierType.MEMBER_CODE.getName(), nsId);
 		clientMemberCode.setText(xRoadClient.getMemberCode());
-
-		clientHeaderBlock.addChild(clientXRoadInstance);
-		clientHeaderBlock.addChild(clientMemberClass);
 		clientHeaderBlock.addChild(clientMemberCode);
-
+		
+		if (!StringUtils.isEmpty(xRoadClient.getSubsystemCode())) {
+			OMElement clientSubsystemCode = factory.createOMElement(XRoadIdentifierType.SUBSYSTEM_CODE.getName(), nsId);
+			clientSubsystemCode.setText(xRoadClient.getSubsystemCode());
+			clientHeaderBlock.addChild(clientSubsystemCode);
+		}
+		
+		soapHeader.addChild(clientHeaderBlock);
+		
+		
 		// Populating service block
-		SOAPHeaderBlock serviceHeaderBlock = factory.createSOAPHeaderBlock(XRoadProtocolHeaderField.SERVICE.getValue(), nsXRoad);
-		serviceHeaderBlock.addAttribute("objectType", XRoadObjectType.SERVICE.getName(), nsId);
+		SOAPHeaderBlock serviceHeaderBlock = factory.createSOAPHeaderBlock(XRoadHeaderField.SERVICE.getValue(), nsXRoad);
+		serviceHeaderBlock.addAttribute(XRoadIdentifier.OBJECT_TYPE_ATTRIBUTE, XRoadObjectType.SERVICE.getName(), nsId);
 
 		OMElement serviceXRoadInstance = factory.createOMElement(XRoadIdentifierType.XROAD_INSTANCE.getName(), nsId);
-		serviceXRoadInstance.setText(xRoadService.getxRoadInstance());
+		serviceXRoadInstance.setText(xRoadService.getXRoadInstance());
+		serviceHeaderBlock.addChild(serviceXRoadInstance);
+		
 		OMElement serviceMemberClass = factory.createOMElement(XRoadIdentifierType.MEMBER_CLASS.getName(), nsId);
 		serviceMemberClass.setText(xRoadService.getMemberClass());
+		serviceHeaderBlock.addChild(serviceMemberClass);
+		
 		OMElement serviceMemberCode = factory.createOMElement(XRoadIdentifierType.MEMBER_CODE.getName(), nsId);
 		serviceMemberCode.setText(xRoadService.getMemberCode());
+		serviceHeaderBlock.addChild(serviceMemberCode);
 
-		OMElement subsystemCode = factory.createOMElement(XRoadIdentifierType.SUBSYSTEM_CODE.getName(), nsId);
-		subsystemCode.setText(xRoadService.getSubsystemCode());
+		OMElement serviceSubsystemCode = factory.createOMElement(XRoadIdentifierType.SUBSYSTEM_CODE.getName(), nsId);
+		serviceSubsystemCode.setText(xRoadService.getSubsystemCode());
+		serviceHeaderBlock.addChild(serviceSubsystemCode);
+		
 		OMElement serviceCode = factory.createOMElement(XRoadIdentifierType.SERVICE_CODE.getName(), nsId);
 		serviceCode.setText(xRoadService.getServiceCode());
+		serviceHeaderBlock.addChild(serviceCode);
+		
 		OMElement serviceVersion = factory.createOMElement(XRoadIdentifierType.SERVICE_VERSION.getName(), nsId);
 		serviceVersion.setText(xRoadService.getServiceVersion());
-
-		serviceHeaderBlock.addChild(serviceXRoadInstance);
-		serviceHeaderBlock.addChild(serviceMemberClass);
-		serviceHeaderBlock.addChild(serviceMemberCode);
-		serviceHeaderBlock.addChild(subsystemCode);
-		serviceHeaderBlock.addChild(serviceCode);
 		serviceHeaderBlock.addChild(serviceVersion);
 
+		soapHeader.addChild(serviceHeaderBlock);
+		
+		
 		// Populating the remaining headers
-		SOAPHeaderBlock uniqueIdHeader = factory.createSOAPHeaderBlock(XRoadProtocolHeaderField.ID.getValue(), nsXRoad);
+		SOAPHeaderBlock uniqueIdHeader = factory.createSOAPHeaderBlock(XRoadHeaderField.ID.getValue(), nsXRoad);
 		uniqueIdHeader.setText(id);
-		SOAPHeaderBlock userIdHeader = factory.createSOAPHeaderBlock(XRoadProtocolHeaderField.USER_ID.getValue(), nsXRoad);
+		soapHeader.addChild(uniqueIdHeader);
+		
+		SOAPHeaderBlock userIdHeader = factory.createSOAPHeaderBlock(XRoadHeaderField.USER_ID.getValue(), nsXRoad);
 		userIdHeader.setText(userId);
-		SOAPHeaderBlock issueHeader = factory.createSOAPHeaderBlock(XRoadProtocolHeaderField.ISSUE.getValue(), nsXRoad);
-		issueHeader.setText(issue);
-		SOAPHeaderBlock protocolVersionHeader = factory.createSOAPHeaderBlock(XRoadProtocolHeaderField.PROTOCOL_VERSION.getValue(), nsXRoad);
-		protocolVersionHeader.setText(protocolVersion.getValue());
+		soapHeader.addChild(userIdHeader);
+		
+		if (!StringUtils.isEmpty(getIssue())) {
+			SOAPHeaderBlock issueHeader = factory.createSOAPHeaderBlock(XRoadHeaderField.ISSUE.getValue(), nsXRoad);
+			issueHeader.setText(issue);
+			soapHeader.addChild(issueHeader);
+		}
+		
+		SOAPHeaderBlock protocolVersionHeader = factory.createSOAPHeaderBlock(XRoadHeaderField.PROTOCOL_VERSION.getValue(), nsXRoad);
+		protocolVersionHeader.setText(messageProtocolVersion.getValue());
+		soapHeader.addChild(protocolVersionHeader);
 
-		envelope.getHeader().addChild(clientHeaderBlock);
-		envelope.getHeader().addChild(serviceHeaderBlock);
-		envelope.getHeader().addChild(uniqueIdHeader);
-		envelope.getHeader().addChild(userIdHeader);
-		envelope.getHeader().addChild(issueHeader);
-		envelope.getHeader().addChild(protocolVersionHeader);
-
-		return envelope;
+		
+		return soapEnvelope;
 	}
 	
-	private static XRoadProtocolHeader buildXRoadProtocol_v2_0_HeaderFromSoap(org.apache.axis.message.SOAPEnvelope soapEnvelope) throws AxisFault {
+	private static XRoadHeader buildXRoadProtocol_v2_0_HeaderFromSoap(org.apache.axis.message.SOAPEnvelope soapEnvelope) throws AxisFault {
 		String asutus = "";
         String andmekogu = "";
         String ametnik = "";
@@ -332,62 +371,62 @@ public final class XRoadProtocolHeader {
         String toimik = "";
         String isikukood = "";
         
-        org.apache.axis.message.SOAPHeaderElement element = soapEnvelope.getHeaderByName(XRoadProtocolVersion.V2_0.getNamespaceURI(), "asutus");
+        org.apache.axis.message.SOAPHeaderElement element = soapEnvelope.getHeaderByName(XRoadMessageProtocolVersion.V2_0.getNamespaceURI(), "asutus");
         if (element != null) {
             asutus = element.getValue();
         }
 
-        element = soapEnvelope.getHeaderByName(XRoadProtocolVersion.V2_0.getNamespaceURI(), "andmekogu");
+        element = soapEnvelope.getHeaderByName(XRoadMessageProtocolVersion.V2_0.getNamespaceURI(), "andmekogu");
         if (element != null) {
             andmekogu = element.getValue();
         }
 
-        element = soapEnvelope.getHeaderByName(XRoadProtocolVersion.V2_0.getNamespaceURI(), "ametnik");
+        element = soapEnvelope.getHeaderByName(XRoadMessageProtocolVersion.V2_0.getNamespaceURI(), "ametnik");
         if (element != null) {
             ametnik = element.getValue();
         }
 
-        element = soapEnvelope.getHeaderByName(XRoadProtocolVersion.V2_0.getNamespaceURI(), "id");
+        element = soapEnvelope.getHeaderByName(XRoadMessageProtocolVersion.V2_0.getNamespaceURI(), "id");
         if (element != null) {
             id = element.getValue();
         }
 
-        element = soapEnvelope.getHeaderByName(XRoadProtocolVersion.V2_0.getNamespaceURI(), "nimi");
+        element = soapEnvelope.getHeaderByName(XRoadMessageProtocolVersion.V2_0.getNamespaceURI(), "nimi");
         if (element != null) {
             nimi = element.getValue();
         }
 
-        element = soapEnvelope.getHeaderByName(XRoadProtocolVersion.V2_0.getNamespaceURI(), "toimik");
+        element = soapEnvelope.getHeaderByName(XRoadMessageProtocolVersion.V2_0.getNamespaceURI(), "toimik");
         if (element != null) {
             toimik = element.getValue();
         }
 
-        element = soapEnvelope.getHeaderByName(XRoadProtocolVersion.V2_0.getNamespaceURI(), "isikukood");
+        element = soapEnvelope.getHeaderByName(XRoadMessageProtocolVersion.V2_0.getNamespaceURI(), "isikukood");
         if (element != null) {
             isikukood = element.getValue();
         }
 
-        return new XRoadProtocolHeader(asutus, andmekogu, ametnik, id, nimi, toimik, isikukood, XRoadProtocolVersion.V2_0);
+        return new XRoadHeader(asutus, andmekogu, ametnik, id, nimi, toimik, isikukood, XRoadMessageProtocolVersion.V2_0);
 	}
     
-	private static XRoadProtocolHeader buildXRoadProtocol_v4_0_HeaderFromSoap(org.apache.axis.message.SOAPEnvelope soapEnvelope) throws AxisFault {
+	private static XRoadHeader buildXRoadProtocol_v4_0_HeaderFromSoap(org.apache.axis.message.SOAPEnvelope soapEnvelope) throws AxisFault {
 		XRoadClient xRoadClient = new XRoadClient();
 		XRoadService xRoadService = new XRoadService();
 		String id = "";
 		String userId = "";
 		String issue = "";
 		
-		QName xRoadInstanceQNname = new QName(NAMESPACE_IDENTIFIERS_URI, XRoadIdentifierType.XROAD_INSTANCE.getName());
-		QName memberClassQNname = new QName(NAMESPACE_IDENTIFIERS_URI, XRoadIdentifierType.MEMBER_CLASS.getName());
-		QName memberCodeQNname = new QName(NAMESPACE_IDENTIFIERS_URI, XRoadIdentifierType.MEMBER_CODE.getName());
+		QName xRoadInstanceQNname = new QName(XRoadIdentifier.NAMESPACE_URI, XRoadIdentifierType.XROAD_INSTANCE.getName());
+		QName memberClassQNname = new QName(XRoadIdentifier.NAMESPACE_URI, XRoadIdentifierType.MEMBER_CLASS.getName());
+		QName memberCodeQNname = new QName(XRoadIdentifier.NAMESPACE_URI, XRoadIdentifierType.MEMBER_CODE.getName());
 
-		QName subsystemCodeQNname = new QName(NAMESPACE_IDENTIFIERS_URI, XRoadIdentifierType.SUBSYSTEM_CODE.getName());
-		QName serviceCodeQNname = new QName(NAMESPACE_IDENTIFIERS_URI, XRoadIdentifierType.SERVICE_CODE.getName());
-		QName serviceVersionQNname = new QName(NAMESPACE_IDENTIFIERS_URI, XRoadIdentifierType.SERVICE_VERSION.getName());
+		QName subsystemCodeQNname = new QName(XRoadIdentifier.NAMESPACE_URI, XRoadIdentifierType.SUBSYSTEM_CODE.getName());
+		QName serviceCodeQNname = new QName(XRoadIdentifier.NAMESPACE_URI, XRoadIdentifierType.SERVICE_CODE.getName());
+		QName serviceVersionQNname = new QName(XRoadIdentifier.NAMESPACE_URI, XRoadIdentifierType.SERVICE_VERSION.getName());
 		
 		/***** Retrieving data from the CLIENT header block *****/
 		org.apache.axis.message.SOAPHeaderElement clientHeaderBlock =
-				soapEnvelope.getHeaderByName(XRoadProtocolVersion.V4_0.getNamespaceURI(), XRoadProtocolHeaderField.CLIENT.getValue());
+				soapEnvelope.getHeaderByName(XRoadMessageProtocolVersion.V4_0.getNamespaceURI(), XRoadHeaderField.CLIENT.getValue());
 		
 		MessageElement clientXRoadInstanceElement = clientHeaderBlock.getChildElement(xRoadInstanceQNname);
 		if (clientXRoadInstanceElement != null) {
@@ -410,13 +449,14 @@ public final class XRoadProtocolHeader {
 		}
 		/***** end of retrieving data from the CLIENT header block *****/
 		
+		
 		/***** Retrieving data from the SERVICE header block *****/
 		org.apache.axis.message.SOAPHeaderElement serviceHeaderBlock =
-				soapEnvelope.getHeaderByName(XRoadProtocolVersion.V4_0.getNamespaceURI(), XRoadProtocolHeaderField.SERVICE.getValue());
+				soapEnvelope.getHeaderByName(XRoadMessageProtocolVersion.V4_0.getNamespaceURI(), XRoadHeaderField.SERVICE.getValue());
 		
 		MessageElement serviceXRoadInstanceElement = serviceHeaderBlock.getChildElement(xRoadInstanceQNname);
 		if (serviceXRoadInstanceElement != null) {
-			xRoadService.setxRoadInstance(serviceXRoadInstanceElement.getValue());
+			xRoadService.setXRoadInstance(serviceXRoadInstanceElement.getValue());
 		}
 		
 		MessageElement serviceMemberClassElement = serviceHeaderBlock.getChildElement(memberClassQNname);
@@ -445,30 +485,31 @@ public final class XRoadProtocolHeader {
 		}
 		/***** end of retrieving data from the SERVICE header block *****/
 		
+		
 		org.apache.axis.message.SOAPHeaderElement idHeaderElement =
-				soapEnvelope.getHeaderByName(XRoadProtocolVersion.V4_0.getNamespaceURI(), XRoadProtocolHeaderField.ID.getValue());
+				soapEnvelope.getHeaderByName(XRoadMessageProtocolVersion.V4_0.getNamespaceURI(), XRoadHeaderField.ID.getValue());
 		if (idHeaderElement != null) {
 			id = idHeaderElement.getValue();
 		}
 		
 		org.apache.axis.message.SOAPHeaderElement userIdHeaderElement =
-				soapEnvelope.getHeaderByName(XRoadProtocolVersion.V4_0.getNamespaceURI(), XRoadProtocolHeaderField.USER_ID.getValue());
+				soapEnvelope.getHeaderByName(XRoadMessageProtocolVersion.V4_0.getNamespaceURI(), XRoadHeaderField.USER_ID.getValue());
 		if (userIdHeaderElement != null) {
 			userId = userIdHeaderElement.getValue();
 		}
 		
 		org.apache.axis.message.SOAPHeaderElement issueHeaderElement =
-				soapEnvelope.getHeaderByName(XRoadProtocolVersion.V4_0.getNamespaceURI(), XRoadProtocolHeaderField.ISSUE.getValue());
+				soapEnvelope.getHeaderByName(XRoadMessageProtocolVersion.V4_0.getNamespaceURI(), XRoadHeaderField.ISSUE.getValue());
 		if (issueHeaderElement != null) {
 			issue = issueHeaderElement.getValue();
 		}
 		
-		return new XRoadProtocolHeader(xRoadClient, xRoadService, id, userId, issue);
+		return new XRoadHeader(xRoadClient, xRoadService, id, userId, issue);
 	}
 	
 	public String getConsumer() {
 		// This is for backward compatibility
-		if (protocolVersion.equals(XRoadProtocolVersion.V4_0)) {
+		if (messageProtocolVersion.equals(XRoadMessageProtocolVersion.V4_0)) {
 			return xRoadClient.getMemberCode();
 		}
 		
@@ -484,7 +525,7 @@ public final class XRoadProtocolHeader {
 
 	public String getProducer() {
 		// This is for backward compatibility
-		if (protocolVersion.equals(XRoadProtocolVersion.V4_0)) {
+		if (messageProtocolVersion.equals(XRoadMessageProtocolVersion.V4_0)) {
 			return xRoadService.getSubsystemCode();
 		}
 		
@@ -503,7 +544,7 @@ public final class XRoadProtocolHeader {
 	 */
 	public String getService() {
 		// This is for backward compatibility
-		if (protocolVersion.equals(XRoadProtocolVersion.V4_0)) {
+		if (messageProtocolVersion.equals(XRoadMessageProtocolVersion.V4_0)) {
 			StringBuilder sb = new StringBuilder();
 			
 			if (!StringUtils.isEmpty(xRoadService.getSubsystemCode())) {
@@ -523,7 +564,7 @@ public final class XRoadProtocolHeader {
 	}
 
 	/**
-	 * Use <b>ONLY</b> for X-Road protocol versions 2.0, 3.X 
+	 * Use <b>ONLY</b> for X-Road message protocol versions 2.0, 3.X 
 	 */
 	public void setService(String service) {
 		this.service = service;
@@ -591,12 +632,12 @@ public final class XRoadProtocolHeader {
 		this.userId = userId;
 	}
 
-	public XRoadProtocolVersion getProtocolVersion() {
-		return protocolVersion;
+	public XRoadMessageProtocolVersion getMessageProtocolVersion() {
+		return messageProtocolVersion;
 	}
 
-	public void setProtocolVersion(XRoadProtocolVersion protocolVersion) {
-		this.protocolVersion = protocolVersion;
+	public void setMessageProtocolVersion(XRoadMessageProtocolVersion messageProtocolVersion) {
+		this.messageProtocolVersion = messageProtocolVersion;
 	}
     
 }

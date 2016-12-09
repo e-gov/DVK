@@ -1,5 +1,14 @@
 package integration;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.junit.Test;
+
 import dvk.client.businesslayer.RequestLog;
 import dvk.client.businesslayer.ResponseStatus;
 import dvk.client.conf.OrgSettings;
@@ -10,14 +19,6 @@ import dvk.core.CommonMethods;
 import dvk.core.Settings;
 import ee.ria.dvk.client.testutil.IntegrationTestsConfigUtil;
 import junit.framework.Assert;
-import org.apache.log4j.Logger;
-import org.junit.Test;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.List;
 
 public class RequestLoggingIntegration {
     ArrayList<OrgSettings> allKnownDatabases;

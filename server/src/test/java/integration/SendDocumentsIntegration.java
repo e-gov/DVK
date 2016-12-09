@@ -15,8 +15,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import dvk.core.xroad.XRoadProtocolHeader;
-import dvk.core.xroad.XRoadProtocolVersion;
+import dvk.core.xroad.XRoadHeader;
+import dvk.core.xroad.XRoadMessageProtocolVersion;
 import junit.framework.Assert;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -33,7 +33,7 @@ public class SendDocumentsIntegration {
 	
     private static Options options;
     private static XHeaderBuilder xHeaderBuilder;
-    private static XRoadProtocolVersion xRoadProtocolVersion;
+    private static XRoadMessageProtocolVersion xRoadMessageProtocolVersion;
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -62,7 +62,7 @@ public class SendDocumentsIntegration {
         options.setProperty(HTTPConstants.CHUNKED, Boolean.FALSE);
         options.setProperty(HTTPConstants.HTTP_HEADERS, customHeaders);
         
-        xRoadProtocolVersion = XRoadProtocolVersion.V2_0;
+        xRoadMessageProtocolVersion = XRoadMessageProtocolVersion.V2_0;
     }
 
     @Test
@@ -111,14 +111,14 @@ public class SendDocumentsIntegration {
         sendMessageWithAttachment(attachmentNames, xHeaderBuilder.setNimi("dhl.sendDocuments.v4").build());
     }
 
-    private void sendMessageWithAttachment(List<String> attachmentNames, XRoadProtocolHeader xHeader) throws Exception {
+    private void sendMessageWithAttachment(List<String> attachmentNames, XRoadHeader xHeader) throws Exception {
         for(String attachmentName: attachmentNames) {
             sendMessageWithAttachment(attachmentName, xHeader);
         }
     }
 
-    private void sendMessageWithAttachment(String attachmentName, XRoadProtocolHeader xHeader) throws Exception {
-        SendDocumentsDvkSoapClient sendDocumentsDvkSoapClient = new SendDocumentsDvkSoapClient(options, xRoadProtocolVersion);
+    private void sendMessageWithAttachment(String attachmentName, XRoadHeader xHeader) throws Exception {
+        SendDocumentsDvkSoapClient sendDocumentsDvkSoapClient = new SendDocumentsDvkSoapClient(options, xRoadMessageProtocolVersion);
         MessageContext sendDocumentsMessageContext = sendDocumentsDvkSoapClient.sendMessage(attachmentName, xHeader);
         Assert.assertTrue(sendDocumentsMessageContext.getEnvelope().toString().contains("keha href=\"cid"));
     }

@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import dvk.core.Fault;
-import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadHeader;
 
 public class DocumentStatusHistory {
     static Logger logger = Logger.getLogger(DocumentStatusHistory.class.getName());
@@ -162,7 +162,7 @@ public class DocumentStatusHistory {
         this.m_occupationShortName = value;
     }
 
-    public int addToDB(Connection conn, XRoadProtocolHeader xTeePais) throws SQLException, IllegalArgumentException {
+    public int addToDB(Connection conn, XRoadHeader xTeePais) throws SQLException, IllegalArgumentException {
         if (conn != null) {
             Calendar cal = Calendar.getInstance();
             StringReader r = new StringReader(m_metaXML);

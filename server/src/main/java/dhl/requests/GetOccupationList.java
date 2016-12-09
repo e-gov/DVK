@@ -16,14 +16,14 @@ import dhl.users.Asutus;
 import dhl.users.UserProfile;
 import dvk.core.AttachmentExtractionResult;
 import dvk.core.CommonMethods;
-import dvk.core.xroad.XRoadProtocolVersion;
+import dvk.core.xroad.XRoadMessageProtocolVersion;
 
 public class GetOccupationList {
 
     private static Logger logger = Logger.getLogger(GetOccupationList.class);
 
     public static getOccupationListResponseType V1(org.apache.axis.MessageContext context, Connection conn,
-    		XRoadProtocolVersion xRoadProtocolVersion) throws AxisFault, RequestProcessingException {
+    		XRoadMessageProtocolVersion xRoadMessageProtocolVersion) throws AxisFault, RequestProcessingException {
     	
         logger.info("GetOccupationList.V1 invoked.");
 
@@ -31,7 +31,7 @@ public class GetOccupationList {
 
         // Laeme päringu keha endale sobivasse andmestruktuuri
         getOccupationListRequestType bodyData = getOccupationListRequestType.getFromSOAPBody(context);
-        if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+        if (xRoadMessageProtocolVersion.equals(XRoadMessageProtocolVersion.V2_0)) {
         	result.paring = bodyData;
         }
 
@@ -55,14 +55,14 @@ public class GetOccupationList {
     }
 
     public static getOccupationListV2ResponseType V2(org.apache.axis.MessageContext context, Connection conn,
-    		UserProfile user, XRoadProtocolVersion xRoadProtocolVersion) throws Exception {
+    		UserProfile user, XRoadMessageProtocolVersion xRoadMessageProtocolVersion) throws Exception {
         logger.info("GetOccupationList.V2 invoked.");
 
         getOccupationListV2ResponseType result = new getOccupationListV2ResponseType();
 
         // Laeme päringu keha endale sobivasse andmestruktuuri
         getOccupationListV2RequestType bodyData = getOccupationListV2RequestType.getFromSOAPBody(context);
-        if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+        if (xRoadMessageProtocolVersion.equals(XRoadMessageProtocolVersion.V2_0)) {
         	result.paring = bodyData;
         }
 

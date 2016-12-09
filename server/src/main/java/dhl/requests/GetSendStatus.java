@@ -36,8 +36,8 @@ import dvk.core.CommonStructures;
 import dvk.core.Fault;
 import dvk.core.HeaderVariables;
 import dvk.core.Settings;
-import dvk.core.xroad.XRoadProtocolHeader;
-import dvk.core.xroad.XRoadProtocolVersion;
+import dvk.core.xroad.XRoadHeader;
+import dvk.core.xroad.XRoadMessageProtocolVersion;
 
 public class GetSendStatus {
     static Logger logger = Logger.getLogger(GetSendStatus.class.getName());
@@ -165,9 +165,9 @@ public class GetSendStatus {
                                         if (tmpEdastus != null) {
                                             // Save status information to local server
                                             r.copyStatusInformationFromAnotherInstance(tmpEdastus.getSaaja());
-                                            XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
+                                            XRoadHeader xTeePais = new XRoadHeader(
                                                     user.getOrganizationCode(), null, null,
-                                                    null, null, null, user.getPersonCode(), XRoadProtocolVersion.V2_0);
+                                                    null, null, null, user.getPersonCode(), XRoadMessageProtocolVersion.V2_0);
                                             r.update(conn, xTeePais);
 
                                             resp.edastus.add(tmpEdastus);
@@ -379,9 +379,9 @@ public class GetSendStatus {
 
                                         // Save status information to local server
                                         r.copyStatusInformationFromAnotherInstance(tmpEdastus.getSaaja());
-                                        XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
+                                        XRoadHeader xTeePais = new XRoadHeader(
                                                 user.getOrganizationCode(), null, null, null,
-                                                null, null, user.getPersonCode(), XRoadProtocolVersion.V2_0);
+                                                null, null, user.getPersonCode(), XRoadMessageProtocolVersion.V2_0);
                                         r.update(conn, xTeePais);
 
                                         edastusList.add(tmpEdastus);

@@ -1,5 +1,38 @@
 package dvk.client.businesslayer;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.sql.CallableStatement;
+import java.sql.Clob;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Stack;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
+
+import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
 import dvk.client.ClientAPI;
 import dvk.client.conf.OrgAddressFilter;
 import dvk.client.conf.OrgSettings;
@@ -9,24 +42,11 @@ import dvk.client.dhl.service.LoggingService;
 import dvk.client.iostructures.Fault;
 import dvk.client.iostructures.GetSendStatusResponseItem;
 import dvk.client.iostructures.SimpleAddressData;
-import dvk.core.*;
-import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamReader;
-import java.io.*;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Stack;
+import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
+import dvk.core.ContainerVersion;
+import dvk.core.FileSplitResult;
+import dvk.core.Settings;
 
 public class DhlMessage implements Cloneable {
 

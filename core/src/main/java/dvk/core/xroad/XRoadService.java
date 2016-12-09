@@ -1,5 +1,7 @@
 package dvk.core.xroad;
 
+import org.apache.axis.utils.StringUtils;
+
 /**
  * This class models XRoadServiceIdentifierType as defined in the related
  * <a href="http://x-road.eu/xsd/identifiers.xsd">XML schema</a>.
@@ -12,14 +14,9 @@ public class XRoadService extends XRoadIdentifier {
 	public XRoadService() {}
 	
 	/**
-	 * A constructor for XRoad service instance.
+	 * A constructor for XRoad service with <em>mandatory</em> parameters.
 	 * 
-	 * <p>
-	 * NOTE:<br>
-	 * According to the XRoadServiceIdentifierType XSD definition subsystemCode and serviceVersion can be omitted.
-	 * </p>
-	 * 
-	 * @param xRoadInstance
+	 * @param xRoadServiceInstance
 	 * @param memberClass
 	 * @param memberCode
 	 * @param serviceCode
@@ -32,9 +29,14 @@ public class XRoadService extends XRoadIdentifier {
 	}
 	
 	/**
-	 * A constructor for XRoad service instance.
+	 * A constructor for XRoad service.
 	 * 
-	 * @param xRoadInstance
+	 * <p>
+	 * NOTE:<br>
+	 * According to the XRoadServiceIdentifierType XSD definition {@code subsystemCode} and {@code serviceVersion} are <em>optional</em>.
+	 * </p>
+	 * 
+	 * @param xRoadServiceInstance
 	 * @param memberClass
 	 * @param memberCode
 	 * @param subsystemCode
@@ -42,19 +44,17 @@ public class XRoadService extends XRoadIdentifier {
 	 * @param serviceVersion
 	 */
 	public XRoadService(String xRoadInstance, String memberClass, String memberCode, String subsystemCode, String serviceCode, String serviceVersion) {
-		this.xRoadInstance = xRoadInstance;
-		this.memberClass = memberClass;
-		this.memberCode = memberCode;
+		this(xRoadInstance, memberClass, memberCode, serviceCode);
+		
 		this.subsystemCode = subsystemCode;
-		this.serviceCode = serviceCode;
 		this.serviceVersion = serviceVersion;
 	}
 	
-	public String getxRoadInstance() {
+	public String getXRoadInstance() {
 		return xRoadInstance;
 	}
 
-	public void setxRoadInstance(String xRoadInstance) {
+	public void setXRoadInstance(String xRoadInstance) {
 		this.xRoadInstance = xRoadInstance;
 	}
 
@@ -91,6 +91,10 @@ public class XRoadService extends XRoadIdentifier {
 	}
 
 	public String getServiceVersion() {
+		if (StringUtils.isEmpty(serviceVersion)) {
+			serviceVersion = "v1";
+		}
+		
 		return serviceVersion;
 	}
 

@@ -1,11 +1,18 @@
 package dvk.client.iostructures;
 
-import dvk.client.businesslayer.MessageRecipient;
-import dvk.core.CommonMethods;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 
-import java.io.*;
-import java.util.List;
+import dvk.client.businesslayer.MessageRecipient;
+import dvk.core.CommonMethods;
 
 /**
  * @author Hendrik Pärna

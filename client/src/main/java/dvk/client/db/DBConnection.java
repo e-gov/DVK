@@ -1,16 +1,16 @@
 package dvk.client.db;
 
-import dvk.client.conf.OrgSettings;
-import dvk.core.CommonStructures;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Types;
-
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+
+import dvk.client.conf.OrgSettings;
+import dvk.core.CommonStructures;
 
 public class DBConnection {
 	

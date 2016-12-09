@@ -1,5 +1,13 @@
 package integration;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.junit.Test;
+
 import dvk.client.dhl.service.DatabaseSessionService;
 import dvk.core.CommonStructures;
 import dvk.core.Settings;
@@ -8,13 +16,6 @@ import ee.ria.dvk.client.testutil.DBTestUtil;
 import ee.ria.dvk.client.testutil.DhlSetting;
 import ee.ria.dvk.client.testutil.IntegrationTestsConfigUtil;
 import junit.framework.Assert;
-import org.apache.log4j.Logger;
-import org.junit.Test;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.util.Arrays;
-import java.util.List;
 
 public class ClientNegativeCasesIntegration {
     private static Logger logger = Logger.getLogger(ClientRequestsIntegration.class);

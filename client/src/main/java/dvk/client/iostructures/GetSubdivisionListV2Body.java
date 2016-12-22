@@ -10,6 +10,7 @@ import org.apache.axis.AxisFault;
 import dvk.client.businesslayer.ErrorLog;
 import dvk.client.dhl.service.LoggingService;
 import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
 
 public class GetSubdivisionListV2Body implements SOAPBodyOverride {
     public String asutusedHref;
@@ -23,7 +24,7 @@ public class GetSubdivisionListV2Body implements SOAPBodyOverride {
     }
 	
 	public String getBodyContentsAsText() {
-		return "<dhl:getSubdivisionList><keha><asutused href=\"cid:" + asutusedHref + "\"/></keha></dhl:getSubdivisionList>";
+		return "<dhl:getSubdivisionList " + CommonStructures.NS_DHL_DECLARATION + "><keha><asutused href=\"cid:" + asutusedHref + "\"/></keha></dhl:getSubdivisionList>";
     }
 	
 	public String createAttachmentFile() throws Exception {

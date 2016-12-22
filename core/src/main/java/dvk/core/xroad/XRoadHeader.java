@@ -275,89 +275,90 @@ public final class XRoadHeader {
     }
 
 	private SOAPEnvelope prepareXRoadMessageProtocol_4_0_Header(SOAPEnvelope soapEnvelope, SOAPFactory factory) {
-		OMNamespace nsXRoad = factory.createOMNamespace(XRoadMessageProtocolVersion.V4_0.getNamespaceURI(), XRoadMessageProtocolVersion.V4_0.getNamespacePrefix());
-		OMNamespace nsId = factory.createOMNamespace(XRoadIdentifier.NAMESPACE_URI, XRoadIdentifier.NAMESPACE_PREFIX);
-
-		soapEnvelope.declareNamespace(nsXRoad);
-		soapEnvelope.declareNamespace(nsId);
-
-		org.apache.axiom.soap.SOAPHeader soapHeader = soapEnvelope.getHeader();
-		
-		// Populating client block
-		SOAPHeaderBlock clientHeaderBlock = factory.createSOAPHeaderBlock(XRoadHeaderField.CLIENT.getValue(), nsXRoad);
-		clientHeaderBlock.addAttribute(XRoadIdentifier.OBJECT_TYPE_ATTRIBUTE, XRoadObjectType.MEMBER.getName(), nsId);
-
-		OMElement clientXRoadInstance = factory.createOMElement(XRoadIdentifierType.XROAD_INSTANCE.getName(), nsId);
-		clientXRoadInstance.setText(xRoadClient.getxRoadInstance());
-		clientHeaderBlock.addChild(clientXRoadInstance);
-		
-		OMElement clientMemberClass = factory.createOMElement(XRoadIdentifierType.MEMBER_CLASS.getName(), nsId);
-		clientMemberClass.setText(xRoadClient.getMemberClass());
-		clientHeaderBlock.addChild(clientMemberClass);
-		
-		OMElement clientMemberCode = factory.createOMElement(XRoadIdentifierType.MEMBER_CODE.getName(), nsId);
-		clientMemberCode.setText(xRoadClient.getMemberCode());
-		clientHeaderBlock.addChild(clientMemberCode);
-		
-		if (!StringUtils.isEmpty(xRoadClient.getSubsystemCode())) {
-			OMElement clientSubsystemCode = factory.createOMElement(XRoadIdentifierType.SUBSYSTEM_CODE.getName(), nsId);
-			clientSubsystemCode.setText(xRoadClient.getSubsystemCode());
-			clientHeaderBlock.addChild(clientSubsystemCode);
+		if (xRoadClient.isValid() && xRoadService.isValid()) {
+			OMNamespace nsXRoad = factory.createOMNamespace(XRoadMessageProtocolVersion.V4_0.getNamespaceURI(), XRoadMessageProtocolVersion.V4_0.getNamespacePrefix());
+			OMNamespace nsId = factory.createOMNamespace(XRoadIdentifier.NAMESPACE_URI, XRoadIdentifier.NAMESPACE_PREFIX);
+	
+			soapEnvelope.declareNamespace(nsXRoad);
+			soapEnvelope.declareNamespace(nsId);
+	
+			org.apache.axiom.soap.SOAPHeader soapHeader = soapEnvelope.getHeader();
+			
+			// Populating client block
+			SOAPHeaderBlock clientHeaderBlock = factory.createSOAPHeaderBlock(XRoadHeaderField.CLIENT.getValue(), nsXRoad);
+			clientHeaderBlock.addAttribute(XRoadIdentifier.OBJECT_TYPE_ATTRIBUTE, XRoadObjectType.MEMBER.getName(), nsId);
+	
+			OMElement clientXRoadInstance = factory.createOMElement(XRoadIdentifierType.XROAD_INSTANCE.getName(), nsId);
+			clientXRoadInstance.setText(xRoadClient.getXRoadInstance());
+			clientHeaderBlock.addChild(clientXRoadInstance);
+			
+			OMElement clientMemberClass = factory.createOMElement(XRoadIdentifierType.MEMBER_CLASS.getName(), nsId);
+			clientMemberClass.setText(xRoadClient.getMemberClass());
+			clientHeaderBlock.addChild(clientMemberClass);
+			
+			OMElement clientMemberCode = factory.createOMElement(XRoadIdentifierType.MEMBER_CODE.getName(), nsId);
+			clientMemberCode.setText(xRoadClient.getMemberCode());
+			clientHeaderBlock.addChild(clientMemberCode);
+			
+			if (!StringUtils.isEmpty(xRoadClient.getSubsystemCode())) {
+				OMElement clientSubsystemCode = factory.createOMElement(XRoadIdentifierType.SUBSYSTEM_CODE.getName(), nsId);
+				clientSubsystemCode.setText(xRoadClient.getSubsystemCode());
+				clientHeaderBlock.addChild(clientSubsystemCode);
+			}
+			
+			soapHeader.addChild(clientHeaderBlock);
+			
+			
+			// Populating service block
+			SOAPHeaderBlock serviceHeaderBlock = factory.createSOAPHeaderBlock(XRoadHeaderField.SERVICE.getValue(), nsXRoad);
+			serviceHeaderBlock.addAttribute(XRoadIdentifier.OBJECT_TYPE_ATTRIBUTE, XRoadObjectType.SERVICE.getName(), nsId);
+	
+			OMElement serviceXRoadInstance = factory.createOMElement(XRoadIdentifierType.XROAD_INSTANCE.getName(), nsId);
+			serviceXRoadInstance.setText(xRoadService.getXRoadInstance());
+			serviceHeaderBlock.addChild(serviceXRoadInstance);
+			
+			OMElement serviceMemberClass = factory.createOMElement(XRoadIdentifierType.MEMBER_CLASS.getName(), nsId);
+			serviceMemberClass.setText(xRoadService.getMemberClass());
+			serviceHeaderBlock.addChild(serviceMemberClass);
+			
+			OMElement serviceMemberCode = factory.createOMElement(XRoadIdentifierType.MEMBER_CODE.getName(), nsId);
+			serviceMemberCode.setText(xRoadService.getMemberCode());
+			serviceHeaderBlock.addChild(serviceMemberCode);
+	
+			OMElement serviceSubsystemCode = factory.createOMElement(XRoadIdentifierType.SUBSYSTEM_CODE.getName(), nsId);
+			serviceSubsystemCode.setText(xRoadService.getSubsystemCode());
+			serviceHeaderBlock.addChild(serviceSubsystemCode);
+			
+			OMElement serviceCode = factory.createOMElement(XRoadIdentifierType.SERVICE_CODE.getName(), nsId);
+			serviceCode.setText(xRoadService.getServiceCode());
+			serviceHeaderBlock.addChild(serviceCode);
+			
+			OMElement serviceVersion = factory.createOMElement(XRoadIdentifierType.SERVICE_VERSION.getName(), nsId);
+			serviceVersion.setText(xRoadService.getServiceVersion());
+			serviceHeaderBlock.addChild(serviceVersion);
+	
+			soapHeader.addChild(serviceHeaderBlock);
+			
+			
+			// Populating the remaining headers
+			SOAPHeaderBlock uniqueIdHeader = factory.createSOAPHeaderBlock(XRoadHeaderField.ID.getValue(), nsXRoad);
+			uniqueIdHeader.setText(id);
+			soapHeader.addChild(uniqueIdHeader);
+			
+			SOAPHeaderBlock userIdHeader = factory.createSOAPHeaderBlock(XRoadHeaderField.USER_ID.getValue(), nsXRoad);
+			userIdHeader.setText(userId);
+			soapHeader.addChild(userIdHeader);
+			
+			if (!StringUtils.isEmpty(getIssue())) {
+				SOAPHeaderBlock issueHeader = factory.createSOAPHeaderBlock(XRoadHeaderField.ISSUE.getValue(), nsXRoad);
+				issueHeader.setText(issue);
+				soapHeader.addChild(issueHeader);
+			}
+			
+			SOAPHeaderBlock protocolVersionHeader = factory.createSOAPHeaderBlock(XRoadHeaderField.PROTOCOL_VERSION.getValue(), nsXRoad);
+			protocolVersionHeader.setText(messageProtocolVersion.getValue());
+			soapHeader.addChild(protocolVersionHeader);
 		}
-		
-		soapHeader.addChild(clientHeaderBlock);
-		
-		
-		// Populating service block
-		SOAPHeaderBlock serviceHeaderBlock = factory.createSOAPHeaderBlock(XRoadHeaderField.SERVICE.getValue(), nsXRoad);
-		serviceHeaderBlock.addAttribute(XRoadIdentifier.OBJECT_TYPE_ATTRIBUTE, XRoadObjectType.SERVICE.getName(), nsId);
-
-		OMElement serviceXRoadInstance = factory.createOMElement(XRoadIdentifierType.XROAD_INSTANCE.getName(), nsId);
-		serviceXRoadInstance.setText(xRoadService.getXRoadInstance());
-		serviceHeaderBlock.addChild(serviceXRoadInstance);
-		
-		OMElement serviceMemberClass = factory.createOMElement(XRoadIdentifierType.MEMBER_CLASS.getName(), nsId);
-		serviceMemberClass.setText(xRoadService.getMemberClass());
-		serviceHeaderBlock.addChild(serviceMemberClass);
-		
-		OMElement serviceMemberCode = factory.createOMElement(XRoadIdentifierType.MEMBER_CODE.getName(), nsId);
-		serviceMemberCode.setText(xRoadService.getMemberCode());
-		serviceHeaderBlock.addChild(serviceMemberCode);
-
-		OMElement serviceSubsystemCode = factory.createOMElement(XRoadIdentifierType.SUBSYSTEM_CODE.getName(), nsId);
-		serviceSubsystemCode.setText(xRoadService.getSubsystemCode());
-		serviceHeaderBlock.addChild(serviceSubsystemCode);
-		
-		OMElement serviceCode = factory.createOMElement(XRoadIdentifierType.SERVICE_CODE.getName(), nsId);
-		serviceCode.setText(xRoadService.getServiceCode());
-		serviceHeaderBlock.addChild(serviceCode);
-		
-		OMElement serviceVersion = factory.createOMElement(XRoadIdentifierType.SERVICE_VERSION.getName(), nsId);
-		serviceVersion.setText(xRoadService.getServiceVersion());
-		serviceHeaderBlock.addChild(serviceVersion);
-
-		soapHeader.addChild(serviceHeaderBlock);
-		
-		
-		// Populating the remaining headers
-		SOAPHeaderBlock uniqueIdHeader = factory.createSOAPHeaderBlock(XRoadHeaderField.ID.getValue(), nsXRoad);
-		uniqueIdHeader.setText(id);
-		soapHeader.addChild(uniqueIdHeader);
-		
-		SOAPHeaderBlock userIdHeader = factory.createSOAPHeaderBlock(XRoadHeaderField.USER_ID.getValue(), nsXRoad);
-		userIdHeader.setText(userId);
-		soapHeader.addChild(userIdHeader);
-		
-		if (!StringUtils.isEmpty(getIssue())) {
-			SOAPHeaderBlock issueHeader = factory.createSOAPHeaderBlock(XRoadHeaderField.ISSUE.getValue(), nsXRoad);
-			issueHeader.setText(issue);
-			soapHeader.addChild(issueHeader);
-		}
-		
-		SOAPHeaderBlock protocolVersionHeader = factory.createSOAPHeaderBlock(XRoadHeaderField.PROTOCOL_VERSION.getValue(), nsXRoad);
-		protocolVersionHeader.setText(messageProtocolVersion.getValue());
-		soapHeader.addChild(protocolVersionHeader);
-
 		
 		return soapEnvelope;
 	}
@@ -430,7 +431,7 @@ public final class XRoadHeader {
 		
 		MessageElement clientXRoadInstanceElement = clientHeaderBlock.getChildElement(xRoadInstanceQNname);
 		if (clientXRoadInstanceElement != null) {
-			xRoadClient.setxRoadInstance(clientXRoadInstanceElement.getValue());
+			xRoadClient.setXRoadInstance(clientXRoadInstanceElement.getValue());
 		}
 		
 		MessageElement clientMemberClassElement = clientHeaderBlock.getChildElement(memberClassQNname);
@@ -555,6 +556,8 @@ public final class XRoadHeader {
 			
 			if (!StringUtils.isEmpty(xRoadService.getServiceVersion())) {
 				sb.append(".").append(xRoadService.getServiceVersion());
+			} else {
+				sb.append(".v1");
 			}
 			
 			return sb.toString();

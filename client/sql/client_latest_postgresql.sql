@@ -472,6 +472,9 @@ END; $$
 create or replace
 function "Get_DhlMessageID"(
     p_dhl_id integer,
+    p_xroad_service_instance character varying,
+    p_xroad_service_member_class character varying,
+    p_xroad_service_member_code character varying,
     p_producer_name character varying,
     p_service_url character varying,
     p_is_incoming integer)
@@ -488,6 +491,9 @@ begin
                 dhl_message m on m.dhl_message_id = r.dhl_message_id
         where   m.is_incoming = 0
                 and r.dhl_id = p_dhl_id
+                and coalesce(r.xroad_service_instance,'') = coalesce(p_xroad_service_instance,'')
+	            and coalesce(r.xroad_service_member_class,'') = coalesce(p_xroad_service_member_class,'')
+	            and coalesce(r.xroad_service_member_code,'') = coalesce(p_xroad_service_member_code,'')
                 and coalesce(r.producer_name,'') = coalesce(p_producer_name,'')
                 and coalesce(r.service_url,'') = coalesce(p_service_url,'');
     else
@@ -678,7 +684,10 @@ function "Update_DhlMessageRecipDhlID"(
     p_dhl_direct_producer_name character varying,
     p_dhl_direct_service_url character varying,
     p_dhl_id integer,
-    p_query_id character varying)
+    p_query_id character varying,
+    p_xroad_service_instance character varying,
+    p_xroad_service_member_class character varying,
+    p_xroad_service_member_code character varying)
 returns boolean
 as $$
 begin
@@ -694,6 +703,9 @@ begin
                 where   coalesce(dhl_direct_capable,1) =coalesce(p_dhl_direct_capable,1)
                         and coalesce(dhl_direct_producer_name,'') = coalesce(p_dhl_direct_producer_name,'')
                         and coalesce(dhl_direct_service_url,'') = coalesce(p_dhl_direct_service_url,'')
+                        and coalesce(xroad_service_instance,'') = coalesce(p_xroad_service_instance,'')
+			            and coalesce(xroad_service_member_class,'') = coalesce(p_xroad_service_member_class,'')
+			            and coalesce(xroad_service_member_code,'') = coalesce(p_xroad_service_member_code,'')
             );
 
     return found;
@@ -806,7 +818,10 @@ function "Get_DhlOrgsByCapability"(
     p_dhl_capable integer,
     p_dhl_direct_capable integer,
     p_dhl_direct_producer_name character varying,
-    p_dhl_direct_service_url character varying)
+    p_dhl_direct_service_url character varying,
+    p_xroad_service_instance character varying,
+    p_xroad_service_member_class character varying,
+    p_xroad_service_member_code character varying)
 returns refcursor
 as $$
 declare
@@ -818,7 +833,10 @@ begin
     where   coalesce(dhl_capable,0) = coalesce(p_dhl_capable,0)
             and coalesce(dhl_direct_capable,0) = coalesce(p_dhl_direct_capable,0)
             and coalesce(dhl_direct_producer_name,'') = coalesce(p_dhl_direct_producer_name,'')
-            and coalesce(dhl_direct_service_url,'') = coalesce(p_dhl_direct_service_url,'');
+            and coalesce(dhl_direct_service_url,'') = coalesce(p_dhl_direct_service_url,'')
+            and coalesce(xroad_service_instance,'') = coalesce(p_xroad_service_instance,'')
+            and coalesce(xroad_service_member_class,'') = coalesce(p_xroad_service_member_class,'')
+            and coalesce(xroad_service_member_code,'') = coalesce(p_xroad_service_member_code,'');
 
     return  RC1;
 end; $$
@@ -1069,6 +1087,9 @@ language plpgsql;
 create or replace
 function "Get_DhlMessageIDByGuid"(
     p_dhl_guid character varying,
+    p_xroad_service_instance character varying,
+    p_xroad_service_member_class character varying,
+    p_xroad_service_member_code character varying,
     p_producer_name character varying,
     p_service_url character varying,
     p_is_incoming integer)
@@ -1084,6 +1105,9 @@ begin
         inner join
                 dhl_message_recipient r on r.dhl_message_id = m.dhl_message_id
         where   m.dhl_guid = p_dhl_guid
+        		and coalesce(r.xroad_service_instance,'') = coalesce(p_xroad_service_instance,'')
+	            and coalesce(r.xroad_service_member_class,'') = coalesce(p_xroad_service_member_class,'')
+	            and coalesce(r.xroad_service_member_code,'') = coalesce(p_xroad_service_member_code,'')
                 and coalesce(r.producer_name,'') = coalesce(p_producer_name,'')
                 and coalesce(r.service_url,'') = coalesce(p_service_url,'')
                 and m.is_incoming = 0;
@@ -1526,7 +1550,10 @@ CREATE TABLE dhl_settings (
     occupation_short_name character varying(25) null,
     subdivision_name character varying(250) null,
     occupation_name character varying(250) null,
-    container_version integer NULL
+    container_version integer NULL,
+    xroad_client_instance VARCHAR(2) NOT NULL,
+    xroad_client_member_class VARCHAR(50) NOT NULL,
+    xroad_client_subsystem_code VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE dhl_settings_folders (

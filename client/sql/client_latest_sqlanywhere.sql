@@ -117,7 +117,10 @@ create table dhl_settings
 	"occupation_short_name" varchar(25) null,
 	"subdivision_name" varchar(250) null,
 	"occupation_name" varchar(250) null,
-	"container_version" int null
+	"container_version" int null,
+	"xroad_client_instance" VARCHAR(2) NOT NULL,
+    "xroad_client_member_class" VARCHAR(50) NOT NULL,
+    "xroad_client_subsystem_code" VARCHAR(50) NOT NULL
 );
 
 create unique index ix_dhl_settings_1 on dhl_settings("unit_id");
@@ -597,6 +600,9 @@ end;
 create procedure "Get_DhlMessageID"
 (
 	in _dhl_id int,
+	in _xroad_service_instance varchar(2),
+	in _xroad_service_member_class varchar(50),
+	in _xroad_service_member_code varchar(50),
 	in _producer_name varchar(50),
 	in _service_url varchar(100),
 	in _is_incoming int,
@@ -611,6 +617,9 @@ begin
                     dhl_message m on m."dhl_message_id" = r."dhl_message_id"
 	    	where   m."is_incoming" = 0
 	    	        and r."dhl_id" = _dhl_id
+	    	        and isnull(r."xroad_service_instance",'') = isnull(_xroad_service_instance,'')
+                    and isnull(r."xroad_service_member_class",'') = isnull(_xroad_service_member_class,'')
+                    and isnull(r."xroad_service_member_code",'') = isnull(_xroad_service_member_code,'')
 	        		and isnull(r."producer_name",'') = isnull(_producer_name,'')
 	        		and isnull(r."service_url",'') = isnull(_service_url,'')
 	    ),0);
@@ -791,7 +800,10 @@ create procedure "Update_DhlMessageRecipDhlID"
 	in _dhl_direct_producer_name varchar(50),
 	in _dhl_direct_service_url varchar(100),
 	in _dhl_id int,
-	in _query_id varchar(50)
+	in _query_id varchar(50),
+	in _xroad_service_instance varchar(2),
+	in _xroad_service_member_class varchar(50),
+	in _xroad_service_member_code varchar(50)
 )
 begin
     -- salvestab vastuvõtja andmetesse vastuvõtja DVK serveri poolt antud sõnumi ID väärtuse
@@ -807,7 +819,10 @@ begin
         		from	dhl_organization
         		where	isnull("dhl_direct_capable",1) = isnull(_dhl_direct_capable,1)
         				and isnull("dhl_direct_producer_name",'') = isnull(_dhl_direct_producer_name,'')
-        				and isnull("dhl_direct_service_url",'')= isnull(_dhl_direct_service_url,'')
+        				and isnull("dhl_direct_service_url",'') = isnull(_dhl_direct_service_url,'')
+        				and isnull("xroad_service_instance",'') = isnull(_xroad_service_instance,'')
+			        	and isnull("xroad_service_member_class",'') = isnull(_xroad_service_member_class,'')
+			        	and isnull("xroad_service_member_code",'') = isnull(_xroad_service_member_code,'')
         	);
 end;
 
@@ -901,7 +916,10 @@ create procedure "Get_DhlOrgsByCapability"
 	in _dhl_capable int,
 	in _dhl_direct_capable int,
 	in _dhl_direct_producer_name varchar(50),
-	in _dhl_direct_service_url varchar(100)
+	in _dhl_direct_service_url varchar(100),
+	in _xroad_service_instance varchar(2),
+	in _xroad_service_member_class varchar(50),
+	in _xroad_service_member_code varchar(50)
 )
 begin
     select	"org_code"
@@ -909,7 +927,10 @@ begin
     where	isnull("dhl_capable",0) = isnull(_dhl_capable,0)
         	and isnull("dhl_direct_capable",0) = isnull(_dhl_direct_capable,0)
         	and isnull("dhl_direct_producer_name",'') = isnull(_dhl_direct_producer_name,'')
-        	and isnull("dhl_direct_service_url",'') = isnull(_dhl_direct_service_url,'');
+        	and isnull("dhl_direct_service_url",'') = isnull(_dhl_direct_service_url,'')
+        	and isnull("xroad_service_instance",'') = isnull(_xroad_service_instance,'')
+        	and isnull("xroad_service_member_class",'') = isnull(_xroad_service_member_class,'')
+        	and isnull("xroad_service_member_code",'') = isnull(_xroad_service_member_code,'');
 end;
 
 create procedure "Get_NextDhlID"
@@ -1107,6 +1128,9 @@ end;
 create procedure "Get_DhlMessageIDByGuid"
 (
 	in _dhl_guid varchar(36),
+	in _xroad_service_instance varchar(2),
+    in _xroad_service_member_class varchar(50),
+    in _xroad_service_member_code varchar(50),
 	in _producer_name varchar(50),
 	in _service_url varchar(100),
 	in _is_incoming int,
@@ -1120,6 +1144,9 @@ begin
 	    	inner join
 	    			dhl_message_recipient r on r."dhl_message_id" = m."dhl_message_id"
 	    	where	m."dhl_guid" = _dhl_guid
+	    	        and isnull(r."xroad_service_instance",'') = isnull(_xroad_service_instance,'')
+                    and isnull(r."xroad_service_member_class",'') = isnull(_xroad_service_member_class,'')
+                    and isnull(r."xroad_service_member_code",'') = isnull(_xroad_service_member_code,'')
 	        		and isnull(r."producer_name",'') = isnull(_producer_name,'')
 	        		and isnull(r."service_url",'') = isnull(_service_url,'')
 	        		and m."is_incoming" = 0

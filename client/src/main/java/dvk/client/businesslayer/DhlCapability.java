@@ -18,13 +18,21 @@ import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 
 public class DhlCapability {
+	
     private String m_orgCode;
     private String m_orgName;
     private boolean m_isDhlCapable;
     private boolean m_isDhlDirectCapable;
+    private String m_parentOrgCode;
+    
+	// For X-Road message protocol v4.0 the equivalent of "producer" is
+    // "subsystemCode" element inside "service" SOAP header block
     private String m_dhlDirectProducerName;
     private String m_dhlDirectServiceUrl;
-    private String m_parentOrgCode;
+    private String xRoadServiceInstance;
+    private String xRoadServiceMemberClass;
+    private String xRoadServiceMemberCode;
+    
 
     public void setOrgCode(String orgCode) {
         this.m_orgCode = orgCode;
@@ -64,21 +72,6 @@ public class DhlCapability {
         return m_isDhlDirectCapable;
     }
 
-    public void setDhlDirectProducerName(String value) {
-        this.m_dhlDirectProducerName = value;
-    }
-
-    public String getDhlDirectProducerName() {
-        return m_dhlDirectProducerName;
-    }
-
-    public void setDhlDirectServiceUrl(String value) {
-        this.m_dhlDirectServiceUrl = value;
-    }
-
-    public String getDhlDirectServiceUrl() {
-        return m_dhlDirectServiceUrl;
-    }
     
     public String getParentOrgCode() {
         return this.m_parentOrgCode;
@@ -88,7 +81,54 @@ public class DhlCapability {
         this.m_parentOrgCode = value;
     }
     
-    public DhlCapability() {
+    /**
+     * NOTE:<br>
+     * "producerName" corresponds to <b>"subsystemCode"</b> element of the <em>service</em> block
+     * in the X-Road message protocol version 4.0
+     * 
+     * @return <em>producerName</em> / <em>subsystemCode</em>
+     */
+    public String getDhlDirectProducerName() {
+    	return m_dhlDirectProducerName;
+    }
+    
+    public void setDhlDirectProducerName(String value) {
+    	this.m_dhlDirectProducerName = value;
+    }
+    
+    public String getDhlDirectServiceUrl() {
+    	return m_dhlDirectServiceUrl;
+    }
+    
+    public void setDhlDirectServiceUrl(String value) {
+    	this.m_dhlDirectServiceUrl = value;
+    }
+    
+    public String getXRoadServiceInstance() {
+		return xRoadServiceInstance;
+	}
+
+	public void setXRoadServiceInstance(String xRoadServiceInstance) {
+		this.xRoadServiceInstance = xRoadServiceInstance;
+	}
+
+	public String getXRoadServiceMemberClass() {
+		return xRoadServiceMemberClass;
+	}
+
+	public void setXRoadServiceMemberClass(String xRoadServiceMemberClass) {
+		this.xRoadServiceMemberClass = xRoadServiceMemberClass;
+	}
+
+	public String getXRoadServiceMemberCode() {
+		return xRoadServiceMemberCode;
+	}
+
+	public void setXRoadServiceMemberCode(String xRoadServiceMemberCode) {
+		this.xRoadServiceMemberCode = xRoadServiceMemberCode;
+	}
+
+	public DhlCapability() {
         clear();
     }
 
@@ -104,9 +144,13 @@ public class DhlCapability {
         m_orgName = "";
         m_isDhlCapable = false;
         m_isDhlDirectCapable = false;
+        m_parentOrgCode = "";
+        
         m_dhlDirectProducerName = "";
         m_dhlDirectServiceUrl = "";
-        m_parentOrgCode = "";
+        xRoadServiceInstance = "";
+        xRoadServiceMemberClass = "";
+        xRoadServiceMemberCode = "";
     }
 
     /**
@@ -123,9 +167,9 @@ public class DhlCapability {
         try {
             if (dbConnection != null) {
                 int parNr = 1;
-                CallableStatement cs = dbConnection.prepareCall("{call Save_DhlOrganization(?,?,?,?,?,?,?)}");
+                CallableStatement cs = dbConnection.prepareCall("{call Save_DhlOrganization(?,?,?,?,?,?,?,?,?,?)}");
                 if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    cs = dbConnection.prepareCall("{? = call \"Save_DhlOrganization\"(?,?,?,?,?,?,?)}");
+                    cs = dbConnection.prepareCall("{? = call \"Save_DhlOrganization\"(?,?,?,?,?,?,?,?,?,?)}");
                     cs.registerOutParameter(parNr++, Types.BOOLEAN);
                 }
 
@@ -133,6 +177,23 @@ public class DhlCapability {
                 cs.setString(parNr++, m_orgName);
                 cs.setInt(parNr++, (m_isDhlCapable ? 1 : 0));
                 cs.setInt(parNr++, (m_isDhlDirectCapable ? 1 : 0));
+                
+                if ((xRoadServiceInstance != null) && (xRoadServiceInstance.length() > 0)) {
+                    cs.setString(parNr++, xRoadServiceInstance);
+                } else {
+                    cs.setNull(parNr++, Types.VARCHAR);
+                }
+                if ((xRoadServiceMemberClass != null) && (xRoadServiceMemberClass.length() > 0)) {
+                    cs.setString(parNr++, xRoadServiceMemberClass);
+                } else {
+                    cs.setNull(parNr++, Types.VARCHAR);
+                }
+                if ((xRoadServiceMemberCode != null) && (xRoadServiceMemberCode.length() > 0)) {
+                    cs.setString(parNr++, xRoadServiceMemberCode);
+                } else {
+                    cs.setNull(parNr++, Types.VARCHAR);
+                }
+                
                 if ((m_dhlDirectProducerName != null) && (m_dhlDirectProducerName.length() > 0)) {
                     cs.setString(parNr++, m_dhlDirectProducerName);
                 } else {
@@ -143,10 +204,14 @@ public class DhlCapability {
                 } else {
                     cs.setNull(parNr++, Types.VARCHAR);
                 }
+                
                 cs.setString(parNr++, m_parentOrgCode);
+                
                 cs.execute();
                 cs.close();
+                
                 dbConnection.commit();
+                
                 return true;
             } else {
                 ErrorLog errorLog = new ErrorLog("Database connection is NULL", this.getClass().getName() + " saveToDB");
@@ -160,9 +225,11 @@ public class DhlCapability {
                 ErrorLog errorLog = new ErrorLog(ex1, this.getClass().getName() + " saveToDB");
                 LoggingService.logError(errorLog);
             }
+            
             ErrorLog errorLog = new ErrorLog(ex, this.getClass().getName() + " saveToDB");
             errorLog.setOrganizationCode(this.getOrgCode());
             LoggingService.logError(errorLog);
+            
             return false;
         }
     }
@@ -186,9 +253,13 @@ public class DhlCapability {
 	                    m_orgName = rs.getString("org_name");
 	                    m_isDhlCapable = (rs.getInt("dhl_capable") ==  1);
 	                    m_isDhlDirectCapable = (rs.getInt("dhl_direct_capable") == 1);
-	                    m_dhlDirectProducerName = rs.getString("dhl_direct_producer_name");
-	                    m_dhlDirectServiceUrl = rs.getString("dhl_direct_service_url");
 	                    m_parentOrgCode = rs.getString("parent_org_code");
+	                    
+	                    m_dhlDirectServiceUrl = rs.getString("dhl_direct_service_url");
+	                    m_dhlDirectProducerName = rs.getString("dhl_direct_producer_name");
+	                    xRoadServiceInstance = rs.getString("xroad_service_instance");
+	                    xRoadServiceMemberClass = rs.getString("xroad_service_member_class");
+	                    xRoadServiceMemberCode = rs.getString("xroad_service_member_code");
 	                }
 	                rs.close();
 	                cs.close();
@@ -221,9 +292,14 @@ public class DhlCapability {
 	                    item.setOrgName(rs.getString("org_name"));
 	                    item.setIsDhlCapable(rs.getInt("dhl_capable") == 1);
 	                    item.setIsDhlDirectCapable(rs.getInt("dhl_direct_capable") == 1);
-	                    item.setDhlDirectProducerName(rs.getString("dhl_direct_producer_name"));
-	                    item.setDhlDirectServiceUrl(rs.getString("dhl_direct_service_url")); 
 	                    item.setParentOrgCode(rs.getString("parent_org_code"));
+	                    
+	                    item.setDhlDirectServiceUrl(rs.getString("dhl_direct_service_url"));
+	                    item.setDhlDirectProducerName(rs.getString("dhl_direct_producer_name"));
+	                    item.setXRoadServiceInstance(rs.getString("xroad_service_instance"));
+	                    item.setXRoadServiceMemberClass(rs.getString("xroad_service_member_class"));
+	                    item.setXRoadServiceMemberCode(rs.getString("xroad_service_member_code"));
+	                    
 	                    result.add(item);
 	                }
 	                rs.close();
@@ -267,8 +343,12 @@ public class DhlCapability {
 	                    DhlCapability item = new DhlCapability();
 	                    item.setIsDhlCapable((rs.getInt("dhl_capable") == 1));
 	                    item.setIsDhlDirectCapable((rs.getInt("dhl_direct_capable") == 1));
+	                    item.setXRoadServiceInstance(rs.getString("xroad_service_instance"));
+	                    item.setXRoadServiceMemberClass(rs.getString("xroad_service_member_class"));
+	                    item.setXRoadServiceMemberCode(rs.getString("xroad_service_member_code"));
 	                    item.setDhlDirectProducerName(rs.getString("dhl_direct_producer_name"));
 	                    item.setDhlDirectServiceUrl(rs.getString("dhl_direct_service_url"));
+	                    
 	                    result.add(item);
 	                }
 	                rs.close();
@@ -304,14 +384,19 @@ public class DhlCapability {
 	                if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
 	                    parNr++;
 	                }
-	                CallableStatement cs = DBConnection.getStatementForResultSet("Get_DhlOrgsByCapability", 4, db, dbConnection);
+	                
+	                CallableStatement cs = DBConnection.getStatementForResultSet("Get_DhlOrgsByCapability", 7, db, dbConnection);
 	                
 	                cs.setInt(parNr++, (dcap.getIsDhlCapable() ? 1 : 0));
 	                cs.setInt(parNr++, (dcap.getIsDhlDirectCapable() ? 1 : 0));
+	                
 	                cs.setString(parNr++, dcap.getDhlDirectProducerName());
 	                cs.setString(parNr++, dcap.getDhlDirectServiceUrl());
+	                cs.setString(parNr++, dcap.getXRoadServiceInstance());
+	                cs.setString(parNr++, dcap.getXRoadServiceMemberClass());
+	                cs.setString(parNr++, dcap.getXRoadServiceMemberCode());
 	                
-	                ResultSet rs = DBConnection.getResultSet(cs, db, 4);
+	                ResultSet rs = DBConnection.getResultSet(cs, db, 7);
 	                
 	                while (rs.next()) {
 	                    result.add(rs.getString("org_code"));
@@ -337,26 +422,31 @@ public class DhlCapability {
     /**
      * Updates DEC document ID value in every recipient record
      */
-    public boolean updateDhlID(DhlMessage msg, OrgSettings db, int dhlID, Connection dbConnection) {        
+    public boolean updateDhlID(DhlMessage msg, OrgSettings db, int dhlID, Connection dbConnection) {
         try {
             // m_dhlID = dhlID;
             // logger.info("Update_DhlMessageRecipientDhlID "+ msg.getDhlID());
             if (dbConnection != null) {
-                CallableStatement cs = dbConnection.prepareCall("{call Update_DhlMessageRecipDhlID(?,?,?,?,?,?)}");
+                CallableStatement cs = dbConnection.prepareCall("{call Update_DhlMessageRecipDhlID(?,?,?,?,?,?,?,?,?)}");
                 int parNr = 1;
                 if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    cs = dbConnection.prepareCall("{? = call \"Update_DhlMessageRecipDhlID\"(?,?,?,?,?,?)}");
+                    cs = dbConnection.prepareCall("{? = call \"Update_DhlMessageRecipDhlID\"(?,?,?,?,?,?,?,?,?)}");
                     cs.registerOutParameter(parNr++, Types.BOOLEAN);
                 }
 
                 cs.setInt(parNr++, msg.getId());
                 cs.setInt(parNr++, (m_isDhlDirectCapable ? 1 : 0));
+                cs.setString(parNr++, xRoadServiceInstance);
+                cs.setString(parNr++, xRoadServiceMemberClass);
+                cs.setString(parNr++, xRoadServiceMemberCode);
                 cs.setString(parNr++, m_dhlDirectProducerName);
                 cs.setString(parNr++, m_dhlDirectServiceUrl);
                 cs.setInt(parNr++, dhlID);
                 cs.setString(parNr++, msg.getQueryID());
+                
                 cs.execute();
                 cs.close();
+                
                 return true;
             } 
         } catch (Exception ex) {

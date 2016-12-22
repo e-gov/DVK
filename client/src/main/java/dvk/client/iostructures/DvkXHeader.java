@@ -159,6 +159,8 @@ public class DvkXHeader implements XHeader {
         sb.append("<xtee:id>").append(getId()).append("</xtee:id>");
         sb.append("<xtee:toimik>").append(getToimik()).append("</xtee:toimik>");
         sb.append("<xtee:isikukood>").append(getIsikukood()).append("</xtee:isikukood>");
+        
         return sb.toString();
     }
+    
 }

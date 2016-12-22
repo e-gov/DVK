@@ -3,8 +3,10 @@ package dvk.client.iostructures;
 import java.util.Date;
 
 import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
 
 public class SendDocumentsV2Body {
+	
     public String dokumendid;
     public String kaust;
     public Date sailitustahtaeg;
@@ -23,7 +25,7 @@ public class SendDocumentsV2Body {
     
     public String getBodyContentsAsText() {
         StringBuilder sb = new StringBuilder();
-        sb.append("<dhl:sendDocuments><keha>");
+        sb.append("<dhl:sendDocuments " + CommonStructures.NS_DHL_DECLARATION + "><keha>");
         sb.append("<dokumendid href=\"cid:" + dokumendid + "\"/>");
         sb.append("<kaust>" + ((kaust == null) ? "" : kaust) + "</kaust>");
         if (sailitustahtaeg != null) {

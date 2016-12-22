@@ -2,6 +2,8 @@ package dvk.client.iostructures;
 
 import java.util.ArrayList;
 
+import dvk.core.CommonStructures;
+
 public class GetSendingOptionsV2Body implements SOAPBodyOverride {
     public ArrayList<String> asutused; // asutuste reg.koodide list
     public boolean vastuvotmata_dokumente_ootel;
@@ -17,7 +19,7 @@ public class GetSendingOptionsV2Body implements SOAPBodyOverride {
 
     public String getBodyContentsAsText() {
         StringBuilder sb = new StringBuilder();
-        sb.append("<dhl:getSendingOptions><keha>");        
+        sb.append("<dhl:getSendingOptions " + CommonStructures.NS_DHL_DECLARATION + "><keha>");        
         if (vastuvotmata_dokumente_ootel)
             sb.append("<vastuvotmata_dokumente_ootel>true</vastuvotmata_dokumente_ootel>");         
         if (vahetatud_dokumente_vahemalt >= 0)

@@ -22,6 +22,7 @@ import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPException;
 
+import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
@@ -29,6 +30,7 @@ import org.apache.axis.attachments.AttachmentPart;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.transport.http.HTTPConstants;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -52,7 +54,6 @@ import dvk.client.db.DBConnection;
 import dvk.client.db.UnitCredential;
 import dvk.client.dhl.service.DatabaseSessionService;
 import dvk.client.dhl.service.LoggingService;
-import dvk.client.iostructures.DvkXHeader;
 import dvk.client.iostructures.GetOccupationListBody;
 import dvk.client.iostructures.GetOccupationListV2Body;
 import dvk.client.iostructures.GetSendStatusBody;
@@ -73,7 +74,7 @@ import dvk.client.iostructures.ReceiveDocumentsV3Body;
 import dvk.client.iostructures.ReceiveDocumentsV4Body;
 import dvk.client.iostructures.SendDocumentsBody;
 import dvk.client.iostructures.SendDocumentsV2Body;
-import dvk.client.iostructures.SoapMessageBuilder;
+import dvk.client.util.SoapMessageUtil;
 import dvk.core.AttachmentExtractionResult;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
@@ -82,17 +83,32 @@ import dvk.core.FileSplitResult;
 import dvk.core.HeaderVariables;
 import dvk.core.Settings;
 import dvk.core.ShortName;
+import dvk.core.util.DVKServiceMethod;
+import dvk.core.xroad.XRoadClient;
+import dvk.core.xroad.XRoadHeader;
+import dvk.core.xroad.XRoadService;
 
 public class ClientAPI {
-	//static Logger logger = Logger.getLogger(ClientAPI.class.getName());
+	
+	private static final Logger logger = LogManager.getLogger(ClientAPI.class.getName());
+	
     private Service service;
     private Call call;
     private OrgDvkSettings orgSettings;
     private ArrayList<String> tempFiles;
-    private String queryId; // viimase X-tee päringu ID
-    private String producerName; // andmekogu nimetus (kui suhtlus käib äle X-tee)
+    private String queryId;	// viimase X-tee päringu ID
+//    private String producerName; // andmekogu nimetus (kui suhtlus käib üle X-tee)
     private ArrayList<OrgSettings> allKnownDatabases;
-    static Logger logger = LogManager.getLogger(ClientAPI.class.getName());
+    
+    /*
+     * The following fields are meant to describe a service
+     * in compliance with the X-Road Message Protocol version 4.0 specification.
+     */
+    private String xRoadServiceInstance;
+    private String xRoadServiceMemberClass;
+    private String xRoadServiceMemberCode;
+    private String xRoadServiceSubsystemCode;	// corresponds to "produceName" ("andmekogu") in the old X-Road message protocol versions
+    
     public void setOrgSettings(OrgDvkSettings value) {
         this.orgSettings = value;
     }
@@ -103,14 +119,6 @@ public class ClientAPI {
     
     public String getServiceURL() {
         return this.call.getTargetEndpointAddress();
-    }
-    
-    public void setProducerName(String value) {
-        this.producerName = value;
-    }
-    
-    public String getProducerName() {
-        return this.producerName;
     }
 
     public String getQueryId() {
@@ -124,13 +132,18 @@ public class ClientAPI {
 	public void setAllKnownDatabases(ArrayList<OrgSettings> allKnownDatabases) {
 		this.allKnownDatabases = allKnownDatabases;
 	}
-	
-    public void initClient(String serverURL, String producer) throws Exception {
-    	logger.debug("Initializing SOAP client for URL \"" + serverURL + "\" and x-road producer \"" + producer + "\"");
+    
+    public void initClient(String serviceURL, String xRoadServiceInstance, String xRoadServiceMemberClass, String xRoadServiceMemberCode, String xRoadServiceSubsystemCode) throws Exception {
+    	logger.debug("Initializing SOAP client for URL \"" + serviceURL + "\" and X-Road producer (service subsystem code) \"" + xRoadServiceSubsystemCode + "\"");
+    	
+    	this.xRoadServiceInstance = xRoadServiceInstance;
+    	this.xRoadServiceMemberClass = xRoadServiceMemberClass;
+    	this.xRoadServiceMemberCode = xRoadServiceMemberCode;
+    	this.xRoadServiceSubsystemCode = xRoadServiceSubsystemCode; 	
     	
         // Kui klient on seadistatud töötama HTTPS ühendusega,
         // siis teeme konfiguratsioonis vajalikud muudatused
-    	URL url = new URL(serverURL);
+    	URL url = new URL(serviceURL);
         if (url.getProtocol().equalsIgnoreCase("https")) {
         	System.setProperty("java.protocol.handler.pkgs", "com.sun.net.ssl.internal.www.protocol");
         	Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
@@ -144,24 +157,16 @@ public class ClientAPI {
         }
     	
     	this.tempFiles = new ArrayList<String>();
-        this.service = new Service();
-        this.producerName = producer;
-        this.call = (Call) service.createCall();
-        this.call.setTargetEndpointAddress(new URL(serverURL));
         
-        // Otsustame, kas saadame SOAPAction päise
-        if ((producerName != null) && !producerName.equalsIgnoreCase("")) {
-            this.call.setUseSOAPAction(true);
-            this.call.setSOAPActionURI("http://producers." + this.producerName + ".xtee.riik.ee/producer/" + this.producerName);
-        } else {
-            this.call.setUseSOAPAction(true);
+        this.service = new Service();
+        this.call = (Call) service.createCall();
+        this.call.setTargetEndpointAddress(new URL(serviceURL));
+        this.call.setUseSOAPAction(true);
+        if (StringUtils.isNotBlank(this.xRoadServiceSubsystemCode)) {
+            this.call.setSOAPActionURI("http://producers." + this.xRoadServiceSubsystemCode + ".xtee.riik.ee/producer/" + this.xRoadServiceSubsystemCode);
         }
         this.call.setProperty(MessageContext.HTTP_TRANSPORT_VERSION, HTTPConstants.HEADER_PROTOCOL_V11);
-        
-        
     }
-    
-    
     
     /**
      * DVK getSendStatus päringu käivitamine.
@@ -191,22 +196,23 @@ public class ClientAPI {
 
             if (!messages.isEmpty()) {
                 // Päringu nimi
-                requestName = this.producerName + ".getSendStatus.v" + String.valueOf(requestVersion);
+                requestName = this.xRoadServiceSubsystemCode + ".getSendStatus.v" + String.valueOf(requestVersion);
             	logger.log(Level.getLevel("SERVICEINFO"), "Väljaminev päring teenusele GetSendStatus(xtee teenus:"+requestName+"). Asutusest:" + headerVar.getOrganizationCode() 
                 		+" isikukood:" + headerVar.getPersonalIDCode());
                 // Päringu ID koostamine
                 queryId =  "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
-                
-                // Määrame X-Tee päise väärtused
-                DvkXHeader header = new DvkXHeader(
-                    headerVar.getOrganizationCode(),
-                    this.producerName,
-                    headerVar.getPersonalIDCode(),
-                    queryId,
-                    requestName,
-                    headerVar.getCaseName(),
-                    headerVar.getPIDWithCountryCode());
 
+                XRoadClient xRoadClient = new XRoadClient(headerVar.getXRoadClientInstance(), headerVar.getXRoadClientMemberClass(), headerVar.getOrganizationCode(), headerVar.getXRoadClientSubsystemCode());
+            	XRoadService xRoadService = new XRoadService(
+            			this.xRoadServiceInstance,
+            			this.xRoadServiceMemberClass,
+            			this.xRoadServiceMemberCode,
+            			this.xRoadServiceSubsystemCode,
+            			DVKServiceMethod.GET_SEND_STATUS.getName(),
+            			String.valueOf(requestVersion));
+                
+                XRoadHeader xRoadHeader = new XRoadHeader(xRoadClient, xRoadService, queryId, headerVar.getPIDWithCountryCode(), headerVar.getCaseName());
+                
                 // Väljundfail
                 String attachmentFile = CommonMethods.createPipelineFile(0);
                 outStream = new FileOutputStream(attachmentFile, false);
@@ -239,25 +245,29 @@ public class ClientAPI {
                 CommonMethods.safeCloseWriter(outWriter);
                 CommonMethods.safeCloseStream(outStream);
 
-                // Koostame SOAP sänumi keha
-                String messageData = "";
+                // Koostame SOAP sõnumi keha
+                SOAPEnvelope soapEnvelope = null;
                 switch (requestVersion) {
                 	case 1:
                 		GetSendStatusBody b = new GetSendStatusBody();
                 		b.keha = attachmentName;
-                		messageData = (new SoapMessageBuilder(header, b.getBodyContentsAsText())).getMessageAsText();
+                		
+                		soapEnvelope = SoapMessageUtil.getSOAPEnvelope(xRoadHeader, b.getBodyContentsAsText());
+                		
                 		break;
                 	case 2:
                 		GetSendStatusV2Body b2 = new GetSendStatusV2Body();
                 		b2.dokumendidHref = attachmentName;
                 		b2.staatuseAjalugu = getStatusHistory;
-                		messageData = (new SoapMessageBuilder(header, b2.getBodyContentsAsText())).getMessageAsText();
+                		
+                		soapEnvelope = SoapMessageUtil.getSOAPEnvelope(xRoadHeader, b2.getBodyContentsAsText());
+                		
                 		break;
                 	default:
                 		throw new IllegalArgumentException("Request version getSendStatus.v" + String.valueOf(requestVersion) + " does not exist!");
                 }
                 
-                Message msg = new Message(messageData);
+                Message msg = new Message(soapEnvelope.toString());
                 call.setOperationName(new QName(CommonStructures.NS_DHL_URI, "getSendStatus"));
 
                 // Lisame sänumile manuse
@@ -278,7 +288,7 @@ public class ClientAPI {
                 call.invoke(msg);
                 
                 logger.debug("Got response message. Processing...");
-                // Teeme vastussänumi andmetest omad järeldused
+                // Teeme vastussõnumi andmetest omad järeldused
                 Message respMessage = call.getResponseMessage();
 
                 RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
@@ -362,21 +372,22 @@ public class ClientAPI {
         String attachmentName = String.valueOf((new Date()).getTime());
         
         // Päringu nimi
-        String requestName = this.producerName + ".sendDocuments.v" + String.valueOf(requestVersion);
+        String requestName = this.xRoadServiceSubsystemCode + ".sendDocuments.v" + String.valueOf(requestVersion);
         logger.log(Level.getLevel("SERVICEINFO"), "Väljaminev päring teenusele SendDocuments(xtee teenus:"+requestName+"). Asutusest:" + headerVar.getOrganizationCode() 
         		+" isikukood:" + headerVar.getPersonalIDCode());
         // Päringu ID koostamine
         queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
         
-        // Saadetava sänumi päisesse kantavad parameetrid
-        DvkXHeader header = new DvkXHeader(
-            headerVar.getOrganizationCode(),
-            this.producerName,
-            headerVar.getPersonalIDCode(),
-            queryId,
-            requestName,
-            headerVar.getCaseName(),
-            headerVar.getPIDWithCountryCode());
+        XRoadClient xRoadClient = new XRoadClient(headerVar.getXRoadClientInstance(), headerVar.getXRoadClientMemberClass(), headerVar.getOrganizationCode(), headerVar.getXRoadClientSubsystemCode());
+    	XRoadService xRoadService = new XRoadService(
+    			this.xRoadServiceInstance,
+    			this.xRoadServiceMemberClass,
+    			this.xRoadServiceMemberCode,
+    			this.xRoadServiceSubsystemCode,
+    			DVKServiceMethod.SEND_DOCUMENTS.getName(),
+    			String.valueOf(requestVersion));
+        
+        XRoadHeader xRoadHeader = new XRoadHeader(xRoadClient, xRoadService, queryId, headerVar.getPIDWithCountryCode(), headerVar.getCaseName());
 
         // Pakime dokumendi faili kokku
         String tmpFile = CommonMethods.gzipPackXML(message.getFilePath(), headerVar.getOrganizationCode(), "sendDocuments");
@@ -402,24 +413,29 @@ public class ClientAPI {
                 int resultID = 0;
                 for (int i = 0; i < b.fragmenteKokku; ++i) {
                     b.fragmentNr = i;
-                    String messageData = (new SoapMessageBuilder(header, b.getBodyContentsAsText())).getMessageAsText();
-                    resultID = runSendDocumentsRequest(messageData, fragmentFiles.get(i), attachmentName, headerVar, requestName);
+//                    String messageData = SoapMessageUtil.getMessageAsText(xRoadHeader, b.getBodyContentsAsText());
+                    SOAPEnvelope soapEnvelope = SoapMessageUtil.getSOAPEnvelope(xRoadHeader, b.getBodyContentsAsText());
+                    
+                    resultID = runSendDocumentsRequest(soapEnvelope.toString(), fragmentFiles.get(i), attachmentName, headerVar, requestName);
                 }
                 return resultID;
             } else {
                 b.edastusID = "";
                 b.fragmenteKokku = 0;
                 b.fragmentNr = -1;
-                String messageData = (new SoapMessageBuilder(header, b.getBodyContentsAsText())).getMessageAsText();
-                return runSendDocumentsRequest(messageData, tmpFile, attachmentName,  headerVar, requestName);
+//                String messageData = SoapMessageUtil.getMessageAsText(xRoadHeader, b.getBodyContentsAsText());
+                SOAPEnvelope soapEnvelope = SoapMessageUtil.getSOAPEnvelope(xRoadHeader, b.getBodyContentsAsText());
+                
+                return runSendDocumentsRequest(soapEnvelope.toString(), tmpFile, attachmentName,  headerVar, requestName);
             }
         } else {
             // Koostame SOAP sänumi keha
             SendDocumentsBody b = new SendDocumentsBody();
             b.dokumendid = attachmentName;
             b.kaust = message.getDhlFolderName();
-            String messageData = (new SoapMessageBuilder(header, b.getBodyContentsAsText())).getMessageAsText();
-            return runSendDocumentsRequest(messageData, tmpFile, attachmentName,  headerVar, requestName);
+            SOAPEnvelope soapEnvelope = SoapMessageUtil.getSOAPEnvelope(xRoadHeader, b.getBodyContentsAsText());
+            
+            return runSendDocumentsRequest(soapEnvelope.toString(), tmpFile, attachmentName,  headerVar, requestName);
         }
     }
     
@@ -573,7 +589,8 @@ public class ClientAPI {
         String attachmentFile = null;
 
         try {
-            Iterator attachments = response.getAttachments();
+            @SuppressWarnings("rawtypes")
+			Iterator attachments = response.getAttachments();
             while (attachments.hasNext()) {
                 AttachmentPart a = (AttachmentPart)attachments.next();
                 DataHandler dh = a.getDataHandler();
@@ -628,24 +645,25 @@ public class ClientAPI {
         ReceiveDocumentsResult result = new ReceiveDocumentsResult();
 
         // Päringu nimi
-        String requestName = this.producerName + ".receiveDocuments.v" + String.valueOf(requestVersion);
+        String requestName = this.xRoadServiceSubsystemCode + ".receiveDocuments.v" + String.valueOf(requestVersion);
         logger.log(Level.getLevel("SERVICEINFO"), "Väljaminev päring teenusele ReceiveDocuments(xtee teenus:"+requestName+"). Asutusest:" + headerVar.getOrganizationCode() 
         		+" isikukood:" + headerVar.getPersonalIDCode());
         // Päringu ID koostamine
         queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
         
-        // Saadetava sänumi päisesse kantavad parameetrid
-        DvkXHeader header = new DvkXHeader(
-            headerVar.getOrganizationCode(),
-            this.producerName,
-            headerVar.getPersonalIDCode(),
-            queryId,
-            requestName,
-            headerVar.getCaseName(),
-            headerVar.getPIDWithCountryCode());
+        XRoadClient xRoadClient = new XRoadClient(headerVar.getXRoadClientInstance(), headerVar.getXRoadClientMemberClass(), headerVar.getOrganizationCode(), headerVar.getXRoadClientSubsystemCode());
+    	XRoadService xRoadService = new XRoadService(
+    			this.xRoadServiceInstance,
+    			this.xRoadServiceMemberClass,
+    			this.xRoadServiceMemberCode,
+    			this.xRoadServiceSubsystemCode,
+    			DVKServiceMethod.RECEIVE_DOCUMENTS.getName(),
+    			String.valueOf(requestVersion));
+        
+        XRoadHeader xRoadHeader = new XRoadHeader(xRoadClient, xRoadService, queryId, headerVar.getPIDWithCountryCode(), headerVar.getCaseName());
 
         // Koostame SOAP sänumi keha
-        String messageData = "";
+        SOAPEnvelope soapEnvelope = null;
         if (requestVersion == 4) {
         	logger.debug("Invoking receiveDocuments.V4...");
             String attachmentFile = CommonMethods.createPipelineFile(0);
@@ -663,8 +681,9 @@ public class ClientAPI {
                 while (hasMoreFragments) {
                     try {
                         b4.fragmentNr++;
-                        messageData = (new SoapMessageBuilder(header, b4.getBodyContentsAsText())).getMessageAsText();
-                        Message msg = new Message(messageData);
+                        
+                        soapEnvelope = SoapMessageUtil.getSOAPEnvelope(xRoadHeader, b4.getBodyContentsAsText());
+                        Message msg = new Message(soapEnvelope.toString());
                         call.setOperationName(new QName(CommonStructures.NS_DHL_URI, "receiveDocuments"));
 
                         // Teostame päringu
@@ -716,7 +735,8 @@ public class ClientAPI {
                         }
                         hasMoreFragments = ((fragmentCount - fragmentNr) > 1);
 
-                        Iterator attachments = response.getAttachments();
+                        @SuppressWarnings("rawtypes")
+						Iterator attachments = response.getAttachments();
                         if (attachments.hasNext()) {
                             AttachmentPart a = (AttachmentPart)attachments.next();
                             DataHandler dh = a.getDataHandler();
@@ -766,7 +786,7 @@ public class ClientAPI {
                     }
                 }
             } else {
-                messageData = (new SoapMessageBuilder(header, b4.getBodyContentsAsText())).getMessageAsText();
+            	soapEnvelope = SoapMessageUtil.getSOAPEnvelope(xRoadHeader, b4.getBodyContentsAsText());
             }
         } else if (requestVersion == 3) {
             String attachmentFile = CommonMethods.createPipelineFile(0);
@@ -784,8 +804,9 @@ public class ClientAPI {
                 try {
                     while (hasMoreFragments) {
                         b3.fragmentNr++;
-                        messageData = (new SoapMessageBuilder(header, b3.getBodyContentsAsText())).getMessageAsText();
-                        Message msg = new Message(messageData);
+                        
+                        soapEnvelope = SoapMessageUtil.getSOAPEnvelope(xRoadHeader, b3.getBodyContentsAsText());
+                        Message msg = new Message(soapEnvelope.toString());
                         call.setOperationName(new QName(CommonStructures.NS_DHL_URI, "receiveDocuments"));
 
                         // Teostame päringu
@@ -833,7 +854,8 @@ public class ClientAPI {
                         }
                         hasMoreFragments = ((fragmentCount - fragmentNr) > 1);
 
-                        Iterator attachments = response.getAttachments();
+                        @SuppressWarnings("rawtypes")
+						Iterator attachments = response.getAttachments();
                         if (attachments.hasNext()) {
                             AttachmentPart a = (AttachmentPart)attachments.next();
                             DataHandler dh = a.getDataHandler();
@@ -881,7 +903,7 @@ public class ClientAPI {
                     throw ex;
                 }
             } else {
-                messageData = (new SoapMessageBuilder(header, b3.getBodyContentsAsText())).getMessageAsText();
+            	soapEnvelope = SoapMessageUtil.getSOAPEnvelope(xRoadHeader, b3.getBodyContentsAsText());
             }
         } else if (requestVersion == 2) {
             String attachmentFile = CommonMethods.createPipelineFile(0);
@@ -897,8 +919,9 @@ public class ClientAPI {
                 try {
                     while (hasMoreFragments) {
                         b2.fragmentNr++;
-                        messageData = (new SoapMessageBuilder(header, b2.getBodyContentsAsText())).getMessageAsText();
-                        Message msg = new Message(messageData);
+                        
+                        soapEnvelope = SoapMessageUtil.getSOAPEnvelope(xRoadHeader, b2.getBodyContentsAsText());
+                        Message msg = new Message(soapEnvelope.toString());
                         call.setOperationName(new QName(CommonStructures.NS_DHL_URI, "receiveDocuments"));
 
                         // Teostame päringu
@@ -946,7 +969,8 @@ public class ClientAPI {
                         }
                         hasMoreFragments = ((fragmentCount - fragmentNr) > 1);
 
-                        Iterator attachments = response.getAttachments();
+                        @SuppressWarnings("rawtypes")
+						Iterator attachments = response.getAttachments();
                         if (attachments.hasNext()) {
                             AttachmentPart a = (AttachmentPart)attachments.next();
                             DataHandler dh = a.getDataHandler();
@@ -994,16 +1018,17 @@ public class ClientAPI {
                     throw ex;
                 }
             } else {
-                messageData = (new SoapMessageBuilder(header, b2.getBodyContentsAsText())).getMessageAsText();
+            	soapEnvelope = SoapMessageUtil.getSOAPEnvelope(xRoadHeader, b2.getBodyContentsAsText());
             }
         } else {
             ReceiveDocumentsBody b = new ReceiveDocumentsBody();
             b.arv = limitDocuments;
             b.kaust = folders;
-            messageData = (new SoapMessageBuilder(header, b.getBodyContentsAsText())).getMessageAsText();
+            
+            soapEnvelope = SoapMessageUtil.getSOAPEnvelope(xRoadHeader, b.getBodyContentsAsText());
         }
 
-        Message msg = new Message(messageData);
+        Message msg = new Message(soapEnvelope.toString());
         call.setOperationName(new QName(CommonStructures.NS_DHL_URI, "receiveDocuments"));
 
         Message response = null;
@@ -1038,7 +1063,8 @@ public class ClientAPI {
             throw ex;
         }
 
-        Iterator attachments = response.getAttachments();
+        @SuppressWarnings("rawtypes")
+		Iterator attachments = response.getAttachments();
         if (attachments.hasNext()) {
             String attachmentFile = CommonMethods.createPipelineFile(0);
 
@@ -1107,30 +1133,32 @@ public class ClientAPI {
         
         // Päringu nimi ja versioon
         int requestVersion = orgSettings.getMarkDocumentsReceivedRequestVersion();
-        String requestName = this.producerName + ".markDocumentsReceived.v" + String.valueOf(requestVersion);
+        String requestName = this.xRoadServiceSubsystemCode + "." + DVKServiceMethod.MARK_DOCUMENTS_RECEIVED.getName() + ".v" + String.valueOf(requestVersion);
         logger.log(Level.getLevel("SERVICEINFO"), "Väljaminev päring teenusele MarkDocumentsReceived(xtee teenus:"+requestName+"). Asutusest:" + headerVar.getOrganizationCode() 
         		+" isikukood:" + headerVar.getPersonalIDCode());
+        
         try {
-        // Saadetava sänumi päisesse kantavad parameetrid
-            DvkXHeader header = new DvkXHeader(
-                headerVar.getOrganizationCode(),
-                this.producerName,
-                headerVar.getPersonalIDCode(),
-                queryId,
-                requestName,
-                headerVar.getCaseName(),
-                headerVar.getPIDWithCountryCode());
-
-            String attachmentName = "";
-            String attachmentFile = "";
-            String messageBody = "";
-
+        	XRoadClient xRoadClient = new XRoadClient(headerVar.getXRoadClientInstance(), headerVar.getXRoadClientMemberClass(), headerVar.getOrganizationCode(), headerVar.getXRoadClientSubsystemCode());
+        	XRoadService xRoadService = new XRoadService(
+        			this.xRoadServiceInstance,
+        			this.xRoadServiceMemberClass,
+        			this.xRoadServiceMemberCode,
+        			this.xRoadServiceSubsystemCode,
+        			DVKServiceMethod.MARK_DOCUMENTS_RECEIVED.getName(),
+        			String.valueOf(requestVersion));
+            
+            XRoadHeader xRoadHeader = new XRoadHeader(xRoadClient, xRoadService, queryId, headerVar.getPIDWithCountryCode(), headerVar.getCaseName());
+            
             ArrayList<Integer> dokumendidIdList = new ArrayList<Integer>();
             for(int i = 0; i < centralServerDocs.size(); i++) {
                 DhlMessage msgTmp = centralServerDocs.get(i);
                 dokumendidIdList.add(msgTmp.getDhlID());
             }
 
+            String attachmentName = "";
+            String attachmentFile = "";
+            SOAPEnvelope soapEnvelope = null;
+            
             if (requestVersion < 3) {
                 logger.debug("RequestVersion < 3.");
                 attachmentName = String.valueOf(System.currentTimeMillis());
@@ -1147,7 +1175,8 @@ public class ClientAPI {
                     b.allyksuseId = unitSettings.getDivisionID();
                     b.ametikohaId = unitSettings.getOccupationID();
                 }
-                messageBody = (new SoapMessageBuilder(header, b.getBodyContentsAsText())).getMessageAsText();
+
+                soapEnvelope = SoapMessageUtil.getSOAPEnvelope(xRoadHeader, b.getBodyContentsAsText());
             } else {
                 logger.debug("RequestVersion = 3");
                 MarkDocumentsReceivedV3Body b3 = new MarkDocumentsReceivedV3Body();
@@ -1165,15 +1194,16 @@ public class ClientAPI {
                     b3.allyksuseLyhinimetus = unitSettings.getDivisionShortName();
                     b3.ametikohaLyhinimetus = unitSettings.getOccupationShortName();
                 }
-                messageBody = (new SoapMessageBuilder(header, b3.getBodyContentsAsText())).getMessageAsText();
+
+                soapEnvelope = SoapMessageUtil.getSOAPEnvelope(xRoadHeader, b3.getBodyContentsAsText());
             }
 
-            Message msg = new Message(messageBody);
+            Message msg = new Message(soapEnvelope.toString());
             call.setOperationName(new QName(CommonStructures.NS_DHL_URI, "markDocumentsReceived"));
 
             // Lisame sänumile manuse
             if (requestVersion < 3) {
-                String tempFile = CommonMethods.gzipPackXML(attachmentFile, header.getAsutus(), "markDocumentsReceived");
+                String tempFile = CommonMethods.gzipPackXML(attachmentFile, xRoadHeader.getXRoadClient().getMemberCode(), "markDocumentsReceived");
                 tempFiles.add(tempFile);
                 FileDataSource ds = new FileDataSource(tempFile);
                 DataHandler d1 = new DataHandler(ds);
@@ -1260,23 +1290,24 @@ public class ClientAPI {
 
             // Päringu nimi ja versioon
             int requestVersion = orgSettings.getMarkDocumentsReceivedRequestVersion();
-            requestName = this.producerName + ".markDocumentsReceived.v" + String.valueOf(requestVersion);
+            requestName = this.xRoadServiceSubsystemCode + ".markDocumentsReceived.v" + String.valueOf(requestVersion);
             logger.log(Level.getLevel("SERVICEINFO"), "Väljaminev päring teenusele MarkDocumentsReceived(xtee teenus:"+requestName+"). Asutusest:" + headerVar.getOrganizationCode() 
             		+" isikukood:" + headerVar.getPersonalIDCode());
-            
-            // Saadetava sänumi päisesse kantavad parameetrid
-            DvkXHeader header = new DvkXHeader(
-                headerVar.getOrganizationCode(),
-                this.producerName,
-                headerVar.getPersonalIDCode(),
-                queryId,
-                requestName,
-                headerVar.getCaseName(),
-                headerVar.getPIDWithCountryCode());
 
+            XRoadClient xRoadClient = new XRoadClient(headerVar.getXRoadClientInstance(), headerVar.getXRoadClientMemberClass(), headerVar.getOrganizationCode(), headerVar.getXRoadClientSubsystemCode());
+        	XRoadService xRoadService = new XRoadService(
+        			this.xRoadServiceInstance,
+        			this.xRoadServiceMemberClass,
+        			this.xRoadServiceMemberCode,
+        			this.xRoadServiceSubsystemCode,
+        			DVKServiceMethod.MARK_DOCUMENTS_RECEIVED.getName(),
+        			"v" + String.valueOf(requestVersion));
+            
+            XRoadHeader xRoadHeader = new XRoadHeader(xRoadClient, xRoadService, queryId, headerVar.getPIDWithCountryCode(), headerVar.getCaseName());
+            
             String attachmentName = "";
             String attachmentFile = "";
-            String messageBody = "";
+            SOAPEnvelope soapEnvelope = null;
 
             if (requestVersion < 3) {
                 attachmentName = String.valueOf(System.currentTimeMillis());
@@ -1289,7 +1320,8 @@ public class ClientAPI {
                     b.allyksuseId = unitSettings.getDivisionID();
                     b.ametikohaId = unitSettings.getOccupationID();
                 }
-                messageBody = (new SoapMessageBuilder(header, b.getBodyContentsAsText())).getMessageAsText();
+                
+                soapEnvelope = SoapMessageUtil.getSOAPEnvelope(xRoadHeader, b.getBodyContentsAsText());
             } else {
                 MarkDocumentsReceivedV3Body b3 = new MarkDocumentsReceivedV3Body();
                 b3.dokumendidObjectList = centralServerDocs;
@@ -1303,15 +1335,16 @@ public class ClientAPI {
                     b3.allyksuseLyhinimetus = unitSettings.getDivisionShortName();
                     b3.ametikohaLyhinimetus = unitSettings.getOccupationShortName();
                 }
-                messageBody = (new SoapMessageBuilder(header, b3.getBodyContentsAsText())).getMessageAsText();
+
+                soapEnvelope = SoapMessageUtil.getSOAPEnvelope(xRoadHeader, b3.getBodyContentsAsText());
             }
 
-            Message msg = new Message(messageBody);
+            Message msg = new Message(soapEnvelope.toString());
             call.setOperationName(new QName(CommonStructures.NS_DHL_URI, "markDocumentsReceived"));
 
-            // Lisame sänumile manuse
+            // Lisame sõnumile manuse
             if (requestVersion < 3) {
-                String tempFile = CommonMethods.gzipPackXML(attachmentFile, header.getAsutus(), "markDocumentsReceived");
+                String tempFile = CommonMethods.gzipPackXML(attachmentFile, xRoadHeader.getXRoadClient().getMemberCode(), "markDocumentsReceived");
                 tempFiles.add(tempFile);
                 FileDataSource ds = new FileDataSource(tempFile);
                 DataHandler d1 = new DataHandler(ds);
@@ -1398,7 +1431,7 @@ public class ClientAPI {
     			UnitCredential[] orgsInDB = UnitCredential.getCredentials(db, dbConnection);
     			for (int j = 0; j < orgsInDB.length; j++) {
     				if (orgsInDB[j].getInstitutionCode().equalsIgnoreCase(message.getSenderOrgCode())) {
-    					int id = DhlMessage.getMessageID(message.getDhlGuid(), null, null, false, db, dbConnection);
+    					int id = DhlMessage.getMessageID(message.getDhlGuid(), null, null, null, null, null, false, db, dbConnection);
     					if (id > 0) {
 	    					ArrayList<MessageRecipient> recipients = MessageRecipient.getList(id, db, dbConnection);
 	    					for (int k = 0; k < recipients.size(); k++) {
@@ -1517,31 +1550,34 @@ public class ClientAPI {
 
         try {
             // Päringu nimi
-            requestName = this.producerName + ".getSendingOptions.v" + String.valueOf(requestVersion);
+            requestName = this.xRoadServiceSubsystemCode + ".getSendingOptions.v" + String.valueOf(requestVersion);
             logger.log(Level.getLevel("SERVICEINFO"), "Väljaminev päring teenusele GetSendingOptions(xtee teenus:"+requestName+"). Asutusest:" + headerVar.getOrganizationCode() 
             		+" isikukood:" + headerVar.getPersonalIDCode());
             // Päringu ID koostamine
             this.queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
 
-            // Saadetava sänumi päisesse kantavad parameetrid
-            DvkXHeader header = new DvkXHeader(
-                headerVar.getOrganizationCode(),
-                this.producerName,
-                headerVar.getPersonalIDCode(),
-                this.queryId,
-                requestName,
-                headerVar.getCaseName(),
-                headerVar.getPIDWithCountryCode());
+            XRoadClient xRoadClient = new XRoadClient(headerVar.getXRoadClientInstance(), headerVar.getXRoadClientMemberClass(), headerVar.getOrganizationCode(), headerVar.getXRoadClientSubsystemCode());
+        	XRoadService xRoadService = new XRoadService(
+        			this.xRoadServiceInstance,
+        			this.xRoadServiceMemberClass,
+        			this.xRoadServiceMemberCode,
+        			this.xRoadServiceSubsystemCode,
+        			DVKServiceMethod.GET_SENDING_OPTIONS.getName(),
+        			String.valueOf(requestVersion));
+            
+            XRoadHeader xRoadHeader = new XRoadHeader(xRoadClient, xRoadService, queryId, headerVar.getPIDWithCountryCode(), headerVar.getCaseName());
 
             // Koostame SOAP sänumi keha
-            String messageData = "";
+            SOAPEnvelope soapEnvelope = null;
             String attachmentName = String.valueOf(System.currentTimeMillis());
             String attachmentFileName = "";
             switch (requestVersion) {
                 case 1:
                     GetSendingOptionsBody b1 = new GetSendingOptionsBody();
                     b1.keha = orgCodes;
-                    messageData = (new SoapMessageBuilder(header, b1.getBodyContentsAsText())).getMessageAsText();
+                    
+                    soapEnvelope = SoapMessageUtil.getSOAPEnvelope(xRoadHeader, b1.getBodyContentsAsText());
+                    
                     break;
                 case 2:
                     GetSendingOptionsV2Body b2 = new GetSendingOptionsV2Body();
@@ -1549,7 +1585,9 @@ public class ClientAPI {
                     b2.vastuvotmata_dokumente_ootel = onlyOrgsWithDocumentsWaiting;
                     b2.vahetatud_dokumente_vahemalt = minimumCountOfDocumentsExchanged;
                     b2.vahetatud_dokumente_kuni = maximumCountOfDocumentsExchanged;
-                    messageData = (new SoapMessageBuilder(header, b2.getBodyContentsAsText())).getMessageAsText();
+                    
+                    soapEnvelope = SoapMessageUtil.getSOAPEnvelope(xRoadHeader, b2.getBodyContentsAsText());
+                    
                     break;
                 case 3:
                     GetSendingOptionsV3Body b3 = new GetSendingOptionsV3Body();
@@ -1561,13 +1599,15 @@ public class ClientAPI {
                     b3.vahetatudDokumenteVahemalt = minimumCountOfDocumentsExchanged;
                     b3.vahetatudDokumenteKuni = maximumCountOfDocumentsExchanged;
                     attachmentFileName = b3.createAttachmentFile();
-                    messageData = (new SoapMessageBuilder(header, b3.getBodyContentsAsText())).getMessageAsText();
+                    
+                    soapEnvelope = SoapMessageUtil.getSOAPEnvelope(xRoadHeader, b3.getBodyContentsAsText());
+                    
                     break;
                 default:
                     break;
             }
 
-            Message msg = new Message(messageData);
+            Message msg = new Message(soapEnvelope.toString());
             call.setOperationName(new QName(CommonStructures.NS_DHL_URI, "getSendingOptions"));
 
             // Lisame sänumile manuse
@@ -1640,44 +1680,47 @@ public class ClientAPI {
         String requestName = null;
         try {
             // Päringu nimi
-            requestName = this.producerName + ".getSubdivisionList.v" + String.valueOf(requestVersion);
+            requestName = this.xRoadServiceSubsystemCode + ".getSubdivisionList.v" + String.valueOf(requestVersion);
             logger.log(Level.getLevel("SERVICEINFO"), "Väljaminev päring teenusele GetSubdivisionList(xtee teenus:"+requestName+"). Asutusest:" + headerVar.getOrganizationCode() 
             		+" isikukood:" + headerVar.getPersonalIDCode());
             // Päringu ID koostamine
             queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
 
-            // Saadetava sänumi päisesse kantavad parameetrid
-            DvkXHeader header = new DvkXHeader(
-                    headerVar.getOrganizationCode(),
-                    this.producerName,
-                    headerVar.getPersonalIDCode(),
-                    queryId,
-                    requestName,
-                    headerVar.getCaseName(),
-                    headerVar.getPIDWithCountryCode());
+            XRoadClient xRoadClient = new XRoadClient(headerVar.getXRoadClientInstance(), headerVar.getXRoadClientMemberClass(), headerVar.getOrganizationCode(), headerVar.getXRoadClientSubsystemCode());
+        	XRoadService xRoadService = new XRoadService(
+        			this.xRoadServiceInstance,
+        			this.xRoadServiceMemberClass,
+        			this.xRoadServiceMemberCode,
+        			this.xRoadServiceSubsystemCode,
+        			DVKServiceMethod.GET_SUBDIVISION_LIST.getName(),
+        			String.valueOf(requestVersion));
+            
+            XRoadHeader xRoadHeader = new XRoadHeader(xRoadClient, xRoadService, queryId, headerVar.getPIDWithCountryCode(), headerVar.getCaseName());
 
             // Koostame SOAP sänumi keha
-            String messageData = "";
+            SOAPEnvelope soapEnvelope = null;
             String attachmentName = String.valueOf(System.currentTimeMillis());
             String attachmentFileName = "";
             switch (requestVersion) {
                 case 1:
                     GetSubdivisionListBody b = new GetSubdivisionListBody();
                     b.keha = orgCodes;
-                    messageData = (new SoapMessageBuilder(header, b.getBodyContentsAsText())).getMessageAsText();
+                    soapEnvelope = SoapMessageUtil.getSOAPEnvelope(xRoadHeader, b.getBodyContentsAsText());
+                    
                     break;
                 case 2:
                     GetSubdivisionListV2Body b2 = new GetSubdivisionListV2Body();
                     b2.asutusedHref = attachmentName;
                     b2.asutused = orgCodes;
                     attachmentFileName = b2.createAttachmentFile();
-                    messageData = (new SoapMessageBuilder(header, b2.getBodyContentsAsText())).getMessageAsText();
+                    soapEnvelope = SoapMessageUtil.getSOAPEnvelope(xRoadHeader, b2.getBodyContentsAsText());
+                    
                     break;
                 default:
                     throw new Exception("Request getSubdivisionList does not have version v" + String.valueOf(requestVersion) + "!");
             }
 
-            Message msg = new Message(messageData);
+            Message msg = new Message(soapEnvelope.toString());
             call.setOperationName(new QName(CommonStructures.NS_DHL_URI, "getSubdivisionList"));
 
             // Lisame sänumile manuse
@@ -1761,47 +1804,51 @@ public class ClientAPI {
     public ArrayList<Occupation> getOccupationList(HeaderVariables headerVar, ArrayList<String> orgCodes, int requestVersion) throws Exception {
         ArrayList<Occupation> result = new ArrayList<Occupation>();
 
-        String requestName = this.producerName + ".getOccupationList.v" + String.valueOf(requestVersion);
-        logger.log(Level.getLevel("SERVICEINFO"), "Väljaminev päring teenusele GetOccupationList(xtee teenus:"+requestName+"). Asutusest:" + headerVar.getOrganizationCode() 
-        		+" isikukood:" + headerVar.getPersonalIDCode());
+        String requestName = null;
         try {
-        // Päringu nimi
-            requestName = this.producerName + ".getOccupationList.v" + String.valueOf(requestVersion);
+        	// Päringu nimi
+            requestName = this.xRoadServiceSubsystemCode + ".getOccupationList.v" + String.valueOf(requestVersion);
+            logger.log(Level.getLevel("SERVICEINFO"), "Väljaminev päring teenusele GetOccupationList(xtee teenus:"+requestName+"). Asutusest:" + headerVar.getOrganizationCode() 
+            +" isikukood:" + headerVar.getPersonalIDCode());
 
             // Päringu ID koostamine
             queryId = "dvk" + headerVar.getOrganizationCode() + String.valueOf((new Date()).getTime());
-
-            // Saadetava sänumi päisesse kantavad parameetrid
-            DvkXHeader header = new DvkXHeader(
-                headerVar.getOrganizationCode(),
-                this.producerName,
-                headerVar.getPersonalIDCode(),
-                queryId,
-                requestName,
-                headerVar.getCaseName(),
-                headerVar.getPIDWithCountryCode());
-
+            
+            XRoadClient xRoadClient = new XRoadClient(headerVar.getXRoadClientInstance(), headerVar.getXRoadClientMemberClass(), headerVar.getOrganizationCode(), headerVar.getXRoadClientSubsystemCode());
+        	XRoadService xRoadService = new XRoadService(
+        			this.xRoadServiceInstance,
+        			this.xRoadServiceMemberClass,
+        			this.xRoadServiceMemberCode,
+        			this.xRoadServiceSubsystemCode,
+        			DVKServiceMethod.GET_OCCUPATION_LIST.getName(),
+        			String.valueOf(requestVersion));
+            
+            XRoadHeader xRoadHeader = new XRoadHeader(xRoadClient, xRoadService, queryId, headerVar.getPIDWithCountryCode(), headerVar.getCaseName());
+            
             // Koostame SOAP sänumi keha
-            String messageData = "";
+            SOAPEnvelope soapEnvelope = null;
             String attachmentName = String.valueOf(System.currentTimeMillis());
             String attachmentFileName = "";
             switch (requestVersion) {
                 case 1:
                     GetOccupationListBody b = new GetOccupationListBody();
                     b.keha = orgCodes;
-                    messageData = (new SoapMessageBuilder(header, b.getBodyContentsAsText())).getMessageAsText();
+                    soapEnvelope = SoapMessageUtil.getSOAPEnvelope(xRoadHeader, b.getBodyContentsAsText());
+                    
                     break;
                 case 2:
                     GetOccupationListV2Body b2 = new GetOccupationListV2Body();
                     b2.asutusedHref = attachmentName;
                     b2.asutused = orgCodes;
                     attachmentFileName = b2.createAttachmentFile();
-                    messageData = (new SoapMessageBuilder(header, b2.getBodyContentsAsText())).getMessageAsText();
+                    soapEnvelope = SoapMessageUtil.getSOAPEnvelope(xRoadHeader, b2.getBodyContentsAsText());
+                    
                     break;
                 default:
                     throw new Exception("Request getOccupationList does not have version v" + String.valueOf(requestVersion) + "!");
             }
-            Message msg = new Message(messageData);
+            
+            Message msg = new Message(soapEnvelope.toString());
             call.setOperationName(new QName(CommonStructures.NS_DHL_URI, "getOccupationList"));
 
             // Lisame sänumile manuse
@@ -1892,4 +1939,37 @@ public class ClientAPI {
 
         return dbConnection;
     }
+
+	public String getXRoadServiceInstance() {
+		return xRoadServiceInstance;
+	}
+
+	public void setXRoadServiceInstance(String xRoadServiceInstance) {
+		this.xRoadServiceInstance = xRoadServiceInstance;
+	}
+
+	public String getXRoadServiceMemberClass() {
+		return xRoadServiceMemberClass;
+	}
+
+	public void setXRoadServiceMemberClass(String xRoadServiceMemberClass) {
+		this.xRoadServiceMemberClass = xRoadServiceMemberClass;
+	}
+
+	public String getXRoadServiceMemberCode() {
+		return xRoadServiceMemberCode;
+	}
+
+	public void setXRoadServiceMemberCode(String xRoadServiceMemberCode) {
+		this.xRoadServiceMemberCode = xRoadServiceMemberCode;
+	}
+
+	public String getXRoadServiceSubsystemCode() {
+		return xRoadServiceSubsystemCode;
+	}
+
+	public void setXRoadServiceSubsystemCode(String xRoadServiceSubsystemCode) {
+		this.xRoadServiceSubsystemCode = xRoadServiceSubsystemCode;
+	}
+    
 }

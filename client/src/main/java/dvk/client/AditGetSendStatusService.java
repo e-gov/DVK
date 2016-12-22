@@ -10,6 +10,7 @@ import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 import javax.xml.namespace.QName;
 
+import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis.Message;
 import org.apache.axis.attachments.AttachmentPart;
 import org.apache.log4j.Logger;
@@ -27,14 +28,16 @@ import dvk.client.iostructures.AditGetSendStatusRequest;
 import dvk.client.iostructures.AditGetSendStatusResponse;
 import dvk.client.iostructures.AditGetSendStatusV1Body;
 import dvk.client.iostructures.AditReciever;
-import dvk.client.iostructures.AditXHeader;
-import dvk.client.iostructures.SoapMessageBuilder;
-import dvk.client.iostructures.XHeader;
+import dvk.client.util.SoapMessageUtil;
 import dvk.core.AttachmentExtractionResult;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import dvk.core.HeaderVariables;
 import dvk.core.Settings;
+import dvk.core.util.DVKServiceMethod;
+import dvk.core.xroad.XRoadClient;
+import dvk.core.xroad.XRoadHeader;
+import dvk.core.xroad.XRoadService;
 
 /**
  * @author Hendrik Pärna
@@ -44,17 +47,15 @@ public class AditGetSendStatusService {
 	
     private static final Logger logger = Logger.getLogger(AditGetSendStatusService.class);
 
-    private String producerName;
     private ClientAPI client;
     private AditGetSendStatusRequest aditGetSendStatusRequest = new AditGetSendStatusRequest();
 
-    public AditGetSendStatusService(final String producerName, ClientAPI clientAPI) {
-        this.producerName = producerName;
+    public AditGetSendStatusService(ClientAPI clientAPI) {
         this.client = clientAPI;
     }
 
     /**
-     * Update all MessageRecipient.opened column values which have been sent to Adit.
+     * Update all MessageRecipient.opened column values which have been sent to ADIT.
      *
      * @param currentDatabases all configured databases.
      */
@@ -83,28 +84,24 @@ public class AditGetSendStatusService {
 
 
                 HeaderVariables headerVar = createHeaderVariables();
-
-                String requestName = this.producerName + ".getSendStatus.v" + db.getDvkSettings().getAditGetSendStatusRequestVersion();
                 String queryId = "dvkAdit" + headerVar.getOrganizationCode() + (new Date()).getTime();
 
-                // Saadetava sõnumi päisesse kantavad parameetrid
-                XHeader xHeader = createXHeader(headerVar, requestName, queryId);
+                XRoadHeader xRoadHeader = createXRoadHeader(headerVar, db.getDvkSettings().getAditGetSendStatusRequestVersion(), queryId);
 
                 List<MessageRecipient> messageRecipients = null;
-
                 try {
-                    messageRecipients = MessageRecipient.
-                            findMessageRecipientsRelatedWithAdit(db, dbConnection);
+                    messageRecipients = MessageRecipient.findMessageRecipientsRelatedWithAdit(db, dbConnection);
                     if (logger.isInfoEnabled()) {
                         logger.info("Leitud " + messageRecipients.size() + " Adit'is avamata sõnumit!");
                     }
 
                     if (messageRecipients.size() > 0) {
-                        Message response = sendAndRecieveRequestToAdit(
-                                messageRecipients, xHeader, headerVar, requestName);
+                    	// The request name is used in the old X-Road message protocol 2.0 format to compactly save it in the related logs
+                    	String requestName = xRoadHeader.getService();
+                    	
+                        Message response = sendAndRecieveRequestToAdit(messageRecipients, xRoadHeader, headerVar, requestName);
 
-                        AttachmentExtractionResult responseData = CommonMethods.
-                                getExtractedFileFromAttachmentWithoutDocumentHeader(response);
+                        AttachmentExtractionResult responseData = CommonMethods.getExtractedFileFromAttachmentWithoutDocumentHeader(response);
                         if (responseData != null) {
                             String fileName = responseData.getExtractedFileName();
                             if ((fileName != null) && (fileName.length() > 0) && (new File(fileName)).exists()) {
@@ -129,64 +126,61 @@ public class AditGetSendStatusService {
         }
     }
 
-    protected void updateOpenedDateFor(
-            AditGetSendStatusResponse parsedResponse, OrgSettings orgSettings, Connection dbConnection) {
+    protected void updateOpenedDateFor(AditGetSendStatusResponse parsedResponse, OrgSettings orgSettings, Connection dbConnection) {
          for (AditDocument aditDocument: parsedResponse.aditDocuments) {
-
              for (AditReciever aditReciever: aditDocument.aditRecievers) {
                  if (aditReciever.opened && aditReciever.openedDate != null) {
                      int dhlId = aditDocument.dhlId;
-                     MessageRecipient.updateOpenedDate(
-                             dhlId, aditReciever.personIdCode, aditReciever.openedDate, orgSettings, dbConnection);
+                     MessageRecipient.updateOpenedDate(dhlId, aditReciever.personIdCode, aditReciever.openedDate, orgSettings, dbConnection);
                  }
              }
          }
     }
 
-    private Message sendAndRecieveRequestToAdit(
-            List<MessageRecipient> messageRecipients, XHeader xHeader,
-            HeaderVariables headerVar, String requestName) {
-
-        File tempFileWithRequest = aditGetSendStatusRequest.createAndSaveTempFile(
-                messageRecipients, UUID.randomUUID().toString());
+    private Message sendAndRecieveRequestToAdit(List<MessageRecipient> messageRecipients, XRoadHeader xRoadHeader, HeaderVariables headerVar, String requestName) throws Exception {
+        File tempFileWithRequest = aditGetSendStatusRequest.createAndSaveTempFile(messageRecipients, UUID.randomUUID().toString());
 
         AditGetSendStatusV1Body requestBody = new AditGetSendStatusV1Body();
         requestBody.keha = tempFileWithRequest.getName();
-        String messageData = (new SoapMessageBuilder(xHeader, requestBody.getBodyContentsAsText())).getMessageAsText();
+        SOAPEnvelope soapEnvelope = SoapMessageUtil.getSOAPEnvelope(xRoadHeader, requestBody.getBodyContentsAsText());
 
-        return runAditGetSendStatusRequest(
-                messageData, tempFileWithRequest, headerVar, requestName);
+        return runAditGetSendStatusRequest(soapEnvelope, tempFileWithRequest, headerVar, requestName);
     }
-
-    private XHeader createXHeader(HeaderVariables headerVar, String requestName, String queryId) {
-        return new AditXHeader(Settings.CLIENT_ADIT_INFORMATION_SYSTEM_NAME,
-                headerVar.getOrganizationCode(),
-                this.producerName,
-                headerVar.getPersonalIDCode(),
-                queryId,
-                requestName,
-                headerVar.getCaseName(),
-                headerVar.getPIDWithCountryCode());
-    }
+    
+    private XRoadHeader createXRoadHeader(HeaderVariables headerVar, int requestVersion, String queryId) {
+    	XRoadClient xRoadClient = new XRoadClient(headerVar.getXRoadClientInstance(), headerVar.getXRoadClientMemberClass(), headerVar.getOrganizationCode(), headerVar.getXRoadClientSubsystemCode());
+	  	XRoadService xRoadService = new XRoadService(
+	  			Settings.getAditXRoadServiceInstance(),
+	  			Settings.getAditXRoadServiceMemberClass(),
+	  			Settings.getAditXRoadServiceMemberCode(),
+	  			Settings.getAditXRoadServiceSubsystemCode(),
+	  			DVKServiceMethod.GET_SEND_STATUS.getName(),
+	  			String.valueOf(requestVersion));
+	      
+	      return new XRoadHeader(xRoadClient, xRoadService, queryId, headerVar.getPIDWithCountryCode(), headerVar.getCaseName());
+	}
 
     private HeaderVariables createHeaderVariables() {
+    	
         return new HeaderVariables(
                 Settings.Client_DefaultOrganizationCode,
                 Settings.Client_DefaultPersonCode,
                 "",
                 CommonMethods.personalIDCodeHasCountryCode(
                         Settings.Client_DefaultPersonCode)
-                            ? Settings.Client_DefaultPersonCode : "EE" + Settings.Client_DefaultPersonCode);
+                            ? Settings.Client_DefaultPersonCode : "EE" + Settings.Client_DefaultPersonCode,
+                Settings.getXRoadClientInstance(),
+                Settings.getXRoadClientMemberClass(),
+                Settings.getXRoadClientSubsystemCode());
     }
 
-    private Message runAditGetSendStatusRequest(
-            String messageData, File attachmentFile, HeaderVariables headerVar, String requestName) {
+    private Message runAditGetSendStatusRequest(SOAPEnvelope soapEnvelope, File attachmentFile, HeaderVariables headerVar, String requestName) {
         if (attachmentFile == null || !attachmentFile.exists()) {
             throw new IllegalArgumentException("AttachmentFile is missing!");
         }
 
         try {
-            Message msg = new Message(messageData);
+            Message msg = new Message(soapEnvelope.toString());
             client.getCall().setOperationName(new QName(CommonStructures.NS_ADIT_URI, "getSendStatus"));
 
             FileDataSource ds = new FileDataSource(attachmentFile);
@@ -222,19 +216,21 @@ public class AditGetSendStatusService {
         } catch (Exception ex) {
             // Vea puhul logime vea pähjustanud SOAP sänumi keha
             ErrorLog errorLog = new ErrorLog(ex, "dvk.client.ClientAPI" + " runAditGetSendStatusRequest");
-            errorLog.setAdditionalInformation("SOAP message body: " + messageData);
+            errorLog.setAdditionalInformation("SOAP message body: " + soapEnvelope.toString());
             errorLog.setOrganizationCode(headerVar.getOrganizationCode());
             errorLog.setUserCode(headerVar.getPersonalIDCode());
+            
             RequestLog requestLog = new RequestLog(requestName, headerVar.getOrganizationCode(), headerVar.getPersonalIDCode());
             int errorLogId = LoggingService.logError(errorLog);
             if (errorLogId != -1) {
                 requestLog.setErrorLogId(errorLogId);
             }
             requestLog.setResponse(ResponseStatus.NOK.toString());
+            
             LoggingService.logRequest(requestLog);
         }
+        
         return null;
     }
-
 
 }

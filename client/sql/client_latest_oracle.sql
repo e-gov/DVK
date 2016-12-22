@@ -89,7 +89,10 @@ CREATE TABLE dhl_settings
     occupation_short_name varchar2(25) null,
     subdivision_name varchar2(250) null,
     occupation_name varchar2(250) null,
-    container_version number(3) NULL
+    container_version number(3) NULL,
+    xroad_client_instance varchar2 (2) NOT NULL,
+    xroad_client_member_class varchar2 (50) NOT NULL,
+    xroad_client_subsystem_code varchar2 (50) NOT NULL
 )
 /
 
@@ -770,8 +773,11 @@ end;
 create procedure Get_DhlMessageID(
     dhl_message_id out number,
     dhl_id in number,
-    producer_name varchar2,
-    service_url varchar2,
+    xroad_service_instance in varchar2,
+    xroad_service_member_class in varchar2,
+    xroad_service_member_code in varchar2,
+    producer_name in varchar2,
+    service_url in varchar2,
     is_incoming in number)
 as
 cnt number(38,0) := 0;
@@ -784,6 +790,9 @@ begin
                 dhl_message m on m.dhl_message_id = r.dhl_message_id
         where   m.is_incoming = 0
                 and r.dhl_id = Get_DhlMessageID.dhl_id
+                and nvl(r.xroad_service_instance,'') = nvl(Get_DhlMessageID.xroad_service_instance,'')
+				and nvl(r.xroad_service_member_class,'') = nvl(Get_DhlMessageID.xroad_service_member_class,'')
+				and nvl(r.xroad_service_member_code,'') = nvl(Get_DhlMessageID.xroad_service_member_code,'')
                 and nvl(r.producer_name,' ') = nvl(Get_DhlMessageID.producer_name,' ')
                 and nvl(r.service_url,' ') = nvl(Get_DhlMessageID.service_url,' ');
     else
@@ -973,7 +982,10 @@ create procedure Update_DhlMessageRecipDhlID(
     dhl_direct_producer_name in varchar2,
     dhl_direct_service_url in varchar2,
     dhl_id in number,
-    query_id in varchar2)
+    query_id in varchar2,
+    xroad_service_instance in varchar2,
+    xroad_service_member_class in varchar2,
+    xroad_service_member_code in varchar2)
 as
 begin
     -- salvestab vastuvõtja andmetesse vastuvõtja DVK serveri poolt antud sõnumi ID väärtuse
@@ -988,6 +1000,9 @@ begin
                 where   nvl(dhl_direct_capable,1) = nvl(Update_DhlMessageRecipDhlID.dhl_direct_capable,1)
 						and nvl(dhl_direct_producer_name,'') = nvl(Update_DhlMessageRecipDhlID.dhl_direct_producer_name,'')
 						and nvl(dhl_direct_service_url,'') = nvl(Update_DhlMessageRecipDhlID.dhl_direct_service_url,'')
+						and nvl(xroad_service_instance,'') = nvl(Update_DhlMessageRecipDhlID.xroad_service_instance,'')
+						and nvl(xroad_service_member_class,'') = nvl(Update_DhlMessageRecipDhlID.xroad_service_member_class,'')
+						and nvl(xroad_service_member_code,'') = nvl(Update_DhlMessageRecipDhlID.xroad_service_member_code,'')
             );
 end;
 /
@@ -1085,6 +1100,9 @@ create procedure Get_DhlOrgsByCapability(
     dhl_direct_capable in number,
     dhl_direct_producer_name in varchar2,
     dhl_direct_service_url in varchar2,
+    xroad_service_instance in varchar2,
+    xroad_service_member_class in varchar2,
+    xroad_service_member_code in varchar2,
 	RC1 in out globalPkg.RCT1)
 as
 begin
@@ -1094,7 +1112,10 @@ begin
     where   nvl(dhl_capable,0) = nvl(Get_DhlOrgsByCapability.dhl_capable,0)
             and nvl(dhl_direct_capable,0) = nvl(Get_DhlOrgsByCapability.dhl_direct_capable,0)
             and ((dhl_direct_producer_name = Get_DhlOrgsByCapability.dhl_direct_producer_name) or ((dhl_direct_producer_name is null) and (Get_DhlOrgsByCapability.dhl_direct_producer_name is null)))
-            and ((dhl_direct_service_url = Get_DhlOrgsByCapability.dhl_direct_service_url) or ((dhl_direct_service_url is null) and (Get_DhlOrgsByCapability.dhl_direct_service_url is null)));
+            and ((dhl_direct_service_url = Get_DhlOrgsByCapability.dhl_direct_service_url) or ((dhl_direct_service_url is null) and (Get_DhlOrgsByCapability.dhl_direct_service_url is null)))
+            and ((xroad_service_instance = Get_DhlOrgsByCapability.xroad_service_instance) or ((xroad_service_instance is null) and (Get_DhlOrgsByCapability.xroad_service_instance is null)))
+            and ((xroad_service_member_class = Get_DhlOrgsByCapability.xroad_service_member_class) or ((xroad_service_member_class is null) and (Get_DhlOrgsByCapability.xroad_service_member_class is null)))
+            and ((xroad_service_member_code = Get_DhlOrgsByCapability.xroad_service_member_code) or ((xroad_service_member_code is null) and (Get_DhlOrgsByCapability.xroad_service_member_code is null)));
 end;
 /
 
@@ -1308,8 +1329,11 @@ end;
 create procedure Get_DhlMessageIDByGuid(
     dhl_message_id out number,
     dhl_guid in varchar2,
-    producer_name varchar2,
-    service_url varchar2,
+    xroad_service_instance in varchar2,
+    xroad_service_member_class in varchar2,
+    xroad_service_member_code in varchar2,
+    producer_name in varchar2,
+    service_url in varchar2,
     is_incoming in number)
 as
 cnt number(38,0) := 0;
@@ -1321,6 +1345,9 @@ begin
         inner join
                 dhl_message_recipient r on r.dhl_message_id = m.dhl_message_id
         where   m.dhl_guid = Get_DhlMessageIDByGuid.dhl_guid
+        		and nvl(r.xroad_service_instance,'') = nvl(Get_DhlMessageIDByGuid.xroad_service_instance,'')
+				and nvl(r.xroad_service_member_class,'') = nvl(Get_DhlMessageIDByGuid.xroad_service_member_class,'')
+				and nvl(r.xroad_service_member_code,'') = nvl(Get_DhlMessageIDByGuid.xroad_service_member_code,'')
                 and nvl(r.producer_name,' ') = nvl(Get_DhlMessageIDByGuid.producer_name,' ')
                 and nvl(r.service_url,' ') = nvl(Get_DhlMessageIDByGuid.service_url,' ')
                 and m.is_incoming = 0;

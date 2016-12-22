@@ -45,7 +45,7 @@ public class MessageRecipientUpdateTests {
         Settings.loadProperties(IntegrationTestsConfigUtil.getAllConfigFilesAbsolutePathsForPositiveCases().get(0));
         List<OrgSettings> allKnownDatabases= OrgSettings.getSettings(Settings.Client_ConfigFile);
         ClientAPI client = new ClientAPI();
-        AditGetSendStatusService service = new AditGetSendStatusService("test", client);
+        AditGetSendStatusService service = new AditGetSendStatusService(client);
 
         Connection dbConnection = client.getSafeDbConnection(allKnownDatabases.get(0));
 

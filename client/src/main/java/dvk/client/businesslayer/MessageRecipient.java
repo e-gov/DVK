@@ -49,11 +49,19 @@ public class MessageRecipient {
     private String m_faultDetail;
     private String m_metaXML;
     private int m_dhlID; // sõnumi saatmisel pannakse siis vastuvõtva DVK serveri poolt dokumendile antud ID väärtus
+    
+    
+    // For X-Road message protocol v4.0 the equivalent of "producer" is
+    // "subsystemCode" element inside the "service" SOAP header block.
     private String m_producerName;
     private String m_serviceURL;
+    private String xRoadServiceInstance;
+    private String xRoadServiceMemberClass;
+    private String xRoadServiceMemberCode;
+    
 
     /**
-     * @return			Adressaadi unikaalne ID kohalikus andmetabelis
+     * @return Adressaadi unikaalne ID kohalikus andmetabelis
      */
     public int getId() {
         return this.m_id;
@@ -246,6 +254,13 @@ public class MessageRecipient {
         return m_dhlID;
     }
 
+    /**
+     * NOTE:<br>
+     * "producerName" corresponds to <b>"subsystemCode"</b> element of the <em>service</em> block
+     * in the X-Road message protocol version 4.0
+     * 
+     * @return <em>producerName</em> / <em>subsystemCode</em>
+     */
     public String getProducerName() {
         return m_producerName;
     }
@@ -258,7 +273,31 @@ public class MessageRecipient {
         return m_serviceURL;
     }
 
-    public void setServiceURL(String value) {
+    public String getXRoadServiceInstance() {
+		return xRoadServiceInstance;
+	}
+
+	public void setXRoadServiceInstance(String xRoadServiceInstance) {
+		this.xRoadServiceInstance = xRoadServiceInstance;
+	}
+
+	public String getXRoadServiceMemberClass() {
+		return xRoadServiceMemberClass;
+	}
+
+	public void setXRoadServiceMemberClass(String xRoadServiceMemberClass) {
+		this.xRoadServiceMemberClass = xRoadServiceMemberClass;
+	}
+
+	public String getXRoadServiceMemberCode() {
+		return xRoadServiceMemberCode;
+	}
+
+	public void setXRoadServiceMemberCode(String xRoadServiceMemberCode) {
+		this.xRoadServiceMemberCode = xRoadServiceMemberCode;
+	}
+
+	public void setServiceURL(String value) {
         m_serviceURL = value;
     }
 
@@ -287,6 +326,10 @@ public class MessageRecipient {
         m_dhlID = 0;
         m_producerName = "";
         m_serviceURL = "";
+        
+        xRoadServiceInstance = "";
+        xRoadServiceMemberClass = "";
+        xRoadServiceMemberCode = "";
     }
 
     public static ArrayList<MessageRecipient> getList(int messageID, OrgSettings db, Connection dbConnection) {
@@ -326,6 +369,7 @@ public class MessageRecipient {
 
     private static MessageRecipient getMessageRecipientFromResultSet(ResultSet rs) throws Exception {
         Calendar cal = Calendar.getInstance();
+        
         MessageRecipient item = new MessageRecipient();
         item.setId(rs.getInt("dhl_message_recipient_id"));
         item.setMessageID(rs.getInt("dhl_message_id"));
@@ -343,14 +387,20 @@ public class MessageRecipient {
         item.setFaultDetail(rs.getString("fault_detail"));
         item.setMetaXML(rs.getString("metaxml"));
         item.setDhlId(rs.getInt("dhl_id"));
-        item.setProducerName(rs.getString("producer_name"));
-        item.setServiceURL(rs.getString("service_url"));
         item.setRecipientDivisionID(rs.getInt("recipient_division_id"));
         item.setRecipientDivisionName(rs.getString("recipient_division_name"));
         item.setRecipientPositionID(rs.getInt("recipient_position_id"));
         item.setRecipientPositionName(rs.getString("recipient_position_name"));
         item.setRecipientDivisionCode(rs.getString("recipient_division_code"));
         item.setRecipientPositionCode(rs.getString("recipient_position_code"));
+        
+        // X-Road specific data
+        item.setServiceURL(rs.getString("service_url"));
+        item.setProducerName(rs.getString("producer_name"));
+        item.setServiceURL(rs.getString("xroad_service_instance"));
+        item.setServiceURL(rs.getString("xroad_service_member_class"));
+        item.setServiceURL(rs.getString("xroad_service_member_code"));
+        
         return item;
     }
 
@@ -369,7 +419,10 @@ public class MessageRecipient {
     	logger.debug("m_faultString: " + m_faultString);
     	logger.debug("m_faultDetail: " + m_faultDetail);
     	logger.debug("m_dhlID: " + m_dhlID);
-    	logger.debug("m_producerName: " + m_producerName);
+    	logger.debug("xRoadServiceInstance: " + xRoadServiceInstance);
+    	logger.debug("xRoadServiceMemberClass: " + xRoadServiceMemberClass);
+    	logger.debug("xRoadServiceMemberCode: " + xRoadServiceMemberCode);
+    	logger.debug("m_producerName (subsystemCode): " + m_producerName);
     	logger.debug("m_serviceURL: " + m_serviceURL);
     	logger.debug("m_recipientDivisionID" + m_recipientDivisionID);
     	logger.debug("m_recipientPositionID: " + m_recipientPositionID);
@@ -383,9 +436,9 @@ public class MessageRecipient {
                 Calendar cal = Calendar.getInstance();
 
                 int parNr = 1;
-                CallableStatement cs = dbConnection.prepareCall("{call Save_DhlMessageRecipient(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                CallableStatement cs = dbConnection.prepareCall("{call Save_DhlMessageRecipient(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    cs = dbConnection.prepareCall("{? = call \"Save_DhlMessageRecipient\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                    cs = dbConnection.prepareCall("{? = call \"Save_DhlMessageRecipient\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 }
 
                 // SQL Anywhere JDBC client requires that output parameters are supplied as last parameter(s).
@@ -417,28 +470,40 @@ public class MessageRecipient {
                 cs.setString(parNr++, m_faultDetail);
                 cs.setString(parNr++, m_metaXML);
                 cs.setInt(parNr++, m_dhlID);
+                
+                // X-Road message protocol specific data
+                cs.setString(parNr++, xRoadServiceInstance);
+                cs.setString(parNr++, xRoadServiceMemberClass);
+                cs.setString(parNr++, xRoadServiceMemberCode);
                 cs.setString(parNr++, m_producerName);
                 cs.setString(parNr++, m_serviceURL);
+                
                 cs.setInt(parNr++, m_recipientDivisionID);
                 cs.setString(parNr++, m_recipientDivisionName);
                 cs.setInt(parNr++, m_recipientPositionID);
                 cs.setString(parNr++, m_recipientPositionName);
                 cs.setString(parNr++, m_recipientDivisionCode);
                 cs.setString(parNr++, m_recipientPositionCode);
+                
                 if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
                 	cs.registerOutParameter(parNr, Types.INTEGER);
                 } else {
                 	cs.registerOutParameter(1, Types.INTEGER);
                 }
+                
                 cs.execute();
+                
                 if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
                 	m_id = cs.getInt(parNr);
                 } else {
                 	m_id = cs.getInt(1);
                 }
                 logger.debug("m_id: " + m_id);
+                
                 cs.close();
+                
                 dbConnection.commit();
+                
                 return m_id;
             } else {
                 ErrorLog errorLog = new ErrorLog("Database connection is NULL", "dvk.client.businesslayer.MessageRecipient" + " saveToDB");

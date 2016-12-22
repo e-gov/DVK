@@ -30,7 +30,7 @@ import dvk.client.iostructures.GetSendStatusBody;
 import dvk.client.iostructures.MarkDocumentsReceivedBody;
 import dvk.client.iostructures.ReceiveDocumentsBody;
 import dvk.client.iostructures.SendDocumentsBody;
-import dvk.client.iostructures.SoapMessageBuilder;
+import dvk.client.util.SoapMessageUtil;
 import dvk.core.CommonMethods;
 import dvk.core.Settings;
 
@@ -136,7 +136,7 @@ public class TestClient {
                         b.dokumendid = attachmentName;
                         b.kaust = "";
                         header.setNimi(Settings.Client_ProducerName + ".sendDocuments.v1");
-                        messageData = (new SoapMessageBuilder(header, b.getBodyContentsAsText())).getMessageAsText();
+                        messageData = SoapMessageUtil.getMessageAsText(header, b.getBodyContentsAsText());
                         msg = new Message(messageData);
                         call.setOperationName(new QName("http://producers.dhl.xtee.riik.ee/producer/dhl", "sendDocuments"));
                         FileDataSource ds = new FileDataSource(tmpFile);
@@ -152,7 +152,7 @@ public class TestClient {
                         GetSendStatusBody b = new GetSendStatusBody();
                         b.keha = attachmentName;
                         header.setNimi(Settings.Client_ProducerName + ".getSendStatus.v1");
-                        messageData = (new SoapMessageBuilder(header, b.getBodyContentsAsText())).getMessageAsText();
+                        messageData = SoapMessageUtil.getMessageAsText(header, b.getBodyContentsAsText());
                         msg = new Message(messageData);
                         call.setOperationName(new QName("http://producers.dhl.xtee.riik.ee/producer/dhl", "getSendStatus"));
                         FileDataSource ds = new FileDataSource(tmpFile);
@@ -170,7 +170,7 @@ public class TestClient {
                         b.kaust = new ArrayList<String>();
                         //b.kaust.add("/TEST");
                         header.setNimi(Settings.Client_ProducerName + ".receiveDocuments.v1");
-                        messageData = (new SoapMessageBuilder(header, b.getBodyContentsAsText())).getMessageAsText();
+                        messageData = SoapMessageUtil.getMessageAsText(header, b.getBodyContentsAsText());
                         msg = new Message(messageData);
                         call.setOperationName(new QName("http://producers.dhl.xtee.riik.ee/producer/dhl", "receiveDocuments"));
                         call.invoke(msg);
@@ -179,7 +179,7 @@ public class TestClient {
                         b.dokumendid = attachmentName;
                         b.kaust = "";
                         header.setNimi(Settings.Client_ProducerName + ".markDocumentsReceived.v1");
-                        messageData = (new SoapMessageBuilder(header, b.getBodyContentsAsText())).getMessageAsText();
+                        messageData = SoapMessageUtil.getMessageAsText(header, b.getBodyContentsAsText());
                         msg = new Message(messageData);
                         call.setOperationName(new QName("http://producers.dhl.xtee.riik.ee/producer/dhl", "markDocumentsReceived"));
                         FileDataSource ds = new FileDataSource(tmpFile);
@@ -193,25 +193,25 @@ public class TestClient {
                         call.invoke(msg);
                     } else if (action.equalsIgnoreCase("deleteOldDocuments")) {
                         header.setNimi(Settings.Client_ProducerName + ".deleteOldDocuments.v1");
-                        messageData = (new SoapMessageBuilder(header, "<dhl:deleteOldDocuments><keha></keha></dhl:deleteOldDocuments>")).getMessageAsText();
+                        messageData = SoapMessageUtil.getMessageAsText(header, "<dhl:deleteOldDocuments><keha></keha></dhl:deleteOldDocuments>");
                         msg = new Message(messageData);
                         call.setOperationName(new QName("http://producers.dhl.xtee.riik.ee/producer/dhl", "deleteOldDocuments"));
                         call.invoke(msg);
                     } else if (action.equalsIgnoreCase("runSystemCheck")) {
                         header.setNimi(Settings.Client_ProducerName + ".runSystemCheck.v1");
-                        messageData = (new SoapMessageBuilder(header, "<dhl:runSystemCheck><keha></keha></dhl:runSystemCheck>")).getMessageAsText();
+                        messageData = SoapMessageUtil.getMessageAsText(header, "<dhl:runSystemCheck><keha></keha></dhl:runSystemCheck>");
                         msg = new Message(messageData);
                         call.setOperationName(new QName("http://producers.dhl.xtee.riik.ee/producer/dhl", "runSystemCheck"));
                         call.invoke(msg);
                     } else if (action.equalsIgnoreCase("changeOrganizationData")) {
                         header.setNimi(Settings.Client_ProducerName + ".changeOrganizationData.v1");
-                        messageData = (new SoapMessageBuilder(header, "<dhl:changeOrganizationData>" + getFileContents(inputFile) + "</dhl:changeOrganizationData>")).getMessageAsText();
+                        messageData = SoapMessageUtil.getMessageAsText(header, "<dhl:changeOrganizationData>" + getFileContents(inputFile) + "</dhl:changeOrganizationData>");
                         msg = new Message(messageData);
                         call.setOperationName(new QName("http://producers.dhl.xtee.riik.ee/producer/dhl", "changeOrganizationData"));
                         call.invoke(msg);
                     } else if (action.equalsIgnoreCase("getSendingOptions.v2")) {
                         header.setNimi(Settings.Client_ProducerName + ".getSendingOptions.v2");
-                        messageData = (new SoapMessageBuilder(header, "<dhl:getSendingOptions>" + getFileContents(inputFile) + "</dhl:getSendingOptions>")).getMessageAsText();
+                        messageData = SoapMessageUtil.getMessageAsText(header, "<dhl:getSendingOptions>" + getFileContents(inputFile) + "</dhl:getSendingOptions>");
                         msg = new Message(messageData);
                         call.setOperationName(new QName("http://producers.dhl.xtee.riik.ee/producer/dhl", "getSendingOptions"));
                         call.invoke(msg);

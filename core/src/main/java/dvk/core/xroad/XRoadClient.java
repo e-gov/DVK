@@ -1,5 +1,7 @@
 package dvk.core.xroad;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * This class models XRoadClientIdentifierType as defined in the related
  * <a href="http://x-road.eu/xsd/identifiers.xsd">XML schema</a>.
@@ -47,11 +49,11 @@ public class XRoadClient extends XRoadIdentifier {
 		
 	}
 	
-	public String getxRoadInstance() {
+	public String getXRoadInstance() {
 		return xRoadInstance;
 	}
 
-	public void setxRoadInstance(String xRoadInstance) {
+	public void setXRoadInstance(String xRoadInstance) {
 		this.xRoadInstance = xRoadInstance;
 	}
 
@@ -77,6 +79,22 @@ public class XRoadClient extends XRoadIdentifier {
 
 	public void setSubsystemCode(String subsystemCode) {
 		this.subsystemCode = subsystemCode;
+	}
+
+	@Override
+	public boolean isValid() {
+		
+		return StringUtils.isNotBlank(xRoadInstance)
+				&& StringUtils.isNotBlank(memberClass)
+				&& StringUtils.isNotBlank(memberCode);
+	}
+
+	@Override
+	public boolean isEmpty() {
+		
+		return StringUtils.isBlank(xRoadInstance)
+				&& StringUtils.isBlank(memberClass)
+				&& StringUtils.isBlank(memberCode);
 	}
 	
 }

@@ -83,6 +83,9 @@ create table dhl_message_recipient
 	"metaxml" long varchar null,
 	"dhl_id" int null,
 	"query_id" varchar(50) null,
+	"xroad_service_instance" varchar(2),
+	"xroad_service_member_class" varchar(50),
+	"xroad_service_member_code" varchar(50),
 	"producer_name" varchar(50) null,
 	"service_url" varchar(100) null,
 	"recipient_division_id" int not null default 0,
@@ -131,6 +134,9 @@ create table dhl_organization
 	"org_name" varchar(100) not null,
 	"dhl_capable" int not null default 0,
 	"dhl_direct_capable" int not null default 0,
+	"xroad_service_instance" varchar(2),
+    "xroad_service_member_class" varchar(50),
+    "xroad_service_member_code" varchar(50),
 	"dhl_direct_producer_name" varchar(50),
 	"dhl_direct_service_url" varchar(100),
 	"parent_org_code" varchar(20) null
@@ -232,6 +238,9 @@ create procedure "Save_DhlOrganization"
 	in _org_name varchar(100),
 	in _is_dhl_capable int,
 	in _is_dhl_direct_capable int,
+	in _xroad_service_instance varchar(2),
+    in _xroad_service_member_class varchar(50),
+    in _xroad_service_member_code varchar(50),
 	in _dhl_direct_producer_name varchar(50),
 	in _dhl_direct_service_url varchar(100),
 	in _parent_org_code varchar(20)
@@ -244,6 +253,9 @@ begin
     		    "org_name",
     		    "dhl_capable",
     		    "dhl_direct_capable",
+    		    "xroad_service_instance",
+    		    "xroad_service_member_class",
+    		    "xroad_service_member_code",
     		    "dhl_direct_producer_name",
     		    "dhl_direct_service_url",
     		    "parent_org_code")
@@ -251,6 +263,9 @@ begin
         		_org_name,
         		_is_dhl_capable,
         		_is_dhl_direct_capable,
+        		_xroad_service_instance,
+			    _xroad_service_member_class,
+			    _xroad_service_member_code,
         		_dhl_direct_producer_name,
         		_dhl_direct_service_url,
         		_parent_org_code);
@@ -259,6 +274,9 @@ begin
     	set     "org_name" = _org_name,
         		"dhl_capable" = _is_dhl_capable,
         		"dhl_direct_capable" = _is_dhl_direct_capable,
+        		"xroad_service_instance" = _xroad_service_instance,
+                "xroad_service_member_class" = _xroad_service_member_class,
+                "xroad_service_member_code" = _xroad_service_member_code,
         		"dhl_direct_producer_name" = _dhl_direct_producer_name,
         		"dhl_direct_service_url" = _dhl_direct_service_url,
         		"parent_org_code" = _parent_org_code
@@ -656,6 +674,9 @@ create procedure "Save_DhlMessageRecipient"
 	in _fault_detail varchar(2000),
 	in _metaxml long varchar,
 	in _dhl_id int,
+	in _xroad_service_instance varchar(2),
+    in _xroad_service_member_class varchar(50),
+    in _xroad_service_member_code varchar(50),
 	in _producer_name varchar(50),
 	in _service_url varchar(100),
 	in _recipient_division_id int,
@@ -700,6 +721,9 @@ begin
         		"fault_detail" = _fault_detail,
         		"metaxml" = _metaxml,
         		"dhl_id" = _dhl_id,
+        		"xroad_service_instance" = _xroad_service_instance,
+                "xroad_service_member_class" = _xroad_service_member_class,
+                "xroad_service_member_code" = _xroad_service_member_code,
         		"producer_name" = _producer_name,
         		"service_url" = _service_url,
         		"recipient_division_name" = _recipient_division_name,
@@ -741,6 +765,9 @@ begin
         		"fault_detail",
         		"metaxml",
         		"dhl_id",
+        		"xroad_service_instance",
+                "xroad_service_member_class",
+                "xroad_service_member_code",
         		"producer_name",
         		"service_url",
         		"recipient_division_id",
@@ -764,6 +791,9 @@ begin
         		_fault_detail,
         		_metaxml,
         		_dhl_id,
+        		_xroad_service_instance,
+			    _xroad_service_member_class,
+			    _xroad_service_member_code,
         		_producer_name,
         		_service_url,
         		_recipient_division_id,
@@ -797,19 +827,22 @@ create procedure "Update_DhlMessageRecipDhlID"
 (
 	in _dhl_message_id int,
 	in _dhl_direct_capable int,
+	in _xroad_service_instance varchar(2),
+	in _xroad_service_member_class varchar(50),
+	in _xroad_service_member_code varchar(50),
 	in _dhl_direct_producer_name varchar(50),
 	in _dhl_direct_service_url varchar(100),
 	in _dhl_id int,
-	in _query_id varchar(50),
-	in _xroad_service_instance varchar(2),
-	in _xroad_service_member_class varchar(50),
-	in _xroad_service_member_code varchar(50)
+	in _query_id varchar(50)
 )
 begin
     -- salvestab vastuvõtja andmetesse vastuvõtja DVK serveri poolt antud sõnumi ID väärtuse
     update	dhl_message_recipient
     set     "dhl_id" = _dhl_id,
         	"query_id" = _query_id,
+        	"xroad_service_instance" = _xroad_service_instance,
+            "xroad_service_member_class" = _xroad_service_member_class,
+            "xroad_service_member_code" = _xroad_service_member_code,
         	"producer_name" = _dhl_direct_producer_name,
         	"service_url" = _dhl_direct_service_url
     where	"dhl_message_id" = _dhl_message_id 
@@ -818,11 +851,11 @@ begin
         		select	"org_code"
         		from	dhl_organization
         		where	isnull("dhl_direct_capable",1) = isnull(_dhl_direct_capable,1)
-        				and isnull("dhl_direct_producer_name",'') = isnull(_dhl_direct_producer_name,'')
-        				and isnull("dhl_direct_service_url",'') = isnull(_dhl_direct_service_url,'')
         				and isnull("xroad_service_instance",'') = isnull(_xroad_service_instance,'')
 			        	and isnull("xroad_service_member_class",'') = isnull(_xroad_service_member_class,'')
 			        	and isnull("xroad_service_member_code",'') = isnull(_xroad_service_member_code,'')
+        				and isnull("dhl_direct_producer_name",'') = isnull(_dhl_direct_producer_name,'')
+        				and isnull("dhl_direct_service_url",'') = isnull(_dhl_direct_service_url,'')
         	);
 end;
 
@@ -901,6 +934,9 @@ begin
     select  distinct
         	o."dhl_capable",
         	o."dhl_direct_capable",
+        	o."xroad_service_instance",
+		    o."xroad_service_member_class",
+		    o."xroad_service_member_code",
         	o."dhl_direct_producer_name",
         	o."dhl_direct_service_url"
     from	dhl_organization o

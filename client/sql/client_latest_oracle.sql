@@ -102,7 +102,10 @@ create table dhl_organization
     org_name varchar2 (100) not null,
     dhl_capable number (1,0) default 0 not null,
     dhl_direct_capable number (1,0) default 0 not null,
-    dhl_direct_producer_name varchar2 (50),
+    xroad_service_instance varchar2(2) null,
+    xroad_service_member_class varchar2(50) null,
+    xroad_service_member_code varchar2(50) null,
+    dhl_direct_producer_name varchar2(50) null,
     dhl_direct_service_url varchar2(100) null,
 	parent_org_code varchar2(20) null
 )
@@ -211,6 +214,9 @@ table	dhl_message_recipient
     metaxml clob null,
     dhl_id number(38,0) null,
     query_id varchar2(50) null,
+    xroad_service_instance varchar2(2) null,
+    xroad_service_member_class varchar2(50) null,
+    xroad_service_member_code varchar2(50) null,
     producer_name varchar2(50) null,
     service_url varchar2(100) null,
     recipient_division_id number(38,0) default 0 not null,
@@ -374,6 +380,9 @@ create procedure Save_DhlOrganization(
     org_name in varchar2,
     is_dhl_capable in number,
     is_dhl_direct_capable in number,
+    xroad_service_instance in varchar2,
+    xroad_service_member_class in varchar2,
+    xroad_service_member_code in varchar2,
     dhl_direct_producer_name in varchar2,
     dhl_direct_service_url in varchar2,
     parent_org_code in varchar2)
@@ -392,6 +401,9 @@ begin
                 org_name,
                 dhl_capable,
                 dhl_direct_capable,
+                xroad_service_instance,
+		        xroad_service_member_class,
+		        xroad_service_member_code,
                 dhl_direct_producer_name,
                 dhl_direct_service_url,
                 parent_org_code)
@@ -399,6 +411,9 @@ begin
                 Save_DhlOrganization.org_name,
                 Save_DhlOrganization.is_dhl_capable,
                 Save_DhlOrganization.is_dhl_direct_capable,
+                Save_DhlOrganization.xroad_service_instance,
+                Save_DhlOrganization.xroad_service_member_class,
+                Save_DhlOrganization.xroad_service_member_code,
                 Save_DhlOrganization.dhl_direct_producer_name,
                 Save_DhlOrganization.dhl_direct_service_url,
                 Save_DhlOrganization.parent_org_code);
@@ -407,6 +422,9 @@ begin
         set     org_name = Save_DhlOrganization.org_name,
                 dhl_capable = Save_DhlOrganization.is_dhl_capable,
                 dhl_direct_capable = Save_DhlOrganization.is_dhl_direct_capable,
+                xroad_service_instance = Save_DhlOrganization.xroad_service_instance,
+                xroad_service_member_class = Save_DhlOrganization.xroad_service_member_class,
+                xroad_service_member_code = Save_DhlOrganization.xroad_service_member_code,
                 dhl_direct_producer_name = Save_DhlOrganization.dhl_direct_producer_name,
                 dhl_direct_service_url = Save_DhlOrganization.dhl_direct_service_url,
                 parent_org_code = Save_DhlOrganization.parent_org_code
@@ -833,6 +851,9 @@ create procedure Save_DhlMessageRecipient(
     fault_detail in varchar2,
     metaxml clob,
     dhl_id in number,
+    xroad_service_instance in varchar2,
+    xroad_service_member_class in varchar2,
+    xroad_service_member_code in varchar2,
     producer_name in varchar2,
     service_url in varchar2,
     recipient_division_id in number,
@@ -875,6 +896,9 @@ begin
                 fault_detail = Save_DhlMessageRecipient.fault_detail,
                 metaxml = Save_DhlMessageRecipient.metaxml,
                 dhl_id = Save_DhlMessageRecipient.dhl_id,
+                xroad_service_instance = Save_DhlMessageRecipient.xroad_service_instance,
+                xroad_service_member_class = Save_DhlMessageRecipient.xroad_service_member_class,
+                xroad_service_member_code = Save_DhlMessageRecipient.xroad_service_member_code,
                 producer_name = Save_DhlMessageRecipient.producer_name,
                 service_url = Save_DhlMessageRecipient.service_url,
                 recipient_division_name = Save_DhlMessageRecipient.recipient_division_name,
@@ -915,6 +939,9 @@ begin
                 fault_detail,
                 metaxml,
                 dhl_id,
+                xroad_service_instance,
+		        xroad_service_member_class,
+		        xroad_service_member_code,
                 producer_name,
                 service_url,
                 recipient_division_id,
@@ -939,6 +966,9 @@ begin
                 Save_DhlMessageRecipient.fault_detail,
                 Save_DhlMessageRecipient.metaxml,
                 Save_DhlMessageRecipient.dhl_id,
+                Save_DhlMessageRecipient.xroad_service_instance,
+                Save_DhlMessageRecipient.xroad_service_member_class,
+                Save_DhlMessageRecipient.xroad_service_member_code,
                 Save_DhlMessageRecipient.producer_name,
                 Save_DhlMessageRecipient.service_url,
                 recipient_division_id_,
@@ -979,30 +1009,35 @@ end;
 create procedure Update_DhlMessageRecipDhlID(
     dhl_message_id in number,
     dhl_direct_capable in number,
+    xroad_service_instance in varchar2,
+    xroad_service_member_class in varchar2,
+    xroad_service_member_code in varchar2),
     dhl_direct_producer_name in varchar2,
     dhl_direct_service_url in varchar2,
     dhl_id in number,
-    query_id in varchar2,
-    xroad_service_instance in varchar2,
-    xroad_service_member_class in varchar2,
-    xroad_service_member_code in varchar2)
+    query_id in varchar2
 as
 begin
     -- salvestab vastuvõtja andmetesse vastuvõtja DVK serveri poolt antud sõnumi ID väärtuse
     update  dhl_message_recipient
     set     dhl_id = Update_DhlMessageRecipDhlID.dhl_id,
-            query_id = Update_DhlMessageRecipDhlID.query_id
+            query_id = Update_DhlMessageRecipDhlID.query_id,
+            xroad_service_instance = Update_DhlMessageRecipDhlID.xroad_service_instance,
+		    xroad_service_member_class = Update_DhlMessageRecipDhlID.xroad_service_member_class,
+		    xroad_service_member_code = Update_DhlMessageRecipDhlID.xroad_service_member_code,
+		    producer_name = Update_DhlMessageRecipDhlID.dhl_direct_producer_name,
+		    service_url = Update_DhlMessageRecipDhlID.dhl_direct_service_url
     where   dhl_message_id = Update_DhlMessageRecipDhlID.dhl_message_id
             and recipient_org_code in
             (
                 select  org_code
                 from    dhl_organization
                 where   nvl(dhl_direct_capable,1) = nvl(Update_DhlMessageRecipDhlID.dhl_direct_capable,1)
-						and nvl(dhl_direct_producer_name,'') = nvl(Update_DhlMessageRecipDhlID.dhl_direct_producer_name,'')
-						and nvl(dhl_direct_service_url,'') = nvl(Update_DhlMessageRecipDhlID.dhl_direct_service_url,'')
 						and nvl(xroad_service_instance,'') = nvl(Update_DhlMessageRecipDhlID.xroad_service_instance,'')
 						and nvl(xroad_service_member_class,'') = nvl(Update_DhlMessageRecipDhlID.xroad_service_member_class,'')
 						and nvl(xroad_service_member_code,'') = nvl(Update_DhlMessageRecipDhlID.xroad_service_member_code,'')
+						and nvl(dhl_direct_producer_name,'') = nvl(Update_DhlMessageRecipDhlID.dhl_direct_producer_name,'')
+						and nvl(dhl_direct_service_url,'') = nvl(Update_DhlMessageRecipDhlID.dhl_direct_service_url,'')
             );
 end;
 /
@@ -1084,6 +1119,9 @@ begin
     select  distinct
             o.dhl_capable,
             o.dhl_direct_capable,
+            o.xroad_service_instance,
+		    o.xroad_service_member_class,
+		    o.xroad_service_member_code,
             o.dhl_direct_producer_name,
             o.dhl_direct_service_url
     from    dhl_organization o

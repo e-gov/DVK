@@ -265,6 +265,9 @@ function "Save_DhlOrganization"(
     p_org_name character varying,
     p_is_dhl_capable integer,
     p_is_dhl_direct_capable integer,
+    p_xroad_service_instance character varying,
+    p_xroad_service_member_class character varying,
+    p_xroad_service_member_code character varying,
     p_dhl_direct_producer_name character varying,
     p_dhl_direct_service_url character varying,
     p_parent_org_code character varying)
@@ -282,6 +285,9 @@ begin
                 org_name,
                 dhl_capable,
                 dhl_direct_capable,
+                xroad_service_instance,
+		        xroad_service_member_class,
+		        xroad_service_member_code,
                 dhl_direct_producer_name,
                 dhl_direct_service_url,
                 parent_org_code)
@@ -289,6 +295,9 @@ begin
                 p_org_name,
                 p_is_dhl_capable,
                 p_is_dhl_direct_capable,
+                p_xroad_service_instance,
+			    p_xroad_service_member_class,
+			    p_xroad_service_member_code,
                 p_dhl_direct_producer_name,
                 p_dhl_direct_service_url,
                 p_parent_org_code);
@@ -297,6 +306,9 @@ begin
         set     org_name = p_org_name,
                 dhl_capable = p_is_dhl_capable,
                 dhl_direct_capable = p_is_dhl_direct_capable,
+                xroad_service_instance = p_xroad_service_instance,
+                xroad_service_member_class = p_xroad_service_member_class,
+                xroad_service_member_code = p_xroad_service_member_code,
                 dhl_direct_producer_name = p_dhl_direct_producer_name,
                 dhl_direct_service_url = p_dhl_direct_service_url,
                 parent_org_code = p_parent_org_code
@@ -534,6 +546,9 @@ function "Save_DhlMessageRecipient"(
     p_fault_detail character varying,
     p_metaxml text,
     p_dhl_id integer,
+    p_xroad_service_instance character varying,
+    p_xroad_service_member_class character varying,
+    p_xroad_service_member_code character varying,
     p_producer_name character varying,
     p_service_url character varying,
     p_recipient_division_id integer,
@@ -596,6 +611,9 @@ begin
                 fault_detail = p_fault_detail,
                 metaxml = p_metaxml,
                 dhl_id = p_dhl_id,
+                xroad_service_instance = p_xroad_service_instance,
+			    xroad_service_member_class = p_xroad_service_member_class,
+			    xroad_service_member_code = p_xroad_service_member_code,
                 producer_name = p_producer_name,
                 service_url = p_service_url,
                 recipient_division_name = p_recipient_division_name,
@@ -639,6 +657,9 @@ begin
                 fault_detail,
                 metaxml,
                 dhl_id,
+                xroad_service_instance,
+		        xroad_service_member_class,
+		        xroad_service_member_code,
                 producer_name,
                 service_url,
                 recipient_division_id,
@@ -663,6 +684,9 @@ begin
                 p_fault_detail,
                 p_metaxml,
                 p_dhl_id,
+                p_xroad_service_instance,
+			    p_xroad_service_member_class,
+			    p_xroad_service_member_code,
                 p_producer_name,
                 p_service_url,
                 recipient_division_id_,
@@ -681,6 +705,9 @@ create or replace
 function "Update_DhlMessageRecipDhlID"(
     p_dhl_message_id integer,
     p_dhl_direct_capable integer,
+    p_xroad_service_instance character varying,
+    p_xroad_service_member_class character varying,
+    p_xroad_service_member_code character varying,
     p_dhl_direct_producer_name character varying,
     p_dhl_direct_service_url character varying,
     p_dhl_id integer,
@@ -694,18 +721,23 @@ begin
     -- salvestab vastuvõtja andmetesse vastuvõtja DVK serveri poolt antud sõnumi ID väärtuse
     update  dhl_message_recipient
     set     dhl_id = p_dhl_id,
-            query_id = p_query_id
+            query_id = p_query_id,
+            xroad_service_instance = p_xroad_service_instance,
+		    xroad_service_member_class = p_xroad_service_member_class,
+		    xroad_service_member_code = p_dhl_direct_producer_name,
+		    producer_name = p_dhl_direct_producer_name,
+		    service_url = p_dhl_direct_service_url
     where   dhl_message_id = p_dhl_message_id
             and recipient_org_code in
             (
                 select  org_code
                 from    dhl_organization
                 where   coalesce(dhl_direct_capable,1) =coalesce(p_dhl_direct_capable,1)
-                        and coalesce(dhl_direct_producer_name,'') = coalesce(p_dhl_direct_producer_name,'')
-                        and coalesce(dhl_direct_service_url,'') = coalesce(p_dhl_direct_service_url,'')
                         and coalesce(xroad_service_instance,'') = coalesce(p_xroad_service_instance,'')
 			            and coalesce(xroad_service_member_class,'') = coalesce(p_xroad_service_member_class,'')
 			            and coalesce(xroad_service_member_code,'') = coalesce(p_xroad_service_member_code,'')
+                        and coalesce(dhl_direct_producer_name,'') = coalesce(p_dhl_direct_producer_name,'')
+                        and coalesce(dhl_direct_service_url,'') = coalesce(p_dhl_direct_service_url,'')
             );
 
     return found;
@@ -800,6 +832,9 @@ begin
     select  distinct
             o.dhl_capable,
             o.dhl_direct_capable,
+            o.xroad_service_instance,
+		    o.xroad_service_member_class,
+		    o.xroad_service_member_code,
             o.dhl_direct_producer_name,
             o.dhl_direct_service_url
     from    dhl_organization o
@@ -1533,6 +1568,9 @@ CREATE TABLE dhl_organization (
     org_name character varying(100) NOT NULL,
     dhl_capable smallint DEFAULT 0 NOT NULL,
     dhl_direct_capable smallint DEFAULT 0 NOT NULL,
+    xroad_service_instance character varying(2),
+    xroad_service_member_class character varying(50),
+    xroad_service_member_code character varying(50),
     dhl_direct_producer_name character varying(50),
     dhl_direct_service_url character varying(100) null,
 	parent_org_code character varying(20) null
@@ -1585,6 +1623,9 @@ CREATE TABLE dhl_message_recipient (
     metaxml text,
     dhl_id integer null,
     query_id character varying(50) null,
+    xroad_service_instance character varying(2),
+	xroad_service_member_class character varying(50),
+	xroad_service_member_code character varying(50),
     producer_name character varying(50) null,
     service_url character varying(100) null,
     recipient_division_id integer default 0 not null,

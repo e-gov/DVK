@@ -1239,6 +1239,10 @@ create
 table   server
 (
     server_id number(38,0) not null,
+    xroad_service_instance varchar2(2),
+    xroad_service_member_class varchar2(50),
+    xroad_service_member_code varchar2(50),
+    -- "andmekogu_nimi" in the X-Road message protocol v.4.0 is "subsytemCode" in the "service" SOAP header block
     andmekogu_nimi varchar2(100),
     aadress varchar2(1000),
     primary key (server_id)

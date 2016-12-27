@@ -65,7 +65,10 @@ public class OrgCapabilityCheckerRequestsIntegration {
                     cred.getInstitutionCode(),
                     cred.getPersonalIdCode(),
                     "",
-                    (CommonMethods.personalIDCodeHasCountryCode(cred.getPersonalIdCode()) ? cred.getPersonalIdCode() : "EE"+cred.getPersonalIdCode()));
+                    (CommonMethods.personalIDCodeHasCountryCode(cred.getPersonalIdCode()) ? cred.getPersonalIdCode() : "EE"+cred.getPersonalIdCode()),
+                    cred.getXRoadClientInstance(),
+	                cred.getXRoadClientMemberClass(),
+	                cred.getXRoadClientSubsystemCode());
 
             // Execute getSendingOptionsRequest with all necessary parameters
             try {
@@ -135,7 +138,13 @@ public class OrgCapabilityCheckerRequestsIntegration {
         Connection connection = null;
 
         try {
-            dvkClient.initClient(Settings.Client_ServiceUrl, Settings.Client_ProducerName);
+            dvkClient.initClient(
+                    Settings.Client_ServiceUrl,
+                    Settings.getDvkXRoadServiceInstance(),
+                    Settings.getDvkXRoadServiceMemberClass(),
+                    Settings.getDvkXRoadServiceMemberCode(),
+                    Settings.getDvkXRoadServiceSubsystemCode()
+            );
             dvkClient.setAllKnownDatabases(allKnownDatabases);
             dvkClient.setOrgSettings(allKnownDatabases.get(0).getDvkSettings());
             connection = DBConnection.getConnection(allKnownDatabases.get(0));

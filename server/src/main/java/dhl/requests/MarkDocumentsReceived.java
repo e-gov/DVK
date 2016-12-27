@@ -424,7 +424,7 @@ public class MarkDocumentsReceived {
             String subdivisionShortName, String occupationShortName) {
         StringBuilder sb = new StringBuilder(1000);
         sb.append("Dokumendi vastuvõetuks märkimine ebaõnnestus! Etteantud ID-le (")
-                            .append(docId).append(") vastavat dokumenti ei ole antud asutusele");
+                            .append(docId).append(") vastavat dokumenti ei ole antud asutusele ");
         sb.append(orgCode);
 
         if ((subdivisionShortName != null) && (subdivisionShortName.length() > 1)) {

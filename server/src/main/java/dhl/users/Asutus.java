@@ -834,13 +834,22 @@ public class Asutus {
             ClientAPI dvkClient = new ClientAPI();
             for (int i = 0; i < servers.size(); ++i) {
                 RemoteServer server = servers.get(i);
-                dvkClient.initClient(server.getAddress(), server.getProducerName());
+                dvkClient.initClient(
+                        server.getAddress(),
+                        server.getXRoadServiceInstance(),
+                        server.getXRoadServiceMemberClass(),
+                        server.getXRoadServiceMemberCode(),
+                        server.getProducerName());
+                
                 HeaderVariables header = new HeaderVariables(
                         Settings.Client_DefaultOrganizationCode,
                         Settings.Client_DefaultPersonCode,
                         "",
                         CommonMethods.personalIDCodeHasCountryCode(Settings.Client_DefaultPersonCode)
-                                ? Settings.Client_DefaultPersonCode : "EE" + Settings.Client_DefaultPersonCode);
+                                ? Settings.Client_DefaultPersonCode : "EE" + Settings.Client_DefaultPersonCode,
+                        Settings.getXRoadClientInstance(),
+                        Settings.getXRoadClientMemberClass(),
+                        Settings.getXRoadClientSubsystemCode());
 
                 try {
                     GetSendingOptionsV3ResponseType result = dvkClient.getSendingOptions(header, null, null, null, false, -1, -1, 1);

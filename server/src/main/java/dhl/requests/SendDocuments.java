@@ -1194,12 +1194,21 @@ public class SendDocuments {
                             RemoteServer server = new RemoteServer(key, conn);
                             if ((server != null) && (server.getAddress() != null) && !server.getAddress().equalsIgnoreCase("")) {
                                 ClientAPI dvkClient = new ClientAPI();
-                                dvkClient.initClient(server.getAddress(), server.getProducerName());
+                                dvkClient.initClient(
+                                        server.getAddress(),
+                                        server.getXRoadServiceInstance(),
+                                        server.getXRoadServiceMemberClass(),
+                                        server.getXRoadServiceMemberCode(),
+                                        server.getProducerName());
+                                
                                 HeaderVariables header = new HeaderVariables(
                                         Settings.Client_DefaultOrganizationCode,
                                         Settings.Client_DefaultPersonCode,
                                         "",
-                                        (CommonMethods.personalIDCodeHasCountryCode(Settings.Client_DefaultPersonCode) ? Settings.Client_DefaultPersonCode : "EE" + Settings.Client_DefaultPersonCode));
+                                        (CommonMethods.personalIDCodeHasCountryCode(Settings.Client_DefaultPersonCode) ? Settings.Client_DefaultPersonCode : "EE" + Settings.Client_DefaultPersonCode),
+                                        Settings.getXRoadClientInstance(),
+                                        Settings.getXRoadClientMemberClass(),
+                                        Settings.getXRoadClientSubsystemCode());
 
                                 DhlMessage dvkMessage = new DhlMessage();
                                 dvkMessage.setFilePath(newFile);

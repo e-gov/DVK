@@ -27,27 +27,27 @@ public class RemoteServer {
         m_id = id;
     }
 
-    public String getxRoadServiceInstance() {
+    public String getXRoadServiceInstance() {
         return xRoadServiceInstance;
     }
 
-    public void setxRoadServiceInstance(String xRoadServiceInstance) {
+    public void setXRoadServiceInstance(String xRoadServiceInstance) {
         this.xRoadServiceInstance = xRoadServiceInstance;
     }
 
-    public String getxRoadServiceMemberClass() {
+    public String getXRoadServiceMemberClass() {
         return xRoadServiceMemberClass;
     }
 
-    public void setxRoadServiceMemberClass(String xRoadServiceMemberClass) {
+    public void setXRoadServiceMemberClass(String xRoadServiceMemberClass) {
         this.xRoadServiceMemberClass = xRoadServiceMemberClass;
     }
 
-    public String getxRoadServiceMemberCode() {
+    public String getXRoadServiceMemberCode() {
         return xRoadServiceMemberCode;
     }
 
-    public void setxRoadServiceMemberCode(String xRoadServiceMemberCode) {
+    public void setXRoadServiceMemberCode(String xRoadServiceMemberCode) {
         this.xRoadServiceMemberCode = xRoadServiceMemberCode;
     }
 

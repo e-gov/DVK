@@ -30,7 +30,13 @@ public class CommunicationTestClient {
             
             ClientAPI dvkClient = new ClientAPI();
             try {
-                dvkClient.initClient(Settings.Client_ServiceUrl, Settings.Client_ProducerName);
+                dvkClient.initClient(
+                        Settings.Client_ServiceUrl,
+                        Settings.getDvkXRoadServiceInstance(),
+                        Settings.getDvkXRoadServiceMemberClass(),
+                        Settings.getDvkXRoadServiceMemberCode(),
+                        Settings.getDvkXRoadServiceSubsystemCode()
+                );
             } catch (Exception ex) {
                 ex.printStackTrace();
                 return;
@@ -52,7 +58,10 @@ public class CommunicationTestClient {
                 Settings.currentProperties.getProperty("test_org_code"),
                 Settings.currentProperties.getProperty("test_person_id_code"),
                 "",
-                (CommonMethods.personalIDCodeHasCountryCode(Settings.currentProperties.getProperty("test_person_id_code")) ? Settings.currentProperties.getProperty("test_person_id_code") : "EE"+Settings.currentProperties.getProperty("test_person_id_code")));
+                (CommonMethods.personalIDCodeHasCountryCode(Settings.currentProperties.getProperty("test_person_id_code")) ? Settings.currentProperties.getProperty("test_person_id_code") : "EE"+Settings.currentProperties.getProperty("test_person_id_code")),
+                Settings.currentProperties.getProperty("test.xRoad.client.instance"),
+                Settings.currentProperties.getProperty("test.xRoad.client.memberClass"),
+                Settings.currentProperties.getProperty("test.xRoad.client.subsystemCode"));
 
 
             // Test variables

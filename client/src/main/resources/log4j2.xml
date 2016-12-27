@@ -33,7 +33,8 @@
     </Logger>
   
     
-    <Root level="info">
+    <Root level="DEBUG">
+      <AppenderRef ref="console"/>
       <AppenderRef ref="file"/>
     </Root>
   </Loggers>

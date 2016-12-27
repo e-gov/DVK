@@ -79,7 +79,13 @@ public class OrgCapabilityChecker {
 	        // "päris" x-tee.
 	        // Initsialiseerime kliendi
 	        try {
-	            dvkClient.initClient(Settings.Client_ServiceUrl, Settings.Client_ProducerName);
+	            dvkClient.initClient(
+	                    Settings.Client_ServiceUrl,
+                        Settings.getDvkXRoadServiceInstance(),
+                        Settings.getDvkXRoadServiceMemberClass(),
+                        Settings.getDvkXRoadServiceMemberCode(),
+                        Settings.getDvkXRoadServiceSubsystemCode()
+	            );
 	        } catch (Exception ex) {
                 LoggingService.logError(new ErrorLog(ex, "dvk.client.OrgCapabilityChecker" + " main"));
 	            ex.printStackTrace();
@@ -115,7 +121,10 @@ public class OrgCapabilityChecker {
 	                cred.getInstitutionCode(),
 	                cred.getPersonalIdCode(),
 	                "",
-	                (CommonMethods.personalIDCodeHasCountryCode(cred.getPersonalIdCode()) ? cred.getPersonalIdCode() : "EE"+cred.getPersonalIdCode()));
+	                (CommonMethods.personalIDCodeHasCountryCode(cred.getPersonalIdCode()) ? cred.getPersonalIdCode() : "EE"+cred.getPersonalIdCode()),
+	                cred.getXRoadClientInstance(),
+	                cred.getXRoadClientMemberClass(),
+	                cred.getXRoadClientSubsystemCode());
 
                 Connection connection = null;
 	            try {

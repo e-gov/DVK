@@ -32,6 +32,7 @@ import dvk.core.Fault;
 import dvk.core.HeaderVariables;
 import dvk.core.Settings;
 import dvk.core.util.DVKServiceMethod;
+import dvk.core.util.DVKUtil;
 import dvk.core.xroad.XRoadService;
 
 public class Client {
@@ -106,7 +107,8 @@ public class Client {
 
             dvkClient = new ClientAPI();
             try {
-                dvkClient.initClient(Settings.Client_ServiceUrl,
+                dvkClient.initClient(
+                        Settings.Client_ServiceUrl,
                 		Settings.getDvkXRoadServiceInstance(),
                 		Settings.getDvkXRoadServiceMemberClass(),
                 		Settings.getDvkXRoadServiceMemberCode(),
@@ -597,7 +599,6 @@ public class Client {
 
                 // Jaotame dokumendid gruppidesse, et staatust küsitaks sellest
                 // serverist, kuhu dokument saadeti
-                ArrayList<XRoadService> keys = new ArrayList<XRoadService>();
                 Hashtable<XRoadService, ArrayList<DhlMessage>> addressTable = new Hashtable<XRoadService, ArrayList<DhlMessage>>();
                 for (int i = 0; i < messages.size(); ++i) {
                     DhlMessage msg = messages.get(i);
@@ -607,80 +608,77 @@ public class Client {
                         MessageRecipient recipient = recipients.get(j);
                         
                         XRoadService xRoadService = new XRoadService();
-                        xRoadService.setXRoadInstance(recipient.getXRoadServiceInstance());
-                        xRoadService.setMemberClass(recipient.getXRoadServiceMemberClass());
-                        xRoadService.setMemberCode(recipient.getXRoadServiceMemberCode());
-                        xRoadService.setSubsystemCode(recipient.getProducerName());
-                        xRoadService.setServiceCode(DVKServiceMethod.GET_SEND_STATUS.getName());
-                        xRoadService.setServiceURL(recipient.getServiceURL());
-                        
-                        ArrayList<DhlMessage> dhlIDs = null;
-                        if (!keys.contains(xRoadService)) {
-                            keys.add(xRoadService);
-                            dhlIDs = new ArrayList<DhlMessage>();
-                        } else {
-                            dhlIDs = addressTable.get(xRoadService);
+                        if (DVKUtil.areNotBlank(recipient.getXRoadServiceInstance(),
+                                recipient.getXRoadServiceMemberClass(),
+                                recipient.getXRoadServiceMemberCode(),
+                                recipient.getProducerName(),
+                                recipient.getServiceURL())) {
+                            
+                            xRoadService.setXRoadInstance(recipient.getXRoadServiceInstance());
+                            xRoadService.setMemberClass(recipient.getXRoadServiceMemberClass());
+                            xRoadService.setMemberCode(recipient.getXRoadServiceMemberCode());
+                            xRoadService.setSubsystemCode(recipient.getProducerName());
+                            xRoadService.setServiceCode(DVKServiceMethod.GET_SEND_STATUS.getName());
+                            xRoadService.setServiceURL(recipient.getServiceURL());
                         }
-                        dhlIDs.add(msg);
                         
-                        addressTable.put(xRoadService, dhlIDs);
+                        ArrayList<DhlMessage> dhlMessages = null;
+                        if (!addressTable.containsKey(xRoadService)) {
+                            dhlMessages = new ArrayList<DhlMessage>();
+                        } else {
+                            dhlMessages = addressTable.get(xRoadService);
+                        }
+                        dhlMessages.add(msg);
+                        
+                        addressTable.put(xRoadService, dhlMessages);
                     }
                 }
 
-                for (int i = 0; i < keys.size(); ++i) {
-                	XRoadService currentKey = keys.get(i);
-                    ArrayList<DhlMessage> dhlIDs = addressTable.get(currentKey);
+                for (XRoadService xRoadService : addressTable.keySet()) {
+                    ArrayList<DhlMessage> dhlMessages = addressTable.get(xRoadService);
                     
                     String serviceURL = "";
                     String xRoadServiceInstance = "";
-                    String xRoadServiceMemeberClass = "";
-                    String xRoadServiceMemeberCode = "";
+                    String xRoadServiceMemberClass = "";
+                    String xRoadServiceMemberCode = "";
                     String xRoadServiceSubsystemCode = "";
                     
                     String realServiceURL = "";
                     String realXRoadServiceInstance = "";
-                    String realXRoadServiceMemeberClass = "";
-                    String realXRoadServiceMemeberCode = "";
+                    String realXRoadServiceMemberClass = "";
+                    String realXRoadServiceMemberCode = "";
                     String realXRoadServiceSubsystemCode = "";
                     
-                    if (currentKey.isEmpty()) {
+                    if (xRoadService.isEmpty()) {
                         realServiceURL = Settings.Client_ServiceUrl;
                         
                         realXRoadServiceInstance = Settings.getDvkXRoadServiceInstance();
-                        realXRoadServiceMemeberClass = Settings.getDvkXRoadServiceMemberClass();
-                        realXRoadServiceMemeberCode = Settings.getDvkXRoadServiceMemberCode();
+                        realXRoadServiceMemberClass = Settings.getDvkXRoadServiceMemberClass();
+                        realXRoadServiceMemberCode = Settings.getDvkXRoadServiceMemberCode();
                         realXRoadServiceSubsystemCode = Settings.getDvkXRoadServiceSubsystemCode();
                     } else {
-                        if (currentKey.isValidWithAddress()) {
-                            serviceURL = currentKey.getServiceURL();
-                            xRoadServiceInstance = currentKey.getXRoadInstance();
-                            xRoadServiceMemeberClass = currentKey.getMemberClass();
-                            xRoadServiceMemeberCode = currentKey.getMemberCode();
-                            xRoadServiceSubsystemCode = currentKey.getSubsystemCode();
-                            
-                            realServiceURL = serviceURL;
-                            realXRoadServiceInstance = xRoadServiceInstance;
-                            realXRoadServiceMemeberClass = xRoadServiceMemeberClass;
-                            realXRoadServiceMemeberCode = xRoadServiceMemeberCode;
-                            realXRoadServiceSubsystemCode = xRoadServiceSubsystemCode;
+                        if (xRoadService.isValidWithAddress()) {
+                            serviceURL = realServiceURL = xRoadService.getServiceURL();
+                            xRoadServiceInstance = realXRoadServiceInstance = xRoadService.getXRoadInstance();
+                            xRoadServiceMemberClass = realXRoadServiceMemberClass = xRoadService.getMemberClass();
+                            xRoadServiceMemberCode = realXRoadServiceMemberCode = xRoadService.getMemberCode();
+                            xRoadServiceSubsystemCode = realXRoadServiceSubsystemCode = xRoadService.getSubsystemCode();
                         } else {
                             throw new Exception("Viga sõnumi aadresaandmete töötlemisel!");
                         }
                     }
                     
-//                    dvkClient.initClient(realServiceURL, realProducerName);
-                    dvkClient.initClient(realServiceURL, realXRoadServiceInstance, realXRoadServiceMemeberClass, realXRoadServiceMemeberCode, realXRoadServiceSubsystemCode);
+                    dvkClient.initClient(realServiceURL, realXRoadServiceInstance, realXRoadServiceMemberClass, realXRoadServiceMemberCode, realXRoadServiceSubsystemCode);
                     
                     logger.info("    Suhtlen DVK serveriga...");
-                    ArrayList<GetSendStatusResponseItem> result = dvkClient.getSendStatus(header, dhlIDs, true);
+                    ArrayList<GetSendStatusResponseItem> result = dvkClient.getSendStatus(header, dhlMessages, true);
                     logger.info("    Töötlen DVKst saadud vastust...");
 
                     // Teeme vastussõnumi andmetest omad järeldused
-                    updateStatusChangesInDB(result, xRoadServiceInstance, xRoadServiceMemeberClass,  xRoadServiceSubsystemCode, xRoadServiceSubsystemCode, serviceURL, db, dbConnection);
+                    updateStatusChangesInDB(result, xRoadServiceInstance, xRoadServiceMemberClass,  xRoadServiceMemberCode, xRoadServiceSubsystemCode, serviceURL, db, dbConnection);
                 }
                 resultCounter = messages.size();
             }
-            messages = null;
         } catch (Exception ex) {
             ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " UpdateSendStatus");
             LoggingService.logError(errorLog);
@@ -690,7 +688,8 @@ public class Client {
         // Taastame seadistuse, et klient oleks vaikimisi seadistatud päringuid saatma konfiguratsioonifailis
         // määratud aadressi ja andmekogu nimega.
         try {
-            dvkClient.initClient(Settings.Client_ServiceUrl,
+            dvkClient.initClient(
+                    Settings.Client_ServiceUrl,
             		Settings.getDvkXRoadServiceInstance(),
             		Settings.getDvkXRoadServiceMemberClass(),
             		Settings.getDvkXRoadServiceMemberCode(),

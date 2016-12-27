@@ -396,7 +396,7 @@ public class DvkDhxService implements DhxImplementationSpecificService {
         }
       }
       if (!asutusFound) {
-        dvkAsutus.setDhxAsutus(false);
+        dvkAsutus.setDvkSaatmine(false);
         dvkAsutus.saveToDB(conn, null);
       }
     }

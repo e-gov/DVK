@@ -178,7 +178,7 @@ dvk.xRoad.service.subsystemCode=dhl
 adit.xRoad.service.instance=EE
 adit.xRoad.service.memberClass=GOV
 adit.xRoad.service.memberCode=70006317
-adit.xRoad.service.subsystemCode=ametlikud-dokumendid
+adit.xRoad.service.subsystemCode=adit
 
 # Testkliendi osa
 test_config_file = test_config.xml

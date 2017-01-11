@@ -15,14 +15,14 @@
 		<repository>
 			<id>ria</id>
 			<name>DVK releases</name>
-			<url>https://artifactory.tt.kit/artifactory/DVK-libs-release-local</url>
+			<url>http://artifactory.tt.kit:8081/artifactory/DVK-libs-release-local</url>
 		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
 			<id>ria</id>
 			<name>DVK releases</name>
-			<url>https://artifactory.tt.kit/artifactory/DVK-libs-release-local</url>
+			<url>http://artifactory.tt.kit:8081/artifactory/DVK-libs-release-local</url>
 		</pluginRepository>
 	</pluginRepositories>
 

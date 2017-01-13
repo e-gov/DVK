@@ -43,7 +43,7 @@ SoapUi testid on tehtud ja nimetatud vastavalt [testilugudele](../dvk_dhx_testil
 | dhs4AdminUserId | EE38806190294 | testilugudes kirjeldatud DHS4 admin kasutaja isikukood(pannakse Xtee header-sse) |
 | dhs1MemberCode | 70000004 | testilugudes kirjeldatud DHS1 Xtee liikme memberCode |
 
-**Failid asuvad [xmls](xmls) kaustas. Faili viidetega parameetrid tuleb muuta igas keskkonnas kus teste käivitatakse. Faili viide peab olema absolute path failini.**  
+**Failid asuvad [xmls](xmls) kaustas. Faili viidetega parameetrid(goodCapsule, badCapsule, notCapsule, goodCapsule10) tuleb muuta igas keskkonnas kus teste käivitatakse. Faili viide peab olema absolute path failini.**  
 
 ## SoapUI testide käivitamine
 Testide struktuuri ja käivitamise kirjeldust võib leida [siin](https://www.soapui.org/functional-testing/structuring-and-running-tests.html). 

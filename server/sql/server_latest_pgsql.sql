@@ -2441,6 +2441,7 @@ select  *
                 and v1.staatus_id = 101
                 and v1.asutus_id=a1.asutus_id
                 and a1.dhx_asutus=1
+                and v1.dhx_external_consignment_id is null
                 and  (v1.dhx_internal_consignment_id is null
 			or v1.last_send_date<p_date
                 ))  for update;

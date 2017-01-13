@@ -10,7 +10,9 @@ SoapUi testid on tehtud ja nimetatud vastavalt [testilugudele](../dvk_dhx_testil
 
 ## SoapUI testide konfigureerimine
 
-Muuta DVK_DHX SoapUi projekti parameetrid(SoapUI parameetrite kohta rohkem infot võib leida [siin](https://www.soapui.org/functional-testing/properties/working-with-properties.html)):
+* Importida SoapUI project.(SoapUI projekti importimise kohta rohkem infot võib leida [siin](https://www.soapui.org/articles/import-project.html))
+
+* Muuta DVK_DHX SoapUi projekti parameetrid(SoapUI parameetrite kohta rohkem infot võib leida [siin](https://www.soapui.org/functional-testing/properties/working-with-properties.html)):
 
 
 | Parameetri nimi | Näidis väärtus | Kommentaar |

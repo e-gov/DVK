@@ -710,10 +710,8 @@ public class DvkDhxService implements DhxImplementationSpecificService {
     Connection conn = null;
     try {
       conn = getConnection();
-      boolean defaultAutoCommit = conn.getAutoCommit();
       Date resendDate = new Date();
       resendDate = new Date(resendDate.getTime() - resendTimeout * 60 * 1000);
-      conn.setAutoCommit(false);
       ArrayList<Document> documents = Document
           .getNotSentDhxDocumentsForSending(resendDate, conn);
       for (Document doc : documents) {
@@ -725,8 +723,6 @@ public class DvkDhxService implements DhxImplementationSpecificService {
           }
         }
       }
-      conn.commit();
-      conn.setAutoCommit(defaultAutoCommit);
     } catch (Exception ex) {
       log.error("Error occured while sending DVk documents to DHX" + ex.getMessage(), ex);
     } finally {

@@ -203,9 +203,9 @@
 			</properties>
 		</profile>
 		<profile>
-			<!-- <activation> -->
-			<!-- <activeByDefault>true</activeByDefault> -->
-			<!-- </activation> -->
+			 <activation> 
+			 <activeByDefault>true</activeByDefault> 
+			 </activation> 
 			<id>latestRelease</id>
 
 			<repositories>
@@ -217,7 +217,7 @@
 			</repositories>
 
 			<properties>
-				<ignoreIntegrationTests>true</ignoreIntegrationTests>
+				<ignoreIntegrationTests>false</ignoreIntegrationTests>
 				<listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI.properties</listOfTestConfigs>
 				<serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_CI_serverIsMissing.properties</serverIsMissingConfigs>
 				<containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_CI_container_1_0.properties</containerVer1Configs>

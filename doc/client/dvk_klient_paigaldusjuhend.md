@@ -695,17 +695,13 @@ Rakenduse ehitamiseks on alates DVK versioonist 1.6.0 kasutusel Maven raamistik 
 
 1. Lae Githubist alla DVK projekt https://github.com/e-gov/DVK
 
-2. Ava tekstiredaktoriga projekti „dvk“ juurkaustas asuv fail **pom.xml** ning lisa endale või muuda olemas olevat ehitusprofiili. Modules bloki abil saad kirjeldada ehitatava DVK versiooni komponentide suhtelised teekonnad (relativePathid).
+2. Lae alla Apache Maven versioon 3.x.x (http://maven.apache.org/download.html ja vali sealt .zip fail).
 
-   Lisaks on muuta **dvkCoreDir'i, dvkClientDir'i** väärtusteks täisteekond konkreetse projekti juurkataloogini (näiteks „/home/kasutaja/projektid/dvk/core“). **ListOfTestConfigs** ja **dvkServerJettyEnvLocation** on vajalikud seadistada vaid siis, kui soovitakse käivitada ka serveri ja clienti integratsiooniteste.
+3. Paki allalaetud pakett lahti.
 
-3. Lae alla Apache Maven versioon 3.x.x (http://maven.apache.org/download.html ja vali sealt .zip fail).
+4. Lisa [MAVEN_HOME]/bin kataloog keskkonnamuutujasse „PATH“.
 
-4. Paki allalaetud pakett lahti.
-
-5. Lisa [MAVEN_HOME]/bin kataloog keskkonnamuutujasse „PATH“.
-
-6. Mine DVK projekti juurkataloogi ja käivita käsurealt järgmine käsklus:
+5. Mine DVK projekti juurkataloogi ja käivita käsurealt järgmine käsklus:
 
    ```
 CMD> mvn -P [PROFILE_NAME] package
@@ -718,7 +714,7 @@ CMD> mvn clean
 CMD> mvn -P [PROFILE_NAME] package
    ```
 
-7. Maven ehitab ja paketeerib rakenduse. Kataloogi [DVK_CLIENT_HOME]/target tekib fail „dvk-client.jar“.
+6. Maven ehitab ja paketeerib rakenduse. Kataloogi [DVK_CLIENT_HOME]/target tekib fail „dvk-client.jar“.
 
 
 ## Logimise seadistamine

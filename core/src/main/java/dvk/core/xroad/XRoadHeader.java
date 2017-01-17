@@ -286,7 +286,7 @@ public final class XRoadHeader {
 			
 			// Populating client block
 			SOAPHeaderBlock clientHeaderBlock = factory.createSOAPHeaderBlock(XRoadHeaderField.CLIENT.getValue(), nsXRoad);
-			clientHeaderBlock.addAttribute(XRoadIdentifier.OBJECT_TYPE_ATTRIBUTE, XRoadObjectType.MEMBER.getName(), nsId);
+			clientHeaderBlock.addAttribute(XRoadIdentifier.OBJECT_TYPE_ATTRIBUTE, XRoadObjectType.SUBSYSTEM.getName(), nsId);
 	
 			OMElement clientXRoadInstance = factory.createOMElement(XRoadIdentifierType.XROAD_INSTANCE.getName(), nsId);
 			clientXRoadInstance.setText(xRoadClient.getXRoadInstance());

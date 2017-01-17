@@ -2104,7 +2104,7 @@ create type get_asutus_by_regnr as (
 
 CREATE OR REPLACE FUNCTION "Get_AsutusByRegNr"(p_registrikood character varying)
   RETURNS SETOF get_asutus_by_regnr AS
-$BODY$
+$$
 
 BEGIN
 RETURN QUERY
@@ -7915,7 +7915,7 @@ CREATE OR REPLACE FUNCTION dvklog.log_asutus(
     asutus_old dvk.asutus,
     tr_operation character varying)
   RETURNS void AS
-$BODY$        
+$$        
 DECLARE    
     clmn      information_schema.columns;
     usr       character varying;

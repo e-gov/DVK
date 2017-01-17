@@ -58,7 +58,7 @@ Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 			and fully-qualified @Configuration classes -->
 		<init-param>
 			<param-name>contextConfigLocation</param-name>
-			<param-value>ee.ria.dhx.ws.beanconfig.DhxEndpointConfig</param-value>
+			<param-value>ee.ria.dhx.ws.config.endpoint.DhxEndpointConfig</param-value>
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>

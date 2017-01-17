@@ -2,6 +2,54 @@ package ee.ria.dhx.dvk;
 
 import com.jcabi.aspects.Loggable;
 
+import ee.ria.dhx.exception.DhxException;
+import ee.ria.dhx.exception.DhxExceptionEnum;
+import ee.ria.dhx.types.AsyncDhxSendDocumentResult;
+import ee.ria.dhx.types.DhxRepresentee;
+import ee.ria.dhx.types.DhxSendDocumentResult;
+import ee.ria.dhx.types.IncomingDhxPackage;
+import ee.ria.dhx.types.InternalXroadMember;
+import ee.ria.dhx.types.OutgoingDhxPackage;
+import ee.ria.dhx.types.ee.riik.schemas.deccontainer.vers_2_1.DecContainer;
+import ee.ria.dhx.types.ee.riik.schemas.deccontainer.vers_2_1.DecContainer.Transport.DecRecipient;
+import ee.ria.dhx.types.eu.x_road.dhx.producer.SendDocumentResponse;
+import ee.ria.dhx.util.StringUtil;
+import ee.ria.dhx.ws.config.SoapConfig;
+import ee.ria.dhx.ws.service.AddressService;
+import ee.ria.dhx.ws.service.AsyncDhxPackageService;
+import ee.ria.dhx.ws.service.DhxImplementationSpecificService;
+import ee.ria.dhx.ws.service.DhxMarshallerService;
+import ee.ria.dhx.ws.service.DhxPackageProviderService;
+import ee.ria.dhx.ws.service.DhxPackageService;
+
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+
+import org.apache.axis.AxisFault;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Service;
+import org.springframework.ws.context.MessageContext;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+
 import dhl.Document;
 import dhl.Folder;
 import dhl.Recipient;
@@ -19,62 +67,6 @@ import dvk.core.FileSplitResult;
 import dvk.core.Settings;
 import dvk.core.xroad.XRoadClient;
 import dvk.core.xroad.XRoadProtocolHeader;
-import dvk.core.xroad.XRoadProtocolVersion;
-
-import ee.ria.dhx.exception.DhxException;
-import ee.ria.dhx.exception.DhxExceptionEnum;
-import ee.ria.dhx.types.AsyncDhxSendDocumentResult;
-import ee.ria.dhx.types.DhxRepresentee;
-import ee.ria.dhx.types.DhxSendDocumentResult;
-import ee.ria.dhx.types.IncomingDhxPackage;
-import ee.ria.dhx.types.InternalXroadMember;
-import ee.ria.dhx.types.OutgoingDhxPackage;
-import ee.ria.dhx.util.StringUtil;
-import ee.ria.dhx.ws.config.DhxConfig;
-import ee.ria.dhx.ws.config.SoapConfig;
-import ee.ria.dhx.ws.service.AddressService;
-import ee.ria.dhx.ws.service.AsyncDhxPackageService;
-import ee.ria.dhx.ws.service.DhxImplementationSpecificService;
-import ee.ria.dhx.ws.service.DhxMarshallerService;
-import ee.ria.dhx.ws.service.DhxPackageProviderService;
-import ee.ria.dhx.ws.service.DhxPackageService;
-import ee.ria.dhx.types.ee.riik.schemas.deccontainer.vers_2_1.DecContainer;
-import ee.ria.dhx.types.ee.riik.schemas.deccontainer.vers_2_1.DecContainer.Transport.DecRecipient;
-import ee.ria.dhx.types.eu.x_road.dhx.producer.SendDocumentResponse;
-
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-
-import org.apache.axis.AxisFault;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-import org.springframework.ws.context.MessageContext;
-
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
-import javax.naming.Context;
-import javax.naming.InitialContext;
 
 /**
  * Class is an example implementation of DhxImplementationSpecificService interface. All data that
@@ -155,12 +147,11 @@ public class DvkDhxService implements DhxImplementationSpecificService {
 
     Connection conn = null;
     ArrayList<Document> serverDocuments = new ArrayList<Document>();
-    Integer recipientId;
     try {
       conn = getConnection();
       String dvkRegCode = createDvkRegCodeFromRepresentee(document
           .getRecipient().getCode(), document.getRecipient()
-          .getSystem());
+              .getSystem());
       Asutus recipientAsutus = new Asutus();
       recipientAsutus.loadByRegNr(dvkRegCode, conn);
       if (StringUtil.isNullOrEmpty(recipientAsutus.getRegistrikood())) {
@@ -244,11 +235,11 @@ public class DvkDhxService implements DhxImplementationSpecificService {
               if ((tmpSending.getSender() != null)
                   && (tmpSending.getSender()
                       .getOrganizationID() != user
-                      .getOrganizationID())
+                          .getOrganizationID())
                   && (tmpSending.getProxy() != null)
                   && (tmpSending.getProxy()
                       .getOrganizationID() != user
-                      .getOrganizationID())) {
+                          .getOrganizationID())) {
                 throw new ContainerValidationException(
                     CommonStructures.VIGA_SAATJA_ASUTUSED_ERINEVAD);
               }
@@ -290,14 +281,16 @@ public class DvkDhxService implements DhxImplementationSpecificService {
       log.error(fault.getMessage(), fault);
       throw new DhxException(DhxExceptionEnum.CAPSULE_VALIDATION_ERROR,
           "Error occured while recieving the document. "
-              + fault.getMessage(), fault);
+              + fault.getMessage(),
+          fault);
     } catch (DhxException ex) {
       throw ex;
     } catch (Exception fault) {
       log.error(fault.getMessage(), fault);
       throw new DhxException(DhxExceptionEnum.TECHNICAL_ERROR,
           "Error occured while recieving the document. "
-              + fault.getMessage(), fault);
+              + fault.getMessage(),
+          fault);
     } finally {
       CommonMethods.safeCloseDatabaseConnection(conn);
       conn = null;
@@ -331,8 +324,10 @@ public class DvkDhxService implements DhxImplementationSpecificService {
   @Loggable
   private List<DhxRepresentee> toDhxRepresentees(List<Asutus> asutuss) {
     List<DhxRepresentee> representees = new ArrayList<DhxRepresentee>();
-    for (Asutus asutus : asutuss) {
-      representees.add(toDhxRepresentee(asutus));
+    if (asutuss != null) {
+      for (Asutus asutus : asutuss) {
+        representees.add(toDhxRepresentee(asutus));
+      }
     }
     return representees;
   }
@@ -558,44 +553,22 @@ public class DvkDhxService implements DhxImplementationSpecificService {
     return regCode;
   }
 
-  /**
-   * If the document was already sent, then no need to resend immediately, need to wait for timeout.
-   * 
-   * @param recipient
-   * @return
-   */
-  /*
-   * private Boolean needToSend(Recipient recipient) {
-   * log.debug("Checking if document needs to be sent to recipient. recipient: " +
-   * recipient.getId()); if (recipient.getSendCount() != null && recipient.getSendCount() != 0) { //
-   * if the document was already sent too many times, then ignore it if (recipient.getSendCount() >=
-   * maxResendCount) { log.debug("Document was already sent too many times"); return false; } // if
-   * the document was sent less than configured as timeout time // ago, then resend it Long
-   * timePassed = (new Date()).getTime() - recipient.getLastSendDate().getTime(); if (timePassed <=
-   * timeoutToResend*1000) { log.debug("Document was already sent recently."); return false; } }
-   * log.debug("Document need to be sent."); return true; }
-   */
 
   public void sendSingleDocument(dhl.Document doc, Connection conn) throws SQLException {
     log.debug("sendSingleDocument docId:" + doc.getId());
     String pipelineDataFile = null;
     Sending tmpSending = new Sending();
     tmpSending.loadByDocumentID(doc.getId(), conn);
-    Boolean allSent = true;
     Asutus senderOrg = new Asutus(tmpSending.getSender().getOrganizationID(), conn);
     for (Recipient recipient : tmpSending.getRecipients()) {
       if (recipient.getSendStatusID() == CommonStructures.SendStatus_Sending
           && Asutus.isDhxAsutus(conn,
               recipient.getOrganizationID())) {
         log.debug("found document and recipient to send to DHX. recipient: " + recipient.getId());
-        /*
-         * if (!needToSend(recipient)) { continue; }
-         */
         String consignmentId = String.valueOf(recipient.getId());
         FileOutputStream out = null;
         OutputStreamWriter ow = null;
         BufferedWriter bw = null;
-        FileInputStream in = null;
         try {
           pipelineDataFile = CommonMethods.createPipelineFile(0);
           out = new FileOutputStream(pipelineDataFile, false);
@@ -640,8 +613,7 @@ public class DvkDhxService implements DhxImplementationSpecificService {
           recipient.setLastSendDate(new Date());
           OutgoingDhxPackage pkg = packageProvider.getOutgoingPackage(new File(pipelineDataFile),
               consignmentId, getDhxRegCode(asutus),
-              getDhxSubsystem(asutus
-              ),
+              getDhxSubsystem(asutus),
               getDhxRegCode(senderOrg), getDhxSubsystem(senderOrg));
           // if we are dealing with subsystem, then maybe we need to replace DVK adressee(subsytem
           // name) or DVK sender with DHX(membercode)
@@ -695,9 +667,8 @@ public class DvkDhxService implements DhxImplementationSpecificService {
           bw = null;
           ow = null;
           out = null;
-          if (pipelineDataFile != null) {
-            new File(pipelineDataFile).delete();
-          }
+          // dhx component sends documents asynchronously and we dont know when it will be safe to
+          // delete attachment file, therefore, we wont delete it
 
         }
       }
@@ -802,13 +773,14 @@ public class DvkDhxService implements DhxImplementationSpecificService {
       }
       recipient.update(conn, null);
       List<Recipient> recipients = Recipient.getList(recipient.getSendingID(), conn);
-      for( Recipient docRecipient : recipients) {
+      for (Recipient docRecipient : recipients) {
         if (docRecipient.getSendStatusID() != CommonStructures.SendStatus_Sent) {
           allSent = false;
         }
       }
       if (allSent) {
-        Sending.updateStatus(recipient.getSendingID(), CommonStructures.SendStatus_Sent, new Date(), conn);
+        Sending.updateStatus(recipient.getSendingID(), CommonStructures.SendStatus_Sent,
+            new Date(), conn);
       }
     } catch (Exception ex) {
       log.error("Error occured while saving send results. " + ex.getMessage(), ex);

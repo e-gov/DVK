@@ -286,7 +286,7 @@ public final class XRoadHeader {
 			
 			// Populating client block
 			SOAPHeaderBlock clientHeaderBlock = factory.createSOAPHeaderBlock(XRoadHeaderField.CLIENT.getValue(), nsXRoad);
-			clientHeaderBlock.addAttribute(XRoadIdentifier.OBJECT_TYPE_ATTRIBUTE, XRoadObjectType.MEMBER.getName(), nsId);
+			clientHeaderBlock.addAttribute(XRoadIdentifier.OBJECT_TYPE_ATTRIBUTE, XRoadObjectType.SUBSYSTEM.getName(), nsId);
 	
 			OMElement clientXRoadInstance = factory.createOMElement(XRoadIdentifierType.XROAD_INSTANCE.getName(), nsId);
 			clientXRoadInstance.setText(xRoadClient.getXRoadInstance());
@@ -334,7 +334,11 @@ public final class XRoadHeader {
 			serviceHeaderBlock.addChild(serviceCode);
 			
 			OMElement serviceVersion = factory.createOMElement(XRoadIdentifierType.SERVICE_VERSION.getName(), nsId);
-			serviceVersion.setText(xRoadService.getServiceVersion());
+			String xrServiceVersion = xRoadService.getServiceVersion();
+			if ( ! xrServiceVersion.startsWith("v")) {
+				xrServiceVersion = "v" + xrServiceVersion;
+			}
+			serviceVersion.setText(xrServiceVersion);
 			serviceHeaderBlock.addChild(serviceVersion);
 	
 			soapHeader.addChild(serviceHeaderBlock);

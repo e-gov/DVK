@@ -28,11 +28,11 @@ WHERE v.staatus_id = 103
 
 ## Lisainfo DHX saatmise jälgimiseks:
 
-* ASUTUS tabelisse lisatud väli DHX_INTERNAL_CONSIGNMENT_ID (character varying(200)), mis sisaldab DVK poolt DHX-i saatmisel genereeritud saadetise id väärtust (DHX sendDocument teenuse sisendis).
+* VASTUVOTJA tabelisse lisatud väli DHX_INTERNAL_CONSIGNMENT_ID (character varying(200)), mis sisaldab DVK poolt DHX-i saatmisel genereeritud saadetise id väärtust (DHX sendDocument teenuse sisendis).
 
-* ASUTUS tabelisse lisatud väli DHX_EXTERNAL_CONSIGNMENT_ID (character varying(200)), mis sisaldab DHX-ist DVK-sse saabunud dokumendi saadetise id väärtust.
+* VASTUVOTJA tabelisse lisatud väli DHX_EXTERNAL_CONSIGNMENT_ID (character varying(200)), mis sisaldab DHX-ist DVK-sse saabunud dokumendi saadetise id väärtust.
 
-* ASUTUS tabelisse lisatud väli DHX_EXTERNAL_RECEIPT_ID (character varying(200)), mis sisaldab DHX-ist DVK-sse saabunud sendDocument pärgingu vastuseks genereeritud recepient id väärtust.
+* VASTUVOTJA tabelisse lisatud väli DHX_EXTERNAL_RECEIPT_ID (character varying(200)), mis sisaldab DHX-ist DVK-sse saabunud sendDocument pärgingu vastuseks genereeritud recepient id väärtust.
 
 * VASTUVOTJA tabelisse lisatud väli LAST_SEND_DATE (timestamp). See sisaldab kuupäeva ja kellaaeg, millel tehti viimane DHX edasi saatmise üritus.
 

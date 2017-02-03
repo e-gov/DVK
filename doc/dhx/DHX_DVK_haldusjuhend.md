@@ -1,5 +1,5 @@
 ![](EL_Regionaalarengu_Fond_horisontaalne.jpg)
-## DVK haldustegevuse muutused (seosed DHX kasutuselevõtuga)
+## DVK haldustegevuse muutused (seoses DHX kasutuselevõtuga)
 
 * DHX-iga liitunud asutused lisatakse DVK andmebaasi tabelisse ASUTUS automaatselt (DHX aadressiraamatu uuendaja poolt).
 

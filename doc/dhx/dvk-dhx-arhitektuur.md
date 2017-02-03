@@ -336,10 +336,15 @@ Näide: sfos.70000272:
 
 #### 7.3.5. Adressaadi registrikoodi asendamine Kapsli sees
  
-DVK-sse saatmisel ja DVK-st vastuvõtmisel pannakse kapsli adressaadina asutused tabeli registrikood välja väärtust (ehk alamsüsteemide puhul see ei ole asutuse registrikood).
-DHX aga nõuab et kapslis olevad adressaadid oleksid asutuste registrikoodid.
-Selle lahendamiseks tuleb DHX-st DVK-sse kapsli jõudmisel asendada kapsli adressaadi (asutuse reaalse registrikoodi) DVK asutuse tabeli registrikoodiga.
-DVK-st DHX-i saatmisel tuleb asendada kapslis oleva adressaadi (asutus tabeli registrikoodi) asutuse reaalse registrikoodiga.
+DVK-sse saatmisel ja DVK-st vastuvõtmisel pannakse kapsli adressaadiks (`<DecRecipient><OrganisationCode>`) ASUTUS tabeli `registrikood` välja väärtus. 
+
+Alamsüsteemide puhul ei ole see asutuse registrikood, vaid väärtus kujul: `adit`, `rt`, `sfos.70000272`, vms. 
+
+DHX protokoll nõuab, et kapslis olevad adressaadid oleksid asutuste reaalsed registrikoodid. 
+
+Selle lahendamiseks tuleb:
+* DHX-st saabunud kapslis asendada adressaadi reaalne registrikood DVK asutuse tabeli `registrikood` välja väärtusega.
+* DVK seest DHX-i saatmisel asendada kapslis oleva adressaadi kood (ASUTUS tabeli välja `registrikood` väärtus) asutuse reaalse registrikoodiga.
 
 
 ## 8. DVK Andmebaasi muudatused

@@ -352,8 +352,8 @@ Selle lahendamiseks tuleb:
 DVK andmebaasi tabelite muudatused on järgmised:
 
 * ASUTUS tabelisse lisatud väli DHX_ASUTUS (`smallint`) võimalikud väärtused: 1 - DHXiga liitunud asutus, 0 - vana DVK-d kasutav asutus
-* ASUTUS tabelisse lisatud väli DHX_INTERNAL_CONSIGNMENT_ID (`character varying(200)`), mis sisaldab DVK poolt DHX-i saatmisel genereeritud saadetise id väärtust (DHX `sendDocument` teenuse sisendis). 
-* ASUTUS tabelisse lisatud väli DHX_EXTERNAL_CONSIGNMENT_ID (`character varying(200)`), mis sisaldab DHX-ist DVK-sse saabunud dokumendi saadetise id väärtust.
-* ASUTUS tabelisse lisatud väli DHX_EXTERNAL_RECEIPT_ID (`character varying(200)`), mis sisaldab DHX-ist DVK-sse saabunud `sendDocument` pärgingu vastuseks genereeritud `recepient id` väärtust. 
+* VASTUVOTJA tabelisse lisatud väli DHX_INTERNAL_CONSIGNMENT_ID (`character varying(200)`), mis sisaldab DVK poolt DHX-i saatmisel genereeritud saadetise id väärtust (DHX `sendDocument` teenuse sisendis). 
+* VASTUVOTJA tabelisse lisatud väli DHX_EXTERNAL_CONSIGNMENT_ID (`character varying(200)`), mis sisaldab DHX-ist DVK-sse saabunud dokumendi saadetise id väärtust.
+* VASTUVOTJA tabelisse lisatud väli DHX_EXTERNAL_RECEIPT_ID (`character varying(200)`), mis sisaldab DHX-ist DVK-sse saabunud `sendDocument` pärgingu vastuseks genereeritud `recepient id` väärtust. 
 * VASTUVOTJA tabelisse lisatud väli LAST_SEND_DATE (`timestamp`). See sisaldab kuupäeva ja kellaaeg, millel tehti viimane DHX edasi saatmise üritus.
 

@@ -1,3 +1,5 @@
+﻿![Riigi Infosüsteemi Ameti](https://avatars3.githubusercontent.com/u/7447915 "Riigi Infosüsteemi Amet")
+
 # Dokumendivahetuskeskuse (DVK) tarkvara
 
 DVK tarkvara koosneb klienditarkvarast ja serveritarkvarast. Samuti on olemas DVK API, mille abil saab liidestada DVK klienditarkvara kolmandate infosüsteemidega.

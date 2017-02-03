@@ -36,3 +36,4 @@ WHERE v.staatus_id = 103
 
 * VASTUVOTJA tabelisse lisatud väli LAST_SEND_DATE (timestamp). See sisaldab kuupäeva ja kellaaeg, millel tehti viimane DHX edasi saatmise üritus.
 
+* Kui DHX adressaat saadab DVK-le dokumendi kapsli, mis ei valideeru või sisaldab valet adressaati, siis selline viga logitakse ainult DVK Serveri logi failis. Selle kohta DVK andmebaasi kirjeid ei teki.

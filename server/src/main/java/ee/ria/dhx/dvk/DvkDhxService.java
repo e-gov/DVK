@@ -5,6 +5,7 @@ import com.jcabi.aspects.Loggable;
 import ee.ria.dhx.exception.DhxException;
 import ee.ria.dhx.exception.DhxExceptionEnum;
 import ee.ria.dhx.types.AsyncDhxSendDocumentResult;
+import ee.ria.dhx.types.DhxOrganisation;
 import ee.ria.dhx.types.DhxRepresentee;
 import ee.ria.dhx.types.DhxSendDocumentResult;
 import ee.ria.dhx.types.IncomingDhxPackage;
@@ -14,6 +15,7 @@ import ee.ria.dhx.types.ee.riik.schemas.deccontainer.vers_2_1.DecContainer;
 import ee.ria.dhx.types.ee.riik.schemas.deccontainer.vers_2_1.DecContainer.Transport.DecRecipient;
 import ee.ria.dhx.types.eu.x_road.dhx.producer.SendDocumentResponse;
 import ee.ria.dhx.util.StringUtil;
+import ee.ria.dhx.ws.DhxOrganisationFactory;
 import ee.ria.dhx.ws.config.SoapConfig;
 import ee.ria.dhx.ws.service.AddressService;
 import ee.ria.dhx.ws.service.AsyncDhxPackageService;
@@ -154,25 +156,41 @@ public class DvkDhxService implements DhxImplementationSpecificService {
               .getSystem());
       Asutus recipientAsutus = new Asutus();
       recipientAsutus.loadByRegNr(dvkRegCode, conn);
+      
+      DhxOrganisation senderDhxOrg = DhxOrganisationFactory.createDhxOrganisation(document.getClient());
+      String senderDvkRegCode = createDvkRegCodeFromRepresentee(senderDhxOrg.getCode(), senderDhxOrg
+            .getSystem());
+    Asutus senderAsutus = new Asutus();
+    senderAsutus.loadByRegNr(senderDvkRegCode, conn);
+    
       if (StringUtil.isNullOrEmpty(recipientAsutus.getRegistrikood())) {
         throw new DhxException(DhxExceptionEnum.WRONG_RECIPIENT,
             "Unable to find recipient oraganisation in DVK. dvkRegCode: " + dvkRegCode);
       }
       // if we are dealing with subsystem, then maybe we need to replace DVK adressee(subsytem name)
       // with DHX(membercode)
-      if (recipientAsutus.getRegistrikood2() != null) {
+      if (recipientAsutus.getRegistrikood2() != null || (senderAsutus != null && senderAsutus.getRegistrikood2() != null)) {
         DecContainer container =
             (DecContainer) document.getParsedContainer();
-        for (DecRecipient decRecipient : container.getTransport().getDecRecipient()) {
-          if (recipientAsutus.getRegistrikood2().equals(decRecipient.getOrganisationCode())) {
-            decRecipient.setOrganisationCode(recipientAsutus.getRegistrikood());
+        if (recipientAsutus.getRegistrikood2() != null) {
+          for (DecRecipient decRecipient : container.getTransport().getDecRecipient()) {
+            if (recipientAsutus.getRegistrikood2().equals(decRecipient.getOrganisationCode())) {
+              decRecipient.setOrganisationCode(recipientAsutus.getRegistrikood());
 
+            }
           }
+        }
+        if (senderAsutus.getRegistrikood2() != null) {
+          container.getTransport().getDecSender()
+              .setOrganisationCode(senderAsutus.getRegistrikood2());
         }
         File capsuleFile = dhxMarshallerService.marshall(container);
         DataSource source = new FileDataSource(capsuleFile);
         document.setDocumentFile(new DataHandler(source));
       }
+
+
+
       DataHandler data = document.getDocumentFile();
       CommonMethods.getDataFromDataSource(data.getDataSource(), "base64",
           pipelineDataFile, false);

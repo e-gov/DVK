@@ -158,7 +158,7 @@ public class DvkDhxService implements DhxImplementationSpecificService {
       recipientAsutus.loadByRegNr(dvkRegCode, conn);
       
       DhxOrganisation senderDhxOrg = DhxOrganisationFactory.createDhxOrganisation(document.getClient());
-      String senderDvkRegCode = createDvkRegCodeFromRepresentee(senderDhxOrg.getCode(), senderDhxOrg
+      String senderDvkRegCode = toDvkCapsuleAddressee(senderDhxOrg.getCode(), senderDhxOrg
             .getSystem());
     Asutus senderAsutus = new Asutus();
     senderAsutus.loadByRegNr(senderDvkRegCode, conn);
@@ -180,7 +180,7 @@ public class DvkDhxService implements DhxImplementationSpecificService {
             }
           }
         }
-        if (senderAsutus.getRegistrikood2() != null) {
+        if (senderAsutus != null && senderAsutus.getRegistrikood2() != null) {
           container.getTransport().getDecSender()
               .setOrganisationCode(senderAsutus.getRegistrikood2());
         }
@@ -569,6 +569,42 @@ public class DvkDhxService implements DhxImplementationSpecificService {
       regCode = representeeCode;
     }
     return regCode;
+  }
+  
+  /**
+   * Sometimes DHX addressee and DVK addresse might be different. In DHX there must be always
+   * registration code, in DVK there might be system also.
+   * 
+   * @param memberCode memberCode to use to transform to DVK capsule addressee
+   * @param subsystem subsystem to use to transform to DVK capsule addressee
+   * @return capsule addressee accordinbg to DVK
+   */
+  @Loggable
+  public String toDvkCapsuleAddressee(String memberCode, String subsystem) {
+    String dvkCode = null;
+    if (!StringUtil.isNullOrEmpty(subsystem)
+        && subsystem.startsWith(config.getDhxSubsystemPrefix() + ".")) {
+      String system = subsystem.substring(config.getDhxSubsystemPrefix().length() + 1);
+      // String perfix = subsystem.substring(0, index);
+      log.debug("found system with subsystem: " + system);
+      if (isSpecialSubsystem(system)) {
+        dvkCode = system;
+      } else {
+        dvkCode = system + "." + memberCode;
+      }
+
+    } else if (!StringUtil.isNullOrEmpty(subsystem)
+        && !subsystem.equals(config.getDhxSubsystemPrefix())) {
+      if (isSpecialSubsystem(subsystem)) {
+        dvkCode = subsystem;
+      } else {
+        dvkCode = subsystem + "." + memberCode;
+      }
+    } else {
+
+      dvkCode = memberCode;
+    }
+    return dvkCode;
   }
 
 

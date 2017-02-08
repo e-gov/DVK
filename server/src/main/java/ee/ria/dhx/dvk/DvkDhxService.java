@@ -156,23 +156,25 @@ public class DvkDhxService implements DhxImplementationSpecificService {
               .getSystem());
       Asutus recipientAsutus = new Asutus();
       recipientAsutus.loadByRegNr(dvkRegCode, conn);
-      
-      DhxOrganisation senderDhxOrg = DhxOrganisationFactory.createDhxOrganisation(document.getClient());
+
+      DhxOrganisation senderDhxOrg =
+          DhxOrganisationFactory.createDhxOrganisation(document.getClient());
       String senderDvkRegCode = toDvkCapsuleAddressee(senderDhxOrg.getCode(), senderDhxOrg
-            .getSystem());
-    Asutus senderAsutus = new Asutus();
-    senderAsutus.loadByRegNr(senderDvkRegCode, conn);
-    
+          .getSystem());
+      Asutus senderAsutus = new Asutus();
+      senderAsutus.loadByRegNr(senderDvkRegCode, conn);
+
       if (StringUtil.isNullOrEmpty(recipientAsutus.getRegistrikood())) {
         throw new DhxException(DhxExceptionEnum.WRONG_RECIPIENT,
             "Unable to find recipient oraganisation in DVK. dvkRegCode: " + dvkRegCode);
       }
       // if we are dealing with subsystem, then maybe we need to replace DVK adressee(subsytem name)
       // with DHX(membercode)
-      if (recipientAsutus.getRegistrikood2() != null || (senderAsutus != null && senderAsutus.getRegistrikood2() != null)) {
+      if (!StringUtil.isNullOrEmpty(recipientAsutus.getRegistrikood2()) || (senderAsutus != null
+          && !StringUtil.isNullOrEmpty(senderAsutus.getRegistrikood2()))) {
         DecContainer container =
             (DecContainer) document.getParsedContainer();
-        if (recipientAsutus.getRegistrikood2() != null) {
+        if (!StringUtil.isNullOrEmpty(recipientAsutus.getRegistrikood2())) {
           for (DecRecipient decRecipient : container.getTransport().getDecRecipient()) {
             if (recipientAsutus.getRegistrikood2().equals(decRecipient.getOrganisationCode())) {
               decRecipient.setOrganisationCode(recipientAsutus.getRegistrikood());
@@ -180,9 +182,10 @@ public class DvkDhxService implements DhxImplementationSpecificService {
             }
           }
         }
-        if (senderAsutus != null && senderAsutus.getRegistrikood2() != null) {
+        if (senderAsutus != null
+            && !StringUtil.isNullOrEmpty(senderAsutus.getRegistrikood2())) {
           container.getTransport().getDecSender()
-              .setOrganisationCode(senderAsutus.getRegistrikood2());
+              .setOrganisationCode(senderAsutus.getRegistrikood());
         }
         File capsuleFile = dhxMarshallerService.marshall(container);
         DataSource source = new FileDataSource(capsuleFile);
@@ -570,7 +573,7 @@ public class DvkDhxService implements DhxImplementationSpecificService {
     }
     return regCode;
   }
-  
+
   /**
    * Sometimes DHX addressee and DVK addresse might be different. In DHX there must be always
    * registration code, in DVK there might be system also.

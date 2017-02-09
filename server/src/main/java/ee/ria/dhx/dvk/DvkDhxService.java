@@ -202,7 +202,8 @@ public class DvkDhxService implements DhxImplementationSpecificService {
       XRoadClient client = new XRoadClient(document.getClient()
           .getXroadInstance(), document.getClient().getMemberClass(),
           document.getClient().getMemberCode());
-      client.setSubsystemCode(trimPrefix(document.getClient().getSubsystemCode()));
+      //
+      client.setSubsystemCode(senderDvkRegCode);
       XRoadProtocolHeader xroadHeader = new XRoadProtocolHeader(client,
           null, null, null, null);
       UserProfile user = UserProfile.getFromHeaders(xroadHeader, conn);

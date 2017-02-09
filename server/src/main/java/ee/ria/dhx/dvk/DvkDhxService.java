@@ -201,9 +201,7 @@ public class DvkDhxService implements DhxImplementationSpecificService {
           "DecContainer", true, false, true);
       XRoadClient client = new XRoadClient(document.getClient()
           .getXroadInstance(), document.getClient().getMemberClass(),
-          document.getClient().getMemberCode());
-      //
-      client.setSubsystemCode(senderDvkRegCode);
+          senderDvkRegCode);
       XRoadProtocolHeader xroadHeader = new XRoadProtocolHeader(client,
           null, null, null, null);
       UserProfile user = UserProfile.getFromHeaders(xroadHeader, conn);

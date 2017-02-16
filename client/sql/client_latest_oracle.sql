@@ -90,7 +90,7 @@ CREATE TABLE dhl_settings
     subdivision_name varchar2(250) null,
     occupation_name varchar2(250) null,
     container_version number(3) NULL,
-    xroad_client_instance varchar2 (2) NOT NULL,
+    xroad_client_instance varchar2 (6) NOT NULL,
     xroad_client_member_class varchar2 (50) NOT NULL,
     xroad_client_subsystem_code varchar2 (50) NOT NULL
 )

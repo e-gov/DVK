@@ -11,7 +11,7 @@ public enum XRoadIdentifierType {
 	/**
 	 * Identifies the X-Road instance. This field is applicable to all identifier types.
 	 */
-	XROAD_INSTANCE("xRoadServiceInstance"),
+	XROAD_INSTANCE("xRoadInstance"),
 	
 	/**
 	 * Type of the member (company, government institution, private person, etc.)

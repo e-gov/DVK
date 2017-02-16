@@ -1589,7 +1589,7 @@ CREATE TABLE dhl_settings (
     subdivision_name character varying(250) null,
     occupation_name character varying(250) null,
     container_version integer NULL,
-    xroad_client_instance VARCHAR(2) NOT NULL,
+    xroad_client_instance VARCHAR(6) NOT NULL,
     xroad_client_member_class VARCHAR(50) NOT NULL,
     xroad_client_subsystem_code VARCHAR(50) NOT NULL
 );

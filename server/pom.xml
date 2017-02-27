@@ -149,7 +149,7 @@
 		<dependency>
 			<groupId>dvk</groupId>
 			<artifactId>client</artifactId>
-			<version>1.7.8</version>
+			<version>1.8.0</version>
 			<exclusions>
 				<exclusion>
 					<groupId>*</groupId>

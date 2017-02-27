@@ -121,7 +121,7 @@ create table dhl_settings
 	"subdivision_name" varchar(250) null,
 	"occupation_name" varchar(250) null,
 	"container_version" int null,
-	"xroad_client_instance" VARCHAR(2) NOT NULL,
+	"xroad_client_instance" VARCHAR(6) NOT NULL,
     "xroad_client_member_class" VARCHAR(50) NOT NULL,
     "xroad_client_subsystem_code" VARCHAR(50) NOT NULL
 );

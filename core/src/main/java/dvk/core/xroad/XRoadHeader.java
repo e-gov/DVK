@@ -334,7 +334,11 @@ public final class XRoadHeader {
 			serviceHeaderBlock.addChild(serviceCode);
 			
 			OMElement serviceVersion = factory.createOMElement(XRoadIdentifierType.SERVICE_VERSION.getName(), nsId);
-			serviceVersion.setText(xRoadService.getServiceVersion());
+			String xrServiceVersion = xRoadService.getServiceVersion();
+			if ( ! xrServiceVersion.startsWith("v")) {
+				xrServiceVersion = "v" + xrServiceVersion;
+			}
+			serviceVersion.setText(xrServiceVersion);
 			serviceHeaderBlock.addChild(serviceVersion);
 	
 			soapHeader.addChild(serviceHeaderBlock);

@@ -842,7 +842,7 @@ public class Asutus {
                         server.getProducerName());
                 
                 HeaderVariables header = new HeaderVariables(
-                        Settings.Client_DefaultOrganizationCode,
+                		Settings.getXRoadClientMemberCode(),
                         Settings.Client_DefaultPersonCode,
                         "",
                         CommonMethods.personalIDCodeHasCountryCode(Settings.Client_DefaultPersonCode)

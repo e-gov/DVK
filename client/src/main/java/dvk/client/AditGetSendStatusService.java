@@ -163,7 +163,7 @@ public class AditGetSendStatusService {
     private HeaderVariables createHeaderVariables() {
     	
         return new HeaderVariables(
-                Settings.Client_DefaultOrganizationCode,
+        		Settings.getXRoadClientMemberCode(),
                 Settings.Client_DefaultPersonCode,
                 "",
                 CommonMethods.personalIDCodeHasCountryCode(

@@ -1202,7 +1202,7 @@ public class SendDocuments {
                                         server.getProducerName());
                                 
                                 HeaderVariables header = new HeaderVariables(
-                                        Settings.Client_DefaultOrganizationCode,
+                                		Settings.getXRoadClientMemberCode(),
                                         Settings.Client_DefaultPersonCode,
                                         "",
                                         (CommonMethods.personalIDCodeHasCountryCode(Settings.Client_DefaultPersonCode) ? Settings.Client_DefaultPersonCode : "EE" + Settings.Client_DefaultPersonCode),

@@ -1024,7 +1024,7 @@ public class Client {
     protected static GetSendingOptionsV3ResponseType receiveDownloadWaitingInstitutionsV2(ArrayList<OrgSettings> databases) throws Exception {
         // Saadetava sõnumi päisesse kantavad parameetrid
         HeaderVariables headerVar = new HeaderVariables(
-                Settings.Client_DefaultOrganizationCode,
+        		Settings.getXRoadClientMemberCode(),
                 Settings.Client_DefaultPersonCode,
                 "",
                 (CommonMethods.personalIDCodeHasCountryCode(Settings.Client_DefaultPersonCode) ? Settings.Client_DefaultPersonCode : "EE" + Settings.Client_DefaultPersonCode),

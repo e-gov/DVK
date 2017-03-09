@@ -403,7 +403,7 @@ public class Document {
               rs.close();
               cs.close();
               
-              if (!setAllDhxNotSentDocumentsToSend(conn)) {
+              if (!setAllDhxNotSentDocumentsToSend(conn, resendDate)) {
             	  throw new RuntimeException("Unable to send documents to sending");
               }
               conn.commit();
@@ -421,10 +421,12 @@ public class Document {
         
       }
 
-    private static Boolean setAllDhxNotSentDocumentsToSend (Connection conn){
+    private static Boolean setAllDhxNotSentDocumentsToSend (Connection conn, Date resendDate){
     	 try {
              if (conn != null) {
-                 CallableStatement cs = conn.prepareCall("{call \"Set_AllDhxNotSentDocumentsInternalConsignment\"()}");
+                 Calendar cal = Calendar.getInstance();
+                 CallableStatement cs = conn.prepareCall("{call \"Set_AllDhxNotSentDocumentsInternalConsignment\"(?)}");
+                 cs.setTimestamp(1, CommonMethods.sqlDateFromDate(resendDate), cal);
                  boolean result = cs.execute();
                  cs.close();
                  return result;

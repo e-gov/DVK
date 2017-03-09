@@ -290,7 +290,7 @@ public class Sending {
               cs.setInt(3, sendingId);
               cs.executeUpdate();
               cs.close();
-              conn.commit();
+             // conn.commit();
               return true;
           } else {
               return false;

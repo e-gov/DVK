@@ -2435,7 +2435,7 @@ BEGIN
 select  *
     from    dokument d
     where   d.dokument_id in (
-     select  distinct(t1.dokument_id)
+     select  t1.dokument_id
         from    transport t1, vastuvotja v1, asutus a1
         where   t1.transport_id = v1.transport_id
                 and v1.staatus_id = 101
@@ -2444,22 +2444,25 @@ select  *
                 and v1.dhx_external_consignment_id is null
                 and  (v1.dhx_internal_consignment_id is null
 			or v1.last_send_date<p_date
-                ))  for update;
+                ) for update) ;
      
     return RC1;
 end;$$
   LANGUAGE PLPGSQL;
 
 
-CREATE OR REPLACE FUNCTION "Set_AllDhxNotSentDocumentsInternalConsignment"()
+CREATE OR REPLACE FUNCTION "Set_AllDhxNotSentDocumentsInternalConsignment"(p_date timestamp without time zone)
   RETURNS void AS
 $$
 DECLARE
 begin
-     update vastuvotja set dhx_internal_consignment_id=vastuvotja_id where vastuvotja_id in (
-     select vastuvotja_id from vastuvotja v1, asutus a1 where 
-     staatus_id=101
-       and dhx_internal_consignment_id is null and v1.asutus_id=a1.asutus_id and a1.dhx_asutus=1);
+    update vastuvotja set dhx_internal_consignment_id=vastuvotja_id, last_send_date=current_timestamp 
+      where vastuvotja_id in (
+                        select vastuvotja_id from vastuvotja v1, asutus a1 where
+                          staatus_id=101 and dhx_external_consignment_id is null
+                            and (dhx_internal_consignment_id is null
+                                or last_send_date<p_date
+                                  ) and v1.asutus_id=a1.asutus_id and a1.dhx_asutus=1);
 end;$$
   LANGUAGE PLPGSQL;
 

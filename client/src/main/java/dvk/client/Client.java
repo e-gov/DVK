@@ -589,7 +589,7 @@ public class Client {
             logger.info("    Saatmisel olevaid sõnumeid: " + String.valueOf(messages.size()));
             if (!messages.isEmpty()) {
                 HeaderVariables header = new HeaderVariables(
-                        masterCredential.getInstitutionCode(),
+                        masterCredential.getXRoadClientMemberCode(),
                         masterCredential.getPersonalIdCode(),
                         "",
                         (CommonMethods.personalIDCodeHasCountryCode(masterCredential.getPersonalIdCode()) ? masterCredential.getPersonalIdCode() : "EE" + masterCredential.getPersonalIdCode()),
@@ -778,7 +778,7 @@ public class Client {
             }
 
             HeaderVariables header = new HeaderVariables(
-                    masterCredential.getInstitutionCode(),
+                    masterCredential.getXRoadClientMemberCode(),
                     masterCredential.getPersonalIdCode(),
                     "",
                     (CommonMethods.personalIDCodeHasCountryCode(masterCredential.getPersonalIdCode()) ? masterCredential.getPersonalIdCode() : "EE" + masterCredential.getPersonalIdCode()),
@@ -912,7 +912,7 @@ public class Client {
         try {
             // Saadetava sõnumi päisesse kantavad parameetrid
             HeaderVariables header = new HeaderVariables(
-                    masterCredential.getInstitutionCode(),
+                    masterCredential.getXRoadClientMemberCode(),
                     masterCredential.getPersonalIdCode(),
                     "",
                     (CommonMethods.personalIDCodeHasCountryCode(masterCredential.getPersonalIdCode()) ? masterCredential.getPersonalIdCode() : "EE" + masterCredential.getPersonalIdCode()),
@@ -988,7 +988,7 @@ public class Client {
         try {
             // Saadetava sõnumi päisesse kantavad parameetrid
             HeaderVariables header = new HeaderVariables(
-                    masterCredential.getInstitutionCode(),
+                    masterCredential.getXRoadClientMemberCode(),
                     masterCredential.getPersonalIdCode(),
                     "",
                     (CommonMethods.personalIDCodeHasCountryCode(masterCredential.getPersonalIdCode()) ? masterCredential.getPersonalIdCode() : "EE" + masterCredential.getPersonalIdCode()),
@@ -1009,7 +1009,7 @@ public class Client {
     private static void markDocumentsReceived(ArrayList<DhlMessage> documents, UnitCredential masterCredential, String deliverySessionID, OrgSettings db, Connection dbConnection) throws Exception {
         // Saadetava sõnumi päisesse kantavad parameetrid
         HeaderVariables header = new HeaderVariables(
-                masterCredential.getInstitutionCode(),
+                masterCredential.getXRoadClientMemberCode(),
                 masterCredential.getPersonalIdCode(),
                 "",
                 (CommonMethods.personalIDCodeHasCountryCode(masterCredential.getPersonalIdCode()) ? masterCredential.getPersonalIdCode() : "EE" + masterCredential.getPersonalIdCode()),

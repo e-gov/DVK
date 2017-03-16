@@ -62,7 +62,7 @@ public class OrgCapabilityCheckerRequestsIntegration {
             ArrayList<String> orgCodes = new ArrayList<String>();
 
             HeaderVariables headerVar = new HeaderVariables(
-                    cred.getInstitutionCode(),
+                    cred.getXRoadClientMemberCode(),
                     cred.getPersonalIdCode(),
                     "",
                     (CommonMethods.personalIDCodeHasCountryCode(cred.getPersonalIdCode()) ? cred.getPersonalIdCode() : "EE"+cred.getPersonalIdCode()),

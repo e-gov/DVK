@@ -669,8 +669,7 @@ public class DvkDhxService implements DhxImplementationSpecificService {
           recipient.setLastSendDate(new Date());
           OutgoingDhxPackage pkg = packageProvider.getOutgoingPackage(new File(pipelineDataFile),
               consignmentId, getDhxRegCode(asutus),
-              getDhxSubsystem(asutus),
-              getDhxRegCode(senderOrg), getDhxSubsystem(senderOrg));
+              getDhxSubsystem(asutus));
           // if we are dealing with subsystem, then maybe we need to replace DVK adressee(subsytem
           // name) or DVK sender with DHX(membercode)
           if (asutus.getRegistrikood2() != null || senderOrg.getRegistrikood2() != null) {

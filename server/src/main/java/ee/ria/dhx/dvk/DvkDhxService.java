@@ -115,6 +115,7 @@ public class DvkDhxService implements DhxImplementationSpecificService {
   DhxMarshallerService dhxMarshallerService;
 
   @Value("${dvk-special-subsystems}")
+  @Setter
   String dvkSpecialSubsystems;
 
   @Override

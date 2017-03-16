@@ -486,10 +486,8 @@ public class DvkDhxService implements DhxImplementationSpecificService {
   // returns true if given subsystem is special DVK subsystem with which registrikood equals
   // subsystemname, not subsystemname.membercode
   private Boolean isSpecialSubsystem(String subSystem) {
-    if (subSystem.startsWith(config.getDhxSubsystemPrefix() + ".")) {
-      subSystem = subSystem.substring(config.getDhxSubsystemPrefix().length() + 1);
-    }
     String specialSubsystems = "," + dvkSpecialSubsystems + ",";
+    log.info("Searching special subsustem in: " + specialSubsystems);
     if (specialSubsystems.contains("," + subSystem + ",")) {
       return true;
     }

@@ -127,7 +127,8 @@ create table dhl_settings
 	container_version int null,
 	xroad_client_instance nvarchar(6) NOT NULL,
 	xroad_client_member_class nvarchar(50) NOT NULL,
-	xroad_client_subsystem_code nvarchar(50) NOT NULL
+	xroad_client_subsystem_code nvarchar(50) NOT NULL,
+	xroad_client_member_code nvarchar(50) NOT NULL
 )
 GO
 

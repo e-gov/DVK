@@ -1591,7 +1591,8 @@ CREATE TABLE dhl_settings (
     container_version integer NULL,
     xroad_client_instance VARCHAR(6) NOT NULL,
     xroad_client_member_class VARCHAR(50) NOT NULL,
-    xroad_client_subsystem_code VARCHAR(50) NOT NULL
+    xroad_client_subsystem_code VARCHAR(50) NOT NULL,
+    xroad_client_member_code VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE dhl_settings_folders (

@@ -123,7 +123,8 @@ create table dhl_settings
 	"container_version" int null,
 	"xroad_client_instance" VARCHAR(6) NOT NULL,
     "xroad_client_member_class" VARCHAR(50) NOT NULL,
-    "xroad_client_subsystem_code" VARCHAR(50) NOT NULL
+    "xroad_client_subsystem_code" VARCHAR(50) NOT NULL,
+    "xroad_client_member_code" VARCHAR(50) NOT NULL
 );
 
 create unique index ix_dhl_settings_1 on dhl_settings("unit_id");

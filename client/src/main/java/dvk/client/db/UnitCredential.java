@@ -32,6 +32,7 @@ public class UnitCredential {
     private String xRoadClientInstance;
     private String xRoadClientMemberClass;
     private String xRoadClientSubsystemCode;
+    private String xRoadClientMemberCode;
     
     public void setId(int id) {
         this.m_id = id;
@@ -161,6 +162,14 @@ public class UnitCredential {
 		this.xRoadClientSubsystemCode = xRoadClientSubsystemCode;
 	}
 
+	public String getXRoadClientMemberCode() {
+		return xRoadClientMemberCode;
+	}
+
+	public void setXRoadClientMemberCode(String xRoadClientMemberCode) {
+		this.xRoadClientMemberCode = xRoadClientMemberCode;
+	}
+
 	public UnitCredential() {
         clear();
     }
@@ -182,6 +191,7 @@ public class UnitCredential {
         xRoadClientInstance = "";
         xRoadClientMemberClass = "";
         xRoadClientSubsystemCode = "";
+        xRoadClientMemberCode = "";
     }
 
     public static UnitCredential[] getCredentials(OrgSettings settings, Connection dbConnection) throws Exception {
@@ -212,7 +222,8 @@ public class UnitCredential {
 	                item.setXRoadClientInstance(rs.getString("xroad_client_instance"));
 	                item.setXRoadClientMemberClass(rs.getString("xroad_client_member_class"));
 	                item.setXRoadClientSubsystemCode(rs.getString("xroad_client_subsystem_code"));
-	                
+	                item.setXRoadClientMemberCode(rs.getString("xroad_client_member_code"));
+
 	                result.add(item);
 	            }
 	            rs.close();

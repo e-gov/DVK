@@ -81,12 +81,14 @@ import dvk.core.xroad.XRoadProtocolHeader;
 @Service
 @Configuration
 public class DvkDhxService implements DhxImplementationSpecificService {
+  
+  @Value("${dvk-special-subsystems}")
+  @Setter
+  String dvkSpecialSubsystems;
 
   @Value("${server_database_environment_variable}")
   @Setter
   String serverDatabaseEnvironmentVariable;
-
-
 
   @Value("${dhx.resend.timeout}")
   @Setter
@@ -97,8 +99,7 @@ public class DvkDhxService implements DhxImplementationSpecificService {
 
   @Autowired
   AsyncDhxPackageService asyncDhxPackageService;
-
-
+  
   private List<InternalXroadMember> members;
 
 
@@ -113,10 +114,6 @@ public class DvkDhxService implements DhxImplementationSpecificService {
 
   @Autowired
   DhxMarshallerService dhxMarshallerService;
-
-  @Value("${dvk-special-subsystems}")
-  @Setter
-  String dvkSpecialSubsystems;
 
   @Override
   @Loggable

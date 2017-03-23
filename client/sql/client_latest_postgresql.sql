@@ -711,10 +711,7 @@ function "Update_DhlMessageRecipDhlID"(
     p_dhl_direct_producer_name character varying,
     p_dhl_direct_service_url character varying,
     p_dhl_id integer,
-    p_query_id character varying,
-    p_xroad_service_instance character varying,
-    p_xroad_service_member_class character varying,
-    p_xroad_service_member_code character varying)
+    p_query_id character varying)
 returns boolean
 as $$
 begin

@@ -39,6 +39,7 @@
 | 03.01.2017 | 1.7.11 | Täiendatud paigaldusprotsessi kirjeldust peatükis „Paigaldamine“. Täiendatud konfiguratsioonifaili dvk_client.properties kirjeldust kuhu lisandusid XTee versioon 4-ja põhised päise seadistused ja nende asukohad andmbaasis. | Tanel Milsaar |
 | 06.01.2017 | 1.7.12 | Konfiguratsioonifailis dvk_client.properties adit.xRoad.service.subsystemCode väärtus muutus "ametlikud-dokumendid" - "adit" | Tanel Milsaar |
 | 17.01.2017 | 1.7.13 | Eemaldatud üleliigne samm rakenduse ehitamisest | Tanel Milsaar |
+| 04.04.2017 | 1.7.14 | Lisatud DVK Maveni repo asukoht | Martin Maarand |
 
 
 ## Nõudmised arvutile
@@ -695,6 +696,8 @@ start_delete.cmd
 ## Rakenduse ehitamine
 
 Rakenduse ehitamiseks on alates DVK versioonist 1.6.0 kasutusel Maven raamistik (http://maven.apache.org/). Eelnevate versioonide ehitamiseks vaadata https://github.com/e-gov/DVK/tree/master/doc/client/arhiiv/1.6.2  paigaldusjuhendit. Alates 1.7.1 versioonist ehitamisskript ise asub projekti juurkataloogis ja kannab nime „pom.xml“. Selles failis on kirjeldatud ära rakenduse kasutatavad teegid (dependencies) ja rakenduse ehitamise juhised (build) ning ehitamisprofiilid (profile). Ehitamiseks toimi järgnevalt:
+
+**NB!** DVK Maveni repositoorium http://ftp.aso.ee/artifactory/DVK-libs-release-local/
 
 1. Lae Githubist alla DVK projekt https://github.com/e-gov/DVK
 

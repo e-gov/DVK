@@ -36,7 +36,10 @@
 | 26.01.2015 | 1.7.8 | Logimise parameetrid ja fail uuendatud | Aleksei Kokarev |
 | 20.01.2016 | 1.7.9 | Muudetud SVN lingid Githubi linkideks | Kertu Hiire |
 | 05.12.2016 | 1.7.10 | Dokumentatsioon üle viidud MarkDown formaati ilma sisulisi muudatusi teostamata | Kertu Hiire |
-| 03.01.2016 | 1.7.11 | Täiendatud paigaldusprotsessi kirjeldust peatükis „Paigaldamine“. Täiendatud konfiguratsioonifaili dvk_client.properties kirjeldust kuhu lisandusid XTee versioon 4-ja põhised päise seadistused ja nende asukohad andmbaasis. | Tanel Milsaar |
+| 03.01.2017 | 1.7.11 | Täiendatud paigaldusprotsessi kirjeldust peatükis „Paigaldamine“. Täiendatud konfiguratsioonifaili dvk_client.properties kirjeldust kuhu lisandusid XTee versioon 4-ja põhised päise seadistused ja nende asukohad andmbaasis. | Tanel Milsaar |
+| 06.01.2017 | 1.7.12 | Konfiguratsioonifailis dvk_client.properties adit.xRoad.service.subsystemCode väärtus muutus "ametlikud-dokumendid" - "adit" | Tanel Milsaar |
+| 17.01.2017 | 1.7.13 | Eemaldatud üleliigne samm rakenduse ehitamisest | Tanel Milsaar |
+
 
 ## Nõudmised arvutile
 

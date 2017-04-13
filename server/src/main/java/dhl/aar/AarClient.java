@@ -43,8 +43,8 @@ import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import dvk.core.Settings;
 import dvk.core.xroad.XRoadClient;
-import dvk.core.xroad.XRoadProtocolHeader;
-import dvk.core.xroad.XRoadProtocolVersion;
+import dvk.core.xroad.XRoadHeader;
+import dvk.core.xroad.XRoadMessageProtocolVersion;
 import dvk.core.xroad.XRoadService;
 
 /**
@@ -54,7 +54,7 @@ public class AarClient {
 	
 	private static final Logger logger = LogManager.getLogger(AarClient.class.getName());
 	
-	private static final XRoadProtocolVersion X_ROAD_PROTOCOL_VERSION = XRoadProtocolVersion.V2_0;
+	private static final XRoadMessageProtocolVersion X_ROAD_PROTOCOL_VERSION = XRoadMessageProtocolVersion.V2_0;
 	
     private String orgCode;
     private String personCode;
@@ -99,18 +99,18 @@ public class AarClient {
         		+" isikukood:" + this.personCode);
         
         // Saadetava sõnumi päisesse kantavad parameetrid
-        XRoadProtocolHeader xHeader = null;
-        if (X_ROAD_PROTOCOL_VERSION.equals(XRoadProtocolVersion.V4_0)) {
-        	XRoadClient xRoadClient = new XRoadClient(Settings.xRoadInstance, Settings.xRoadMemberClass, orgCode);
-        	XRoadService xRoadService = new XRoadService(Settings.xRoadInstance, Settings.xRoadMemberClass, "Member code unknown yet", "aar", "asutused", "v1");
+        XRoadHeader xHeader = null;
+        if (X_ROAD_PROTOCOL_VERSION.equals(XRoadMessageProtocolVersion.V4_0)) {
+        	XRoadClient xRoadClient = new XRoadClient(Settings.getDvkXRoadServiceInstance(), Settings.getDvkXRoadServiceMemberClass(), orgCode);
+        	XRoadService xRoadService = new XRoadService("EE", "GOV", "Member code unknown yet", "aar", "asutused", "v1");
         	
-        	xHeader = new XRoadProtocolHeader(xRoadClient, xRoadService, queryId,
+        	xHeader = new XRoadHeader(xRoadClient, xRoadService, queryId,
         			CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode, "");
         } else {
         	// Using X-Road protocol version 2.0 by default
-        	xHeader = new XRoadProtocolHeader(
+        	xHeader = new XRoadHeader(
         			orgCode, "aar", personCode, queryId, requestName, "",
-        			CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode, XRoadProtocolVersion.V2_0);
+        			CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode, XRoadMessageProtocolVersion.V2_0);
         }
         
 
@@ -140,7 +140,7 @@ public class AarClient {
         elKeha.addChild(elAsutused);
         elRequest.addChild(elKeha);
         env.getBody().addChild(elRequest);
-        env = xHeader.appendToSOAPHeader(env, fac);
+        env = xHeader.prepareSOAPHeader(env, fac);
         requestMsg.setEnvelope(env);
 
         // Käivitame päringu
@@ -183,9 +183,9 @@ public class AarClient {
         String queryId = "aar" + orgCode + String.valueOf((new Date()).getTime());
 
         // Saadetava sõnumi päisesse kantavad parameetrid
-        XRoadProtocolHeader header = new XRoadProtocolHeader(
+        XRoadHeader header = new XRoadHeader(
                 orgCode, "aar", personCode, queryId, requestName, "",
-                CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode, XRoadProtocolVersion.V2_0);
+                CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode, XRoadMessageProtocolVersion.V2_0);
 
         // Koodtame päringu faili
         String requestFile = ametikohadRequestType.createRequestFile();
@@ -213,7 +213,7 @@ public class AarClient {
         elKeha.addChild(elMain);
         elRequest.addChild(elKeha);
         env.getBody().addChild(elRequest);
-        env = header.appendToSOAPHeader(env, fac);
+        env = header.prepareSOAPHeader(env, fac);
         requestMsg.setEnvelope(env);
 
         // Käivitame päringu
@@ -255,9 +255,9 @@ public class AarClient {
         String queryId = "aar" + orgCode + String.valueOf((new Date()).getTime());
 
         // Saadetava sõnumi päisesse kantavad parameetrid
-        XRoadProtocolHeader header = new XRoadProtocolHeader(
+        XRoadHeader header = new XRoadHeader(
                 orgCode, "aar", personCode, queryId, requestName, "",
-                CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode, XRoadProtocolVersion.V2_0);
+                CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode, XRoadMessageProtocolVersion.V2_0);
 
         // Koodtame päringu faili
         String requestFile = isikudRequestType.createRequestFile();
@@ -285,7 +285,7 @@ public class AarClient {
         elKeha.addChild(elMain);
         elRequest.addChild(elKeha);
         env.getBody().addChild(elRequest);
-        env = header.appendToSOAPHeader(env, fac);
+        env = header.prepareSOAPHeader(env, fac);
         requestMsg.setEnvelope(env);
 
         // Käivitame päringu
@@ -327,9 +327,9 @@ public class AarClient {
         String queryId = "aar" + orgCode + String.valueOf((new Date()).getTime());
 
         // Saadetava sõnumi päisesse kantavad parameetrid
-        XRoadProtocolHeader header = new XRoadProtocolHeader(
+        XRoadHeader header = new XRoadHeader(
                 orgCode, "aar", personCode, queryId, requestName, "",
-                CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode, XRoadProtocolVersion.V2_0);
+                CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode, XRoadMessageProtocolVersion.V2_0);
 
         // Koodtame päringu faili
         String requestFile = taitmisedRequestType.createRequestFile();
@@ -357,7 +357,7 @@ public class AarClient {
         elKeha.addChild(elMain);
         elRequest.addChild(elKeha);
         env.getBody().addChild(elRequest);
-        env = header.appendToSOAPHeader(env, fac);
+        env = header.prepareSOAPHeader(env, fac);
         requestMsg.setEnvelope(env);
 
         // Käivitame päringu
@@ -396,9 +396,9 @@ public class AarClient {
         String queryId = "aar" + this.orgCode + String.valueOf((new Date()).getTime());
 
         // Saadetava sõnumi päisesse kantavad parameetrid
-        XRoadProtocolHeader header = new XRoadProtocolHeader(
+        XRoadHeader header = new XRoadHeader(
                 this.orgCode, "aar", this.personCode, queryId, requestName, "",
-                CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode, XRoadProtocolVersion.V2_0);
+                CommonMethods.personalIDCodeHasCountryCode(this.personCode) ? this.personCode : "EE" + this.personCode, XRoadMessageProtocolVersion.V2_0);
 
         // SOAP sõnumi saatmine
         serviceClient.getOptions().setProperty(Constants.Configuration.ENABLE_SWA, Constants.VALUE_FALSE);
@@ -431,7 +431,7 @@ public class AarClient {
         elKeha.addChild(elMain);
         elRequest.addChild(elKeha);
         env.getBody().addChild(elRequest);
-        env = header.appendToSOAPHeader(env, fac);
+        env = header.prepareSOAPHeader(env, fac);
         requestMsg.setEnvelope(env);
 
         // Käivitame päringu

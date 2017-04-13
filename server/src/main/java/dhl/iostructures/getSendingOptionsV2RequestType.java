@@ -6,7 +6,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import dvk.core.CommonMethods;
-import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadHeader;
 
 public class getSendingOptionsV2RequestType {
 	
@@ -25,7 +25,7 @@ public class getSendingOptionsV2RequestType {
         vastuvotmataDokumenteOotel = false;
     }
 
-    public static getSendingOptionsV2RequestType getFromSOAPBody(org.apache.axis.MessageContext context, XRoadProtocolHeader xRoadProtocolHeader) {
+    public static getSendingOptionsV2RequestType getFromSOAPBody(org.apache.axis.MessageContext context, XRoadHeader xRoadHeader) {
         org.apache.axis.Message msg = null;
         SOAPBody body = null;
         NodeList nodes = null;

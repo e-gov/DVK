@@ -20,7 +20,7 @@ import dhl.users.UserProfile;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import dvk.core.Settings;
-import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadHeader;
 
 public class Sending {
     private static Logger logger = Logger.getLogger(Sending.class);
@@ -223,7 +223,7 @@ public class Sending {
     }
     
     
-    public int addToDB(Connection conn, XRoadProtocolHeader xTeePais) throws IllegalArgumentException, SQLException {
+    public int addToDB(Connection conn, XRoadHeader xTeePais) throws IllegalArgumentException, SQLException {
     	if (conn != null) {
 
             logger.debug("Adding transport info to database: ");
@@ -275,7 +275,7 @@ public class Sending {
     }
 
     
-    public boolean update(boolean updateChildObjects, Connection conn, XRoadProtocolHeader xTeePais) {
+    public boolean update(boolean updateChildObjects, Connection conn, XRoadHeader xTeePais) {
         logger.debug("Updating sending. Parameters: ");
         logger.debug("sending_id: " + m_id);
         logger.debug("document_id: " + m_documentID);
@@ -312,7 +312,7 @@ public class Sending {
     }
     
     
-    public static Sending fromXML(XMLStreamReader xmlReader, Connection conn, XRoadProtocolHeader xTeePais) throws AxisFault {
+    public static Sending fromXML(XMLStreamReader xmlReader, Connection conn, XRoadHeader xTeePais) throws AxisFault {
         logger.debug("Parsing sending information from XML...");
         try {
             Calendar cal = Calendar.getInstance();

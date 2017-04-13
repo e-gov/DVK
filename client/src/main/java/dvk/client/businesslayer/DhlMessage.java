@@ -1,5 +1,39 @@
 package dvk.client.businesslayer;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.sql.CallableStatement;
+import java.sql.Clob;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Stack;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
 import dvk.client.ClientAPI;
 import dvk.client.conf.OrgAddressFilter;
 import dvk.client.conf.OrgSettings;
@@ -9,24 +43,11 @@ import dvk.client.dhl.service.LoggingService;
 import dvk.client.iostructures.Fault;
 import dvk.client.iostructures.GetSendStatusResponseItem;
 import dvk.client.iostructures.SimpleAddressData;
-import dvk.core.*;
-import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamReader;
-import java.io.*;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Stack;
+import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
+import dvk.core.ContainerVersion;
+import dvk.core.FileSplitResult;
+import dvk.core.Settings;
 
 public class DhlMessage implements Cloneable {
 
@@ -64,7 +85,7 @@ public class DhlMessage implements Cloneable {
     private String m_faultDetail;
     private boolean m_statusUpdateNeeded;
     private String m_metaXML;
-    private String m_queryID; // X-tee põringu põise ID
+    private String m_queryID; // X-tee päringu päise ID
     private ArrayList<MessageRecipient> m_recipients; // sõnumi saajad
     private String m_recipientDepartmentNr;
     private String m_recipientDepartmentName;
@@ -81,8 +102,7 @@ public class DhlMessage implements Cloneable {
 
     private int m_containerVersion;
 
-    // DeliveryChannel tõidetakse saatmisel ja seda infot
-    // andmebaasi ei salvestata.
+    // DeliveryChannel täidetakse saatmisel ja seda infot andmebaasi ei salvestata.
     private DeliveryChannel m_deliveryChannel;
 
 
@@ -1029,18 +1049,27 @@ public class DhlMessage implements Cloneable {
         }
     }
 
-    public static int getMessageID(int dhlID, String producerName, String serviceURL, boolean isIncoming, OrgSettings db, Connection dbConnection) {
+    public static int getMessageID(
+            int dhlID,
+            String xRoadServiceInstance,
+            String xRoadServiceMemeberClass,
+            String xRoadServiceMemeberCode,
+            String producerName,
+            String serviceURL,
+            boolean isIncoming,
+            OrgSettings db,
+            Connection dbConnection) {
         logger.debug("Getting message ID from database. Parameters: ");
         logger.debug("dhlID: " + dhlID);
         logger.debug("isIncoming: " + isIncoming);
-        logger.debug("producerName: " + producerName);
+        logger.debug("producerName (service subsystemCode): " + producerName);
         logger.debug("serviceURL: " + serviceURL);
         try {
             if (dbConnection != null) {
                 int parNr = 1;
-                CallableStatement cs = dbConnection.prepareCall("{call Get_DhlMessageID(?,?,?,?,?)}");
+                CallableStatement cs = dbConnection.prepareCall("{call Get_DhlMessageID(?,?,?,?,?,?,?,?)}");
                 if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    cs = dbConnection.prepareCall("{? = call \"Get_DhlMessageID\"(?,?,?,?)}");
+                    cs = dbConnection.prepareCall("{? = call \"Get_DhlMessageID\"(?,?,?,?,?,?,?)}");
                 }
 
                 // SQL Anywhere JDBC client requires that output parameters are supplied as last parameter(s).
@@ -1050,21 +1079,28 @@ public class DhlMessage implements Cloneable {
                 }
 
                 cs.setInt(parNr++, dhlID);
+                cs.setString(parNr++, xRoadServiceInstance);
+                cs.setString(parNr++, xRoadServiceMemeberClass);
+                cs.setString(parNr++, xRoadServiceMemeberCode);
                 cs.setString(parNr++, producerName);
                 cs.setString(parNr++, serviceURL);
                 cs.setInt(parNr++, (isIncoming ? 1 : 0));
+                
                 if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
                     cs.registerOutParameter(parNr, Types.INTEGER);
                 } else {
                     cs.registerOutParameter(1, Types.INTEGER);
                 }
+                
                 cs.execute();
+                
                 int result = 0;
                 if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
                     result = cs.getInt(parNr);
                 } else {
                     result = cs.getInt(1);
                 }
+                
                 cs.close();
 
                 return result;
@@ -1080,13 +1116,22 @@ public class DhlMessage implements Cloneable {
         }
     }
 
-    public static int getMessageID(String dhlGuid, String producerName, String serviceURL, boolean isIncoming, OrgSettings db, Connection dbConnection) {
+    public static int getMessageID(
+            String dhlGuid,
+            String xRoadServiceInstance,
+            String xRoadServiceMemeberClass,
+            String xRoadServiceMemeberCode,
+            String producerName,
+            String serviceURL,
+            boolean isIncoming,
+            OrgSettings db,
+            Connection dbConnection) {
         try {
             if (dbConnection != null) {
                 int parNr = 1;
-                CallableStatement cs = dbConnection.prepareCall("{call Get_DhlMessageIDByGuid(?,?,?,?,?)}");
+                CallableStatement cs = dbConnection.prepareCall("{call Get_DhlMessageIDByGuid(?,?,?,?,?,?,?,?)}");
                 if (db.getDbProvider().equalsIgnoreCase(CommonStructures.PROVIDER_TYPE_POSTGRE)) {
-                    cs = dbConnection.prepareCall("{? = call \"Get_DhlMessageIDByGuid\"(?,?,?,?)}");
+                    cs = dbConnection.prepareCall("{? = call \"Get_DhlMessageIDByGuid\"(?,?,?,?,?,?,?)}");
                 }
 
                 // SQL Anywhere JDBC client requires that output parameters are supplied as last parameter(s).
@@ -1096,21 +1141,28 @@ public class DhlMessage implements Cloneable {
                 }
 
                 cs.setString(parNr++, dhlGuid);
+                cs.setString(parNr++, xRoadServiceInstance);
+                cs.setString(parNr++, xRoadServiceMemeberClass);
+                cs.setString(parNr++, xRoadServiceMemeberCode);
                 cs.setString(parNr++, producerName);
                 cs.setString(parNr++, serviceURL);
                 cs.setInt(parNr++, (isIncoming ? 1 : 0));
+                
                 if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
                     cs.registerOutParameter(parNr, Types.INTEGER);
                 } else {
                     cs.registerOutParameter(1, Types.INTEGER);
                 }
+                
                 cs.execute();
+                
                 int result = 0;
                 if (CommonStructures.PROVIDER_TYPE_SQLANYWHERE.equalsIgnoreCase(db.getDbProvider())) {
                     result = cs.getInt(parNr);
                 } else {
                     result = cs.getInt(1);
                 }
+                
                 cs.close();
 
                 return result;
@@ -1187,7 +1239,7 @@ public class DhlMessage implements Cloneable {
                 if (originalRecipient != null) {
                     logger.debug("Original recipient is defined. Saving messageRecipient to database.");
                     // Kuna antud juhul on ilmselt tegemist DVK serveri poolel automaatselt
-                    // lisatud adressaadiga, siis jääb siin määramata saatmise põringu ID
+                    // lisatud adressaadiga, siis jääb siin määramata saatmise päringu ID
                     originalRecipient.setSendingDate(r.getSendingDate());
                     originalRecipient.setSendingStatusID(r.getSendingStatusID());
                     originalRecipient.setReceivedDate(r.getReceivedDate());
@@ -1198,6 +1250,7 @@ public class DhlMessage implements Cloneable {
                     originalRecipient.setFaultString(r.getFaultString());
                     originalRecipient.setFaultDetail(r.getFaultDetail());
                     originalRecipient.setDhlId(r.getDhlID());
+                    
                     originalRecipient.saveToDB(db, dbConnection);
                 } else {
                     logger.debug("Original recipient is undefined. Saving messageRecipient to database.");
@@ -3033,7 +3086,7 @@ public class DhlMessage implements Cloneable {
 
     /**
      * Jaotab sõnumi iga erineva edastuskanali jaoks omaette alamsõnumiteks.
-     * Alamsõnumid erinevad õksteisest DVK konteineri <transport> elemendis
+     * Alamsõnumid erinevad üksteisest DVK konteineri <transport> elemendis
      * asuvate adressaatide poolest.
      *
      * @return Alamsõnumite nimekiri
@@ -3048,11 +3101,8 @@ public class DhlMessage implements Cloneable {
             this.m_recipients = MessageRecipient.getList(this.m_id, myDatabase, dbConnection);
         }
 
-        // Kontrollime, kas mõnedele adressaatidele saaks otse andmebaasist
-        // andmebaasi saata.
-        //
-        // Esmalt eraldame adressaatide hulgast need adressaadid, kes
-        // on saatjaga samas asutuses.
+        // Kontrollime, kas mõnedele adressaatidele saaks otse andmebaasist andmebaasi saata.
+        // Esmalt eraldame adressaatide hulgast need adressaadid, kes on saatjaga samas asutuses.
         String senderOrgCode = this.m_senderOrgCode;
         ArrayList<MessageRecipient> allRecipients = this.getRecipients();
         ArrayList<MessageRecipient> centralServerRecipients = allRecipients;
@@ -3068,13 +3118,13 @@ public class DhlMessage implements Cloneable {
         }
         logger.info("Minuga samas asutuses on " + String.valueOf(myOrgRecipients.size()) + " adressaati.");
 
-// Kui mõni adressaat on saatjaga samas asutuses, siis tuvastame,
-// kas meil on teada andmebaasiõhendus dokumendi otse saatmiseks.
-//
-// Isegi juhul, kui sama dokument lõheb samas andmebaasis mitmele
-// adressaadile, saadame ta sinna mitmes eksemplaris. Vastasel juhul
-// ei saa adressaadipõhiselt jõlgida, milline adressaat on dokumendi
-// kõtte saanud ja milline mitte.
+		// Kui mõni adressaat on saatjaga samas asutuses, siis tuvastame,
+		// kas meil on teada andmebaasiühendus dokumendi otse saatmiseks.
+		//
+		// Isegi juhul, kui sama dokument läheb samas andmebaasis mitmele
+		// adressaadile, saadame ta sinna mitmes eksemplaris. Vastasel juhul
+		// ei saa adressaadipõhiselt jälgida, milline adressaat on dokumendi
+		// kätte saanud ja milline mitte.
         for (OrgSettings db : allKnownDatabases) {
             // Never-ever send anything back to the same database it
             // originally came from.
@@ -3125,19 +3175,19 @@ public class DhlMessage implements Cloneable {
             String centralServerFilePath = centralServerMessage.createNewFile(centralServerRecipients, containerVersion);
             centralServerMessage.setFilePath(centralServerFilePath);
 
-// Uuendame objektis olevat adressaatide nimekirja vastavalt
-// XML konteineris tehtud muudatustele.
+			// Uuendame objektis olevat adressaatide nimekirja vastavalt
+			// XML konteineris tehtud muudatustele.
             centralServerMessage.loadRecipientsFromXML();
 
-// Leiame nimekirja erinevatest serveritest, kuhu antud dokument tuleks saata.
-// S.t. kui dokument peab jõudma erinevatele adressaatidele erinevate serverite kaudu
+			// Leiame nimekirja erinevatest serveritest, kuhu antud dokument tuleks saata.
+			// S.t. kui dokument peab jõudma erinevatele adressaatidele erinevate serverite kaudu
             ArrayList<DhlCapability> destinationServers = DhlCapability.getListByMessageID(centralServerMessage.getId(), myDatabase, dbConnection);
 
-// Võtame filtreerimiseks võlja kõigi teadaolevate asutuste nimekirja
+            // Võtame filtreerimiseks võlja kõigi teadaolevate asutuste nimekirja
             ArrayList<DhlCapability> allKnownOrgs = DhlCapability.getList(myDatabase, dbConnection);
 
-// Kui serverite massiiv on tõhi, siis lisame sinna
-// õhe tõhja võõrtuse DVK keskserveri jaoks
+			// Kui serverite massiiv on tühi, siis lisame sinna
+			// ühe tühja väärtuse DVK keskserveri jaoks
             if (destinationServers == null) {
                 destinationServers = new ArrayList<DhlCapability>();
             }
@@ -3145,6 +3195,9 @@ public class DhlMessage implements Cloneable {
                 DhlCapability defaultServer = new DhlCapability();
                 defaultServer.setIsDhlCapable(true);
                 defaultServer.setIsDhlDirectCapable(false);
+                defaultServer.setXRoadServiceInstance("");
+                defaultServer.setXRoadServiceMemberClass("");
+                defaultServer.setXRoadServiceMemberCode("");
                 defaultServer.setDhlDirectProducerName("");
                 defaultServer.setDhlDirectServiceUrl("");
                 destinationServers.add(defaultServer);
@@ -3154,16 +3207,28 @@ public class DhlMessage implements Cloneable {
             for (int i = 0; i < destinationServers.size(); i++) {
                 // Paneme kokku konkreetsesse serverisse saadetavate saajate sõnumi,
                 // ehk siis  eemaldame saajate hulgast need, kes selles sihtserveris ei paikne
+                
+                String currentXRoadServiceInstance = destinationServers.get(i).getXRoadServiceInstance();
+                String currentXRoadServiceMemberClass = destinationServers.get(i).getXRoadServiceMemberClass();
+                String currentXRoadServiceMemberCode = destinationServers.get(i).getXRoadServiceMemberCode();
                 String currentProducer = destinationServers.get(i).getDhlDirectProducerName();
                 String currentServiceUrl = destinationServers.get(i).getDhlDirectServiceUrl();
-                if (((currentServiceUrl == null)) || (currentServiceUrl.length() == 0)) {
+                
+                if (StringUtils.isBlank(currentXRoadServiceInstance)
+                        || StringUtils.isBlank(currentXRoadServiceMemberClass)
+                        || StringUtils.isBlank(currentXRoadServiceMemberCode)
+                        || StringUtils.isBlank(currentProducer)
+                        || StringUtils.isBlank(currentServiceUrl)) {
+                    
+                    currentXRoadServiceInstance = Settings.getDvkXRoadServiceInstance();
+                    currentXRoadServiceMemberClass = Settings.getDvkXRoadServiceMemberClass();
+                    currentXRoadServiceMemberCode = Settings.getDvkXRoadServiceMemberCode();
+                    currentProducer = Settings.getDvkXRoadServiceSubsystemCode();
+                    
                     currentServiceUrl = Settings.Client_ServiceUrl;
                 }
-                if ((currentProducer == null) || (currentProducer.length() == 0)) {
-                    currentProducer = Settings.Client_ProducerName;
-                }
 
-                // Filtreerime võlja asutused, kes saavad sõnumit aktiivse (indexiga i) DVK serveri kaudu
+                // Filtreerime välja asutused, kes saavad sõnumit aktiivse (indexiga i) DVK serveri kaudu
                 ArrayList<String> orgs = DhlCapability.getOrgsByCapability(destinationServers.get(i), myDatabase, dbConnection); // nimekiri asutuse koodidest
                 if ((orgs != null) && (orgs.size() > 0)) {
                     DhlMessage newMessage = (DhlMessage) centralServerMessage.clone();
@@ -3173,8 +3238,8 @@ public class DhlMessage implements Cloneable {
                         if (orgs.contains(mr.getRecipientOrgCode())) {
                             allowedOrgs.add(mr.getRecipientOrgCode());
                         } else {
-                            // Kontrollime, kas me sellist asutust õldse tunneme.
-                            // Kui ei tunne, siis õrme teda igaks juhuks võlja viska.
+                            // Kontrollime, kas me sellist asutust üldse tunneme.
+                            // Kui ei tunne, siis ärme teda igaks juhuks välja viska.
                             boolean orgFound = false;
                             for (int j = 0; j < allKnownOrgs.size(); j++) {
                                 if (CommonMethods.stringsEqualIgnoreNull(allKnownOrgs.get(i).getOrgCode(), mr.getRecipientOrgCode())) {
@@ -3190,12 +3255,15 @@ public class DhlMessage implements Cloneable {
 
                     String newFilePath = newMessage.CreateNewFile(allowedOrgs, containerVersion); // eemldada sõnumi XMList need saajad, kes aktiivse serveri kaudu kirja ei saa
                     newMessage.setFilePath(newFilePath);
-
-                    newMessage.getDeliveryChannel().setServiceUrl(currentServiceUrl);
+                    
+                    newMessage.getDeliveryChannel().setXRoadServiceInstance(currentXRoadServiceInstance);
+                    newMessage.getDeliveryChannel().setXRoadServiceMemberClass(currentXRoadServiceMemberClass);
+                    newMessage.getDeliveryChannel().setXRoadServiceMemberCode(currentXRoadServiceMemberCode);
                     newMessage.getDeliveryChannel().setProducerName(currentProducer);
+                    newMessage.getDeliveryChannel().setServiceUrl(currentServiceUrl);
 
-// Paneme keskserveri kaudu saadetavad sõnumid ettepoole,
-// et saatmisel saaks keskserveri ID võimalikult kiiresti kõtte.
+					// Paneme keskserveri kaudu saadetavad sõnumid ettepoole,
+					// et saatmisel saaks keskserveri ID võimalikult kiiresti kõtte.
                     result.add(0, newMessage);
                     logger.info("Added message clone for central server delivery");
                 }

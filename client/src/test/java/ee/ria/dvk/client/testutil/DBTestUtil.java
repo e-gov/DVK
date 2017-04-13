@@ -1,14 +1,5 @@
 package ee.ria.dvk.client.testutil;
 
-import dvk.client.businesslayer.DhlMessage;
-import dvk.client.conf.OrgSettings;
-import dvk.client.db.UnitCredential;
-import dvk.client.dhl.service.DatabaseSessionService;
-import dvk.core.CommonMethods;
-import dvk.core.CommonStructures;
-import integration.ClientRequestsIntegration;
-import org.apache.log4j.Logger;
-
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -16,6 +7,16 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.log4j.Logger;
+
+import dvk.client.businesslayer.DhlMessage;
+import dvk.client.conf.OrgSettings;
+import dvk.client.db.UnitCredential;
+import dvk.client.dhl.service.DatabaseSessionService;
+import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
+import integration.ClientRequestsIntegration;
 
 public class DBTestUtil {
     private static Logger logger = Logger.getLogger(DBTestUtil.class);

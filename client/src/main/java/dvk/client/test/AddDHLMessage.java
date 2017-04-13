@@ -4,10 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -19,12 +16,8 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 
-import dvk.client.businesslayer.DhlMessage;
 import dvk.client.conf.OrgSettings;
-import dvk.client.db.DBConnection;
-import dvk.client.db.UnitCredential;
 import dvk.core.CommonMethods;
-import dvk.core.CommonStructures;
 import dvk.core.Settings;
 
 public class AddDHLMessage {

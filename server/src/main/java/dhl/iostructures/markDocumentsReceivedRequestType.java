@@ -7,7 +7,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import dvk.core.CommonMethods;
-import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadHeader;
 
 public class markDocumentsReceivedRequestType {
 	
@@ -29,7 +29,7 @@ public class markDocumentsReceivedRequestType {
         ametikohtId = 0;
     }
 
-    public static markDocumentsReceivedRequestType getFromSOAPBody(org.apache.axis.MessageContext context, XRoadProtocolHeader xRoadProtocolHeader) {
+    public static markDocumentsReceivedRequestType getFromSOAPBody(org.apache.axis.MessageContext context, XRoadHeader xRoadHeader) {
         try {
             org.apache.axis.Message msg = context.getRequestMessage();
             SOAPBody body = msg.getSOAPBody();

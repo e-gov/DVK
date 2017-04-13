@@ -1,13 +1,14 @@
 package dvk.client.conf;
 
-import dvk.core.CommonMethods;
-import dvk.core.CommonStructures;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
 
 public class OrgSettings implements Cloneable {
     

@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	
 	<artifactId>client</artifactId>
-	<version>1.7.8</version>
+	<version>1.8.0</version>
 	<packaging>jar</packaging>
 	
 	<name>dvk-client</name>
@@ -106,12 +106,6 @@
 			<groupId>dvk</groupId>
 			<artifactId>core</artifactId>
 			<version>1.7.3</version>
-			<exclusions>
-				<exclusion>
-					<groupId>*</groupId>
-					<artifactId>*</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		
 		<dependency>
@@ -148,12 +142,6 @@
 			<groupId>com.sybase</groupId>
 			<artifactId>jdbc3-tds</artifactId>
 			<version>6.0</version>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.3.2</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>

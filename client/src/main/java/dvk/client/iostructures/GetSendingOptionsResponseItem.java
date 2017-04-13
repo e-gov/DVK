@@ -1,12 +1,13 @@
 package dvk.client.iostructures;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import dvk.client.businesslayer.ErrorLog;
 import dvk.client.dhl.service.LoggingService;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 public class GetSendingOptionsResponseItem {
     private String m_regNr;

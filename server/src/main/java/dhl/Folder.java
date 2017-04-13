@@ -5,7 +5,7 @@ import java.sql.Connection;
 import java.sql.Types;
 
 import dvk.core.CommonMethods;
-import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadHeader;
 
 public class Folder {
     public static final int NONEXISTING_FOLDER = Integer.MIN_VALUE;
@@ -82,7 +82,7 @@ public class Folder {
     }
 
     public static int getFolderIdByPath(String path, int organizationID, Connection conn,
-                                        boolean allowUnspecified, boolean allowNew, XRoadProtocolHeader xTeePais) {
+                                        boolean allowUnspecified, boolean allowNew, XRoadHeader xTeePais) {
         if ((path == null) || (path.length() < 1)) {
             return allowUnspecified ? UNSPECIFIED_FOLDER : GLOBAL_ROOT_FOLDER;
         }
@@ -180,7 +180,7 @@ public class Folder {
 
 
     
-    public static int createFolder(String fullPath, int parentID, int orgID, String folderNumber, Connection conn, XRoadProtocolHeader xTeePais) {
+    public static int createFolder(String fullPath, int parentID, int orgID, String folderNumber, Connection conn, XRoadHeader xTeePais) {
     	try {
             if (conn != null) {
                 while (fullPath.startsWith(DELIMITER)) {

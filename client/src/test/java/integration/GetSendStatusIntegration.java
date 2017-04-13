@@ -1,17 +1,17 @@
 package integration;
 
+import java.sql.Connection;
+import java.util.Date;
+import java.util.List;
+
+import org.junit.Assert;
+
 import dvk.client.businesslayer.DhlMessage;
 import dvk.client.businesslayer.MessageRecipient;
 import dvk.client.conf.OrgSettings;
 import dvk.client.db.DBConnection;
 import dvk.client.dhl.service.DatabaseSessionService;
 import dvk.core.Settings;
-import org.junit.Assert;
-import org.junit.Test;
-
-import java.sql.Connection;
-import java.util.Date;
-import java.util.List;
 
 /**
  * @author Hendrik Pärna

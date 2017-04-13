@@ -1,18 +1,13 @@
 package dvk.client.businesslayer;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
-import java.sql.Connection;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import dvk.client.businesslayer.DhlMessage;
-import dvk.client.businesslayer.MessageRecipient;
 import dvk.client.conf.OrgSettings;
-import dvk.client.db.DBConnection;
-import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 
 public class DhlMessageTest {

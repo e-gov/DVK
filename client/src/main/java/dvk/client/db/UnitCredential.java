@@ -1,10 +1,5 @@
 package dvk.client.db;
 
-import dvk.client.businesslayer.ErrorLog;
-import dvk.client.conf.OrgSettings;
-import dvk.client.dhl.service.LoggingService;
-import dvk.core.CommonMethods;
-import dvk.core.CommonStructures;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -12,10 +7,13 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import dvk.client.businesslayer.ErrorLog;
+import dvk.client.conf.OrgSettings;
+import dvk.client.dhl.service.LoggingService;
+import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
 
 public class UnitCredential {
-	private static Logger logger = Logger.getLogger(UnitCredential.class.getName());
 	
 	private int m_id;
     private String m_institutionCode;
@@ -30,6 +28,11 @@ public class UnitCredential {
     private String m_occupationName;
     private List<String> m_folders;
     private int m_containerVersion;
+    
+    private String xRoadClientInstance;
+    private String xRoadClientMemberClass;
+    private String xRoadClientSubsystemCode;
+    private String xRoadClientMemberCode;
     
     public void setId(int id) {
         this.m_id = id;
@@ -135,7 +138,39 @@ public class UnitCredential {
 		m_containerVersion = version;
 	}
 
-    public UnitCredential() {
+    public String getXRoadClientInstance() {
+		return xRoadClientInstance;
+	}
+
+	public void setXRoadClientInstance(String xRoadClientInstance) {
+		this.xRoadClientInstance = xRoadClientInstance;
+	}
+
+	public String getXRoadClientMemberClass() {
+		return xRoadClientMemberClass;
+	}
+
+	public void setXRoadClientMemberClass(String xRoadClientMemberClass) {
+		this.xRoadClientMemberClass = xRoadClientMemberClass;
+	}
+
+	public String getXRoadClientSubsystemCode() {
+		return xRoadClientSubsystemCode;
+	}
+
+	public void setXRoadClientSubsystemCode(String xRoadClientSubsystemCode) {
+		this.xRoadClientSubsystemCode = xRoadClientSubsystemCode;
+	}
+
+	public String getXRoadClientMemberCode() {
+		return xRoadClientMemberCode;
+	}
+
+	public void setXRoadClientMemberCode(String xRoadClientMemberCode) {
+		this.xRoadClientMemberCode = xRoadClientMemberCode;
+	}
+
+	public UnitCredential() {
         clear();
     }
 
@@ -152,6 +187,11 @@ public class UnitCredential {
         m_divisionName = "";
         m_occupationName = "";
         m_folders = new ArrayList<String>();
+        
+        xRoadClientInstance = "";
+        xRoadClientMemberClass = "";
+        xRoadClientSubsystemCode = "";
+        xRoadClientMemberCode = "";
     }
 
     public static UnitCredential[] getCredentials(OrgSettings settings, Connection dbConnection) throws Exception {
@@ -164,6 +204,7 @@ public class UnitCredential {
 	            ResultSet rs = DBConnection.getResultSet(cs, settings, 0);
 	            while (rs.next()) {
 	                UnitCredential item = new UnitCredential();
+	                
 	                item.setId(rs.getInt("id"));
 	                item.setInstitutionCode(rs.getString("institution_code"));
 	                item.setInstitutionName(rs.getString("institution_name"));
@@ -177,6 +218,12 @@ public class UnitCredential {
 	                item.setOccupationName(rs.getString("occupation_name"));
 	                item.setContainerVersion(rs.getInt("container_version"));
 	                item.setFolders(loadFolders(item.getId(), dbConnection, settings));
+
+	                item.setXRoadClientInstance(rs.getString("xroad_client_instance"));
+	                item.setXRoadClientMemberClass(rs.getString("xroad_client_member_class"));
+	                item.setXRoadClientSubsystemCode(rs.getString("xroad_client_subsystem_code"));
+	                item.setXRoadClientMemberCode(rs.getString("xroad_client_member_code"));
+
 	                result.add(item);
 	            }
 	            rs.close();

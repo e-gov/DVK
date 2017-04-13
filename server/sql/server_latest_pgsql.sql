@@ -575,6 +575,10 @@ ALTER TABLE logi ADD CONSTRAINT logi_id_pkey PRIMARY KEY (log_id);
 
 CREATE TABLE server (
 	server_id integer NOT NULL,
+	xroad_service_instance varchar(2) NULL,
+	xroad_service_member_class varchar(50) NULL,
+	xroad_service_member_code varchar(50) NULL,
+	-- "andmekogu_nimi" in the X-Road message protocol v.4.0 is "subsytemCode" in the "service" SOAP header block
 	andmekogu_nimi varchar(100) NULL,
 	aadress varchar(1000) NULL
 ) ;

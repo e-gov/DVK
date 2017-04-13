@@ -21,14 +21,14 @@ import dhl.iostructures.markDocumentsReceivedV3RequestType;
 import dhl.users.UserProfile;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
-import dvk.core.xroad.XRoadProtocolHeader;
-import dvk.core.xroad.XRoadProtocolVersion;
+import dvk.core.xroad.XRoadHeader;
+import dvk.core.xroad.XRoadMessageProtocolVersion;
 
 public class MarkDocumentsReceived {
     private static Logger logger = Logger.getLogger(MarkDocumentsReceived.class);
 
     public static RequestInternalResult V1(
-            org.apache.axis.MessageContext context, Connection conn, UserProfile user, XRoadProtocolHeader xRoadProtocolHeader) throws SQLException, AxisFault {
+            org.apache.axis.MessageContext context, Connection conn, UserProfile user, XRoadHeader xRoadHeader) throws SQLException, AxisFault {
         logger.info("MarkDocumentsReceived.V1 invoked.");
 
         RequestInternalResult result = new RequestInternalResult();
@@ -36,7 +36,7 @@ public class MarkDocumentsReceived {
 
         try {
             // Lame SOAP keha endale sobivasse andmestruktuuri
-            markDocumentsReceivedRequestType bodyData = markDocumentsReceivedRequestType.getFromSOAPBody(context, xRoadProtocolHeader);
+            markDocumentsReceivedRequestType bodyData = markDocumentsReceivedRequestType.getFromSOAPBody(context, xRoadHeader);
             if (bodyData == null) {
                 throw new AxisFault(CommonStructures.VIGA_VIGANE_KEHA);
             }
@@ -110,8 +110,8 @@ public class MarkDocumentsReceived {
                                 tmpRecipient.setSendStatusID(CommonStructures.SendStatus_Sent);
                                 tmpRecipient.setSendingEndDate(new Date());
                                 tmpRecipient.setStatusDate(new Date());
-                                XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
-                                        user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode(), XRoadProtocolVersion.V2_0);
+                                XRoadHeader xTeePais = new XRoadHeader(
+                                        user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode(), XRoadMessageProtocolVersion.V2_0);
                                 tmpRecipient.update(conn, xTeePais);
                             }
                         }
@@ -128,8 +128,8 @@ public class MarkDocumentsReceived {
                     if (allSent && (tmpSending.getSendStatusID() != CommonStructures.SendStatus_Sent)) {
                         tmpSending.setSendStatusID(CommonStructures.SendStatus_Sent);
                         tmpSending.setEndDate(new Date());
-                        XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
-                                user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode(), XRoadProtocolVersion.V2_0);
+                        XRoadHeader xTeePais = new XRoadHeader(
+                                user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode(), XRoadMessageProtocolVersion.V2_0);
                         tmpSending.update(false, conn, xTeePais);
                     }
                 } else {
@@ -151,7 +151,7 @@ public class MarkDocumentsReceived {
     }
 
     public static RequestInternalResult V2(
-            org.apache.axis.MessageContext context, Connection conn, UserProfile user, XRoadProtocolHeader xRoadProtocolHeader) throws SQLException, AxisFault {
+            org.apache.axis.MessageContext context, Connection conn, UserProfile user, XRoadHeader xRoadHeader) throws SQLException, AxisFault {
         logger.info("MarkDocumentsReceived.V2 invoked.");
 
         RequestInternalResult result = new RequestInternalResult();
@@ -159,7 +159,7 @@ public class MarkDocumentsReceived {
 
         try {
             // Lame SOAP keha endale sobivasse andmestruktuuri
-            markDocumentsReceivedRequestType bodyData = markDocumentsReceivedRequestType.getFromSOAPBody(context, xRoadProtocolHeader);
+            markDocumentsReceivedRequestType bodyData = markDocumentsReceivedRequestType.getFromSOAPBody(context, xRoadHeader);
             if (bodyData == null) {
                 throw new AxisFault(CommonStructures.VIGA_VIGANE_KEHA);
             }
@@ -259,8 +259,8 @@ public class MarkDocumentsReceived {
                                     tmpRecipient.setStatusDate(item.staatuseMuutmiseAeg);
                                 }
 
-                                XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
-                                        user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode(), XRoadProtocolVersion.V2_0);
+                                XRoadHeader xTeePais = new XRoadHeader(
+                                        user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode(), XRoadMessageProtocolVersion.V2_0);
                                 tmpRecipient.update(conn, xTeePais);
                             }
                         }
@@ -278,8 +278,8 @@ public class MarkDocumentsReceived {
                     if (allSent && (tmpSending.getSendStatusID() != CommonStructures.SendStatus_Sent)) {
                         tmpSending.setSendStatusID(CommonStructures.SendStatus_Sent);
                         tmpSending.setEndDate(new Date());
-                        XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
-                                user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode(), XRoadProtocolVersion.V2_0);
+                        XRoadHeader xTeePais = new XRoadHeader(
+                                user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode(), XRoadMessageProtocolVersion.V2_0);
                         tmpSending.update(false, conn, xTeePais);
                     }
                 } else {
@@ -300,14 +300,14 @@ public class MarkDocumentsReceived {
     }
 
     public static RequestInternalResult V3(
-            org.apache.axis.MessageContext context, Connection conn, UserProfile user, XRoadProtocolHeader xRoadProtocolHeader) throws SQLException, AxisFault {
+            org.apache.axis.MessageContext context, Connection conn, UserProfile user, XRoadHeader xRoadHeader) throws SQLException, AxisFault {
         logger.info("MarkDocumentsReceived.V3 invoked.");
 
         RequestInternalResult result = new RequestInternalResult();
         result.requestElement = CommonMethods.getXRoadRequestBodyElement(context, "markDocumentsReceived");
 
         // Lame SOAP keha endale sobivasse andmestruktuuri
-        markDocumentsReceivedV3RequestType bodyData = markDocumentsReceivedV3RequestType.getFromSOAPBody(context, xRoadProtocolHeader);
+        markDocumentsReceivedV3RequestType bodyData = markDocumentsReceivedV3RequestType.getFromSOAPBody(context, xRoadHeader);
         if (bodyData == null) {
             throw new AxisFault(CommonStructures.VIGA_VIGANE_KEHA);
         }
@@ -382,8 +382,8 @@ public class MarkDocumentsReceived {
                                 tmpRecipient.setStatusDate(item.staatuseMuutmiseAeg);
                             }
 
-                            XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
-                                    user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode(), XRoadProtocolVersion.V2_0);
+                            XRoadHeader xTeePais = new XRoadHeader(
+                                    user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode(), XRoadMessageProtocolVersion.V2_0);
                             tmpRecipient.update(conn, xTeePais);
                         }
                     }
@@ -401,8 +401,8 @@ public class MarkDocumentsReceived {
                 if (allSent && (tmpSending.getSendStatusID() != CommonStructures.SendStatus_Sent)) {
                     tmpSending.setSendStatusID(CommonStructures.SendStatus_Sent);
                     tmpSending.setEndDate(new Date());
-                    XRoadProtocolHeader xTeePais = new XRoadProtocolHeader(
-                            user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode(), XRoadProtocolVersion.V2_0);
+                    XRoadHeader xTeePais = new XRoadHeader(
+                            user.getOrganizationCode(), null, null, null, null, null, user.getPersonCode(), XRoadMessageProtocolVersion.V2_0);
                     tmpSending.update(false, conn, xTeePais);
                 }
             } else {
@@ -424,7 +424,7 @@ public class MarkDocumentsReceived {
             String subdivisionShortName, String occupationShortName) {
         StringBuilder sb = new StringBuilder(1000);
         sb.append("Dokumendi vastuvõetuks märkimine ebaõnnestus! Etteantud ID-le (")
-                            .append(docId).append(") vastavat dokumenti ei ole antud asutusele");
+                            .append(docId).append(") vastavat dokumenti ei ole antud asutusele ");
         sb.append(orgCode);
 
         if ((subdivisionShortName != null) && (subdivisionShortName.length() > 1)) {

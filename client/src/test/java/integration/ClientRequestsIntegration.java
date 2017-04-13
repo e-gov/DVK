@@ -1,5 +1,24 @@
 package integration;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.zip.GZIPInputStream;
+
+import org.apache.commons.codec.binary.Base64InputStream;
+import org.apache.commons.codec.binary.Base64OutputStream;
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import dvk.api.container.v1.ContainerVer1;
 import dvk.api.container.v1.DataFile;
 import dvk.api.container.v1.Saaja;
@@ -17,24 +36,6 @@ import ee.ria.dvk.client.testutil.DhlSetting;
 import ee.ria.dvk.client.testutil.IntegrationTestsConfigUtil;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.apache.commons.codec.binary.Base64InputStream;
-import org.apache.commons.codec.binary.Base64OutputStream;
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.zip.GZIPInputStream;
 
 @RunWith(JUnitParamsRunner.class)
 public class ClientRequestsIntegration {

@@ -10,7 +10,12 @@ import java.util.ArrayList;
 import dvk.core.CommonMethods;
 
 public class RemoteServer {
+    
     private int m_id;
+    
+    private String xRoadServiceInstance;
+    private String xRoadServiceMemberClass;
+    private String xRoadServiceMemberCode;
     private String m_producerName;
     private String m_address;
 
@@ -22,6 +27,37 @@ public class RemoteServer {
         m_id = id;
     }
 
+    public String getXRoadServiceInstance() {
+        return xRoadServiceInstance;
+    }
+
+    public void setXRoadServiceInstance(String xRoadServiceInstance) {
+        this.xRoadServiceInstance = xRoadServiceInstance;
+    }
+
+    public String getXRoadServiceMemberClass() {
+        return xRoadServiceMemberClass;
+    }
+
+    public void setXRoadServiceMemberClass(String xRoadServiceMemberClass) {
+        this.xRoadServiceMemberClass = xRoadServiceMemberClass;
+    }
+
+    public String getXRoadServiceMemberCode() {
+        return xRoadServiceMemberCode;
+    }
+
+    public void setXRoadServiceMemberCode(String xRoadServiceMemberCode) {
+        this.xRoadServiceMemberCode = xRoadServiceMemberCode;
+    }
+
+    /**
+     * NOTE:<br>
+     * "producerName" corresponds to <b>"subsystemCode"</b> element of the <em>service</em> block
+     * in the X-Road message protocol version 4.0
+     * 
+     * @return <em>producerName</em> / <em>subsystemCode</em>
+     */
     public String getProducerName() {
         return m_producerName;
     }

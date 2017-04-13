@@ -11,7 +11,7 @@ import org.w3c.dom.NodeList;
 
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
-import dvk.core.xroad.XRoadProtocolVersion;
+import dvk.core.xroad.XRoadMessageProtocolVersion;
 
 public class changeOrganizationDataResponseType {
 	
@@ -28,13 +28,13 @@ public class changeOrganizationDataResponseType {
         m_requestElement = value;
     }
 
-    public void addToSOAPBody(org.apache.axis.Message msg, XRoadProtocolVersion xRoadProtocolVersion) {
+    public void addToSOAPBody(org.apache.axis.Message msg, XRoadMessageProtocolVersion xRoadMessageProtocolVersion) {
         try {
             // get SOAP envelope from SOAP message
             org.apache.axis.message.SOAPEnvelope se = msg.getSOAPEnvelope();
             SOAPBody body = se.getBody();
 
-            se.addNamespaceDeclaration(xRoadProtocolVersion.getNamespacePrefix(), xRoadProtocolVersion.getNamespaceURI());
+            se.addNamespaceDeclaration(xRoadMessageProtocolVersion.getNamespacePrefix(), xRoadMessageProtocolVersion.getNamespaceURI());
 
             @SuppressWarnings("rawtypes")
 			Iterator items = body.getChildElements();
@@ -43,10 +43,10 @@ public class changeOrganizationDataResponseType {
             }
 
             SOAPBodyElement element = body.addBodyElement(se.createName("changeOrganizationDataResponse",
-            				xRoadProtocolVersion.getNamespacePrefix(),
-            				xRoadProtocolVersion.getNamespaceURI()));
+            				xRoadMessageProtocolVersion.getNamespacePrefix(),
+            				xRoadMessageProtocolVersion.getNamespaceURI()));
             
-            if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+            if (xRoadMessageProtocolVersion.equals(XRoadMessageProtocolVersion.V2_0)) {
             	se.addNamespaceDeclaration(CommonStructures.NS_SOAPENC_PREFIX, CommonStructures.NS_SOAPENC_URI);
             	
             	SOAPElement elParing = element.addChildElement(se.createName("paring"));

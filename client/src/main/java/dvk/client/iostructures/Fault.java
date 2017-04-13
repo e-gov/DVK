@@ -1,9 +1,10 @@
 package dvk.client.iostructures;
 
-import dvk.core.CommonMethods;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import dvk.core.CommonMethods;
 
 public class Fault {
     private String m_faultCode;

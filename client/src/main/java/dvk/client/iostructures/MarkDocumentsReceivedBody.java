@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 
 import dvk.client.businesslayer.DhlMessage;
 import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
 
 public class MarkDocumentsReceivedBody implements SOAPBodyOverride {
 
@@ -30,7 +31,7 @@ public class MarkDocumentsReceivedBody implements SOAPBodyOverride {
     }
 
     public String getBodyContentsAsText() {
-        String result = "<dhl:markDocumentsReceived><keha><dokumendid href=\"cid:" + dokumendid + "\"/><kaust>" + kaust + "</kaust>";
+        String result = "<dhl:markDocumentsReceived " + CommonStructures.NS_DHL_DECLARATION + "><keha><dokumendid href=\"cid:" + dokumendid + "\"/><kaust>" + kaust + "</kaust>";
         if ((edastusID != null) && !edastusID.equalsIgnoreCase("")) {
             result += "<edastus_id>"+ edastusID +"</edastus_id>";
         }

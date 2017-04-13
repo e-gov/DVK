@@ -27,7 +27,7 @@ import org.w3c.dom.NodeList;
 import dhl.iostructures.ExpiredDocumentData;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
-import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadHeader;
 
 public class Document {
     static Logger logger = Logger.getLogger(Document.class.getName());
@@ -204,7 +204,7 @@ public class Document {
     }
     
 
-    public int addToDB(Connection conn, XRoadProtocolHeader xTeePais) throws AxisFault {
+    public int addToDB(Connection conn, XRoadHeader xTeePais) throws AxisFault {
         FileInputStream inStream = null;
         InputStreamReader inReader = null;
         BufferedReader reader = null;
@@ -474,7 +474,7 @@ public class Document {
      * @throws AxisFault
      */
     public static Document fromXML(String dataFile, int organizationID,
-                                   boolean extractFiles, Connection conn, XRoadProtocolHeader xTeePais) throws AxisFault {
+                                   boolean extractFiles, Connection conn, XRoadHeader xTeePais) throws AxisFault {
         try {
             Document result = new Document();
             result.setFilePath(dataFile);

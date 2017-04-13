@@ -1,10 +1,11 @@
 package integration;
 
-import ee.ria.dvk.client.testutil.IntegrationTestsConfigUtil;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.List;
+import ee.ria.dvk.client.testutil.IntegrationTestsConfigUtil;
 
 /**
  * @author Hendrik Pärna

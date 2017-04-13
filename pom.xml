@@ -15,14 +15,14 @@
 		<repository>
 			<id>ria</id>
 			<name>DVK releases</name>
-			<url>https://artifactory.tt.kit/artifactory/DVK-libs-release-local</url>
+			<url>http://artifactory.tt.kit:8081/artifactory/DVK-libs-release-local</url>
 		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
 			<id>ria</id>
 			<name>DVK releases</name>
-			<url>https://artifactory.tt.kit/artifactory/DVK-libs-release-local</url>
+			<url>http://artifactory.tt.kit:8081/artifactory/DVK-libs-release-local</url>
 		</pluginRepository>
 	</pluginRepositories>
 
@@ -142,6 +142,11 @@
 				<groupId>commons-discovery</groupId>
 				<artifactId>commons-discovery</artifactId>
 				<version>0.4</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>3.5</version>
 			</dependency>
 			<dependency>
 				<groupId>xerces</groupId>
@@ -265,6 +270,10 @@
 		<dependency>
 			<groupId>commons-discovery</groupId>
 			<artifactId>commons-discovery</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>xerces</groupId>

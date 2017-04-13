@@ -36,6 +36,12 @@
 | 26.01.2015 | 1.7.8 | Logimise parameetrid ja fail uuendatud | Aleksei Kokarev |
 | 20.01.2016 | 1.7.9 | Muudetud SVN lingid Githubi linkideks | Kertu Hiire |
 | 05.12.2016 | 1.7.10 | Dokumentatsioon üle viidud MarkDown formaati ilma sisulisi muudatusi teostamata | Kertu Hiire |
+| 03.01.2017 | 1.7.11 | Täiendatud paigaldusprotsessi kirjeldust peatükis „Paigaldamine“. Täiendatud konfiguratsioonifaili dvk_client.properties kirjeldust kuhu lisandusid XTee versioon 4-ja põhised päise seadistused ja nende asukohad andmbaasis. | Tanel Milsaar |
+| 06.01.2017 | 1.7.12 | Konfiguratsioonifailis dvk_client.properties adit.xRoad.service.subsystemCode väärtus muutus "ametlikud-dokumendid" - "adit" | Tanel Milsaar |
+| 17.01.2017 | 1.7.13 | Eemaldatud üleliigne samm rakenduse ehitamisest | Tanel Milsaar |
+| 04.04.2017 | 1.7.14 | Lisatud DVK Maveni repo asukoht | Martin Maarand |
+| 10.04.2017 | 1.7.15 | Uuendatud DVK Maveni repo asukoht ja parandatud formateeritud teksti kuvamist  | Martin Maarand |
+
 
 ## Nõudmised arvutile
 
@@ -160,6 +166,36 @@ database_buffer_size = 65536
 mail.host = mail.asutus.ee
 mail.from = dvkclient@asutus.ee
 mail.to = administraator@asutus.ee
+
+# The default DVK Universal Client data (X-Road message protocol version 4.0 "client" block)
+xRoad.client.instance=EE
+xRoad.client.memberClass=BUSINESS
+xRoad.client.memberCode=12486864
+xRoad.client.subsystemCode=testSubsystem
+
+# The default service that DVK Universal Client uses (X-Road message protocol version 4.0 "service" block)
+dvk.xRoad.service.instance=EE
+dvk.xRoad.service.memberClass=GOV
+dvk.xRoad.service.memberCode=70006317
+dvk.xRoad.service.subsystemCode=dhl
+
+# Data for the ADIT service that DVK Universal Client uses(X-Road message protocol version 4.0 "service" block)
+adit.xRoad.service.instance=EE
+adit.xRoad.service.memberClass=GOV
+adit.xRoad.service.memberCode=70006317
+adit.xRoad.service.subsystemCode=adit
+
+# Testkliendi osa
+test_config_file = test_config.xml
+test_person_id_code = 12345678901
+test_org_code = 12345678
+test_log_file = dvk_test_log.txt
+
+# Test data for DVK Universal Client (X-Road message protocol version 4.0 "client" block)
+test.xRoad.client.instance=EE
+test.xRoad.client.memberClass=BUSINESS
+test.xRoad.client.memberCode=12486864
+test.xRoad.client.subsystemCode=testSubsystem
 ```
 
 <a name="konf1-1"></a>
@@ -243,6 +279,15 @@ mail.to = administraator@asutus.ee
 
 - **mail.to** - E-posti aadress, kuhu DVK klient või server töös tekkinud vigade kohta e-kirju saadab.
 
+- **xRoad.client.\*** - Vaikimisi XTee versioon 4-ja kasutaja päise väärtused.
+    Andmebaasis asuvad vastavad väljad tabelis *dhl_settings*.
+
+- **dvk.xRoad.service.\*** - Vaikimisi XTee versioon 4-ja DVK teenuse päise väärtused.
+   Andmebaasis asuvad vastavad väljad tabelis *dhl_message_recipient*.
+
+- **adit.xRoad.service.\*** - Vaikimisi XTee versioon 4-ja ADIT teenuse päise väärtused.
+   Andmebaasis asuvad vastavad väljad tabelis *dhl_organization*.
+
 - **test_config_file** - DVK testkliendi konfiguratsioonifaili asukoht.  
    Reaalses töös ei lähe seda seadistust vaja.
 
@@ -257,6 +302,8 @@ mail.to = administraator@asutus.ee
 
 - **performance_log_file** - DVK serveri või kliendi jõudlusandemete logi asukoht.  
    Üldjuhul peaks see parameeter määramata olema.
+
+- **test.xRoad.client.\*** - Testkliendi XTee versioon 4-ja kasutaja päise väärtused.
 
 <a name="konf2"></a>
 ## Konfiguratsioonifail _client_config.xml_
@@ -651,32 +698,30 @@ start_delete.cmd
 
 Rakenduse ehitamiseks on alates DVK versioonist 1.6.0 kasutusel Maven raamistik (http://maven.apache.org/). Eelnevate versioonide ehitamiseks vaadata https://github.com/e-gov/DVK/tree/master/doc/client/arhiiv/1.6.2  paigaldusjuhendit. Alates 1.7.1 versioonist ehitamisskript ise asub projekti juurkataloogis ja kannab nime „pom.xml“. Selles failis on kirjeldatud ära rakenduse kasutatavad teegid (dependencies) ja rakenduse ehitamise juhised (build) ning ehitamisprofiilid (profile). Ehitamiseks toimi järgnevalt:
 
+**NB!** Kui soovite rakendust ise ehitada, tuleks vahetada maven repositooriumi aadress pom.xml failides DVK avaliku repositooriumi oma vastu http://ftp.aso.ee/pub/artifactory/DVK-libs-release-local/
+
 1. Lae Githubist alla DVK projekt https://github.com/e-gov/DVK
 
-2. Ava tekstiredaktoriga projekti „dvk“ juurkaustas asuv fail **pom.xml** ning lisa endale või muuda olemas olevat ehitusprofiili. Modules bloki abil saad kirjeldada ehitatava DVK versiooni komponentide suhtelised teekonnad (relativePathid).
+2. Lae alla Apache Maven versioon 3.x.x (http://maven.apache.org/download.html ja vali sealt .zip fail).
 
-   Lisaks on muuta **dvkCoreDir'i, dvkClientDir'i** väärtusteks täisteekond konkreetse projekti juurkataloogini (näiteks „/home/kasutaja/projektid/dvk/core“). **ListOfTestConfigs** ja **dvkServerJettyEnvLocation** on vajalikud seadistada vaid siis, kui soovitakse käivitada ka serveri ja clienti integratsiooniteste.
+3. Paki allalaetud pakett lahti.
 
-3. Lae alla Apache Maven versioon 3.x.x (http://maven.apache.org/download.html ja vali sealt .zip fail).
+4. Lisa [MAVEN_HOME]/bin kataloog keskkonnamuutujasse „PATH“.
 
-4. Paki allalaetud pakett lahti.
-
-5. Lisa [MAVEN_HOME]/bin kataloog keskkonnamuutujasse „PATH“.
-
-6. Mine DVK projekti juurkataloogi ja käivita käsurealt järgmine käsklus:
+5. Mine DVK projekti juurkataloogi ja käivita käsurealt järgmine käsklus:
 
    ```
-CMD> mvn -P [PROFILE_NAME] package
+	CMD> mvn -P [PROFILE_NAME] package
+   ```
+	
+	Kui edaspidi on mingil põhjusel vaja projekti uuesti kompilleerida, siis tasuks järgnevatel kompilleerimiskordadel enne pakendamist käivitada ka varasemate kompilleerimistulemuste puhastamine:
+
+   ```
+	CMD> mvn clean
+	CMD> mvn -P [PROFILE_NAME] package
    ```
 
-Kui edaspidi on mingil põhjusel vaja projekti uuesti kompilleerida, siis tasuks järgnevatel kompilleerimiskordadel enne pakendamist käivitada ka varasemate kompilleerimistulemuste puhastamine:
-
-   ```
-CMD> mvn clean
-CMD> mvn -P [PROFILE_NAME] package
-   ```
-
-7. Maven ehitab ja paketeerib rakenduse. Kataloogi [DVK_CLIENT_HOME]/target tekib fail „dvk-client.jar“.
+6. Maven ehitab ja paketeerib rakenduse. Kataloogi [DVK_CLIENT_HOME]/target tekib fail „dvk-client.jar“.
 
 
 ## Logimise seadistamine
@@ -721,7 +766,7 @@ Logimine on alates versioonist 1.6.0 realiseeritud kasutades raamistikku Apache 
 2. Logimise sügavus – logimise sügavuse  väärtusteks võib olla: OFF, FATAL, ERROR, WARN, INFO, DEBUG, ALL – kus DEBUG puhul kirjutatakse logisse väga detailselt ning ERROR puhul ainult veateated.
 
    ```
-<Root level="info">
-	<AppenderRef ref="file"/>
-</Root>
+	<Root level="info">
+		<AppenderRef ref="file"/>
+	</Root>
    ```

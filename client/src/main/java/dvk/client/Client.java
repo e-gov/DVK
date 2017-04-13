@@ -1,6 +1,24 @@
 package dvk.client;
 
-import dvk.client.businesslayer.*;
+import java.io.File;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Hashtable;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import dvk.client.businesslayer.Classifier;
+import dvk.client.businesslayer.DhlCapability;
+import dvk.client.businesslayer.DhlMessage;
+import dvk.client.businesslayer.ErrorLog;
+import dvk.client.businesslayer.MessageRecipient;
+import dvk.client.businesslayer.Occupation;
+import dvk.client.businesslayer.RequestLog;
+import dvk.client.businesslayer.ResponseStatus;
+import dvk.client.businesslayer.Subdivision;
 import dvk.client.conf.OrgSettings;
 import dvk.client.db.DBConnection;
 import dvk.client.db.UnitCredential;
@@ -13,31 +31,29 @@ import dvk.core.CommonMethods;
 import dvk.core.Fault;
 import dvk.core.HeaderVariables;
 import dvk.core.Settings;
-
-import java.io.File;
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Date;
-
-import java.util.Hashtable;
-
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
+import dvk.core.util.DVKServiceMethod;
+import dvk.core.util.DVKUtil;
+import dvk.core.xroad.XRoadService;
 
 public class Client {
-  //  static Logger logger = Logger.getLogger(Client.class);
+	
+	private static final Logger logger = LogManager.getLogger(Client.class.getName());
+	
     private static ArrayList<String> tempFiles = new ArrayList<String>();
+    
     private static ClientAPI dvkClient;
+    
     private static ArrayList<OrgSettings> allKnownDatabases;
+    
     private static ArrayList<OrgSettings> currentClientDatabases;
-    private static ClientExecType ExecType; // määrab tegevused, mida programm peab tegema
-    static Logger logger = LogManager.getLogger(Client.class.getName());
+    
+    private static ClientExecType execType;	// määrab tegevused, mida programm peab tegema
+    
     public static void main(String[] args) {
         Date startDate = new Date();
         try {
             if (args.length > 3) {
-                ShowHelp();
+                showHelp();
                 return;
             }
 
@@ -57,9 +73,9 @@ public class Client {
             }
 
             int documentLifetimeInDays = CommonMethods.toIntSafe(documentLifetimeString, -1);
-            InitExecType(runningMode);
-            logger.info("\n\nKäivitamise reziim: " + ExecType);
-            logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele "+ ExecType);
+            initExecType(runningMode);
+            logger.info("\n\nKäivitamise reziim: " + execType);
+            logger.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele "+ execType);
             // Check if application properties file exists
             if (!(new File(propertiesFile)).exists()) {
                 logger.error("Application properties file " + propertiesFile + " does not exist!");
@@ -91,7 +107,13 @@ public class Client {
 
             dvkClient = new ClientAPI();
             try {
-                dvkClient.initClient(Settings.Client_ServiceUrl, Settings.Client_ProducerName);
+                dvkClient.initClient(
+                        Settings.Client_ServiceUrl,
+                		Settings.getDvkXRoadServiceInstance(),
+                		Settings.getDvkXRoadServiceMemberClass(),
+                		Settings.getDvkXRoadServiceMemberCode(),
+                		Settings.getDvkXRoadServiceSubsystemCode());
+                
                 dvkClient.setAllKnownDatabases(allKnownDatabases);
             } catch (Exception ex) {
                 logger.error(ex.getStackTrace());
@@ -114,7 +136,7 @@ public class Client {
             }
 
             // SEND
-            if (ExecType == ClientExecType.Send || ExecType == ClientExecType.SendReceive) {
+            if (execType == ClientExecType.SEND || execType == ClientExecType.SEND_RECEIVE) {
                 for (OrgSettings db : currentClientDatabases) {
                     Connection dbConnection = null;
                     try {
@@ -137,19 +159,19 @@ public class Client {
                                 dvkClient.setServiceURL(secureServer);
 
                                 // Saadame DHL poole teele saatmist ootavad dokumendid
-                                int sentMessages = SendUnsentMessages(credentials[i], db, dbConnection);
+                                int sentMessages = sendUnsentMessages(credentials[i], db, dbConnection);
 
                                 if (sentMessages > 0) {
                                     // Uuendame saatmisel olevate dokumentide staatust
                                     logger.info("\nUuendan välja saadetud sõnumite staatusi...");
-                                    int updatedMessages = UpdateSendStatus(credentials[i], db, dbConnection);
+                                    int updatedMessages = updateSendStatus(credentials[i], db, dbConnection);
                                     logger.info("Välja saadetud sõnumite (" + updatedMessages + ") staatused uuendatud!");
                                 }
 
                                 // Saadame vastuvõetud sõnumite staatusemuudatused ja veateated
                                 if (db.getDvkSettings().getMarkDocumentsReceivedRequestVersion() > 1) {
                                     logger.info("\nUuendan vastuvõetud sõnumite staatusi ja veateateid...");
-                                    int updatedMessages = UpdateClientStatus(credentials[i], db, dbConnection);
+                                    int updatedMessages = updateClientStatus(credentials[i], db, dbConnection);
                                     logger.info("Vastuvõetud sõnumite (" + updatedMessages + ") staatused ja veateated uuendatud!");
                                 }
                             } catch (Exception ex) {
@@ -166,8 +188,8 @@ public class Client {
             }
 
             // RECEIVE
-            if (ExecType == ClientExecType.Receive || ExecType == ClientExecType.SendReceive) {
-                logger.info("Client executionMode: " + ExecType);
+            if (execType == ClientExecType.RECEIVE || execType == ClientExecType.SEND_RECEIVE) {
+                logger.info("Client executionMode: " + execType);
 
                 // Tuvastame andmebaasiseadetest, milline on suurim lubatud
                 // getSendingOptions päringu versioon vaikimisi seadistatud
@@ -209,19 +231,19 @@ public class Client {
                                     // Küsime DHL-st meile saadetud dokumendid
                                     logger.info("\nVõtan vastu saabuvaid sõnumeid...");
                                     //// Küsime DHL-st meile saadetud dokumendid
-                                    ReceiveNewMessages(credentials[i], db, dbConnection);
+                                    receiveNewMessages(credentials[i], db, dbConnection);
                                     logger.info("Saabuvad sõnumid vastu võetud!");
 
                                     // Saadame vastuvõetud sõnumite staatusemuudatused ja veateated
                                     if (db.getDvkSettings().getMarkDocumentsReceivedRequestVersion() > 1) {
                                         logger.info("\nUuendan vastuvõetud sõnumite staatusi ja veateateid...");
-                                        int updatedMessages = UpdateClientStatus(credentials[i], db, dbConnection);
+                                        int updatedMessages = updateClientStatus(credentials[i], db, dbConnection);
                                         logger.info("Vastuvõetud sõnumite (" + updatedMessages + ") staatused ja veateated uuendatud!");
                                     }
 
                                     // Uuendame saatmisel olevate dokumentide staatust - vajalik selleks, et saatja dokumendi staatus saaks muudetud
                                     logger.info("\nUuendan välja saadetud sõnumite staatusi...");
-                                    int updatedMessages = UpdateSendStatus(credentials[i], db, dbConnection);
+                                    int updatedMessages = updateSendStatus(credentials[i], db, dbConnection);
                                     logger.info("Välja saadetud sõnumite (" + updatedMessages + ") staatused uuendatud!");
                                 } catch (Exception ex) {
                                     ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " main");
@@ -240,7 +262,7 @@ public class Client {
 
                     // Laeme asutuste nimekrija, kellel on alla laadimist ootavaid dokumente
                     try {
-                        GetSendingOptionsV3ResponseType waitingInstitutions = ReceiveDownloadWaitingInstitutionsV2(currentClientDatabases);
+                        GetSendingOptionsV3ResponseType waitingInstitutions = receiveDownloadWaitingInstitutionsV2(currentClientDatabases);
                         //ArrayList<String> waitingInstitutions = ReceiveDownloadWaitingInstitutions(currentClientDatabases);
                         RequestLog requestLog = new RequestLog("dhl-if.getSendingOptions.v", Settings.Client_DefaultOrganizationCode,
                                 Settings.Client_DefaultPersonCode);
@@ -324,19 +346,19 @@ public class Client {
                                                 logger.info("\nVõtan vastu saabuvaid sõnumeid...");
                                                 logger.info("\nSõnumite alla laadimist ootavate asutuste arv: " + waitingInstitutions.asutused.size());
                                                 //// Küsime DHL-st meile saadetud dokumendid
-                                                ReceiveNewMessages(credentials[i], db, dbConnection);
+                                                receiveNewMessages(credentials[i], db, dbConnection);
                                                 logger.info("Saabuvad sõnumid vastu võetud!");
 
                                                 // Saadame vastuvõetud sõnumite staatusemuudatused ja veateated
                                                 if (db.getDvkSettings().getMarkDocumentsReceivedRequestVersion() > 1) {
                                                     logger.info("\nUuendan vastuvõetud sõnumite staatusi ja veateateid...");
-                                                    int updatedMessages = UpdateClientStatus(credentials[i], db, dbConnection);
+                                                    int updatedMessages = updateClientStatus(credentials[i], db, dbConnection);
                                                     logger.info("Vastuvõetud sõnumite (" + updatedMessages + ") staatused ja veateated uuendatud!");
                                                 }
 
                                                 // Uuendame saatmisel olevate dokumentide staatust - vajalik selleks, et saatja dokumendi staatus saaks muudetud
                                                 logger.info("\nUuendan välja saadetud sõnumite staatusi...");
-                                                int updatedMessages = UpdateSendStatus(credentials[i], db, dbConnection);
+                                                int updatedMessages = updateSendStatus(credentials[i], db, dbConnection);
                                                 logger.info("Välja saadetud sõnumite (" + updatedMessages + ") staatused uuendatud!");
                                             }
                                         } catch (Exception ex) {
@@ -366,7 +388,7 @@ public class Client {
             }
 
             // UPDATE STATUS
-            if (ExecType == ClientExecType.UpdateStatus) {
+            if (execType == ClientExecType.UPDATE_STATUS) {
                 for (OrgSettings db : currentClientDatabases) {
                     Connection dbConnection = null;
                     try {
@@ -389,13 +411,13 @@ public class Client {
                                 // Saadame vastuvõetud sõnumite staatusemuudatused ja veateated
                                 if (db.getDvkSettings().getMarkDocumentsReceivedRequestVersion() > 1) {
                                     logger.info("\nUuendan vastuvõetud sõnumite staatusi ja veateateid...");
-                                    int updatedMessages = UpdateClientStatus(credentials[i], db, dbConnection);
+                                    int updatedMessages = updateClientStatus(credentials[i], db, dbConnection);
                                     logger.info("Vastuvõetud sõnumite (" + updatedMessages + ") staatused ja veateated uuendatud!");
                                 }
 
                                 // Uuendame saatmisel olevate dokumentide staatust - vajalik selleks, et saatja dokumendi staatus saaks muudetud
                                 logger.info("\nUuendan sõnumite staatusi...");
-                                int updatedMessages = UpdateSendStatus(credentials[i], db, dbConnection);
+                                int updatedMessages = updateSendStatus(credentials[i], db, dbConnection);
                                 logger.info("Sõnumite (" + updatedMessages + ") staatused uuendatud!");
                             } catch (Exception ex) {
                                 ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " main");
@@ -411,7 +433,7 @@ public class Client {
             }
 
             // Delete old documents
-            if (ExecType == ClientExecType.DeleteOldDocuments) {
+            if (execType == ClientExecType.DELETE_OLDDOCUMENTS) {
                 for (OrgSettings db : currentClientDatabases) {
                     if ((documentLifetimeInDays > 0) || (db.getDeleteOldDocumentsAfterDays() > 0)) {
                         // Determine document lifetime for this database
@@ -442,10 +464,14 @@ public class Client {
                 }
             }
 
-            if (ClientExecType.ADITGetSendStatus.equals(ExecType)) {
+            if (ClientExecType.ADIT_GET_SEND_STATUS.equals(execType)) {
                 ClientAPI aditDvkApi = new ClientAPI();
                 try {
-                    aditDvkApi.initClient(Settings.Client_ServiceUrl, Settings.Client_AditProducerName);
+                    aditDvkApi.initClient(Settings.Client_ServiceUrl,
+                    		Settings.getAditXRoadServiceInstance(),
+                    		Settings.getAditXRoadServiceMemberClass(),
+                    		Settings.getAditXRoadServiceMemberCode(),
+                    		Settings.getAditXRoadServiceSubsystemCode());
                     aditDvkApi.setAllKnownDatabases(allKnownDatabases);
                 } catch (Exception ex) {
                     logger.error(ex.getStackTrace());
@@ -454,8 +480,7 @@ public class Client {
                     return;
                 }
 
-                AditGetSendStatusService aditGetSendStatusService = new AditGetSendStatusService(
-                        Settings.Client_AditProducerName, aditDvkApi);
+                AditGetSendStatusService aditGetSendStatusService = new AditGetSendStatusService(aditDvkApi);
                 aditGetSendStatusService.updateAditSendStatusFor(currentClientDatabases);
             }
         } catch (Exception ex) {
@@ -488,45 +513,45 @@ public class Client {
     }
 
     // Kuvab juhised programmi käivitamiseks. Valede parameetrite korral kuvatakse alati juhised
-    private static void InitExecType(String runningMode) {
+    private static void initExecType(String runningMode) {
         int mode = 0;
         // vaikimisi tehakse nii alla laadimine kui ka saatmine
-        ExecType = ClientExecType.SendReceive;
+        execType = ClientExecType.SEND_RECEIVE;
         if ((runningMode != null) && (runningMode.length() > 0)) {
             try {
                 mode = Integer.parseInt(runningMode);
                 switch (mode) {
                     case 1:
-                        ExecType = ClientExecType.Send;
+                        execType = ClientExecType.SEND;
                         break;
                     case 2:
-                        ExecType = ClientExecType.Receive;
+                        execType = ClientExecType.RECEIVE;
                         break;
                     case 3:
-                        ExecType = ClientExecType.SendReceive;
+                        execType = ClientExecType.SEND_RECEIVE;
                         break;
                     case 4:
-                        ExecType = ClientExecType.UpdateStatus;
+                        execType = ClientExecType.UPDATE_STATUS;
                         break;
                     case 5:
-                        ExecType = ClientExecType.DeleteOldDocuments;
+                        execType = ClientExecType.DELETE_OLDDOCUMENTS;
                         break;
                     case 6:
-                        ExecType = ClientExecType.ADITGetSendStatus;
+                        execType = ClientExecType.ADIT_GET_SEND_STATUS;
                         break;
                     default:
-                        ExecType = ClientExecType.SendReceive;
+                        execType = ClientExecType.SEND_RECEIVE;
                         break;
                 }
             } catch (Exception ex) {
                 ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " InitExecType");
                 LoggingService.logError(errorLog);
-                ExecType = ClientExecType.SendReceive;
+                execType = ClientExecType.SEND_RECEIVE;
             }
         }
     }
 
-    private static void ShowHelp() {
+    private static void showHelp() {
         logger.info("Programmi käivitamise parameetrid:");
         logger.info("  -mode=X");
         logger.info("    Parameetri võimalikud väärtused:");
@@ -557,81 +582,103 @@ public class Client {
         logger.info("Parameetrite puudumisel teostatakse saatmine, vastuvõtmine ja staatuste uuendamine");
     }
 
-    private static int UpdateSendStatus(UnitCredential masterCredential, OrgSettings db, Connection dbConnection) {
+    private static int updateSendStatus(UnitCredential masterCredential, OrgSettings db, Connection dbConnection) {
         int resultCounter = 0;
         try {
             ArrayList<DhlMessage> messages = DhlMessage.getList(false, Settings.Client_StatusSending, masterCredential.getUnitID(), false, true, db, dbConnection);
             logger.info("    Saatmisel olevaid sõnumeid: " + String.valueOf(messages.size()));
             if (!messages.isEmpty()) {
                 HeaderVariables header = new HeaderVariables(
-                        masterCredential.getInstitutionCode(),
+                        masterCredential.getXRoadClientMemberCode(),
                         masterCredential.getPersonalIdCode(),
                         "",
-                        (CommonMethods.personalIDCodeHasCountryCode(masterCredential.getPersonalIdCode()) ? masterCredential.getPersonalIdCode() : "EE" + masterCredential.getPersonalIdCode()));
+                        (CommonMethods.personalIDCodeHasCountryCode(masterCredential.getPersonalIdCode()) ? masterCredential.getPersonalIdCode() : "EE" + masterCredential.getPersonalIdCode()),
+                        masterCredential.getXRoadClientInstance(),
+                        masterCredential.getXRoadClientMemberClass(),
+                        masterCredential.getXRoadClientSubsystemCode());
 
                 // Jaotame dokumendid gruppidesse, et staatust küsitaks sellest
                 // serverist, kuhu dokument saadeti
-                ArrayList<String> keys = new ArrayList<String>();
-                Hashtable<String, ArrayList<DhlMessage>> addressTable = new Hashtable<String, ArrayList<DhlMessage>>();
+                Hashtable<XRoadService, ArrayList<DhlMessage>> addressTable = new Hashtable<XRoadService, ArrayList<DhlMessage>>();
                 for (int i = 0; i < messages.size(); ++i) {
                     DhlMessage msg = messages.get(i);
+                    
                     ArrayList<MessageRecipient> recipients = MessageRecipient.getList(msg.getId(), db, dbConnection);
                     for (int j = 0; j < recipients.size(); ++j) {
                         MessageRecipient recipient = recipients.get(j);
-                        String currentKey = "";
-                        if (recipient.getProducerName() != null) {
-                            currentKey += recipient.getProducerName().trim();
+                        
+                        XRoadService xRoadService = new XRoadService();
+                        if (DVKUtil.areNotBlank(recipient.getXRoadServiceInstance(),
+                                recipient.getXRoadServiceMemberClass(),
+                                recipient.getXRoadServiceMemberCode(),
+                                recipient.getProducerName(),
+                                recipient.getServiceURL())) {
+                            
+                            xRoadService.setXRoadInstance(recipient.getXRoadServiceInstance());
+                            xRoadService.setMemberClass(recipient.getXRoadServiceMemberClass());
+                            xRoadService.setMemberCode(recipient.getXRoadServiceMemberCode());
+                            xRoadService.setSubsystemCode(recipient.getProducerName());
+                            xRoadService.setServiceCode(DVKServiceMethod.GET_SEND_STATUS.getName());
+                            xRoadService.setServiceURL(recipient.getServiceURL());
                         }
-                        currentKey += "|";
-                        if (recipient.getServiceURL() != null) {
-                            currentKey += recipient.getServiceURL().trim();
-                        }
-                        ArrayList<DhlMessage> dhlIDs = null;
-                        if (!keys.contains(currentKey)) {
-                            keys.add(currentKey);
-                            dhlIDs = new ArrayList<DhlMessage>();
+                        
+                        ArrayList<DhlMessage> dhlMessages = null;
+                        if (!addressTable.containsKey(xRoadService)) {
+                            dhlMessages = new ArrayList<DhlMessage>();
                         } else {
-                            dhlIDs = addressTable.get(currentKey);
+                            dhlMessages = addressTable.get(xRoadService);
                         }
-                        dhlIDs.add(msg);
-                        addressTable.put(currentKey, dhlIDs);
+                        dhlMessages.add(msg);
+                        
+                        addressTable.put(xRoadService, dhlMessages);
                     }
                 }
 
-                for (int i = 0; i < keys.size(); ++i) {
-                    String currentKey = keys.get(i);
-                    ArrayList<DhlMessage> dhlIDs = addressTable.get(currentKey);
-                    String producerName = "";
+                for (XRoadService xRoadService : addressTable.keySet()) {
+                    ArrayList<DhlMessage> dhlMessages = addressTable.get(xRoadService);
+                    
                     String serviceURL = "";
-                    String realProducerName = "";
+                    String xRoadServiceInstance = "";
+                    String xRoadServiceMemberClass = "";
+                    String xRoadServiceMemberCode = "";
+                    String xRoadServiceSubsystemCode = "";
+                    
                     String realServiceURL = "";
-                    if (currentKey.equalsIgnoreCase("|")) {
-                        producerName = "";
-                        serviceURL = "";
-                        realProducerName = Settings.Client_ProducerName;
+                    String realXRoadServiceInstance = "";
+                    String realXRoadServiceMemberClass = "";
+                    String realXRoadServiceMemberCode = "";
+                    String realXRoadServiceSubsystemCode = "";
+                    
+                    if (xRoadService.isEmpty()) {
                         realServiceURL = Settings.Client_ServiceUrl;
+                        
+                        realXRoadServiceInstance = Settings.getDvkXRoadServiceInstance();
+                        realXRoadServiceMemberClass = Settings.getDvkXRoadServiceMemberClass();
+                        realXRoadServiceMemberCode = Settings.getDvkXRoadServiceMemberCode();
+                        realXRoadServiceSubsystemCode = Settings.getDvkXRoadServiceSubsystemCode();
                     } else {
-                        String[] address = currentKey.split("[|]");
-                        if (address.length == 2) {
-                            producerName = address[0];
-                            serviceURL = address[1];
-                            realProducerName = producerName;
-                            realServiceURL = serviceURL;
+                        if (xRoadService.isValidWithAddress()) {
+                            serviceURL = realServiceURL = xRoadService.getServiceURL();
+                            xRoadServiceInstance = realXRoadServiceInstance = xRoadService.getXRoadInstance();
+                            xRoadServiceMemberClass = realXRoadServiceMemberClass = xRoadService.getMemberClass();
+                            xRoadServiceMemberCode = realXRoadServiceMemberCode = xRoadService.getMemberCode();
+                            xRoadServiceSubsystemCode = realXRoadServiceSubsystemCode = xRoadService.getSubsystemCode();
                         } else {
                             throw new Exception("Viga sõnumi aadresaandmete töötlemisel!");
                         }
                     }
-                    dvkClient.initClient(realServiceURL, realProducerName);
+                    
+                    dvkClient.initClient(realServiceURL, realXRoadServiceInstance, realXRoadServiceMemberClass, realXRoadServiceMemberCode, realXRoadServiceSubsystemCode);
+                    
                     logger.info("    Suhtlen DVK serveriga...");
-                    ArrayList<GetSendStatusResponseItem> result = dvkClient.getSendStatus(header, dhlIDs, true);
+                    ArrayList<GetSendStatusResponseItem> result = dvkClient.getSendStatus(header, dhlMessages, true);
                     logger.info("    Töötlen DVKst saadud vastust...");
 
                     // Teeme vastussõnumi andmetest omad järeldused
-                    UpdateStatusChangesInDB(result, producerName, serviceURL, db, dbConnection);
+                    updateStatusChangesInDB(result, xRoadServiceInstance, xRoadServiceMemberClass,  xRoadServiceMemberCode, xRoadServiceSubsystemCode, serviceURL, db, dbConnection);
                 }
                 resultCounter = messages.size();
             }
-            messages = null;
         } catch (Exception ex) {
             ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " UpdateSendStatus");
             LoggingService.logError(errorLog);
@@ -641,7 +688,12 @@ public class Client {
         // Taastame seadistuse, et klient oleks vaikimisi seadistatud päringuid saatma konfiguratsioonifailis
         // määratud aadressi ja andmekogu nimega.
         try {
-            dvkClient.initClient(Settings.Client_ServiceUrl, Settings.Client_ProducerName);
+            dvkClient.initClient(
+                    Settings.Client_ServiceUrl,
+            		Settings.getDvkXRoadServiceInstance(),
+            		Settings.getDvkXRoadServiceMemberClass(),
+            		Settings.getDvkXRoadServiceMemberCode(),
+            		Settings.getDvkXRoadServiceSubsystemCode());
         } catch (Exception ex) {
             ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " UpdateSendStatus");
             LoggingService.logError(errorLog);
@@ -650,7 +702,15 @@ public class Client {
         return resultCounter;
     }
 
-    private static void UpdateStatusChangesInDB(ArrayList<GetSendStatusResponseItem> statusMessgaes, String producerName, String serviceURL, OrgSettings db, Connection dbConnection) {
+    private static void updateStatusChangesInDB(
+            ArrayList<GetSendStatusResponseItem> statusMessgaes,
+            String xRoadServiceInstance,
+            String xRoadServiceMemeberClass,
+            String xRoadServiceMemeberCode,
+            String producerName,
+            String serviceURL,
+            OrgSettings db,
+            Connection dbConnection) {
         if ((statusMessgaes == null) || (statusMessgaes.size() < 1)) {
             return;
         }
@@ -660,19 +720,30 @@ public class Client {
             logger.debug("Updating status.");
             logger.debug("DHL_ID: " + item.getDhlID());
             logger.debug("GUID: " + item.getGuid());
-            int messageID = DhlMessage.getMessageID(item.getDhlID(), producerName, serviceURL, false, db, dbConnection);
+            
+            int messageID = DhlMessage.getMessageID(
+                    item.getDhlID(),
+                    xRoadServiceInstance,
+                    xRoadServiceMemeberClass,
+                    xRoadServiceMemeberCode,
+                    producerName,
+                    serviceURL,
+                    false,
+                    db,
+                    dbConnection);
             logger.debug("messageID: " + messageID);
+            
             DhlMessage.updateStatus(messageID, item, db, dbConnection);
         }
     }
 
-    private static int UpdateClientStatus(UnitCredential masterCredential, OrgSettings db, Connection dbConnection) {
+    private static int updateClientStatus(UnitCredential masterCredential, OrgSettings db, Connection dbConnection) {
         int resultCounter = 0;
         try {
             ArrayList<DhlMessage> messages = DhlMessage.getList(true, Settings.Client_StatusReceived, masterCredential.getUnitID(), true, true, db, dbConnection);
             logger.info("    Staatuse uuendamist vajavaid sõnumeid: " + String.valueOf(messages.size()));
             if ((messages != null) && !messages.isEmpty()) {
-                MarkDocumentsReceived(messages, masterCredential, "", db, dbConnection);
+                markDocumentsReceived(messages, masterCredential, "", db, dbConnection);
                 resultCounter = messages.size();
                 DhlMessage tmp = null;
                 for (int i = 0; i < messages.size(); ++i) {
@@ -689,8 +760,7 @@ public class Client {
         return resultCounter;
     }
 
-    private static int SendUnsentMessages(UnitCredential masterCredential,
-                                          OrgSettings db, Connection dbConnection) {
+    private static int sendUnsentMessages(UnitCredential masterCredential, OrgSettings db, Connection dbConnection) {
         int resultCounter = 0;
         try {
             // Töötleme andmebaasis olevad saatmist ootavad sõnumid üle, et
@@ -708,10 +778,13 @@ public class Client {
             }
 
             HeaderVariables header = new HeaderVariables(
-                    masterCredential.getInstitutionCode(),
+                    masterCredential.getXRoadClientMemberCode(),
                     masterCredential.getPersonalIdCode(),
                     "",
-                    (CommonMethods.personalIDCodeHasCountryCode(masterCredential.getPersonalIdCode()) ? masterCredential.getPersonalIdCode() : "EE" + masterCredential.getPersonalIdCode()));
+                    (CommonMethods.personalIDCodeHasCountryCode(masterCredential.getPersonalIdCode()) ? masterCredential.getPersonalIdCode() : "EE" + masterCredential.getPersonalIdCode()),
+                    masterCredential.getXRoadClientInstance(),
+                    masterCredential.getXRoadClientMemberClass(),
+                    masterCredential.getXRoadClientSubsystemCode());
 
             resultCounter = messages.size();
             for (int i = 0; i < messages.size(); ++i) {
@@ -746,9 +819,12 @@ public class Client {
                             // Sõnum on mõeldud SOAP kujul edastamiseks
                             String serviceUrl = currentClone.getDeliveryChannel().getServiceUrl();
                             String producerName = currentClone.getDeliveryChannel().getProducerName();
+                            String xRoadServiceInstance = currentClone.getDeliveryChannel().getXRoadServiceInstance();
+                            String xRoadServiceMemberClass = currentClone.getDeliveryChannel().getXRoadServiceMemberClass();
+                            String xRoadServiceMemberCode = currentClone.getDeliveryChannel().getXRoadServiceMemberCode();
 
                             logger.info("Sending document " + String.valueOf(msg.getId()) + " (GUID:" + msg.getDhlGuid() + ") to server " + serviceUrl + " (" + producerName + ")");
-                            dvkClient.initClient(serviceUrl, producerName);
+                            dvkClient.initClient(serviceUrl, xRoadServiceInstance, xRoadServiceMemberClass, xRoadServiceMemberCode, producerName);
 
                             result = dvkClient.sendDocuments(header, currentClone);
                             currentClone.setDhlID(result);
@@ -830,17 +906,19 @@ public class Client {
         return resultCounter;
     }
 
-    private static void ReceiveNewMessages(UnitCredential masterCredential,
-                                           OrgSettings db, Connection dbConnection) {
+    private static void receiveNewMessages(UnitCredential masterCredential, OrgSettings db, Connection dbConnection) {
         logger.info("Receiving new messages.");
 
         try {
             // Saadetava sõnumi päisesse kantavad parameetrid
             HeaderVariables header = new HeaderVariables(
-                    masterCredential.getInstitutionCode(),
+                    masterCredential.getXRoadClientMemberCode(),
                     masterCredential.getPersonalIdCode(),
                     "",
-                    (CommonMethods.personalIDCodeHasCountryCode(masterCredential.getPersonalIdCode()) ? masterCredential.getPersonalIdCode() : "EE" + masterCredential.getPersonalIdCode()));
+                    (CommonMethods.personalIDCodeHasCountryCode(masterCredential.getPersonalIdCode()) ? masterCredential.getPersonalIdCode() : "EE" + masterCredential.getPersonalIdCode()),
+                    masterCredential.getXRoadClientInstance(),
+                    masterCredential.getXRoadClientMemberClass(),
+                    masterCredential.getXRoadClientSubsystemCode());
 
             ReceiveDocumentsResult resultFiles = dvkClient.receiveDocuments(header, db.getDvkSettings().getReceiveDocumentsAmount(), masterCredential.getFolders(), masterCredential.getDivisionID(), masterCredential.getDivisionShortName(), masterCredential.getOccupationID(), masterCredential.getOccupationShortName());
             ArrayList<DhlMessage> receivedDocs = new ArrayList<DhlMessage>();
@@ -879,7 +957,7 @@ public class Client {
             // Märgime edukalt vastuvõetud dokumendid vastuvõetuks.
             if (receivedDocs.size() > 0) {
                 logger.info("Annan dokumendivahetuskeskusele teada, et sain dokumendid kätte...");
-                MarkDocumentsReceived(receivedDocs, masterCredential, db.getDvkSettings().getDefaultStatusID(), null, "", resultFiles.deliverySessionID, db, dbConnection);
+                markDocumentsReceived(receivedDocs, masterCredential, db.getDvkSettings().getDefaultStatusID(), null, "", resultFiles.deliverySessionID, db, dbConnection);
             }
 
             // Teavitame dokumendivahetuskeskust dokumentidest, mille
@@ -888,7 +966,7 @@ public class Client {
                 logger.info("Teavitame dokumendivahetuskeskust dokumentidest, mille vastuvõtmine ebaõnnestus.");
                 Fault clientFault = new Fault();
                 clientFault.setFaultString("Error occured while saving document to database!");
-                MarkDocumentsReceived(failedDocs, masterCredential, 0, clientFault, "", resultFiles.deliverySessionID, db, dbConnection);
+                markDocumentsReceived(failedDocs, masterCredential, 0, clientFault, "", resultFiles.deliverySessionID, db, dbConnection);
             }
         } catch (Exception ex) {
             ErrorLog errorLog = new ErrorLog(ex, "dvk.client.Client" + " ReceiveNewMessages");
@@ -897,7 +975,7 @@ public class Client {
         }
     }
 
-    private static void MarkDocumentsReceived(
+    private static void markDocumentsReceived(
             ArrayList<DhlMessage> documents,
             UnitCredential masterCredential,
             int statusID,
@@ -906,13 +984,17 @@ public class Client {
             String deliverySessionID,
             OrgSettings db,
             Connection dbConnection) {
+    	
         try {
             // Saadetava sõnumi päisesse kantavad parameetrid
             HeaderVariables header = new HeaderVariables(
-                    masterCredential.getInstitutionCode(),
+                    masterCredential.getXRoadClientMemberCode(),
                     masterCredential.getPersonalIdCode(),
                     "",
-                    (CommonMethods.personalIDCodeHasCountryCode(masterCredential.getPersonalIdCode()) ? masterCredential.getPersonalIdCode() : "EE" + masterCredential.getPersonalIdCode()));
+                    (CommonMethods.personalIDCodeHasCountryCode(masterCredential.getPersonalIdCode()) ? masterCredential.getPersonalIdCode() : "EE" + masterCredential.getPersonalIdCode()),
+                    masterCredential.getXRoadClientInstance(),
+                    masterCredential.getXRoadClientMemberClass(),
+                    masterCredential.getXRoadClientSubsystemCode());
 
             // Käivitame päringu
             dvkClient.markDocumentsReceived(header, documents, statusID, clientFault, metaXML, deliverySessionID, false, db, dbConnection, masterCredential);
@@ -924,25 +1006,31 @@ public class Client {
         }
     }
 
-    private static void MarkDocumentsReceived(ArrayList<DhlMessage> documents, UnitCredential masterCredential, String deliverySessionID, OrgSettings db, Connection dbConnection) throws Exception {
+    private static void markDocumentsReceived(ArrayList<DhlMessage> documents, UnitCredential masterCredential, String deliverySessionID, OrgSettings db, Connection dbConnection) throws Exception {
         // Saadetava sõnumi päisesse kantavad parameetrid
         HeaderVariables header = new HeaderVariables(
-                masterCredential.getInstitutionCode(),
+                masterCredential.getXRoadClientMemberCode(),
                 masterCredential.getPersonalIdCode(),
                 "",
-                (CommonMethods.personalIDCodeHasCountryCode(masterCredential.getPersonalIdCode()) ? masterCredential.getPersonalIdCode() : "EE" + masterCredential.getPersonalIdCode()));
+                (CommonMethods.personalIDCodeHasCountryCode(masterCredential.getPersonalIdCode()) ? masterCredential.getPersonalIdCode() : "EE" + masterCredential.getPersonalIdCode()),
+                masterCredential.getXRoadClientInstance(),
+                masterCredential.getXRoadClientMemberClass(),
+                masterCredential.getXRoadClientSubsystemCode());
 
         // Käivitame päringu
         dvkClient.markDocumentsReceived(header, documents, deliverySessionID, db, dbConnection, masterCredential);
     }
 
-    protected static GetSendingOptionsV3ResponseType ReceiveDownloadWaitingInstitutionsV2(ArrayList<OrgSettings> databases) throws Exception {
+    protected static GetSendingOptionsV3ResponseType receiveDownloadWaitingInstitutionsV2(ArrayList<OrgSettings> databases) throws Exception {
         // Saadetava sõnumi päisesse kantavad parameetrid
         HeaderVariables headerVar = new HeaderVariables(
-                Settings.Client_DefaultOrganizationCode,
+        		Settings.getXRoadClientMemberCode(),
                 Settings.Client_DefaultPersonCode,
                 "",
-                (CommonMethods.personalIDCodeHasCountryCode(Settings.Client_DefaultPersonCode) ? Settings.Client_DefaultPersonCode : "EE" + Settings.Client_DefaultPersonCode));
+                (CommonMethods.personalIDCodeHasCountryCode(Settings.Client_DefaultPersonCode) ? Settings.Client_DefaultPersonCode : "EE" + Settings.Client_DefaultPersonCode),
+                Settings.getXRoadClientInstance(),
+                Settings.getXRoadClientMemberClass(),
+                Settings.getXRoadClientSubsystemCode());
 
         // Käivitame päringu
         logger.debug("Käivitame päringu parameetritega:");

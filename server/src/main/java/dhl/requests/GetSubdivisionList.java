@@ -16,14 +16,14 @@ import dhl.users.Asutus;
 import dhl.users.UserProfile;
 import dvk.core.AttachmentExtractionResult;
 import dvk.core.CommonMethods;
-import dvk.core.xroad.XRoadProtocolVersion;
+import dvk.core.xroad.XRoadMessageProtocolVersion;
 
 public class GetSubdivisionList {
 
     private static Logger logger = Logger.getLogger(GetSubdivisionList.class);
 
     public static getSubdivisionListResponseType V1(org.apache.axis.MessageContext context, Connection conn,
-    		XRoadProtocolVersion xRoadProtocolVersion) throws AxisFault, RequestProcessingException {
+    		XRoadMessageProtocolVersion xRoadMessageProtocolVersion) throws AxisFault, RequestProcessingException {
 
         logger.info("GetSubdivisionList.V1 invoked.");
 
@@ -31,7 +31,7 @@ public class GetSubdivisionList {
 
         // Laeme päringu keha endale sobivasse andmestruktuuri
         getSubdivisionListRequestType bodyData = getSubdivisionListRequestType.getFromSOAPBody(context);
-        if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+        if (xRoadMessageProtocolVersion.equals(XRoadMessageProtocolVersion.V2_0)) {
         	result.paring = bodyData;
         }
 
@@ -55,7 +55,7 @@ public class GetSubdivisionList {
     }
 
     public static getSubdivisionListV2ResponseType V2(org.apache.axis.MessageContext context, Connection conn,
-    		UserProfile user, XRoadProtocolVersion xRoadProtocolVersion) throws Exception {
+    		UserProfile user, XRoadMessageProtocolVersion xRoadMessageProtocolVersion) throws Exception {
 
         logger.info("GetSubdivisionList.V2 invoked.");
 
@@ -63,7 +63,7 @@ public class GetSubdivisionList {
 
         // Laeme päringu keha endale sobivasse andmestruktuuri
         getSubdivisionListV2RequestType bodyData = getSubdivisionListV2RequestType.getFromSOAPBody(context);
-        if (xRoadProtocolVersion.equals(XRoadProtocolVersion.V2_0)) {
+        if (xRoadMessageProtocolVersion.equals(XRoadMessageProtocolVersion.V2_0)) {
         	result.paring = bodyData;
         }
 

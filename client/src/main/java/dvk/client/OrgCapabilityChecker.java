@@ -1,17 +1,5 @@
 package dvk.client;
 
-import dvk.client.amphora.Department;
-import dvk.client.amphora.Organization;
-import dvk.client.businesslayer.*;
-import dvk.client.conf.OrgSettings;
-import dvk.client.dhl.service.DatabaseSessionService;
-import dvk.client.dhl.service.LoggingService;
-import dvk.core.Settings;
-import dvk.client.db.DBConnection;
-import dvk.client.db.UnitCredential;
-import dvk.client.iostructures.GetSendingOptionsV3ResponseType;
-import dvk.core.CommonMethods;
-import dvk.core.HeaderVariables;
 import java.io.File;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -19,6 +7,25 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+
+import dvk.client.amphora.Department;
+import dvk.client.amphora.Organization;
+import dvk.client.businesslayer.Classifier;
+import dvk.client.businesslayer.DhlCapability;
+import dvk.client.businesslayer.ErrorLog;
+import dvk.client.businesslayer.Occupation;
+import dvk.client.businesslayer.RequestLog;
+import dvk.client.businesslayer.ResponseStatus;
+import dvk.client.businesslayer.Subdivision;
+import dvk.client.conf.OrgSettings;
+import dvk.client.db.DBConnection;
+import dvk.client.db.UnitCredential;
+import dvk.client.dhl.service.DatabaseSessionService;
+import dvk.client.dhl.service.LoggingService;
+import dvk.client.iostructures.GetSendingOptionsV3ResponseType;
+import dvk.core.CommonMethods;
+import dvk.core.HeaderVariables;
+import dvk.core.Settings;
 
 public class OrgCapabilityChecker {
 
@@ -72,7 +79,13 @@ public class OrgCapabilityChecker {
 	        // "päris" x-tee.
 	        // Initsialiseerime kliendi
 	        try {
-	            dvkClient.initClient(Settings.Client_ServiceUrl, Settings.Client_ProducerName);
+	            dvkClient.initClient(
+	                    Settings.Client_ServiceUrl,
+                        Settings.getDvkXRoadServiceInstance(),
+                        Settings.getDvkXRoadServiceMemberClass(),
+                        Settings.getDvkXRoadServiceMemberCode(),
+                        Settings.getDvkXRoadServiceSubsystemCode()
+	            );
 	        } catch (Exception ex) {
                 LoggingService.logError(new ErrorLog(ex, "dvk.client.OrgCapabilityChecker" + " main"));
 	            ex.printStackTrace();
@@ -105,10 +118,13 @@ public class OrgCapabilityChecker {
 	            UnitCredential cred = credList[0];
 
 	            HeaderVariables headerVar = new HeaderVariables(
-	                cred.getInstitutionCode(),
+	                cred.getXRoadClientMemberCode(),
 	                cred.getPersonalIdCode(),
 	                "",
-	                (CommonMethods.personalIDCodeHasCountryCode(cred.getPersonalIdCode()) ? cred.getPersonalIdCode() : "EE"+cred.getPersonalIdCode()));
+	                (CommonMethods.personalIDCodeHasCountryCode(cred.getPersonalIdCode()) ? cred.getPersonalIdCode() : "EE"+cred.getPersonalIdCode()),
+	                cred.getXRoadClientInstance(),
+	                cred.getXRoadClientMemberClass(),
+	                cred.getXRoadClientSubsystemCode());
 
                 Connection connection = null;
 	            try {

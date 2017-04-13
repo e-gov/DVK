@@ -1,10 +1,11 @@
 package dvk.client.amphora;
 
-import dvk.client.businesslayer.ErrorLog;
-import dvk.client.dhl.service.LoggingService;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Types;
+
+import dvk.client.businesslayer.ErrorLog;
+import dvk.client.dhl.service.LoggingService;
 
 public class Party {
     public static boolean addParty(Connection conn, int partyID, int partyTypeID) {

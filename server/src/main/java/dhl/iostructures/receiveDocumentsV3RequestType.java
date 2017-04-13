@@ -10,7 +10,7 @@ import org.w3c.dom.NodeList;
 
 import dvk.core.CommonMethods;
 import dvk.core.Settings;
-import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadHeader;
 
 public class receiveDocumentsV3RequestType {
 	
@@ -36,7 +36,7 @@ public class receiveDocumentsV3RequestType {
         fragmentSizeBytesOrig = 0;
     }
 
-    public static receiveDocumentsV3RequestType getFromSOAPBody(org.apache.axis.MessageContext context, XRoadProtocolHeader xRoadProtocolHeader) {
+    public static receiveDocumentsV3RequestType getFromSOAPBody(org.apache.axis.MessageContext context, XRoadHeader xRoadHeader) {
         try {
             org.apache.axis.Message msg = context.getRequestMessage();
             SOAPBody body = msg.getSOAPBody();

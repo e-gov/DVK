@@ -2,9 +2,12 @@ package dvk.client.iostructures;
 
 import java.util.ArrayList;
 import java.util.Date;
+
 import org.apache.log4j.Logger;
+
 import dvk.client.businesslayer.DhlMessage;
 import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
 import dvk.core.Fault;
 
 public class MarkDocumentsReceivedV3Body implements SOAPBodyOverride {
@@ -39,11 +42,11 @@ public class MarkDocumentsReceivedV3Body implements SOAPBodyOverride {
     	logger.debug("Constructing SOAP body for MarkDocumentsReceivedV3Body.");
     	
         StringBuilder sb = new StringBuilder(10240);
-        sb.append("<dhl:markDocumentsReceived><keha>");
+        sb.append("<dhl:markDocumentsReceived " + CommonStructures.NS_DHL_DECLARATION + "><keha>");
         
         if ((dokumendidIdList != null) && (dokumendidIdList.size() > 0)) {
         	logger.debug("Using dokumendidIdList.");
-        	sb.append("<dokumendid xsi:type=\"SOAP-ENC:Array\" SOAP-ENC:arrayType=\"dhl:asutus["+ String.valueOf(dokumendidIdList.size()) +"]\">");
+        	sb.append("<dokumendid>");
 	        for (int i = 0; i < dokumendidIdList.size(); ++i) {
 		        sb.append("<item>");
 		        sb.append("<dhl_id>" + String.valueOf(dokumendidIdList.get(i)) + "</dhl_id>");		        
@@ -60,7 +63,7 @@ public class MarkDocumentsReceivedV3Body implements SOAPBodyOverride {
 	        sb.append("</dokumendid>");
         } else if ((dokumendidObjectList != null) && (dokumendidObjectList.size() > 0)) {
         	logger.debug("Using dokumendidObjectList.");
-        	sb.append("<dokumendid xsi:type=\"SOAP-ENC:Array\" SOAP-ENC:arrayType=\"dhl:asutus["+ String.valueOf(dokumendidObjectList.size()) +"]\">");
+        	sb.append("<dokumendid>");
 	        for (int i = 0; i < dokumendidObjectList.size(); ++i) {
 	        	DhlMessage tmpMessage = dokumendidObjectList.get(i);
 		        sb.append("<item>");

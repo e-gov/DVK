@@ -4,10 +4,13 @@ import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+
+import org.apache.axis.AxisFault;
+
 import dvk.client.businesslayer.ErrorLog;
 import dvk.client.dhl.service.LoggingService;
-import org.apache.axis.AxisFault;
 import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
 import dvk.core.ShortName;
 
 public class GetSendingOptionsV3Body implements SOAPBodyOverride {
@@ -33,7 +36,7 @@ public class GetSendingOptionsV3Body implements SOAPBodyOverride {
     }
 
 	public String getBodyContentsAsText() {
-		return "<dhl:getSendingOptions><keha href=\"cid:" + kehaHref + "\"/></dhl:getSendingOptions>";
+		return "<dhl:getSendingOptions " + CommonStructures.NS_DHL_DECLARATION + "><keha href=\"cid:" + kehaHref + "\"/></dhl:getSendingOptions>";
     }
 
 	public String createAttachmentFile() throws Exception {

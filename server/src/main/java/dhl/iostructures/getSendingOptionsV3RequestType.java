@@ -13,7 +13,7 @@ import org.w3c.dom.NodeList;
 
 import dvk.core.CommonMethods;
 import dvk.core.ShortName;
-import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadHeader;
 
 public class getSendingOptionsV3RequestType {
 	
@@ -50,7 +50,7 @@ public class getSendingOptionsV3RequestType {
         vastuvotmataDokumenteOotel = false;
     }
 
-    public static getSendingOptionsV3RequestType getFromSOAPBody(org.apache.axis.MessageContext context, XRoadProtocolHeader xRoadProtocolHeader) throws Exception {
+    public static getSendingOptionsV3RequestType getFromSOAPBody(org.apache.axis.MessageContext context, XRoadHeader xRoadHeader) throws Exception {
         org.apache.axis.Message msg = context.getRequestMessage();
         SOAPBody body = msg.getSOAPBody();
         

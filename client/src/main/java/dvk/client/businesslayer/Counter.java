@@ -1,12 +1,12 @@
 package dvk.client.businesslayer;
 
-import dvk.client.conf.OrgSettings;
-import dvk.client.dhl.service.LoggingService;
-import dvk.core.CommonMethods;
-import dvk.core.CommonStructures;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Types;
+
+import dvk.client.conf.OrgSettings;
+import dvk.client.dhl.service.LoggingService;
+import dvk.core.CommonStructures;
 
 public class Counter {
     public static int getNextDhlID(OrgSettings db, Connection dbConnection) {

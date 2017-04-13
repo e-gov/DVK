@@ -3,6 +3,8 @@ package dvk.client.iostructures;
 import java.util.ArrayList;
 import java.util.List;
 
+import dvk.core.CommonStructures;
+
 public class ReceiveDocumentsV3Body implements SOAPBodyOverride {
     public int arv;
     public int allyksus;
@@ -23,7 +25,7 @@ public class ReceiveDocumentsV3Body implements SOAPBodyOverride {
     }
 
     public String getBodyContentsAsText() {
-        String tmp = "<dhl:receiveDocuments><keha><arv>" + String.valueOf(arv) + "</arv>";
+        String tmp = "<dhl:receiveDocuments " + CommonStructures.NS_DHL_DECLARATION + "><keha><arv>" + String.valueOf(arv) + "</arv>";
         if (allyksus > 0) {
             tmp += "<allyksus>"+ String.valueOf(allyksus) +"</allyksus>";
         }

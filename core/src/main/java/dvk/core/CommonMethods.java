@@ -72,8 +72,8 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.xml.sax.InputSource;
 
-import dvk.core.xroad.XRoadProtocolHeader;
-import dvk.core.xroad.XRoadProtocolVersion;
+import dvk.core.xroad.XRoadHeader;
+import dvk.core.xroad.XRoadMessageProtocolVersion;
 
 
 public class CommonMethods {
@@ -702,15 +702,15 @@ public class CommonMethods {
         }
     }
 
-    public static String getXRoadServiceVersion(XRoadProtocolHeader xRoadProtocolHeader) {
+    public static String getXRoadServiceVersion(XRoadHeader xRoadHeader) {
     	String requestVersion = "";
     	
-    	if (xRoadProtocolHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-    		if (xRoadProtocolHeader.getXRoadService() != null && xRoadProtocolHeader.getXRoadService().getServiceVersion() != null) {
-    			requestVersion = xRoadProtocolHeader.getXRoadService().getServiceVersion();
+    	if (xRoadHeader.getMessageProtocolVersion().equals(XRoadMessageProtocolVersion.V4_0)) {
+    		if (xRoadHeader.getXRoadService() != null && xRoadHeader.getXRoadService().getServiceVersion() != null) {
+    			requestVersion = xRoadHeader.getXRoadService().getServiceVersion();
     		}
-    	} else if (xRoadProtocolHeader.getService() != null) {
-    		String[] splitName = xRoadProtocolHeader.getService().split("[.]");
+    	} else if (xRoadHeader.getService() != null) {
+    		String[] splitName = xRoadHeader.getService().split("[.]");
 	        if ((splitName != null) && (splitName.length > 0)) {
 	        	requestVersion = splitName[splitName.length - 1];
 	        }

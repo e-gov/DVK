@@ -1,14 +1,14 @@
 package dvk.client.amphora;
 
-import dvk.client.businesslayer.ErrorLog;
-import dvk.client.conf.OrgSettings;
-import dvk.client.db.UnitCredential;
-import dvk.client.dhl.service.LoggingService;
-import dvk.core.CommonMethods;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Types;
+
+import dvk.client.businesslayer.ErrorLog;
+import dvk.client.conf.OrgSettings;
+import dvk.client.db.UnitCredential;
+import dvk.client.dhl.service.LoggingService;
 
 public class Department {
     private int m_partyID;

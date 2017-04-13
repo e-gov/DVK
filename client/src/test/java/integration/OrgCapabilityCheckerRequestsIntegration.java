@@ -1,5 +1,12 @@
 package integration;
 
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.junit.Test;
+
 import dvk.client.ClientAPI;
 import dvk.client.businesslayer.Occupation;
 import dvk.client.businesslayer.Subdivision;
@@ -13,12 +20,6 @@ import dvk.core.HeaderVariables;
 import dvk.core.Settings;
 import ee.ria.dvk.client.testutil.IntegrationTestsConfigUtil;
 import junit.framework.Assert;
-import org.apache.log4j.Logger;
-import org.junit.Test;
-
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
 
 public class OrgCapabilityCheckerRequestsIntegration {
 
@@ -61,10 +62,13 @@ public class OrgCapabilityCheckerRequestsIntegration {
             ArrayList<String> orgCodes = new ArrayList<String>();
 
             HeaderVariables headerVar = new HeaderVariables(
-                    cred.getInstitutionCode(),
+                    cred.getXRoadClientMemberCode(),
                     cred.getPersonalIdCode(),
                     "",
-                    (CommonMethods.personalIDCodeHasCountryCode(cred.getPersonalIdCode()) ? cred.getPersonalIdCode() : "EE"+cred.getPersonalIdCode()));
+                    (CommonMethods.personalIDCodeHasCountryCode(cred.getPersonalIdCode()) ? cred.getPersonalIdCode() : "EE"+cred.getPersonalIdCode()),
+                    cred.getXRoadClientInstance(),
+	                cred.getXRoadClientMemberClass(),
+	                cred.getXRoadClientSubsystemCode());
 
             // Execute getSendingOptionsRequest with all necessary parameters
             try {
@@ -134,7 +138,13 @@ public class OrgCapabilityCheckerRequestsIntegration {
         Connection connection = null;
 
         try {
-            dvkClient.initClient(Settings.Client_ServiceUrl, Settings.Client_ProducerName);
+            dvkClient.initClient(
+                    Settings.Client_ServiceUrl,
+                    Settings.getDvkXRoadServiceInstance(),
+                    Settings.getDvkXRoadServiceMemberClass(),
+                    Settings.getDvkXRoadServiceMemberCode(),
+                    Settings.getDvkXRoadServiceSubsystemCode()
+            );
             dvkClient.setAllKnownDatabases(allKnownDatabases);
             dvkClient.setOrgSettings(allKnownDatabases.get(0).getDvkSettings());
             connection = DBConnection.getConnection(allKnownDatabases.get(0));

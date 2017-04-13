@@ -13,17 +13,17 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.context.MessageContext;
 import org.apache.log4j.Logger;
 
-import dvk.core.xroad.XRoadProtocolHeader;
-import dvk.core.xroad.XRoadProtocolVersion;
+import dvk.core.xroad.XRoadHeader;
+import dvk.core.xroad.XRoadMessageProtocolVersion;
 
 public class GetSendStatusDvkSoapClient extends AbstractDvkServiceSoapClient {
     private static Logger logger = Logger.getLogger(GetSendStatusDvkSoapClient.class);
 
-    public GetSendStatusDvkSoapClient(Options options, XRoadProtocolVersion xRoadProtocol) {
+    public GetSendStatusDvkSoapClient(Options options, XRoadMessageProtocolVersion xRoadProtocol) {
         super(options, xRoadProtocol);
     }
 
-    public MessageContext sendRequest(String attachmentName, XRoadProtocolHeader xHeader) throws Exception {
+    public MessageContext sendRequest(String attachmentName, XRoadHeader xHeader) throws Exception {
         super.attachmentName = attachmentName;
         super.xHeader = xHeader;
         return sendMessage(xHeader);

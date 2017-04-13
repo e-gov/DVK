@@ -58,18 +58,30 @@ public class CommonStructures {
     public static final String ROLL_ALLYKSUSE_ADMIN = "DHL: allyksuse administraator";
 
     // Nimeruumid
-    public static final String NS_XTEE_PREFIX = "xtee";
-    public static final String NS_XTEE_URI = "http://x-tee.riik.ee/xsd/xtee.xsd";
-    public static final String NS_SOAPENC_PREFIX = "SOAP-ENC";
-    public static final String NS_SOAPENC_URI = "http://schemas.xmlsoap.org/soap/encoding/";
     public static final String NS_XSI_PREFIX = "xsi";
     public static final String NS_XSI_URI = "http://www.w3.org/2001/XMLSchema-instance";
+    public static final String NS_XSI_DECLARATION = "xmlns:" + NS_XSI_PREFIX + "=\"" + NS_XSI_URI + "\"";
+    
+    public static final String NS_DHL_SCHEMA_URI = "http://www.riik.ee/schemas/dhl";
+    
+    public static final String NS_XTEE_PREFIX = "xtee";
+    public static final String NS_XTEE_URI = "http://x-tee.riik.ee/xsd/xtee.xsd";
+    
+    public static final String NS_SOAPENC_PREFIX = "SOAP-ENC";
+    public static final String NS_SOAPENC_URI = "http://schemas.xmlsoap.org/soap/encoding/";
+    public static final String NS_SOAPENC_DECLARATION = "xmlns:" + NS_SOAPENC_PREFIX + "=\"" + NS_SOAPENC_URI + "\"";
+    
     public static final String NS_DHL_PREFIX = "dhl";
-    public static final String NS_DHL_URI = "http://www.riik.ee/schemas/dhl";
-    public static final String NS_DVK_MAIN = "http://producers.dhl.xtee.riik.ee/producer/dhl";
+    public static final String NS_DHL_URI = "http://producers.dhl.xtee.riik.ee/producer/dhl";
+    public static final String NS_DHL_DECLARATION = "xmlns:" + NS_DHL_PREFIX + "=\"" + NS_DHL_URI + "\"";
+    
+    public static final String NS_ADIT_PREFIX = "adit";
+    public static final String NS_ADIT_URI = "http://producers.ametlikud-dokumendid.xtee.riik.ee/producer/ametlikud-dokumendid";
+    public static final String NS_ADIT_DECLARATION = "xmlns:" + NS_ADIT_PREFIX + "=\"" + NS_ADIT_URI + "\"";
+    
     public static final String NS_AAR_MAIN = "http://producers.aar.xtee.riik.ee/producer/aar";
-    public static final String NS_ADIT_MAIN = "http://producers.ametlikud-dokumendid.xtee.riik.ee/producer/ametlikud-dokumendid";
 
+    
     // Saatmisviisid
     public static final String SENDING_DHL = "dhl";
     public static final String SENDING_DHL_DIRECT = "dhl_otse";

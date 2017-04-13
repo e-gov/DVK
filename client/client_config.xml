@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <databases>
   <database>
-    <provider>[MSSQL|MSSQL2005|ORACLE_10G|ORACLE_11G|POSTGRE|SQLANYWHERE]</provider>
-    <server_name>[db_server_name]</server_name>
-    <server_port>[db_port]</server_port>
-    <database_name>[db_name]</database_name>
-    <username>[db_username]</username>
-    <password>[db_password]</password>
+    <provider>POSTGRE</provider>
+    <server_name>ats.girf.ee</server_name>
+    <server_port>5432</server_port>
+    <database_name>adit</database_name>
+    <username>adit_dvkuk_user</username>
+    <password>yyy</password>
     <process_name>[db_process_name]</process_name>
     <instance_name>[mssql_instance_name]</instance_name>
-    <schema_name>[postgres_schema_name]</schema_name>
+    <schema_name>adit_dvkuk</schema_name>
     
     <dvk_settings>
       <!-- Kui siin service_url väärtus määramata jätta, siis kasutab rakendus antud andmebaasi puhul
       üldist (dvk_client.properties failis määratud) turvaserveri aadressi -->
-      <service_url>http://[TURVASERVER]/cgi-bin/consumer_proxy</service_url>
+      <service_url>http://localhost:9099/services/dhlHttpSoapPort</service_url>
       
       <send_documents_ver>4</send_documents_ver> <!-- Võimalikud väärtused: 1, 2, 3, 4 -->
       <receive_documents_ver>4</receive_documents_ver> <!-- Võimalikud väärtused: 1, 2, 3, 4 -->

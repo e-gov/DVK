@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import dvk.core.CommonStructures;
+
 public class ReceiveDocumentsV4Body implements SOAPBodyOverride {
 	
 	private static Logger logger = Logger.getLogger(ReceiveDocumentsV4Body.class);
@@ -29,7 +31,7 @@ public class ReceiveDocumentsV4Body implements SOAPBodyOverride {
 
     public String getBodyContentsAsText() {
     	logger.debug("getBodyContentsAsText for ReceiveDocuments.V4");
-        String tmp = "<dhl:receiveDocuments><keha><arv>" + String.valueOf(arv) + "</arv>";
+        String tmp = "<dhl:receiveDocuments " + CommonStructures.NS_DHL_DECLARATION + "><keha><arv>" + String.valueOf(arv) + "</arv>";
         if ((allyksuseLyhinimetus != null) && (allyksuseLyhinimetus.length() > 0)) {
             tmp += "<allyksuse_lyhinimetus>"+ allyksuseLyhinimetus +"</allyksuse_lyhinimetus>";
         }

@@ -7,7 +7,7 @@ import org.apache.axis.AxisFault;
 import org.apache.commons.lang3.StringUtils;
 
 import dvk.core.CommonStructures;
-import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadHeader;
 
 public class UserProfile {
     private int m_organizationID;
@@ -88,7 +88,7 @@ public class UserProfile {
         m_divisions = new ArrayList<Integer>();
     }
 
-    public static UserProfile getFromHeaders(XRoadProtocolHeader header, Connection conn) throws AxisFault {
+    public static UserProfile getFromHeaders(XRoadHeader header, Connection conn) throws AxisFault {
         UserProfile result = new UserProfile();
 
         // Kontrollime, et vajalik X-Tee päis anti kaasa ja et see sisaldaks

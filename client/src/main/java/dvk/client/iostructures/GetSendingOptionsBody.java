@@ -1,7 +1,8 @@
 package dvk.client.iostructures;
 
-import dvk.client.iostructures.SOAPBodyOverride;
 import java.util.ArrayList;
+
+import dvk.core.CommonStructures;
 
 public class GetSendingOptionsBody implements SOAPBodyOverride {
     public ArrayList<String> keha;
@@ -12,7 +13,7 @@ public class GetSendingOptionsBody implements SOAPBodyOverride {
 
     public String getBodyContentsAsText() {
         StringBuilder sb = new StringBuilder();
-        sb.append("<dhl:getSendingOptions><keha>");
+        sb.append("<dhl:getSendingOptions " + CommonStructures.NS_DHL_DECLARATION + "><keha>");
         if (keha != null) {
 	        for (int i = 0; i < keha.size(); ++i) {
 	            sb.append("<asutus>" + keha.get(i) + "</asutus>");

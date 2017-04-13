@@ -4,10 +4,13 @@ import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+
+import org.apache.axis.AxisFault;
+
 import dvk.client.businesslayer.ErrorLog;
 import dvk.client.dhl.service.LoggingService;
-import org.apache.axis.AxisFault;
 import dvk.core.CommonMethods;
+import dvk.core.CommonStructures;
 
 public class GetOccupationListV2Body implements SOAPBodyOverride {
     public String asutusedHref;
@@ -21,7 +24,7 @@ public class GetOccupationListV2Body implements SOAPBodyOverride {
     }
 	
 	public String getBodyContentsAsText() {
-		return "<dhl:getOccupationList><keha><asutused href=\"cid:" + asutusedHref + "\"/></keha></dhl:getOccupationList>";
+		return "<dhl:getOccupationList " + CommonStructures.NS_DHL_DECLARATION + "><keha><asutused href=\"cid:" + asutusedHref + "\"/></keha></dhl:getOccupationList>";
     }
 	
 	public String createAttachmentFile() throws Exception {

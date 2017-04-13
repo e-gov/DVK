@@ -70,9 +70,11 @@ import dvk.client.db.UnitCredential;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
 import dvk.core.Settings;
-import dvk.core.util.DvkUtil;
-import dvk.core.xroad.XRoadProtocolHeader;
-import dvk.core.xroad.XRoadProtocolVersion;
+import dvk.core.util.DVKServiceMethod;
+import dvk.core.util.DVKUtil;
+import dvk.core.xroad.XRoadHeader;
+import dvk.core.xroad.XRoadIdentifier;
+import dvk.core.xroad.XRoadMessageProtocolVersion;
 import dvk.core.xroad.XRoadService;
 
 public class CoreServices implements Dhl {
@@ -133,59 +135,59 @@ public class CoreServices implements Dhl {
     	// Initializing service methods list for use with X-Road protocol version 2.0
     	String producer = Settings.Server_ProducerName;
 		mehodsListWhenRunOnClientDatabase = new String[] {
-			producer + ".sendDocuments.v1",
-			producer + ".sendDocuments.v2",
-			producer + ".sendDocuments.v3",
-			producer + ".sendDocuments.v4",
-			producer + ".getSendStatus.v1",
-			producer + ".getSendStatus.v2",
-			producer + ".getSendingOptions.v1",
-			producer + ".getSendingOptions.v2",
-			producer + ".getSendingOptions.v3"
+			producer + "." + DVKServiceMethod.SEND_DOCUMENTS.getName() + ".v1",
+			producer + "." + DVKServiceMethod.SEND_DOCUMENTS.getName() + ".v2",
+			producer + "." + DVKServiceMethod.SEND_DOCUMENTS.getName() + ".v3",
+			producer + "." + DVKServiceMethod.SEND_DOCUMENTS.getName() + ".v4",
+			producer + "." + DVKServiceMethod.GET_SEND_STATUS.getName() + ".v1",
+			producer + "." + DVKServiceMethod.GET_SEND_STATUS.getName() + ".v2",
+			producer + "." + DVKServiceMethod.GET_SENDING_OPTIONS.getName() + ".v1",
+			producer + "." + DVKServiceMethod.GET_SENDING_OPTIONS.getName() + ".v2",
+			producer + "." + DVKServiceMethod.GET_SENDING_OPTIONS.getName() + ".v3"
 		};
 		methodsListFull = (String[]) ArrayUtils.addAll(mehodsListWhenRunOnClientDatabase, new String[] {
-			producer + ".receiveDocuments.v1",
-			producer + ".receiveDocuments.v2",
-			producer + ".receiveDocuments.v3",
-			producer + ".receiveDocuments.v4",
-			producer + ".markDocumentsReceived.v1",
-			producer + ".markDocumentsReceived.v2",
-			producer + ".markDocumentsReceived.v3",
-			producer + ".deleteOldDocuments.v1",
-			producer + ".changeOrganizationData.v1",
-			producer + ".runSystemCheck.v1",
-			producer + ".getOccupationList.v1",
-			producer + ".getOccupationList.v2",
-			producer + ".getSubdivisionList.v1",
-			producer + ".getSubdivisionList.v2"
+			producer + "." + DVKServiceMethod.RECEIVE_DOCUMENTS.getName() + ".v1",
+			producer + "." + DVKServiceMethod.RECEIVE_DOCUMENTS.getName() + ".v2",
+			producer + "." + DVKServiceMethod.RECEIVE_DOCUMENTS.getName() + ".v3",
+			producer + "." + DVKServiceMethod.RECEIVE_DOCUMENTS.getName() + ".v4",
+			producer + "." + DVKServiceMethod.MARK_DOCUMENTS_RECEIVED.getName() + ".v1",
+			producer + "." + DVKServiceMethod.MARK_DOCUMENTS_RECEIVED.getName() + ".v2",
+			producer + "." + DVKServiceMethod.MARK_DOCUMENTS_RECEIVED.getName() + ".v3",
+			producer + "." + DVKServiceMethod.DELETE_OLD_DOCUMENTS.getName() + ".v1",
+			producer + "." + DVKServiceMethod.CHANGE_ORGANIZATION_DATA.getName() + ".v1",
+			producer + "." + DVKServiceMethod.RUN_SYSTEM_CHECK.getName() + ".v1",
+			producer + "." + DVKServiceMethod.GET_OCCUPATION_LIST.getName() + ".v1",
+			producer + "." + DVKServiceMethod.GET_OCCUPATION_LIST.getName() + ".v2",
+			producer + "." + DVKServiceMethod.GET_SUBDIVISION_LIST.getName() + ".v1",
+			producer + "." + DVKServiceMethod.GET_SUBDIVISION_LIST.getName() + ".v2"
 		});
 		
 		// Initializing service methods list for use with X-Road protocol version 4.0
-		serviceMethodsWhenRunOnClientDatabase.add(DvkUtil.createDvkXRoadService("sendDocuments", "v1"));
-		serviceMethodsWhenRunOnClientDatabase.add(DvkUtil.createDvkXRoadService("sendDocuments", "v2"));
-		serviceMethodsWhenRunOnClientDatabase.add(DvkUtil.createDvkXRoadService("sendDocuments", "v3"));
-		serviceMethodsWhenRunOnClientDatabase.add(DvkUtil.createDvkXRoadService("sendDocuments", "v4"));
-		serviceMethodsWhenRunOnClientDatabase.add(DvkUtil.createDvkXRoadService("getSendStatus", "v1"));
-		serviceMethodsWhenRunOnClientDatabase.add(DvkUtil.createDvkXRoadService("getSendStatus", "v2"));
-		serviceMethodsWhenRunOnClientDatabase.add(DvkUtil.createDvkXRoadService("getSendingOptions", "v1"));
-		serviceMethodsWhenRunOnClientDatabase.add(DvkUtil.createDvkXRoadService("getSendingOptions", "v2"));
-		serviceMethodsWhenRunOnClientDatabase.add(DvkUtil.createDvkXRoadService("getSendingOptions", "v3"));
+		serviceMethodsWhenRunOnClientDatabase.add(DVKUtil.createXRoadService(DVKServiceMethod.SEND_DOCUMENTS.getName(), "v1"));
+		serviceMethodsWhenRunOnClientDatabase.add(DVKUtil.createXRoadService(DVKServiceMethod.SEND_DOCUMENTS.getName(), "v2"));
+		serviceMethodsWhenRunOnClientDatabase.add(DVKUtil.createXRoadService(DVKServiceMethod.SEND_DOCUMENTS.getName(), "v3"));
+		serviceMethodsWhenRunOnClientDatabase.add(DVKUtil.createXRoadService(DVKServiceMethod.SEND_DOCUMENTS.getName(), "v4"));
+		serviceMethodsWhenRunOnClientDatabase.add(DVKUtil.createXRoadService(DVKServiceMethod.GET_SEND_STATUS.getName(), "v1"));
+		serviceMethodsWhenRunOnClientDatabase.add(DVKUtil.createXRoadService(DVKServiceMethod.GET_SEND_STATUS.getName(), "v2"));
+		serviceMethodsWhenRunOnClientDatabase.add(DVKUtil.createXRoadService(DVKServiceMethod.GET_SENDING_OPTIONS.getName(), "v1"));
+		serviceMethodsWhenRunOnClientDatabase.add(DVKUtil.createXRoadService(DVKServiceMethod.GET_SENDING_OPTIONS.getName(), "v2"));
+		serviceMethodsWhenRunOnClientDatabase.add(DVKUtil.createXRoadService(DVKServiceMethod.GET_SENDING_OPTIONS.getName(), "v3"));
 		
 		serviceMethodsFull.addAll(serviceMethodsWhenRunOnClientDatabase);
-		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("receiveDocuments", "v1"));
-		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("receiveDocuments", "v2"));
-		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("receiveDocuments", "v3"));
-		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("receiveDocuments", "v4"));
-		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("markDocumentsReceived", "v1"));
-		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("markDocumentsReceived", "v2"));
-		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("markDocumentsReceived", "v3"));
-		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("deleteOldDocuments", "v1"));
-		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("changeOrganizationData", "v1"));
-		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("runSystemCheck", "v1"));
-		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("getOccupationList", "v1"));
-		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("getOccupationList", "v2"));
-		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("getSubdivisionList", "v1"));
-		serviceMethodsFull.add(DvkUtil.createDvkXRoadService("getSubdivisionList", "v2"));
+		serviceMethodsFull.add(DVKUtil.createXRoadService(DVKServiceMethod.RECEIVE_DOCUMENTS.getName(), "v1"));
+		serviceMethodsFull.add(DVKUtil.createXRoadService(DVKServiceMethod.RECEIVE_DOCUMENTS.getName(), "v2"));
+		serviceMethodsFull.add(DVKUtil.createXRoadService(DVKServiceMethod.RECEIVE_DOCUMENTS.getName(), "v3"));
+		serviceMethodsFull.add(DVKUtil.createXRoadService(DVKServiceMethod.RECEIVE_DOCUMENTS.getName(), "v4"));
+		serviceMethodsFull.add(DVKUtil.createXRoadService(DVKServiceMethod.MARK_DOCUMENTS_RECEIVED.getName(), "v1"));
+		serviceMethodsFull.add(DVKUtil.createXRoadService(DVKServiceMethod.MARK_DOCUMENTS_RECEIVED.getName(), "v2"));
+		serviceMethodsFull.add(DVKUtil.createXRoadService(DVKServiceMethod.MARK_DOCUMENTS_RECEIVED.getName(), "v3"));
+		serviceMethodsFull.add(DVKUtil.createXRoadService(DVKServiceMethod.DELETE_OLD_DOCUMENTS.getName(), "v1"));
+		serviceMethodsFull.add(DVKUtil.createXRoadService(DVKServiceMethod.CHANGE_ORGANIZATION_DATA.getName(), "v1"));
+		serviceMethodsFull.add(DVKUtil.createXRoadService(DVKServiceMethod.RUN_SYSTEM_CHECK.getName(), "v1"));
+		serviceMethodsFull.add(DVKUtil.createXRoadService(DVKServiceMethod.GET_OCCUPATION_LIST.getName(), "v1"));
+		serviceMethodsFull.add(DVKUtil.createXRoadService(DVKServiceMethod.GET_OCCUPATION_LIST.getName(), "v2"));
+		serviceMethodsFull.add(DVKUtil.createXRoadService(DVKServiceMethod.GET_SUBDIVISION_LIST.getName(), "v1"));
+		serviceMethodsFull.add(DVKUtil.createXRoadService(DVKServiceMethod.GET_SUBDIVISION_LIST.getName(), "v2"));
     }
 
     protected void finalize() {
@@ -217,16 +219,16 @@ public class CoreServices implements Dhl {
         	org.apache.axis.MessageContext context = org.apache.axis.MessageContext.getCurrentContext();
         	org.apache.axis.Message response = context.getResponseMessage();
         	
-        	XRoadProtocolHeader xRoadHeader = XRoadProtocolHeader.getFromSOAPHeaderAxis(context);
+        	XRoadHeader xRoadHeader = XRoadHeader.getFromSOAPHeaderAxis(context, null);
         	
             listMethodsResponseType body = null;
-        	if (xRoadHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
+        	if (xRoadHeader.getMessageProtocolVersion().equals(XRoadMessageProtocolVersion.V2_0)) {
         		if (Settings.Server_RunOnClientDatabase) {
         			body = new listMethodsResponseType(mehodsListWhenRunOnClientDatabase);
 	        	} else {
 	        		body = new listMethodsResponseType(methodsListFull);
 	        	}
-        	} else if (xRoadHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
+        	} else if (xRoadHeader.getMessageProtocolVersion().equals(XRoadMessageProtocolVersion.V4_0)) {
         		@SuppressWarnings("rawtypes")
     			Vector headers = context.getRequestMessage().getSOAPEnvelope().getHeaders();
                 for (int i = 0; i < headers.size(); ++i) {
@@ -315,14 +317,14 @@ public class CoreServices implements Dhl {
             org.apache.axis.MessageContext context = org.apache.axis.MessageContext.getCurrentContext();
             org.apache.axis.Message response = context.getResponseMessage();
             
-            XRoadProtocolHeader xRoadHeader = XRoadProtocolHeader.getFromSOAPHeaderAxis(context);
+            XRoadHeader xRoadHeader = XRoadHeader.getFromSOAPHeaderAxis(context, null);
             
-            String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xRoadHeader.getProtocolVersion().getNamespaceURI());
+            String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xRoadHeader.getMessageProtocolVersion().getNamespaceURI());
             if ((xroadNamespacePrefix != null) && (xroadNamespacePrefix.length() > 0)) {
-                response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xRoadHeader.getProtocolVersion().getNamespaceURI());
+                response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xRoadHeader.getMessageProtocolVersion().getNamespaceURI());
             }
-            if (xRoadHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-            	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX, XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_URI);
+            if (xRoadHeader.getMessageProtocolVersion().equals(XRoadMessageProtocolVersion.V4_0)) {
+            	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadIdentifier.NAMESPACE_PREFIX, XRoadIdentifier.NAMESPACE_URI);
             }
             
             response.getSOAPEnvelope().removeHeaders();
@@ -337,7 +339,7 @@ public class CoreServices implements Dhl {
             response.getSOAPEnvelope().addBody();
             
             runSystemCheckResponseType body = new runSystemCheckResponseType();
-            if (xRoadHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
+            if (xRoadHeader.getMessageProtocolVersion().equals(XRoadMessageProtocolVersion.V2_0)) {
             	body.setRequestElement(getXRoadRequestBodyElement(context, "runSystemCheck"));
             }
             body.addToSOAPBody(response, xRoadHeader);
@@ -373,28 +375,28 @@ public class CoreServices implements Dhl {
         if (!Settings.Server_RunOnClientDatabase) {
             Connection conn = null;
             try {
-            	LOGGER.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele DeleteOldDocuments");
+            	LOGGER.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele DELETE_OLDDOCUMENTS");
             	
                 conn = getConnection();
                 DeleteOldDocuments.V1(conn);
                 
                 org.apache.axis.MessageContext context = org.apache.axis.MessageContext.getCurrentContext();
                 
-                XRoadProtocolHeader xRoadHeader = XRoadProtocolHeader.getFromSOAPHeaderAxis(context);
+                XRoadHeader xRoadHeader = XRoadHeader.getFromSOAPHeaderAxis(context, null);
                 
                 deleteOldDocumentsResponseType body = new deleteOldDocumentsResponseType();
-                if (xRoadHeader.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
+                if (xRoadHeader.getMessageProtocolVersion().equals(XRoadMessageProtocolVersion.V2_0)) {
                 	body.setRequestElement(getXRoadRequestBodyElement(context, "deleteOldDocuments"));
                 }
                 
                 org.apache.axis.Message response = context.getResponseMessage();
                 
-                String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xRoadHeader.getProtocolVersion().getNamespaceURI());
+                String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xRoadHeader.getMessageProtocolVersion().getNamespaceURI());
                 if ((xroadNamespacePrefix != null) && (xroadNamespacePrefix.length() > 0)) {
-                    response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xRoadHeader.getProtocolVersion().getNamespaceURI());
+                    response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xRoadHeader.getMessageProtocolVersion().getNamespaceURI());
                 }
-                if (xRoadHeader.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-                	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX, XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_URI);
+                if (xRoadHeader.getMessageProtocolVersion().equals(XRoadMessageProtocolVersion.V4_0)) {
+                	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadIdentifier.NAMESPACE_PREFIX, XRoadIdentifier.NAMESPACE_URI);
                 }
                 
                 response.getSOAPEnvelope().removeHeaders();
@@ -433,7 +435,7 @@ public class CoreServices implements Dhl {
                     conn = getConnection();
 
                     // Laeme sõnumi X-Tee päised endale sobivasse andmestruktuuri
-                    XRoadProtocolHeader xTeePais = XRoadProtocolHeader.getFromSOAPHeaderAxis(context);
+                    XRoadHeader xTeePais = XRoadHeader.getFromSOAPHeaderAxis(context, null);
                     LOGGER.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele ChangeOrganizationData(xtee teenus: " 
                     		+ xTeePais.getService() +"). Asutusest: " + xTeePais.getConsumer()
                     		+ getSubsystemCodeForLog(xTeePais)
@@ -449,16 +451,16 @@ public class CoreServices implements Dhl {
                     org.apache.axis.Message response = context.getResponseMessage();
                     
                     changeOrganizationDataResponseType body = new changeOrganizationDataResponseType();
-                    if (xTeePais.getProtocolVersion().equals(XRoadProtocolVersion.V2_0)) {
+                    if (xTeePais.getMessageProtocolVersion().equals(XRoadMessageProtocolVersion.V2_0)) {
                     	body.setRequestElement(getXRoadRequestBodyElement(context, "changeOrganizationData"));
                     }
                     
-                    String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xTeePais.getProtocolVersion().getNamespaceURI());
+                    String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xTeePais.getMessageProtocolVersion().getNamespaceURI());
                     if ((xroadNamespacePrefix != null) && (xroadNamespacePrefix.length() > 0)) {
-                        response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getProtocolVersion().getNamespaceURI());
+                        response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getMessageProtocolVersion().getNamespaceURI());
                     }
-                    if (xTeePais.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-                    	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX, XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_URI);
+                    if (xTeePais.getMessageProtocolVersion().equals(XRoadMessageProtocolVersion.V4_0)) {
+                    	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadIdentifier.NAMESPACE_PREFIX, XRoadIdentifier.NAMESPACE_URI);
                     }
                     
                     response.getSOAPEnvelope().removeHeaders();
@@ -472,7 +474,7 @@ public class CoreServices implements Dhl {
                     response.getSOAPEnvelope().removeBody();
                     
                     response.getSOAPEnvelope().addBody();
-                    body.addToSOAPBody(response, xTeePais.getProtocolVersion());
+                    body.addToSOAPBody(response, xTeePais.getMessageProtocolVersion());
                     
                     response.saveChanges();
                 }
@@ -518,7 +520,7 @@ public class CoreServices implements Dhl {
                 }
 
                 // Laeme sõnumi X-Tee päised endale sobivasse andmestruktuuri
-                XRoadProtocolHeader xTeePais = XRoadProtocolHeader.getFromSOAPHeaderAxis(context);
+                XRoadHeader xTeePais = XRoadHeader.getFromSOAPHeaderAxis(context, null);
                 
                 // Tuvastame, millist päringu versiooni välja kutsuti
                 String ver = CommonMethods.getXRoadServiceVersion(xTeePais);
@@ -559,12 +561,12 @@ public class CoreServices implements Dhl {
                 // Koostame väljundsõnumi keha
                 org.apache.axis.Message response = context.getResponseMessage();
                 
-                String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xTeePais.getProtocolVersion().getNamespaceURI());
+                String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xTeePais.getMessageProtocolVersion().getNamespaceURI());
                 if ((xroadNamespacePrefix != null) && (xroadNamespacePrefix.length() > 0)) {
-                    response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getProtocolVersion().getNamespaceURI());
+                    response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getMessageProtocolVersion().getNamespaceURI());
                 }
-                if (xTeePais.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-                	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX, XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_URI);
+                if (xTeePais.getMessageProtocolVersion().equals(XRoadMessageProtocolVersion.V4_0)) {
+                	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadIdentifier.NAMESPACE_PREFIX, XRoadIdentifier.NAMESPACE_URI);
                 }
                 
                 response.getSOAPEnvelope().removeHeaders();
@@ -645,7 +647,9 @@ public class CoreServices implements Dhl {
 
                 // Laeme sõnumi X-Tee päised endale sobivasse andmestruktuuri
                 t.reset();
-                XRoadProtocolHeader xTeePais = XRoadProtocolHeader.getFromSOAPHeaderAxis(context);                
+
+                XRoadHeader xTeePais = XRoadHeader.getFromSOAPHeaderAxis(context, null);
+
                 LOGGER.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele SendDocuments(xtee teenus:" 
                 		+ xTeePais.getService() +"). Asutusest:" + xTeePais.getConsumer() 
                 		+ getSubsystemCodeForLog(xTeePais)
@@ -700,12 +704,12 @@ public class CoreServices implements Dhl {
                     
                     org.apache.axis.Message response = context.getResponseMessage();
                     
-                    String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xTeePais.getProtocolVersion().getNamespaceURI());
+                    String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xTeePais.getMessageProtocolVersion().getNamespaceURI());
                     if ((xroadNamespacePrefix != null) && (xroadNamespacePrefix.length() > 0)) {
-                        response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getProtocolVersion().getNamespaceURI());
+                        response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getMessageProtocolVersion().getNamespaceURI());
                     }
-                    if (xTeePais.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-                    	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX, XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_URI);
+                    if (xTeePais.getMessageProtocolVersion().equals(XRoadMessageProtocolVersion.V4_0)) {
+                    	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadIdentifier.NAMESPACE_PREFIX, XRoadIdentifier.NAMESPACE_URI);
                     }
                     
                     response.getSOAPEnvelope().removeHeaders();
@@ -781,7 +785,7 @@ public class CoreServices implements Dhl {
                     // Loeme SOAP sõnumi detailandmetest välja X-Tee päise andmed ja
                     // sõnumiga MIME lisadena kaasa pandud andmed.
                     t.reset();
-                    XRoadProtocolHeader xTeePais = XRoadProtocolHeader.getFromSOAPHeaderAxis(context);
+                    XRoadHeader xTeePais = XRoadHeader.getFromSOAPHeaderAxis(context, null);
                     LOGGER.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele ReceiveDocuments(xtee teenus:" 
                     		+ xTeePais.getService() +"). Asutusest:" + xTeePais.getConsumer() 
                     		+ getSubsystemCodeForLog(xTeePais)
@@ -822,12 +826,12 @@ public class CoreServices implements Dhl {
                         
                         org.apache.axis.Message response = context.getResponseMessage();
                         
-                        String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xTeePais.getProtocolVersion().getNamespaceURI());
+                        String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xTeePais.getMessageProtocolVersion().getNamespaceURI());
                         if ((xroadNamespacePrefix != null) && (xroadNamespacePrefix.length() > 0)) {
-                            response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getProtocolVersion().getNamespaceURI());
+                            response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getMessageProtocolVersion().getNamespaceURI());
                         }
-                        if (xTeePais.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-                        	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX, XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_URI);
+                        if (xTeePais.getMessageProtocolVersion().equals(XRoadMessageProtocolVersion.V4_0)) {
+                        	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadIdentifier.NAMESPACE_PREFIX, XRoadIdentifier.NAMESPACE_URI);
                         }
                         
                         response.getSOAPEnvelope().removeHeaders();
@@ -922,7 +926,7 @@ public class CoreServices implements Dhl {
 
                     // Loeme SOAP sõnumi detailandmetest välja X-Tee päise andmed ja
                     // sõnumiga MIME lisadena kaasa pandud andmed.
-                    XRoadProtocolHeader xTeePais = XRoadProtocolHeader.getFromSOAPHeaderAxis(context);
+                    XRoadHeader xTeePais = XRoadHeader.getFromSOAPHeaderAxis(context, null);
                     LOGGER.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele MarkDocumentsReceived(xtee teenus:" 
                     		+ xTeePais.getService() +"). Asutusest:" + xTeePais.getConsumer() 
                     		+ getSubsystemCodeForLog(xTeePais)
@@ -952,12 +956,12 @@ public class CoreServices implements Dhl {
                     try {
                         org.apache.axis.Message response = context.getResponseMessage();
                         
-                        String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xTeePais.getProtocolVersion().getNamespaceURI());
+                        String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xTeePais.getMessageProtocolVersion().getNamespaceURI());
                         if ((xroadNamespacePrefix != null) && (xroadNamespacePrefix.length() > 0)) {
-                            response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getProtocolVersion().getNamespaceURI());
+                            response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getMessageProtocolVersion().getNamespaceURI());
                         }
-                        if (xTeePais.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-                        	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX, XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_URI);
+                        if (xTeePais.getMessageProtocolVersion().equals(XRoadMessageProtocolVersion.V4_0)) {
+                        	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadIdentifier.NAMESPACE_PREFIX, XRoadIdentifier.NAMESPACE_URI);
                         }
                         
                         response.getSOAPEnvelope().removeHeaders();
@@ -1036,7 +1040,7 @@ public class CoreServices implements Dhl {
 
                 // Loeme SOAP sõnumi detailandmetest välja X-Tee päise andmed ja
                 // sõnumiga MIME lisadena kaasa pandud andmed.
-                XRoadProtocolHeader xTeePais = XRoadProtocolHeader.getFromSOAPHeaderAxis(context);
+                XRoadHeader xTeePais = XRoadHeader.getFromSOAPHeaderAxis(context, null);
                 LOGGER.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele GetSendStatus(xtee teenus: " 
                 		+ xTeePais.getService() +"). Asutusest: " + xTeePais.getConsumer()
                 		+ getSubsystemCodeForLog(xTeePais)
@@ -1075,12 +1079,12 @@ public class CoreServices implements Dhl {
                 try {
                     org.apache.axis.Message response = context.getResponseMessage();
                     
-                    String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xTeePais.getProtocolVersion().getNamespaceURI());
+                    String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xTeePais.getMessageProtocolVersion().getNamespaceURI());
                     if ((xroadNamespacePrefix != null) && (xroadNamespacePrefix.length() > 0)) {
-                        response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getProtocolVersion().getNamespaceURI());
+                        response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getMessageProtocolVersion().getNamespaceURI());
                     }
-                    if (xTeePais.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-                    	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX, XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_URI);
+                    if (xTeePais.getMessageProtocolVersion().equals(XRoadMessageProtocolVersion.V4_0)) {
+                    	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadIdentifier.NAMESPACE_PREFIX, XRoadIdentifier.NAMESPACE_URI);
                     }
                     
                     response.getSOAPEnvelope().removeHeaders();
@@ -1149,7 +1153,7 @@ public class CoreServices implements Dhl {
                     conn = getConnection();
 
                     // Laeme sõnumi X-Tee päised endale sobivasse andmestruktuuri
-                    XRoadProtocolHeader xTeePais = XRoadProtocolHeader.getFromSOAPHeaderAxis(context);
+                    XRoadHeader xTeePais = XRoadHeader.getFromSOAPHeaderAxis(context, null);
                     LOGGER.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele GetOccupationList(xtee teenus:" 
                     		+ xTeePais.getService() +"). Asutusest:" + xTeePais.getConsumer()
                     		+ getSubsystemCodeForLog(xTeePais)
@@ -1164,9 +1168,9 @@ public class CoreServices implements Dhl {
                     // Käivitame päringust vajaliku versiooni
                     SOAPOutputBodyRepresentation result = null;
                     if (ver.equalsIgnoreCase("v1")) {
-                        result = GetOccupationList.V1(context, conn, xTeePais.getProtocolVersion());
+                        result = GetOccupationList.V1(context, conn, xTeePais.getMessageProtocolVersion());
                     } else if (ver.equalsIgnoreCase("v2")) {
-                        result = GetOccupationList.V2(context, conn, user, xTeePais.getProtocolVersion());
+                        result = GetOccupationList.V2(context, conn, user, xTeePais.getMessageProtocolVersion());
                     } else {
                         // Vale versioon
                         throw new AxisFault(CommonStructures.VIGA_PARINGU_VERSIOONIS);
@@ -1175,12 +1179,12 @@ public class CoreServices implements Dhl {
                     // Koostame väljundsõnumi keha
                     org.apache.axis.Message response = context.getResponseMessage();
                     
-                    String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xTeePais.getProtocolVersion().getNamespaceURI());
+                    String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xTeePais.getMessageProtocolVersion().getNamespaceURI());
                     if ((xroadNamespacePrefix != null) && (xroadNamespacePrefix.length() > 0)) {
-                        response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getProtocolVersion().getNamespaceURI());
+                        response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getMessageProtocolVersion().getNamespaceURI());
                     }
-                    if (xTeePais.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-                    	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX, XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_URI);
+                    if (xTeePais.getMessageProtocolVersion().equals(XRoadMessageProtocolVersion.V4_0)) {
+                    	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadIdentifier.NAMESPACE_PREFIX, XRoadIdentifier.NAMESPACE_URI);
                     }
                     
                     response.getSOAPEnvelope().removeHeaders();
@@ -1236,7 +1240,7 @@ public class CoreServices implements Dhl {
                     conn = getConnection();
 
                     // Laeme sõnumi X-Tee päised endale sobivasse andmestruktuuri
-                    XRoadProtocolHeader xTeePais = XRoadProtocolHeader.getFromSOAPHeaderAxis(context);
+                    XRoadHeader xTeePais = XRoadHeader.getFromSOAPHeaderAxis(context, null);
                     LOGGER.log(Level.getLevel("SERVICEINFO"), "Sissetulev päring teenusele GetSubdivisionList(xtee teenus:" 
                     		+ xTeePais.getService() +"). Asutusest:" + xTeePais.getConsumer()
                     		+ getSubsystemCodeForLog(xTeePais)
@@ -1251,9 +1255,9 @@ public class CoreServices implements Dhl {
                     // Käivitame päringust vajaliku versiooni
                     SOAPOutputBodyRepresentation result = null;
                     if (ver.equalsIgnoreCase("v1")) {
-                        result = GetSubdivisionList.V1(context, conn, xTeePais.getProtocolVersion());
+                        result = GetSubdivisionList.V1(context, conn, xTeePais.getMessageProtocolVersion());
                     } else if (ver.equalsIgnoreCase("v2")) {
-                        result = GetSubdivisionList.V2(context, conn, user, xTeePais.getProtocolVersion());
+                        result = GetSubdivisionList.V2(context, conn, user, xTeePais.getMessageProtocolVersion());
                     } else {
                         // Vale versioon
                         throw new AxisFault(CommonStructures.VIGA_PARINGU_VERSIOONIS);
@@ -1262,12 +1266,12 @@ public class CoreServices implements Dhl {
                     // Koostame väljundsõnumi keha
                     org.apache.axis.Message response = context.getResponseMessage();
                     
-                    String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xTeePais.getProtocolVersion().getNamespaceURI());
+                    String xroadNamespacePrefix = getXroadNamespacePrefix(context.getRequestMessage(), xTeePais.getMessageProtocolVersion().getNamespaceURI());
                     if ((xroadNamespacePrefix != null) && (xroadNamespacePrefix.length() > 0)) {
-                        response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getProtocolVersion().getNamespaceURI());
+                        response.getSOAPEnvelope().addNamespaceDeclaration(xroadNamespacePrefix, xTeePais.getMessageProtocolVersion().getNamespaceURI());
                     }
-                    if (xTeePais.getProtocolVersion().equals(XRoadProtocolVersion.V4_0)) {
-                    	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_PREFIX, XRoadProtocolHeader.NAMESPACE_IDENTIFIERS_URI);
+                    if (xTeePais.getMessageProtocolVersion().equals(XRoadMessageProtocolVersion.V4_0)) {
+                    	response.getSOAPEnvelope().addNamespaceDeclaration(XRoadIdentifier.NAMESPACE_PREFIX, XRoadIdentifier.NAMESPACE_URI);
                     }
                     
                     response.getSOAPEnvelope().removeHeaders();
@@ -1373,7 +1377,7 @@ public class CoreServices implements Dhl {
         }
     }
     
-	private String getSubsystemCodeForLog(XRoadProtocolHeader XRoadHeader) {
+	private String getSubsystemCodeForLog(XRoadHeader XRoadHeader) {
 		String subSystemCode = "";
 
 		if (XRoadHeader.getXRoadClient() != null

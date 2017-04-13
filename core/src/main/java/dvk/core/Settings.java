@@ -20,12 +20,19 @@ public class Settings {
     private static final String CLIENT_DEFAULT_ADIT_PROCUCER_NAME = "adit";
     private static final String CLIENT_DEFAULT_ADIT_INFORMATION_SYSTEM_NAME = "DHS";
     
-    // X-Road protocol version 4.0 related default settings
-    private static final String XROAD_DEFAULT_INSTANCE = "EE";
-	private static final String XROAD_DEFAULT_MEMBER_CLASS = "GOV";
-	private static final String XROAD_DEFAULT_MEMBER_CODE = "70006317";
-	private static final String XROAD_DEFAULT_SUBSYSTEM_CODE = "dhl";
+    // X-Road message protocol version 4.0 "service" block default data for DVK
+    private static final String DVK_XROAD_SERVICE_DEFAULT_INSTANCE = "EE";
+	private static final String DVK_XROAD_SERVICE_DEFAULT_MEMBER_CLASS = "GOV";
+	private static final String DVK_XROAD_SERVICE_DEFAULT_MEMBER_CODE = "70006317";
+	private static final String DVK_XROAD_SERVICE_DEFAULT_SUBSYSTEM_CODE = "dhl";
+	
+	// X-Road message protocol version 4.0 "service" block default data for ADIT
+	private static final String ADIT_XROAD_SERVICE_DEFAULT_INSTANCE = "EE";
+	private static final String ADIT_XROAD_SERVICE_DEFAULT_MEMBER_CLASS = "GOV";
+	private static final String ADIT_XROAD_SERVICE_DEFAULT_MEMBER_CODE = "70006317";
+	private static final String ADIT_XROAD_SERVICE_DEFAULT_SUBSYSTEM_CODE = "ametlikud-dokumendid";
 
+	
     public static Properties currentProperties;
 
     public static int Client_StatusWaiting = 1;
@@ -72,12 +79,6 @@ public class Settings {
     public static boolean Server_DocumentSenderMustMatchXroadHeader = true;
     public static boolean Server_AutoRegisterUnknownSenders = false;
     public static String serverJdigidocConfigLocation = "jar://jdigidoc.cfg";
-    
-    // X-Road protocol version 4.0 settings
-    public static String xRoadInstance = XROAD_DEFAULT_INSTANCE;
-	public static String xRoadMemberClass = XROAD_DEFAULT_MEMBER_CLASS;
-	public static String xRoadMemberCode = XROAD_DEFAULT_MEMBER_CODE;
-	public static String xRoadSubsystemCode = XROAD_DEFAULT_SUBSYSTEM_CODE;
 
     // General settings (both client and server)
     public static boolean LogErrors = false;
@@ -86,8 +87,58 @@ public class Settings {
 
     // Test client settings
     public static String Test_LogFile = "";
-
-
+    
+    /*
+     * X-Road message protocol version 4.0 "client" block settings.
+     * 
+     * In order to configure custom X-Road "client" block settings
+     * use the following keys in the related properties file:
+     * ------------------------------------------------------
+     * xRoad.client.instance
+	 * xRoad.client.memberClass
+	 * xRoad.client.memberCode
+	 * xRoad.client.subsystemCode
+	 * ------------------------------------------------------
+     */
+    private static String xRoadClientInstance;
+    private static String xRoadClientMemberClass;
+    private static String xRoadClientMemberCode;
+    private static String xRoadClientSubsystemCode; 
+    
+    /*
+     * X-Road message protocol version 4.0 "service" block data for DVK.
+     * 
+     * In order to configure custom X-Road "service" block data for DVK
+     * use the following keys in the related properties file:
+     * ------------------------------------------------------
+     * dvk.xRoad.service.instance
+	 * dvk.xRoad.service.memberClass
+	 * dvk.xRoad.service.memberCode
+	 * dvk.xRoad.service.subsystemCode
+	 * ------------------------------------------------------
+     */
+    private static String dvkXRoadServiceInstance = DVK_XROAD_SERVICE_DEFAULT_INSTANCE;
+    private static String dvkXRoadServiceMemberClass = DVK_XROAD_SERVICE_DEFAULT_MEMBER_CLASS;
+    private static String dvkXRoadServiceMemberCode = DVK_XROAD_SERVICE_DEFAULT_MEMBER_CODE;
+    private static String dvkXRoadServiceSubsystemCode = DVK_XROAD_SERVICE_DEFAULT_SUBSYSTEM_CODE;
+    
+    /*
+     * X-Road message protocol version 4.0 "service" block data for ADIT.
+     * 
+     * In order to configure custom X-Road "service" block data for ADIT
+     * use the following keys in the related properties file:
+     * ------------------------------------------------------
+     * adit.xRoad.service.instance
+     * adit.xRoad.service.memberClass
+     * adit.xRoad.service.memberCode
+     * adit.xRoad.service.subsystemCode
+     * ------------------------------------------------------
+     */
+    private static String aditXRoadServiceInstance = ADIT_XROAD_SERVICE_DEFAULT_INSTANCE;
+    private static String aditXRoadServiceMemberClass = ADIT_XROAD_SERVICE_DEFAULT_MEMBER_CLASS;
+    private static String aditXRoadServiceMemberCode = ADIT_XROAD_SERVICE_DEFAULT_MEMBER_CODE;
+    private static String aditXRoadServiceSubsystemCode = ADIT_XROAD_SERVICE_DEFAULT_SUBSYSTEM_CODE;
+    
     public static int getBinaryBufferSize() {
         int defValue = 100000;
         try {
@@ -378,19 +429,48 @@ public class Settings {
                 Server_RunOnClientDatabase = true;
             }
 
-            // X-Road protocol configurations
-            if (currentProperties.getProperty("xRoad.instance") != null) {
-            	xRoadInstance = currentProperties.getProperty("xRoad.instance");	
+            // X-Road message protocol "client" block configurations
+            if (currentProperties.getProperty("xRoad.client.instance") != null) {
+            	xRoadClientInstance = currentProperties.getProperty("xRoad.client.instance");	
             }
-            if (currentProperties.getProperty("xRoad.memberClass") != null) {
-            	xRoadMemberClass = currentProperties.getProperty("xRoad.memberClass");	
+            if (currentProperties.getProperty("xRoad.client.memberClass") != null) {
+            	xRoadClientMemberClass = currentProperties.getProperty("xRoad.client.memberClass");	
             }
-            if (currentProperties.getProperty("xRoad.memberCode") != null) {
-            	xRoadMemberCode = currentProperties.getProperty("xRoad.memberCode");	
+            if (currentProperties.getProperty("xRoad.client.memberCode") != null) {
+            	xRoadClientMemberCode = currentProperties.getProperty("xRoad.client.memberCode");	
             }
-            if (currentProperties.getProperty("xRoad.subsystemCode") != null) {
-            	xRoadSubsystemCode = currentProperties.getProperty("xRoad.subsystemCode");	
+            if (currentProperties.getProperty("xRoad.client.subsystemCode") != null) {
+            	xRoadClientSubsystemCode = currentProperties.getProperty("xRoad.client.subsystemCode");	
             }
+            
+            // X-Road message protocol "service" block configurations for DVK
+            if (currentProperties.getProperty("dvk.xRoad.service.instance") != null) {
+            	dvkXRoadServiceInstance = currentProperties.getProperty("dvk.xRoad.service.instance");	
+            }
+            if (currentProperties.getProperty("dvk.xRoad.service.memberClass") != null) {
+            	dvkXRoadServiceMemberClass = currentProperties.getProperty("dvk.xRoad.service.memberClass");	
+            }
+            if (currentProperties.getProperty("dvk.xRoad.service.memberCode") != null) {
+            	dvkXRoadServiceMemberCode = currentProperties.getProperty("dvk.xRoad.service.memberCode");	
+            }
+            if (currentProperties.getProperty("dvk.xRoad.service.subsystemCode") != null) {
+            	dvkXRoadServiceSubsystemCode = currentProperties.getProperty("dvk.xRoad.service.subsystemCode");	
+            }
+            
+            // X-Road message protocol "service" block configurations for ADIT
+            if (currentProperties.getProperty("adit.xRoad.service.instance") != null) {
+            	aditXRoadServiceInstance = currentProperties.getProperty("adit.xRoad.service.instance");	
+            }
+            if (currentProperties.getProperty("adit.xRoad.service.memberClass") != null) {
+            	aditXRoadServiceMemberClass = currentProperties.getProperty("adit.xRoad.service.memberClass");	
+            }
+            if (currentProperties.getProperty("adit.xRoad.service.memberCode") != null) {
+            	aditXRoadServiceMemberCode = currentProperties.getProperty("adit.xRoad.service.memberCode");	
+            }
+            if (currentProperties.getProperty("adit.xRoad.service.subsystemCode") != null) {
+            	aditXRoadServiceSubsystemCode = currentProperties.getProperty("adit.xRoad.service.subsystemCode");	
+            }
+            
             
             // Üldkasutatavad seaded
             if ((currentProperties.getProperty("log_errors") != null)
@@ -420,20 +500,52 @@ public class Settings {
         }
     }
 
-	public static String getXRoadInstance() {
-		return xRoadInstance;
+    public static String getXRoadClientInstance() {
+		return xRoadClientInstance;
 	}
 
-	public static String getXRoadMemberClass() {
-		return xRoadMemberClass;
+	public static String getXRoadClientMemberClass() {
+		return xRoadClientMemberClass;
 	}
 
-	public static String getxRoadMemberCode() {
-		return xRoadMemberCode;
+	public static String getXRoadClientMemberCode() {
+		return xRoadClientMemberCode;
 	}
 
-	public static String getXRoadSubsystemCode() {
-		return xRoadSubsystemCode;
+	public static String getXRoadClientSubsystemCode() {
+		return xRoadClientSubsystemCode;
+	}
+    
+	public static String getDvkXRoadServiceInstance() {
+		return dvkXRoadServiceInstance;
+	}
+
+	public static String getDvkXRoadServiceMemberClass() {
+		return dvkXRoadServiceMemberClass;
+	}
+
+	public static String getDvkXRoadServiceMemberCode() {
+		return dvkXRoadServiceMemberCode;
+	}
+
+	public static String getDvkXRoadServiceSubsystemCode() {
+		return dvkXRoadServiceSubsystemCode;
+	}
+
+	public static String getAditXRoadServiceInstance() {
+		return aditXRoadServiceInstance;
+	}
+
+	public static String getAditXRoadServiceMemberClass() {
+		return aditXRoadServiceMemberClass;
+	}
+
+	public static String getAditXRoadServiceMemberCode() {
+		return aditXRoadServiceMemberCode;
+	}
+
+	public static String getAditXRoadServiceSubsystemCode() {
+		return aditXRoadServiceSubsystemCode;
 	}
 	
 }

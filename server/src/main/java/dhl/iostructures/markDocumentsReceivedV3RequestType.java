@@ -10,7 +10,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import dvk.core.CommonMethods;
-import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadHeader;
 
 public class markDocumentsReceivedV3RequestType {
     static Logger logger = Logger.getLogger(markDocumentsReceivedV3RequestType.class.getName());
@@ -28,7 +28,7 @@ public class markDocumentsReceivedV3RequestType {
         this.ametikohaLyhinimetus = "";
     }
 
-    public static markDocumentsReceivedV3RequestType getFromSOAPBody(org.apache.axis.MessageContext context, XRoadProtocolHeader xRoadProtocolHeader) {
+    public static markDocumentsReceivedV3RequestType getFromSOAPBody(org.apache.axis.MessageContext context, XRoadHeader xRoadHeader) {
         try {
             org.apache.axis.Message msg = context.getRequestMessage();
             SOAPBody body = msg.getSOAPBody();

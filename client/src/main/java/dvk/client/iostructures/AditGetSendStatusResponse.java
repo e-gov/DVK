@@ -1,13 +1,11 @@
 package dvk.client.iostructures;
 
-import dvk.core.CommonMethods;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 /**
  * @author Hendrik Pärna

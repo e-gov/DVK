@@ -11,12 +11,48 @@ import dvk.client.conf.OrgSettings;
  * @author		Jaak Lember
  */
 public class DeliveryChannel {
+    
+    private String xRoadServiceInstance;
+    private String xRoadServiceMemberClass;
+    private String xRoadServiceMemberCode;
 	private String m_producerName;
 	private String m_serviceUrl;
+	
 	private OrgSettings m_database;
 	private int m_unitId;
 	private MessageRecipient m_recipient;
 	
+	public String getXRoadServiceInstance() {
+        return xRoadServiceInstance;
+    }
+
+    public void setXRoadServiceInstance(String xRoadServiceInstance) {
+        this.xRoadServiceInstance = xRoadServiceInstance;
+    }
+
+    public String getXRoadServiceMemberClass() {
+        return xRoadServiceMemberClass;
+    }
+
+    public void setXRoadServiceMemberClass(String xRoadServiceMemberClass) {
+        this.xRoadServiceMemberClass = xRoadServiceMemberClass;
+    }
+
+    public String getXRoadServiceMemberCode() {
+        return xRoadServiceMemberCode;
+    }
+
+    public void setXRoadServiceMemberCode(String xRoadServiceMemberCode) {
+        this.xRoadServiceMemberCode = xRoadServiceMemberCode;
+    }
+	
+	/**
+     * NOTE:<br>
+     * "producerName" corresponds to <b>"subsystemCode"</b> element of the <em>service</em> block
+     * in the X-Road message protocol version 4.0
+     * 
+     * @return <em>producerName</em> / <em>subsystemCode</em>
+     */
     public String getProducerName() {
         return this.m_producerName;
     }
@@ -58,8 +94,12 @@ public class DeliveryChannel {
     }
 
     public void clear() {
+        xRoadServiceInstance = "";
+        xRoadServiceMemberClass = "";
+        xRoadServiceMemberCode = "";
     	m_producerName = "";
     	m_serviceUrl = "";
+    	
     	m_database = null;
     	m_unitId = 0;
     	m_recipient = null;
@@ -68,4 +108,5 @@ public class DeliveryChannel {
     public DeliveryChannel() {
     	clear();
     }
+
 }

@@ -18,7 +18,7 @@ import org.apache.axis.AxisFault;
 import dhl.iostructures.FragmentationResult;
 import dvk.core.CommonMethods;
 import dvk.core.CommonStructures;
-import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadHeader;
 
 public class DocumentFragment {
     private int m_id;
@@ -186,7 +186,7 @@ public class DocumentFragment {
     
     
     
-    public int addToDBProc(Connection conn, XRoadProtocolHeader xTeePais) throws AxisFault {
+    public int addToDBProc(Connection conn, XRoadHeader xTeePais) throws AxisFault {
         try {
             FileInputStream inStream = null;
             if (conn != null) {
@@ -376,7 +376,7 @@ public class DocumentFragment {
 
     public static FragmentationResult getFragments(String fileName, long fragmentMaxSize, int orgID,
                                                    String deliverySessionID, boolean isIncoming,
-                                                   Connection conn, XRoadProtocolHeader xTeePais) throws AxisFault {
+                                                   Connection conn, XRoadHeader xTeePais) throws AxisFault {
         String firstFragment = null;
         FragmentationResult result = new FragmentationResult();
         try {

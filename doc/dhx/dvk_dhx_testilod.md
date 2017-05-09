@@ -99,7 +99,7 @@ Iga SOAP sõnumi X-tee headeri, service elemendi tuleb täita DVK andmetega, ehk
        <ns4:protocolVersion xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">4.0</ns4:protocolVersion>
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
+    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
       <ns3:memberClass>COM</ns3:memberClass>
       <ns3:memberCode>30000001</ns3:memberCode>
@@ -260,7 +260,7 @@ Märkus: Vajadusel (juhul kui testi tehakse mitte selle adressaadiga, kelle andm
        <ns4:protocolVersion xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">4.0</ns4:protocolVersion>
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
+    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
       <ns3:memberClass>COM</ns3:memberClass>
       <ns3:memberCode>30000001</ns3:memberCode>
@@ -415,7 +415,7 @@ Märkus: Vajadusel (juhul kui testi tehakse mitte selle adressaadiga, kelle andm
        <ns4:protocolVersion xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">4.0</ns4:protocolVersion>
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
+    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
       <ns3:memberClass>COM</ns3:memberClass>
       <ns3:memberCode>30000001</ns3:memberCode>
@@ -562,7 +562,7 @@ Märkus: Vajadusel (juhul kui testi tehakse mitte selle adressaadiga, kelle andm
        <ns4:protocolVersion xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">4.0</ns4:protocolVersion>
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
+    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
       <ns3:memberClass>COM</ns3:memberClass>
       <ns3:memberCode>30000001</ns3:memberCode>
@@ -620,7 +620,7 @@ Test fail.
        <ns4:protocolVersion xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">4.0</ns4:protocolVersion>
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
+    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
       <ns3:memberClass>COM</ns3:memberClass>
       <ns3:memberCode>30000001</ns3:memberCode>
@@ -773,7 +773,7 @@ Test fail.
        <ns4:protocolVersion xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">4.0</ns4:protocolVersion>
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
+    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
       <ns3:memberClass>COM</ns3:memberClass>
       <ns3:memberCode>30000001</ns3:memberCode>
@@ -928,7 +928,7 @@ Test fail.
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM"
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
@@ -1000,7 +1000,7 @@ Märkus: kui testimisel kasutatakse DHX etalonteostuses tehtud DHS maketti, siis
        <ns4:protocolVersion xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">4.0</ns4:protocolVersion>
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
+    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
       <ns3:memberClass>COM</ns3:memberClass>
       <ns3:memberCode>30000001</ns3:memberCode>
@@ -1158,7 +1158,7 @@ Place>
        <ns4:protocolVersion xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">4.0</ns4:protocolVersion>
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
+    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
       <ns3:memberClass>COM</ns3:memberClass>
       <ns3:memberCode>30000001</ns3:memberCode>
@@ -1321,7 +1321,7 @@ Place>
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM"
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
@@ -1482,7 +1482,7 @@ Place>
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM"
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
@@ -1635,7 +1635,7 @@ Place>
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM"
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
@@ -1698,7 +1698,7 @@ Test fail.
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM"
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
@@ -1857,7 +1857,7 @@ Test fail.
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM"
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
@@ -2018,7 +2018,7 @@ Test fail.
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM"
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
@@ -2076,7 +2076,7 @@ Test fail.
        <ns4:protocolVersion xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">4.0</ns4:protocolVersion>
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
       <ns3:memberClass>GOV</ns3:memberClass>
       <ns3:memberCode>70006317</ns3:memberCode>
@@ -2132,7 +2132,7 @@ Test fail.
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM"
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
@@ -2191,7 +2191,7 @@ Test fail.
        <ns4:protocolVersion xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">4.0</ns4:protocolVersion>
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
       <ns3:memberClass>GOV</ns3:memberClass>
       <ns3:memberCode>70006317</ns3:memberCode>
@@ -2246,7 +2246,7 @@ Test fail.
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM"
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
@@ -2301,7 +2301,7 @@ Test fail.
        <ns4:protocolVersion xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">4.0</ns4:protocolVersion>
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
       <ns3:memberClass>GOV</ns3:memberClass>
       <ns3:memberCode>70006317</ns3:memberCode>
@@ -2359,7 +2359,7 @@ Test fail.
        <ns4:protocolVersion xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">4.0</ns4:protocolVersion>
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
       <ns3:memberClass>GOV</ns3:memberClass>
       <ns3:memberCode>70006317</ns3:memberCode>
@@ -2417,7 +2417,7 @@ Test fail.
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM"
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
@@ -2578,7 +2578,7 @@ Test fail.
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM"
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
@@ -2674,7 +2674,7 @@ Märkus: manuses olev fail on kodeeritud kujul(base64 ja gZip).
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM"
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
@@ -2733,7 +2733,7 @@ Märkus: manuses olev fail on kodeeritud kujul(base64 ja gZip).
        <ns4:protocolVersion xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">4.0</ns4:protocolVersion>
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
       <ns3:memberClass>GOV</ns3:memberClass>
       <ns3:memberCode>70006317</ns3:memberCode>
@@ -2791,7 +2791,7 @@ Märkus: manuses olev fail on kodeeritud kujul(base64 ja gZip).
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM"
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
@@ -2850,7 +2850,7 @@ Märkus: manuses olev fail on kodeeritud kujul(base64 ja gZip).
        <ns4:protocolVersion xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">4.0</ns4:protocolVersion>
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>ee-dev</ns3:xRoadInstance>
       <ns3:memberClass>GOV</ns3:memberClass>
       <ns3:memberCode>70006317</ns3:memberCode>

@@ -55,7 +55,13 @@ public class Recipient {
     private String m_divisionShortName;
     private boolean m_cc;
     private Date m_statusDate;
+    
+    private String m_dhxInternalConsignmentId;
+    private String m_dhxExternalConsignmentId;
+    private String m_dhxExternalReceiptId;
 
+    private Date m_lastSendDate;
+    
     public void setId(int id) {
         this.m_id = id;
     }
@@ -231,6 +237,30 @@ public class Recipient {
     public void setDivisionShortName(String shortName) {
         m_divisionShortName = shortName;
     }
+    
+    public String getDhxInternalConsignmentId() {
+        return m_dhxInternalConsignmentId;
+      }
+
+      public void setDhxInternalConsignmentId(String m_dhxInternalConsignmentId) {
+        this.m_dhxInternalConsignmentId = m_dhxInternalConsignmentId;
+      }
+      
+      public String getDhxExternalConsignmentId() {
+        return m_dhxExternalConsignmentId;
+      }
+
+      public void setDhxExternalConsignmentId(String m_dhxExternalConsignmentId) {
+        this.m_dhxExternalConsignmentId = m_dhxExternalConsignmentId;
+      }
+      
+      public String getDhxExternalReceiptId() {
+        return m_dhxExternalReceiptId;
+      }
+
+      public void setDhxExternalReceiptId(String m_dhxExternalReceiptId) {
+        this.m_dhxExternalReceiptId = m_dhxExternalReceiptId;
+      }
 
     public boolean isCc() {
         return m_cc;
@@ -248,7 +278,16 @@ public class Recipient {
         this.m_statusDate = value;
     }
 
-    public Recipient() {
+
+    public Date getLastSendDate() {
+      return m_lastSendDate;
+  }
+
+  public void setLastSendDate(Date m_lastSendDate) {
+      this.m_lastSendDate = m_lastSendDate;
+  }
+  
+	public Recipient() {
         clear();
     }
 
@@ -277,7 +316,32 @@ public class Recipient {
         m_divisionShortName = "";
         m_cc = false;
         m_statusDate = new Date();
+        m_lastSendDate = new Date();
     }
+    
+    public static Boolean isDuplicate (Connection conn, String externalConsignmentId, Integer asutusId) throws Exception{
+        if (conn != null) {
+          boolean defaultAutoCommit = conn.getAutoCommit();
+          try{
+              conn.setAutoCommit(false);
+              Boolean result = false;
+              CallableStatement cs = conn.prepareCall("select count(*) cnt from vastuvotja v, saatja s where s.transport_id=v.transport_id and s.asutus_id=? and v.dhx_external_consignment_id=?");
+              cs.setInt(1, asutusId);
+              cs.setString(2, externalConsignmentId);
+              ResultSet rs = cs.executeQuery();
+              while (rs.next()) {
+                result = rs.getInt("cnt") > 0;
+              }
+              rs.close();
+              cs.close();
+              return result;
+          } finally {
+              conn.setAutoCommit(defaultAutoCommit);
+          }                                                                   
+      } else {
+          throw new Exception("Database connection is NULL!");
+      }
+      }
     
 
     public static ArrayList<Recipient> getList(int sendingID, Connection conn) throws Exception {
@@ -322,6 +386,11 @@ public class Recipient {
 	                item.setIdInRemoteServer(rs.getInt("dok_id_teises_serveris"));
 	                item.setDivisionShortName(rs.getString("allyksuse_lyhinimetus"));
 	                item.setPositionShortName(rs.getString("ametikoha_lyhinimetus"));
+	                item.setDhxInternalConsignmentId(rs.getString("dhx_internal_consignment_id"));
+	                item.setDhxExternalConsignmentId(rs.getString("dhx_external_consignment_id"));
+	                item.setDhxExternalReceiptId(rs.getString("dhx_external_receipt_id"));
+	                item.setLastSendDate(rs.getTimestamp("last_send_date", cal));
+	                
 	
 	                // Loeme CLOB-ist dokumendi andmed
 	                String tmpBlob = rs.getString("metaxml");
@@ -343,7 +412,73 @@ public class Recipient {
     }
     
     
-    public int addToDB(Connection conn, XRoadHeader xTeePais) throws SQLException, IllegalArgumentException {
+    public static Recipient getById(int id, Connection conn) throws Exception {
+        if (conn != null) {
+            Calendar cal = Calendar.getInstance();
+        	boolean defaultAutoCommit = conn.getAutoCommit();
+        	try{
+        		conn.setAutoCommit(false);
+        		
+            	CallableStatement cs = conn.prepareCall("{? = call \"Get_Recipient_By_Id\"(?)}");
+            	cs.registerOutParameter(1, Types.OTHER);
+            	cs.setInt(2, id);
+                cs.execute();
+            
+	            ResultSet rs = (ResultSet) cs.getObject(1);
+	            Recipient result = null;
+	            while (rs.next()) {
+	            	result = new Recipient();
+	            	result.setId(rs.getInt("vastuvotja_id"));
+	            	result.setSendingID(rs.getInt("transport_id"));
+	            	result.setOrganizationID(rs.getInt("asutus_id"));
+	            	result.setPositionID(rs.getInt("ametikoht_id"));
+	            	result.setDivisionID(rs.getInt("allyksus_id"));
+	            	result.setPersonalIdCode(rs.getString("isikukood"));
+	                result.setName(rs.getString("nimi"));
+	                result.setOrganizationName(rs.getString("asutuse_nimi"));
+	                result.setEmail(rs.getString("email"));
+	                result.setDepartmentNumber(rs.getString("osakonna_nr"));
+	                result.setDepartmentName(rs.getString("osakonna_nimi"));
+	                result.setSendingMethodID(rs.getInt("saatmisviis_id"));
+	                result.setSendStatusID(rs.getInt("staatus_id"));
+	                result.setSendingStartDate(rs.getTimestamp("saatmise_algus", cal));
+	                result.setSendingEndDate(rs.getTimestamp("saatmise_lopp", cal));
+	
+	                String faultString = rs.getString("fault_string");
+	                if ((faultString != null) && (faultString.length() > 0)) {
+	                    Fault f = new Fault(rs.getString("fault_code"), rs.getString("fault_actor"), faultString, rs.getString("fault_detail"));
+	                    result.setFault(f);
+	                }
+	
+	                result.setRecipientStatusId(rs.getInt("vastuvotja_staatus_id"));
+	                result.setIdInRemoteServer(rs.getInt("dok_id_teises_serveris"));
+	                result.setDivisionShortName(rs.getString("allyksuse_lyhinimetus"));
+	                result.setPositionShortName(rs.getString("ametikoha_lyhinimetus"));
+	                result.setDhxInternalConsignmentId(rs.getString("dhx_internal_consignment_id"));
+	                result.setDhxExternalConsignmentId(rs.getString("dhx_external_consignment_id"));
+	                result.setDhxExternalReceiptId(rs.getString("dhx_external_receipt_id"));
+	                result.setLastSendDate(rs.getTimestamp("last_send_date", cal));
+	                
+	
+	                // Loeme CLOB-ist dokumendi andmed
+	                String tmpBlob = rs.getString("metaxml");
+	                if (tmpBlob != null) {
+	                	result.setMetaXML(tmpBlob);
+	                }
+	            }
+	            rs.close();
+	            cs.close();
+	            return result;
+            } finally {
+    			conn.setAutoCommit(defaultAutoCommit);
+    		}	               	               	                	            
+        } else {
+            throw new Exception("Database connection is NULL!");
+        }
+    }
+    
+    
+    public int addToDB(Connection conn, XRoadProtocolHeader xTeePais) throws SQLException, IllegalArgumentException {
         if (conn != null) {
             Calendar cal = Calendar.getInstance();
             boolean defaultAutoCommit = conn.getAutoCommit();
@@ -352,7 +487,7 @@ public class Recipient {
             try {
                 m_id = getNextID(conn);
                 StringReader r = new StringReader(m_metaXML);
-                CallableStatement cs = conn.prepareCall("{call \"Add_Vastuvotja\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+                CallableStatement cs = conn.prepareCall("{call \"Add_Vastuvotja\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
                 cs.setInt(1, m_id);
                 cs.setInt(2, m_sendingID);
                 cs = CommonMethods.setNullableIntParam(cs, 3, m_organizationID);
@@ -392,6 +527,11 @@ public class Recipient {
                     cs.setString(25, "");
                     cs.setString(26, "");
                 }
+                cs.setString(27, m_dhxInternalConsignmentId);
+                cs.setString(28, m_dhxExternalConsignmentId);
+                cs.setString(29, m_dhxExternalReceiptId);
+
+                cs.setTimestamp(30, CommonMethods.sqlDateFromDate(m_lastSendDate), cal);
 
                 cs.execute();
                 cs.close();
@@ -424,7 +564,7 @@ public class Recipient {
 
             try {
                 StringReader r = new StringReader(m_metaXML);
-                CallableStatement cs = conn.prepareCall("{call \"Update_Vastuvotja\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");                
+                CallableStatement cs = conn.prepareCall("{call \"Update_Vastuvotja\"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");                
                 cs.setInt(2, m_sendingID);
                 cs = CommonMethods.setNullableIntParam(cs, 3, m_organizationID);
                 cs = CommonMethods.setNullableIntParam(cs, 4, m_positionID);
@@ -466,6 +606,11 @@ public class Recipient {
                     cs.setString(26, "");
                 }
 
+                cs.setString(27, m_dhxInternalConsignmentId);
+                cs.setString(28, m_dhxExternalConsignmentId);
+                cs.setString(29, m_dhxExternalReceiptId);
+                cs.setTimestamp(30, CommonMethods.sqlDateFromDate(m_lastSendDate), cal);
+                
                 cs.executeUpdate();
                 cs.close();
 
@@ -505,7 +650,8 @@ public class Recipient {
                                 + "staatus_id=?, saatmise_algus=?, saatmise_lopp=?, fault_code=?, "
                                 + "fault_actor=?, fault_string=?, fault_detail=?, vastuvotja_staatus_id=?, "
                                 + "metaxml=?, dok_id_teises_serveris=?, allyksuse_lyhinimetus=?, "
-                                + "ametikoha_lyhinimetus=? WHERE vastuvotja_id=?");
+                                + "ametikoha_lyhinimetus=?, dhx_internal_consignment_id=?,"
+                                + "dhx_external_consignment_id=?, dhx_external_receipt_id=?, last_send_date=? WHERE vastuvotja_id=?");
                 cs.setInt(1, m_sendingID);
                 cs = CommonMethods.setNullableIntParam(cs, 2, m_organizationID);
                 cs = CommonMethods.setNullableIntParam(cs, 3, m_positionID);
@@ -538,8 +684,13 @@ public class Recipient {
                 cs = CommonMethods.setNullableIntParam(cs, 21, m_idInRemoteServer);
                 cs.setString(22, m_divisionShortName);
                 cs.setString(23, m_positionShortName);
+                cs.setString(24, m_dhxInternalConsignmentId);
+                cs.setString(25, m_dhxExternalConsignmentId);
+                cs.setString(26, m_dhxExternalReceiptId);
 
-                cs.setInt(24, m_id);
+                cs.setTimestamp(27, CommonMethods.sqlDateFromDate(m_lastSendDate), cal);
+
+                cs.setInt(28, m_id);
 
                 cs.executeUpdate();
                 cs.close();

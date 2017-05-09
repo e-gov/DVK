@@ -63,8 +63,8 @@ public abstract class AbstractDvkServiceSoapClient {
         OMNamespace xsiNs = fac.createOMNamespace("http://www.w3.org/2001/XMLSchema-instance", "xsi");
         OMNamespace xteeNs = fac.createOMNamespace("http://x-tee.riik.ee/xsd/xtee.xsd", "xtee");
         OMNamespace xsdNs = fac.createOMNamespace("http://www.w3.org/2001/XMLSchema", "xsd");
-        //OMNamespace dhlNs = fac.createOMNamespace("http://0.0.0.0:9099/services/dhlHttpSoapPort", "xsd");
-        OMNamespace dhlNs = fac.createOMNamespace("http://0.0.0.0:8070/dvk/services/dhlHttpSoapPort", "xsd");
+        OMNamespace dhlNs = fac.createOMNamespace("http://localhost:8070/services/dhlHttpSoapPort", "xsd");
+        //OMNamespace dhlNs = fac.createOMNamespace("http://0.0.0.0:8070/dvk/services/dhlHttpSoapPort", "xsd");
 
         namespaces.put("xsiNs", xsiNs);
         namespaces.put("xteeNs", xteeNs);

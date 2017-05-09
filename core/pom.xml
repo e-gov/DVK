@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	
 	<artifactId>core</artifactId>
-	<version>1.7.3</version>
+	<version>1.7.4</version>
 	<packaging>jar</packaging>
 
 	<name>dvk-core</name>
@@ -13,7 +13,7 @@
 	<parent>
 		<groupId>dvk</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.8.1</version>
+		<version>1.9.0</version>
 	</parent>
 
 	<!-- Build -->
@@ -23,16 +23,17 @@
 	</build>
 	
 	<dependencies>
+				
 		<dependency>
 			<groupId>org.apache.ws.commons.axiom</groupId>
 			<artifactId>axiom-api</artifactId>
 			<version>1.2.7</version>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.apache.ws.commons.axiom</groupId>
 			<artifactId>axiom-dom</artifactId>
 			<version>1.2.7</version>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>org.apache.ws.commons.axiom</groupId>
 			<artifactId>axiom-impl</artifactId>

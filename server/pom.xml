@@ -1,25 +1,36 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
 	<modelVersion>4.0.0</modelVersion>
-	
 	<artifactId>server</artifactId>
-	<version>1.8.1</version>
+	<version>1.9.0</version>
 	<packaging>war</packaging>
-	
+
 	<name>dvk-server</name>
 
 	<parent>
 		<groupId>dvk</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.8.1</version>
+		<version>1.9.0</version>
 	</parent>
 
+	<pluginRepositories>		<pluginRepository>
+			<id>central</id>
+			<name>Maven Plugin Repository</name>
+			<url>http://repo1.maven.org/maven2</url>
+			<layout>default</layout>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+		</pluginRepository>
+	</pluginRepositories>
 	<properties>
 		<packageName>dhl</packageName>
-		<dvkServerJettyEnvLocation>src/test/resources/jetty-env.xml</dvkServerJettyEnvLocation>
-		<jettyWebXml>src/test/resources/web-test.xml</jettyWebXml>
+		<dvkServerJettyEnvLocation>src/test/resources/jetty-env-pg.xml</dvkServerJettyEnvLocation>
+		<jettyWebXml>src/test/resources/web-test-pg.xml</jettyWebXml>
 	</properties>
 
 	<build>
@@ -75,28 +86,29 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.mortbay.jetty</groupId>
-				<artifactId>maven-jetty-plugin</artifactId>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>9.3.9.v20160517</version>
 				<configuration>
-					<connectors>
-						<connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
-							<port>9099</port>
-							<maxIdleTime>60000</maxIdleTime>
-						</connector>
-					</connectors>
+					<httpConnector>
+						<port>8070</port>
+					</httpConnector>
+					<webApp>
+						<jettyEnvXml>${dvkServerJettyEnvLocation}</jettyEnvXml>
+						<descriptor>${jettyWebXml}</descriptor>
+						<allowDuplicateFragmentNames>true</allowDuplicateFragmentNames>
+						<contextPath>/</contextPath>
+					</webApp>
 					<stopKey>foo</stopKey>
 					<stopPort>9999</stopPort>
-					<jettyEnvXml>${dvkServerJettyEnvLocation}</jettyEnvXml>
-					<overrideWebXml>${jettyWebXml}</overrideWebXml>
 					<webAppSourceDirectory>target/dhl</webAppSourceDirectory>
-					<contextPath>/</contextPath>
 				</configuration>
 				<executions>
 					<execution>
 						<id>start-jetty</id>
 						<phase>pre-integration-test</phase>
 						<goals>
-							<goal>run</goal>
+							<goal>start</goal>
 						</goals>
 						<configuration>
 							<scanIntervalSeconds>0</scanIntervalSeconds>
@@ -118,27 +130,28 @@
 						<version>postgresql-9.0-801.jdbc4</version>
 					</dependency>
 					<dependency>
-			            <groupId>commons-dbcp</groupId>
-			            <artifactId>commons-dbcp</artifactId>
-			            <version>1.4</version>
-			        </dependency>
+						<groupId>commons-dbcp</groupId>
+						<artifactId>commons-dbcp</artifactId>
+						<version>1.4</version>
+					</dependency>
 				</dependencies>
 			</plugin>
 		</plugins>
+
 	</build>
 
 	<dependencies>
-	
+
 		<!-- Module dependencies -->
 		<dependency>
 			<groupId>dvk</groupId>
 			<artifactId>core</artifactId>
-			<version>1.7.3</version>
+			<version>1.7.4</version>
 		</dependency>
 		<dependency>
 			<groupId>dvk</groupId>
 			<artifactId>api</artifactId>
-			<version>1.0.14</version>
+			<version>1.0.15</version>
 			<exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -157,7 +170,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>java</groupId>
 			<artifactId>annogen</artifactId>
@@ -167,106 +180,224 @@
 			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2-adb</artifactId>
 			<version>1.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.ws.commons.axiom</groupId>
+					<artifactId>axiom-dom</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2-adb-codegen</artifactId>
 			<version>1.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.ws.commons.axiom</groupId>
+					<artifactId>axiom-dom</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2-ant-plugin</artifactId>
 			<version>1.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.ws.commons.axiom</groupId>
+					<artifactId>axiom-dom</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2-clustering</artifactId>
 			<version>1.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.ws.commons.axiom</groupId>
+					<artifactId>axiom-dom</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2-codegen</artifactId>
 			<version>1.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.ws.commons.axiom</groupId>
+					<artifactId>axiom-dom</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2-corba</artifactId>
 			<version>1.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.ws.commons.axiom</groupId>
+					<artifactId>axiom-dom</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2-fastinfoset</artifactId>
 			<version>1.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.ws.commons.axiom</groupId>
+					<artifactId>axiom-dom</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2-java2wsdl</artifactId>
 			<version>1.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.ws.commons.axiom</groupId>
+					<artifactId>axiom-dom</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2-jaxbri</artifactId>
 			<version>1.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.ws.commons.axiom</groupId>
+					<artifactId>axiom-dom</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
+
+
 		<dependency>
 			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2-jaxws</artifactId>
 			<version>1.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.axis2</groupId>
+					<artifactId>axis2-saaj</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.ws.commons.axiom</groupId>
+					<artifactId>axiom-dom</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>javax.servlet</groupId>
+					<artifactId>servlet-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2-jaxws-api</artifactId>
 			<version>1.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.axis2</groupId>
+					<artifactId>axis2-saaj</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.ws.commons.axiom</groupId>
+					<artifactId>axiom-dom</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
+
+
+
 		<dependency>
 			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2-jibx</artifactId>
 			<version>1.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.ws.commons.axiom</groupId>
+					<artifactId>axiom-dom</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2-json</artifactId>
 			<version>1.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.ws.commons.axiom</groupId>
+					<artifactId>axiom-dom</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2-jws-api</artifactId>
 			<version>1.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.ws.commons.axiom</groupId>
+					<artifactId>axiom-dom</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2-kernel</artifactId>
 			<version>1.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.ws.commons.axiom</groupId>
+					<artifactId>axiom-dom</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>javax.servlet</groupId>
+					<artifactId>servlet-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2-metadata</artifactId>
 			<version>1.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.axis2</groupId>
+					<artifactId>axis2-saaj</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.ws.commons.axiom</groupId>
+					<artifactId>axiom-dom</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2-mtompolicy</artifactId>
 			<version>1.4</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.axis2</groupId>
-			<artifactId>axis2-saaj</artifactId>
-			<version>1.4</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.axis2</groupId>
-			<artifactId>axis2-saaj-api</artifactId>
-			<version>1.4</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.axis2</groupId>
-			<artifactId>axis2-spring</artifactId>
-			<version>1.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.ws.commons.axiom</groupId>
+					<artifactId>axiom-dom</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2-xmlbeans</artifactId>
 			<version>1.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.ws.commons.axiom</groupId>
+					<artifactId>axiom-dom</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>backport</groupId>
@@ -310,18 +441,18 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>
-    		<artifactId>geronimo-annotation_1.0_spec</artifactId>
+			<artifactId>geronimo-annotation_1.0_spec</artifactId>
 			<version>1.1</version>
 		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.apache.geronimo.specs</groupId> -->
-<!-- 			<artifactId>geronimo-stax-api_1.0_spec</artifactId> -->
-<!-- 			<version>1.0.1</version> -->
-<!-- 		</dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.apache.geronimo.specs</groupId> -->
+		<!-- <artifactId>geronimo-stax-api_1.0_spec</artifactId> -->
+		<!-- <version>1.0.1</version> -->
+		<!-- </dependency> -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpcore</artifactId>
-			<version>4.0-beta1</version>
+			<version>4.4.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
@@ -389,26 +520,16 @@
 			<artifactId>jstl</artifactId>
 			<version>1.2</version>
 		</dependency>
-		 <!--
-        Commented out for further notice.
-        ERROR ModuleDeployer - The mex-1.4.jar module, which is not valid, caused java.lang.ArrayIndexOutOfBoundsException: -1
-        org.apache.axis2.deployment.DeploymentException: java.lang.ArrayIndexOutOfBoundsException: -1
+		<!-- Commented out for further notice. ERROR ModuleDeployer - The mex-1.4.jar 
+			module, which is not valid, caused java.lang.ArrayIndexOutOfBoundsException: 
+			-1 org.apache.axis2.deployment.DeploymentException: java.lang.ArrayIndexOutOfBoundsException: 
+			-1 <dependency> <groupId>java</groupId> <artifactId>mex</artifactId> <version>1.4</version> 
+			<scope>system</scope> <systemPath>${basedir}/lib/mex-1.4.jar</systemPath> 
+			</dependency> -->
 
-        <dependency>
-            <groupId>java</groupId>
-            <artifactId>mex</artifactId>
-            <version>1.4</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/lib/mex-1.4.jar</systemPath>
-        </dependency>
-        -->
-        
-		<!-- <dependency>
-			<groupId>org.apache.axis2</groupId>
-			<artifactId>mex</artifactId>
-			<version>1.4</version>
-		</dependency> -->
-        
+		<!-- <dependency> <groupId>org.apache.axis2</groupId> <artifactId>mex</artifactId> 
+			<version>1.4</version> </dependency> -->
+
 		<dependency>
 			<groupId>org.apache.neethi</groupId>
 			<artifactId>neethi</artifactId>
@@ -500,7 +621,13 @@
 			<artifactId>castor-core</artifactId>
 			<version>1.3.1</version>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.3.2</version>
+		</dependency>
+
 		<!-- Cryptography -->
 		<dependency>
 			<groupId>sunjce_provider</groupId>
@@ -522,6 +649,143 @@
 			<artifactId>iaikPkcs11Wrapper</artifactId>
 			<version>1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>ee.ria.dhx</groupId>
+			<artifactId>dhx-adapter-ws</artifactId>
+			<version>1.0.0</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>ee.ria.dhx</groupId>
+			<artifactId>dhx-adapter-core</artifactId>
+			<version>1.0.0</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.ibm.icu</groupId>
+			<artifactId>icu4j</artifactId>
+			<version>3.4.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-log4j2</artifactId>
+			<version>1.3.5.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<version>1.8.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.jcabi</groupId>
+			<artifactId>jcabi-aspects</artifactId>
+			<version>0.19</version>
+		</dependency>
+		<dependency>
+			<groupId>com.jcabi</groupId>
+			<artifactId>jcabi-log</artifactId>
+			<version>0.15</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+			<version>1.7.21</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jul-to-slf4j</artifactId>
+			<version>1.7.21</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+			<version>2.4.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.12</version>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.16.6</version>
+		</dependency>
+
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>2.9.1</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>1.1.0.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+			<version>4.2.7.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+			<version>4.2.7.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-log4j2</artifactId>
+			<version>1.3.5.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>4.2.7.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>4.3.3.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-expression</artifactId>
+			<version>4.2.7.RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-oxm</artifactId>
+			<version>4.2.7.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>4.2.7.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>4.2.7.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.ws</groupId>
+			<artifactId>spring-ws-core</artifactId>
+			<version>2.4.0.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.ws</groupId>
+			<artifactId>spring-xml</artifactId>
+			<version>2.4.0.RELEASE</version>
+		</dependency>
+
 	</dependencies>
-	
+
+
+
 </project>

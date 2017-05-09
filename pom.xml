@@ -1,13 +1,12 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>dvk</groupId>
 	<artifactId>parent</artifactId>
 	<packaging>pom</packaging>
-	<version>1.8.1</version>
+	<version>1.9.0</version>
 
 	<name>dvk-parent</name>
 
@@ -46,7 +45,7 @@
 		<serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_CI_serverIsMissing.properties</serverIsMissingConfigs>
 		<containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_CI_container_1_0.properties</containerVer1Configs>
 		<conversionTestConfig>./conf/integrationTests/dvk_client_postgreSQL_CI_conversion.properties</conversionTestConfig>
-	</properties>
+</properties>
 
 	<build>
 		<pluginManagement>
@@ -81,6 +80,18 @@
 					<artifactId>maven-jetty-plugin</artifactId>
 					<version>6.1.26</version>
 				</plugin>
+				<plugin>
+					<groupId>org.apache.tomcat.maven</groupId>
+					<artifactId>tomcat7-maven-plugin</artifactId>
+					<version>2.2</version>
+					<configuration>
+						<server>devbpw</server>
+						<url>${tomcat.manager}</url>
+						<username>${tomcat.manager.username}</username>
+						<password>${tomcat.manager.password}</password>
+						<path>/dhl</path>
+					</configuration>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
@@ -88,7 +99,7 @@
 	<profiles>
 		<profile>
 			<id>ci-trunk</id>
-			
+
 			<repositories>
 				<repository>
 					<id>ria</id>
@@ -96,7 +107,7 @@
 					<url>https://artifactory.tt.kit/artifactory/DVK-libs-release-local</url>
 				</repository>
 			</repositories>
-			
+
 			<properties>
 				<ignoreIntegrationTests>false</ignoreIntegrationTests>
 				<listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI.properties</listOfTestConfigs>
@@ -108,11 +119,95 @@
 			</properties>
 		</profile>
 		<profile>
-			<!-- <activation> -->
-			<!-- <activeByDefault>true</activeByDefault> -->
-			<!-- </activation> -->
+			<id>jenkins-tomcat1</id>
+			<activation>
+				<property>
+					<name>env</name>
+					<value>jenkins-tomcat1</value>
+				</property>
+			</activation>
+			<properties>
+				<ignoreIntegrationTests>true</ignoreIntegrationTests>
+				<listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI.properties</listOfTestConfigs>
+				<serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_CI_serverIsMissing.properties</serverIsMissingConfigs>
+				<containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_CI_container_1_0.properties</containerVer1Configs>
+				<conversionTestConfig>./conf/integrationTests/dvk_client_postgreSQL_CI_conversion.properties</conversionTestConfig>
+				<containerVer2_1FragmentingConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI_fragmenting.properties</containerVer2_1FragmentingConfigs>
+				<containerVer1FragmentingConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI_container_1_0_fragmenting.properties</containerVer1FragmentingConfigs>
+				<tomcat.manager>http://10.0.13.229:8080/manager/text</tomcat.manager>
+				<tomcat.manager.username>jenkins_tom</tomcat.manager.username>
+				<tomcat.manager.password>yg8907123+c2n3umiLYN</tomcat.manager.password>
+			</properties>
+			<repositories>
+				<repository>
+					<id>ria</id>
+					<name>DVK releases</name>
+					<url>http://artifactory.tt.kit:8081/artifactory/DVK-libs-release-local</url>
+				</repository>
+			</repositories>
+			<pluginRepositories>
+				<pluginRepository>
+					<id>ria</id>
+					<name>DVK releases</name>
+					<url>http://artifactory.tt.kit:8081/artifactory/DVK-libs-release-local</url>
+				</pluginRepository>
+			</pluginRepositories>
+		</profile>
+		<profile>
+			<id>jenkins-tomcat2</id>
+			<activation>
+				<property>
+					<name>env</name>
+					<value>jenkins-tomcat2</value>
+				</property>
+			</activation>
+			<properties>
+				<ignoreIntegrationTests>true</ignoreIntegrationTests>
+				<listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI.properties</listOfTestConfigs>
+				<serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_CI_serverIsMissing.properties</serverIsMissingConfigs>
+				<containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_CI_container_1_0.properties</containerVer1Configs>
+				<conversionTestConfig>./conf/integrationTests/dvk_client_postgreSQL_CI_conversion.properties</conversionTestConfig>
+				<containerVer2_1FragmentingConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI_fragmenting.properties</containerVer2_1FragmentingConfigs>
+				<containerVer1FragmentingConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI_container_1_0_fragmenting.properties</containerVer1FragmentingConfigs>
+				<tomcat.manager>http://10.0.13.231:8080/manager/text</tomcat.manager>
+				<tomcat.manager.username>jenkins_tom</tomcat.manager.username>
+				<tomcat.manager.password>yg8907123+c2n3umiLYN</tomcat.manager.password>
+			</properties>
+			<repositories>
+				<repository>
+					<id>ria</id>
+					<name>DVK releases</name>
+					<url>http://artifactory.tt.kit:8081/artifactory/DVK-libs-release-local</url>
+				</repository>
+			</repositories>
+			<pluginRepositories>
+				<pluginRepository>
+					<id>ria</id>
+					<name>DVK releases</name>
+					<url>http://artifactory.tt.kit:8081/artifactory/DVK-libs-release-local</url>
+				</pluginRepository>
+			</pluginRepositories>
+		</profile>
+		<profile>
+			<id>arendus-tomcat</id>
+			<activation>
+				<property>
+					<name>env</name>
+					<value>arendus-tomcat</value>
+				</property>
+			</activation>
+			<properties>
+				<tomcat.manager>http://localhost:8085/manager/text</tomcat.manager>
+				<tomcat.manager.username>admin</tomcat.manager.username>
+				<tomcat.manager.password>admin</tomcat.manager.password>
+			</properties>
+		</profile>
+		<profile>
+			 <activation> 
+			 <activeByDefault>true</activeByDefault> 
+			 </activation> 
 			<id>latestRelease</id>
-			
+
 			<repositories>
 				<repository>
 					<id>ria</id>
@@ -120,9 +215,9 @@
 					<url>https://artifactory.tt.kit/artifactory/DVK-libs-release-local</url>
 				</repository>
 			</repositories>
-			
+
 			<properties>
-				<ignoreIntegrationTests>true</ignoreIntegrationTests>
+				<ignoreIntegrationTests>false</ignoreIntegrationTests>
 				<listOfTestConfigs>./conf/integrationTests/dvk_client_postgreSQL_CI.properties</listOfTestConfigs>
 				<serverIsMissingConfigs>./conf/integrationTests/dvk_client_postgreSQL-V9_3_CI_serverIsMissing.properties</serverIsMissingConfigs>
 				<containerVer1Configs>./conf/integrationTests/dvk_client_postgreSQL_CI_container_1_0.properties</containerVer1Configs>
@@ -151,7 +246,7 @@
 			<dependency>
 				<groupId>xerces</groupId>
 				<artifactId>xercesImpl</artifactId>
-				<version>2.11.0</version>
+				<version>2.9.1</version>
 			</dependency>
 			<dependency>
 				<groupId>com.oracle</groupId>
@@ -186,7 +281,7 @@
 			<dependency>
 				<groupId>axis</groupId>
 				<artifactId>axis</artifactId>
-				<version>1.0</version>
+				<version>1.4</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.mail</groupId>
@@ -347,10 +442,8 @@
 			<groupId>java</groupId>
 			<artifactId>serializer</artifactId>
 		</dependency>
-		<!-- <dependency>
-			<groupId>org.codehaus.woodstox</groupId>
-			<artifactId>stax2-api</artifactId>
-		</dependency> -->
+		<!-- <dependency> <groupId>org.codehaus.woodstox</groupId> <artifactId>stax2-api</artifactId> 
+			</dependency> -->
 		<dependency>
 			<groupId>org.codehaus.woodstox</groupId>
 			<artifactId>wstx-lgpl</artifactId>

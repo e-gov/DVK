@@ -1381,7 +1381,7 @@ import java.nio.file.*
        <ns4:protocolVersion xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">4.0</ns4:protocolVersion>
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-      <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+      <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" 
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
@@ -1488,7 +1488,7 @@ import java.nio.file.*
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" 
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
@@ -1596,7 +1596,7 @@ import java.nio.file.*
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" 
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
@@ -1702,7 +1702,7 @@ import java.nio.file.*
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" 
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
@@ -1809,7 +1809,7 @@ import java.nio.file.*
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" 
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
@@ -1915,7 +1915,7 @@ import java.nio.file.*
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" 
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
@@ -2021,7 +2021,7 @@ import java.nio.file.*
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" 
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
@@ -2058,7 +2058,7 @@ import java.nio.file.*
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" 
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
@@ -2164,7 +2164,7 @@ import java.nio.file.*
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" 
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
@@ -2277,7 +2277,7 @@ import java.nio.file.*
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+    <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" 
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
@@ -2382,7 +2382,7 @@ ByteArrayOutputStream bos = null;
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" 
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
@@ -2480,7 +2480,7 @@ import java.nio.file.*
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" 
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
@@ -2566,7 +2566,7 @@ import java.nio.file.*
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" 
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
@@ -2669,7 +2669,7 @@ ByteArrayOutputStream bos = null;
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" 
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
@@ -2772,7 +2772,7 @@ ByteArrayOutputStream bos = null;
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" 
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
@@ -2808,7 +2808,7 @@ ByteArrayOutputStream bos = null;
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-          <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+          <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" 
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
@@ -2855,7 +2855,7 @@ assert xml.contains('DecId>'+ dhlId  +'&lt;/');
        <ns4:protocolVersion xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">4.0</ns4:protocolVersion>
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"  ns3:objectType="SUBSYSTEM" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
       <ns3:memberClass>${#Project#dhs3MemberClass}</ns3:memberClass>
       <ns3:memberCode>${#Project#dhs3MemberCode}</ns3:memberCode>
@@ -2889,7 +2889,7 @@ assert xml.contains('DecId>'+ dhlId  +'&lt;/');
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" 
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
@@ -2937,7 +2937,7 @@ assert xml.contains('DecId>'+ dhlId  +'&lt;/');
        <ns4:protocolVersion xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">4.0</ns4:protocolVersion>
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"  ns3:objectType="SUBSYSTEM" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
       <ns3:memberClass>${#Project#dhs3MemberClass}</ns3:memberClass>
       <ns3:memberCode>${#Project#dhs3MemberCode}</ns3:memberCode>
@@ -2971,7 +2971,7 @@ assert xml.contains('DecId>'+ dhlId  +'&lt;/');
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" 
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
@@ -3004,7 +3004,7 @@ def recipientMemberCode2 = testRunner.testCase.testSuite.project.getPropertyValu
 def resp = request.response;
 def respdata = resp.getContentAsString();
 assert respdata.contains('&lt;regnr>' + recipientMemberCode  + '&lt;/regnr>');
-assert respdata.contains('&lt;regnr>' + recipientMemberCode2  + '&lt;/regnr>');</script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="a08236aa-fa91-4838-ace2-0598d464e42a" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="2.11 DHX-i saadetud dokumendi staatuse pärimine(saatmine õnnestus)" searchProperties="true"><con:settings/><con:testStep type="calltestcase" name="Send to DHX" id="8656049a-3f37-4534-9a8a-3f8de3f83c24"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>63be369f-26a7-469c-b4ab-ec825294cac7</con:targetTestCase><con:properties><con:property><con:name>dhl_id</con:name><con:value>33391</con:value></con:property></con:properties><con:returnProperties><con:entry>dhl_id</con:entry></con:returnProperties><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="transfer" name="Dhl id" id="28309046-3171-4f82-a0b1-9adc03035e74"><con:settings/><con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" entitize="false" transferChildNodes="false"><con:name>Dhl id</con:name><con:sourceType>dhl_id</con:sourceType><con:sourceStep>Send to DHX</con:sourceStep><con:targetType>dhl_id</con:targetType><con:targetStep>#TestCase#</con:targetStep><con:upgraded>true</con:upgraded></con:transfers></con:config></con:testStep><con:testStep type="groovy" name="Wait and attach" id="4acc742f-3613-49d5-a323-dcff4d63bbab"><con:settings/><con:config><script><![CDATA[import groovy.xml.MarkupBuilder
+assert respdata.contains('&lt;regnr>' + recipientMemberCode2  + '&lt;/regnr>');</script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="a08236aa-fa91-4838-ace2-0598d464e42a" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="2.11 DHX-i saadetud dokumendi staatuse pärimine(saatmine õnnestus)" searchProperties="true"><con:settings/><con:testStep type="calltestcase" name="Send to DHX" id="8656049a-3f37-4534-9a8a-3f8de3f83c24"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>63be369f-26a7-469c-b4ab-ec825294cac7</con:targetTestCase><con:properties><con:property><con:name>dhl_id</con:name><con:value>33385</con:value></con:property></con:properties><con:returnProperties><con:entry>dhl_id</con:entry></con:returnProperties><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="transfer" name="Dhl id" id="28309046-3171-4f82-a0b1-9adc03035e74"><con:settings/><con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" entitize="false" transferChildNodes="false"><con:name>Dhl id</con:name><con:sourceType>dhl_id</con:sourceType><con:sourceStep>Send to DHX</con:sourceStep><con:targetType>dhl_id</con:targetType><con:targetStep>#TestCase#</con:targetStep><con:upgraded>true</con:upgraded></con:transfers></con:config></con:testStep><con:testStep type="groovy" name="Wait and attach" id="4acc742f-3613-49d5-a323-dcff4d63bbab"><con:settings/><con:config><script><![CDATA[import groovy.xml.MarkupBuilder
 import org.custommonkey.xmlunit.*
 import java.util.Random  
 import java.security.MessageDigest
@@ -3070,7 +3070,7 @@ ByteArrayOutputStream bos = null;
        <ns4:protocolVersion xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">4.0</ns4:protocolVersion>
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM"  xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
       <ns3:memberClass>${#Project#dhs3MemberClass}</ns3:memberClass>
       <ns3:memberCode>${#Project#dhs3MemberCode}</ns3:memberCode>
@@ -3168,7 +3168,7 @@ ByteArrayOutputStream bos = null;
        <ns4:protocolVersion xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">4.0</ns4:protocolVersion>
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"  ns3:objectType="SUBSYSTEM" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
       <ns3:memberClass>${#Project#dhs3MemberClass}</ns3:memberClass>
       <ns3:memberCode>${#Project#dhs3MemberCode}</ns3:memberCode>
@@ -3275,7 +3275,7 @@ ByteArrayOutputStream bos = null;
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" 
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
@@ -3387,7 +3387,7 @@ ByteArrayOutputStream bos = null;
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" 
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
@@ -3423,7 +3423,7 @@ ByteArrayOutputStream bos = null;
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" 
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
@@ -3469,7 +3469,7 @@ assert xml.contains('dhl_id>'+ dhlId + '&lt;');
        <ns4:protocolVersion xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">4.0</ns4:protocolVersion>
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"  ns3:objectType="SUBSYSTEM" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
       <ns3:memberClass>${#Project#dhs4MemberClass}</ns3:memberClass>
       <ns3:memberCode>${#Project#dhs4MemberCode}</ns3:memberCode>
@@ -3503,7 +3503,7 @@ assert xml.contains('dhl_id>'+ dhlId + '&lt;');
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" 
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
@@ -3551,7 +3551,7 @@ assert xml.contains('DecId>'+ dhlId  +'&lt;/');
        <ns4:protocolVersion xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">4.0</ns4:protocolVersion>
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"  ns3:objectType="SUBSYSTEM" xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>
       <ns3:memberClass>${#Project#dhs3MemberClass}</ns3:memberClass>
       <ns3:memberCode>${#Project#dhs3MemberCode}</ns3:memberCode>
@@ -3652,7 +3652,7 @@ ByteArrayOutputStream bos = null;
     <ns4:id xmlns:ns2="http://dhx.x-road.eu/producer" xmlns:ns3="http://x-road.eu/xsd/identifiers"
       xmlns:ns4="http://x-road.eu/xsd/xroad.xsd" xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">64a3ddbd-1620-42c4-b2fe-60b854c2f32f
     </ns4:id>
-         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer"
+         <ns4:client xmlns:ns2="http://dhx.x-road.eu/producer" ns3:objectType="SUBSYSTEM" 
       xmlns:ns3="http://x-road.eu/xsd/identifiers" xmlns:ns4="http://x-road.eu/xsd/xroad.xsd"
       xmlns:ns5="http://www.riik.ee/schemas/deccontainer/vers_2_1/">
       <ns3:xRoadInstance>${#Project#xroadInstance}</ns3:xRoadInstance>

@@ -652,7 +652,7 @@
 		<dependency>
 			<groupId>ee.ria.dhx</groupId>
 			<artifactId>dhx-adapter-ws</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.1</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>

@@ -68,7 +68,7 @@ import dvk.core.Fault;
 import dvk.core.FileSplitResult;
 import dvk.core.Settings;
 import dvk.core.xroad.XRoadClient;
-import dvk.core.xroad.XRoadProtocolHeader;
+import dvk.core.xroad.XRoadHeader;
 
 /**
  * Class is an example implementation of DhxImplementationSpecificService interface. All data that
@@ -200,7 +200,7 @@ public class DvkDhxService implements DhxImplementationSpecificService {
       XRoadClient client = new XRoadClient(document.getClient()
           .getXroadInstance(), document.getClient().getMemberClass(),
           senderDvkRegCode);
-      XRoadProtocolHeader xroadHeader = new XRoadProtocolHeader(client,
+      XRoadHeader xroadHeader = new XRoadHeader(client,
           null, null, null, null);
       UserProfile user = UserProfile.getFromHeaders(xroadHeader, conn);
       int senderTargetFolder = Folder.GLOBAL_ROOT_FOLDER;

@@ -478,7 +478,7 @@ public class Recipient {
     }
     
     
-    public int addToDB(Connection conn, XRoadProtocolHeader xTeePais) throws SQLException, IllegalArgumentException {
+    public int addToDB(Connection conn, XRoadHeader xTeePais) throws SQLException, IllegalArgumentException {
         if (conn != null) {
             Calendar cal = Calendar.getInstance();
             boolean defaultAutoCommit = conn.getAutoCommit();

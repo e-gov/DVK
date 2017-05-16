@@ -106,12 +106,13 @@
 			<groupId>dvk</groupId>
 			<artifactId>core</artifactId>
 			<version>1.7.4</version>
-			<exclusions>
-				<exclusion>
-					<groupId>*</groupId>
-					<artifactId>*</artifactId>
-				</exclusion>
-			</exclusions>
+<!-- 			SOAPEnvelope from core from axiom is needed -->
+<!-- 			<exclusions> -->
+<!-- 				<exclusion> -->
+<!-- 					<groupId>*</groupId> -->
+<!-- 					<artifactId>*</artifactId> -->
+<!-- 				</exclusion> -->
+<!-- 			</exclusions> -->
 		</dependency>
 		
 		<dependency>

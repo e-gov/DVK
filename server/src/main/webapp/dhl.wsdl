@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<definitions xmlns:tns="http://producers.dhl.xtee.riik.ee/producer/dhl"
+<definitions xmlns:tns="http://producers.dhl.xrd.riik.ee/producer/dhl"
 		xmlns:xtee="http://x-tee.riik.ee/xsd/xtee.xsd"
 		xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
 		xmlns="http://schemas.xmlsoap.org/wsdl/"
@@ -14,11 +14,11 @@
 		xmlns:ns6="http://www.riik.ee/schemas/dhl-meta-manual"
 		xmlns:ns7="http://www.riik.ee/schemas/dhl-meta-automatic"
 		name="dhlDefinitions"
-		targetNamespace="http://producers.dhl.xtee.riik.ee/producer/dhl">
+		targetNamespace="http://producers.dhl.xrd.riik.ee/producer/dhl">
 	<types>
-		<schema targetNamespace="http://producers.dhl.xtee.riik.ee/producer/dhl"
+		<schema targetNamespace="http://producers.dhl.xrd.riik.ee/producer/dhl"
 				xmlns="http://www.w3.org/2001/XMLSchema"
-				xmlns:tns="http://producers.dhl.xtee.riik.ee/producer/dhl"
+				xmlns:tns="http://producers.dhl.xrd.riik.ee/producer/dhl"
 				xmlns:dhlma="http://www.riik.ee/schemas/dhl-meta-automatic"
 				xmlns:dhl="http://www.riik.ee/schemas/dhl"
 				xmlns:dd="http://www.sk.ee/DigiDoc/v1.3.0#">

@@ -211,11 +211,13 @@ public class SendDocuments {
 
                                     throw new AxisFault(CommonStructures.VIGA_SAATJA_ASUTUSED_ERINEVAD);
                                 }
+                                validateRecipientsOldCapsule(tmpSending.getRecipients(), conn);
                                 if (validationFault != null) {
                                     for (int k = 0; k < tmpSending.getRecipients().size(); ++k) {
                                         tmpSending.getRecipients().get(k).setFault(validationFault);
                                     }
                                 }
+                                
                             }
                         }
 
@@ -566,6 +568,7 @@ public class SendDocuments {
                                             (tmpSending.getProxy() != null) && (tmpSending.getProxy().getOrganizationID() != user.getOrganizationID())) {
                                         throw new ContainerValidationException(CommonStructures.VIGA_SAATJA_ASUTUSED_ERINEVAD);
                                     }
+                                    validateRecipientsOldCapsule(tmpSending.getRecipients(), conn);
                                     if (validationFault != null) {
                                         for (int k = 0; k < tmpSending.getRecipients().size(); ++k) {
                                             tmpSending.getRecipients().get(k).setFault(validationFault);
@@ -942,6 +945,7 @@ public class SendDocuments {
                                             (tmpSending.getProxy() != null) && (tmpSending.getProxy().getOrganizationID() != user.getOrganizationID())) {
                                         throw new ContainerValidationException(CommonStructures.VIGA_SAATJA_ASUTUSED_ERINEVAD);
                                     }
+                                    validateRecipientsOldCapsule(tmpSending.getRecipients(), conn);
                                     if (validationFault != null) {
                                         for (int k = 0; k < tmpSending.getRecipients().size(); ++k) {
                                             tmpSending.getRecipients().get(k).setFault(validationFault);
@@ -1071,7 +1075,7 @@ public class SendDocuments {
         return result;
     }
 
-    private static void fillRecipientDataFor2_1ContainerIfNecessary(FileSplitResult docFiles, int i, Document doc) throws Exception {
+    public static void fillRecipientDataFor2_1ContainerIfNecessary(FileSplitResult docFiles, int i, Document doc) throws Exception {
         try {
             ContainerVer2_1 containerVer2_1 = ContainerVer2_1.parseFile(docFiles.subFiles.get(i));
             if (containerVer2_1 != null && containerVer2_1.getTransport() != null) {
@@ -1239,8 +1243,20 @@ public class SendDocuments {
         }
         return sendingList;
     }
+    
+    private static void validateRecipientsOldCapsule (List<Recipient> recipients, Connection conn) throws Exception{
+    	if(recipients != null) {
+    		for(Recipient recipient : recipients) {
+    			Asutus asutus = new Asutus(recipient.getOrganizationID(), conn);
+    			if(asutus.getDhxAsutus()) {
+    				 throw new Exception("Leitud DHX adressaat. DHX adressaadid ei toeta kapsli versiooni 1.0. "
+    				 		+ "Leitud adressaat:" + asutus.getRegistrikood());
+    			}
+    		}
+    	}
+    }
 
-    private static void validateXmlFiles(ArrayList<DocumentFile> docFiles) throws AxisFault, Exception {
+    public static void validateXmlFiles(ArrayList<DocumentFile> docFiles) throws AxisFault, Exception {
         logger.debug("validateXmlFiles started");
         if (Settings.Server_ValidateXmlFiles && (docFiles != null)) {
             logger.info("Starting XML validation of total " + String.valueOf(docFiles.size()) + " files.");
@@ -1285,7 +1301,7 @@ public class SendDocuments {
         }
     }
 
-    private static void validateSignedFileSignatures(ArrayList<DocumentFile> docFiles) throws ComponentException, IncorrectSignatureException {
+    public static void validateSignedFileSignatures(ArrayList<DocumentFile> docFiles) throws ComponentException, IncorrectSignatureException {
         if (Settings.Server_ValidateSignatures && (docFiles != null)) {
             logger.info("Starting signature validation of total " + String.valueOf(docFiles.size()) + " files.");
             ArrayList<String> allErrors = new ArrayList<String>();

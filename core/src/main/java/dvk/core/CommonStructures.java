@@ -72,7 +72,7 @@ public class CommonStructures {
     public static final String NS_SOAPENC_DECLARATION = "xmlns:" + NS_SOAPENC_PREFIX + "=\"" + NS_SOAPENC_URI + "\"";
     
     public static final String NS_DHL_PREFIX = "dhl";
-    public static final String NS_DHL_URI = "http://producers.dhl.xtee.riik.ee/producer/dhl";
+    public static final String NS_DHL_URI = "http://producers.dhl.xrd.riik.ee/producer/dhl";
     public static final String NS_DHL_DECLARATION = "xmlns:" + NS_DHL_PREFIX + "=\"" + NS_DHL_URI + "\"";
     
     public static final String NS_ADIT_PREFIX = "adit";
@@ -87,7 +87,7 @@ public class CommonStructures {
     public static final String SENDING_DHL_DIRECT = "dhl_otse";
 
     // Veakoodid
-    public static final String FAULT_ACTOR = "http://producers.dhl.xtee.riik.ee/producer/dhl";
+    public static final String FAULT_ACTOR = "http://producers.dhl.xrd.riik.ee/producer/dhl";
     public static final String FAULT_EXPIRED_CODE = "DVK-ERR-001";
     public static final String FAULT_INVALID_CONTAINER_CODE = "DVK-ERR-002";
 

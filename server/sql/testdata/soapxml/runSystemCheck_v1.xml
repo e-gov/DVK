@@ -2,7 +2,7 @@
 <env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:dhl="http://producers.dhl.xtee.riik.ee/producer/dhl"
+  xmlns:dhl="http://producers.dhl.xrd.riik.ee/producer/dhl"
   xmlns:xtee="http://x-tee.riik.ee/xsd/xtee.xsd">  
 	<env:Header>
 		<xtee:asutus>70006317</xtee:asutus>

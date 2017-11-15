@@ -56,7 +56,7 @@ public class TestClient {
                 call = (Call) service.createCall();
                 call.setTargetEndpointAddress(new URL(Settings.Client_ServiceUrl));
                 call.setUseSOAPAction(true);
-                call.setSOAPActionURI("http://producers.dhl.xtee.riik.ee/producer/dhl");
+                call.setSOAPActionURI("http://producers.dhl.xrd.riik.ee/producer/dhl");
                 call.setTimeout(60 * 60 * 1000);
             } catch (Exception ex) {
                 CommonMethods.logError(ex, "clnt.DhlTestClient", "main");

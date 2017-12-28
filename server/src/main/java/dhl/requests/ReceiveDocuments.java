@@ -193,7 +193,7 @@ public class ReceiveDocuments {
         return result;
     }
 
-    private static Conversion convertContainer(Connection conn, dhl.Document document, Integer fromVersion, Integer toVersion) throws Exception {
+    public static Conversion convertContainer(Connection conn, dhl.Document document, Integer fromVersion, Integer toVersion) throws Exception {
         // Convert to DVK container version 1
         Conversion conversion = new Conversion();
         conversion.setInputFile(document.getFilePath());
@@ -216,7 +216,7 @@ public class ReceiveDocuments {
      * @param documentContainerVersion if null it represents ContainerVersion.VERSION_1_0, if present then {@link ContainerVersion}
      * @return true if the conversion is needed othewise false.
      */
-    protected static boolean isContainerConversionNeeded(String recipientSupportedContainerVersion, String documentContainerVersion) {
+    public static boolean isContainerConversionNeeded(String recipientSupportedContainerVersion, String documentContainerVersion) {
         boolean result = false;
         if (documentContainerVersion != null
                 && documentContainerVersion.equals(ContainerVersion.VERSION_2_1.toString())
@@ -885,7 +885,7 @@ public class ReceiveDocuments {
      * @param documentContainerVersion new container version
      * @throws Exception
      */
-    private static void appendAutomaticMetaData(
+    public static void appendAutomaticMetaData(
             String filePath,
             Sending sendingData,
             Recipient recipientData,
@@ -927,11 +927,9 @@ public class ReceiveDocuments {
                     "Failed to process XML contents of document "
                             + documentData.getId() + "! Document XML is empty or invalid.");
         }
-
         Element decMetadata = null;
 
-        NodeList foundNodes = currentXmlContent.getDocumentElement().getElementsByTagName("DecMetadata");
-
+        NodeList foundNodes = currentXmlContent.getDocumentElement().getElementsByTagNameNS("*", "DecMetadata");
         if (foundNodes != null && foundNodes.getLength() > 0) {
             decMetadata = (Element) foundNodes.item(0);
         } else {
@@ -962,7 +960,9 @@ public class ReceiveDocuments {
                     CommonMethods.getDateISO8601(sendingData.getStartDate()),
                     firstMetadataNode);
         }
-
+        if( currentXmlContent.getDocumentElement().getPrefix() != null) {
+          CommonMethods.removeNamespaceRecursive(currentXmlContent.getDocumentElement());
+        }
         // Salvestame muudetud XML andmed faili
         CommonMethods.xmlElementToFile(currentXmlContent.getDocumentElement(), filePath);
     }
@@ -976,7 +976,7 @@ public class ReceiveDocuments {
 
     private static Element appendTextElement(Document xmlDoc, Element parentNode, String tagName, String tagValue, Node refNode) {
         Element e = null;
-        NodeList foundNodes = parentNode.getElementsByTagName(tagName);
+        NodeList foundNodes = parentNode.getElementsByTagNameNS("*", tagName);
         if (foundNodes.getLength() == 0) {
             e = xmlDoc.createElement(tagName);
             if (refNode != null) {

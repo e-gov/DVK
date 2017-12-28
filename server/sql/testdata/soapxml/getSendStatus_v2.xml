@@ -1,4 +1,4 @@
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:ns4="http://x-tee.riik.ee/xsd/xtee.xsd" xmlns:ns5="http://producers.dhl.xtee.riik.ee/producer/dhl" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:ns4="http://x-tee.riik.ee/xsd/xtee.xsd" xmlns:ns5="http://producers.dhl.xrd.riik.ee/producer/dhl" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
 	<SOAP-ENV:Header>
 		<ns4:asutus xsi:type="xsd:string">adit</ns4:asutus>
 		<ns4:andmekogu xsi:type="xsd:string">dhl</ns4:andmekogu>

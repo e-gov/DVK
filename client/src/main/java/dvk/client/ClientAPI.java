@@ -221,6 +221,14 @@ public class ClientAPI {
 
                 // Koostame sänumi sisu
                 ArrayList<Integer> processedIDs = new ArrayList<Integer>();
+                
+                if(requestVersion > 1) {
+                	writer.write("<items>");
+                }
+                else {
+                	writer.write("<dhl_ids>");
+                }
+                
                 for (int i = 0; i < messages.size(); ++i) {
                 	DhlMessage dhlMessage = messages.get(i);
                 	if(requestVersion > 1) {
@@ -238,6 +246,14 @@ public class ClientAPI {
                         }
                 	}                   
                 }
+                
+                if(requestVersion > 1) {
+                	writer.write("</items>");
+                }
+                else {
+                	writer.write("</dhl_ids>");
+                }
+                
                 processedIDs = null;
 
                 // Väljundstreamid kinni

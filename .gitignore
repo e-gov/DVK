@@ -3,3 +3,6 @@
 /.project
 /.settings
 *.log
+api/target
+client/target
+core/target

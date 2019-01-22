@@ -1016,7 +1016,7 @@ create procedure Update_DhlMessageRecipDhlID(
     dhl_direct_producer_name in varchar2,
     dhl_direct_service_url in varchar2,
     dhl_id in number,
-    query_id in varchar2
+    query_id in varchar2)
 as
 begin
     -- salvestab vastuvõtja andmetesse vastuvõtja DVK serveri poolt antud sõnumi ID väärtuse
